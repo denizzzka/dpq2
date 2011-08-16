@@ -19,7 +19,7 @@ class answer {
 
 	struct cell {
 		package {
-			immutable(byte)* val;
+			immutable (byte)* val;
 			int size; // currently used only for bin
 			debug valueFormat format;
 		}
@@ -75,27 +75,27 @@ class answer {
 		return n;
 	}
 
-    cell* get_value( ref cell_coords c ) {
+    cell* get_value( ref immutable cell_coords c ) {
 		assert_coords(c);
 		
 		cell* r = new cell;
-		r.val = cast(immutable(byte)*) PQgetvalue(res, c.row, c.col);
+		r.val = PQgetvalue(res, c.row, c.col);
 		r.size = get_value_size( c );
 		debug r.format = column_format( c.col );
 		return r;
     }
 
-	int get_value_size( ref cell_coords c ) {
+	int get_value_size( ref immutable cell_coords c ) {
 		assert_coords(c);
 		return PQgetlength(res, c.row, c.col);
 	}
     
-    bool isNULL( ref cell_coords c ) {
+    bool isNULL( ref immutable cell_coords c ) {
 		assert_coords(c);
 		return PQgetisnull(res, c.row, c.col) != 0;
     }
 
-	private void assert_coords( ref cell_coords c ) {
+	private void assert_coords( ref immutable cell_coords c ) {
 		assert( c.row < rows_num, to!string(c.row)~" row is out of range 0.."~to!string(rows_num-1)~" of result rows" );
 		assert( c.col < cols_num, to!string(c.col)~" col is out of range 0.."~to!string(rows_num-1)~" of result cols" );
 	}
