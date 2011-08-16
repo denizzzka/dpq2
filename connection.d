@@ -168,4 +168,8 @@ unittest {
 
 		r = conn.exec_params( p );		
 		assert( r.get_value( c2 ).str == "abc" );
+
+		string sql_query3 = "listen test_notify; notify test_notify";
+		r = conn.exec( sql_query3 );
+		assert( conn.get_next_notify.name == "test_notify" );
 }
