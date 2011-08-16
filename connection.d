@@ -93,7 +93,7 @@ class conn_piece {
 					lengths[i] = to!int( p.args[i].value_bin.length );
 			}
 		}
-writeln("params num: ", to!int( p.args.length ));
+
 		return new answer(
 			PQexecParams (
 				conn,
