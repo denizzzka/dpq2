@@ -10,17 +10,6 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
-
-/**
- * Bugs: On Unix connection is not thread safe.
- * 
- * On Unix, forking a process with open libpq connections can lead
- * to unpredictable results because the parent and child processes share
- * the same sockets and operating system resources. For this reason,
- * such usage is not recommended, though doing an exec from the child
- * process to load a new executable is safe.
- */
-
 enum conn_variant { SYNC, ASYNC };
 
 struct conn_args {	
@@ -43,6 +32,16 @@ struct query_arg {
 	};
 }
 
+
+/**
+ * Bugs: On Unix connection is not thread safe.
+ * 
+ * On Unix, forking a process with open libpq connections can lead
+ * to unpredictable results because the parent and child processes share
+ * the same sockets and operating system resources. For this reason,
+ * such usage is not recommended, though doing an exec from the child
+ * process to load a new executable is safe.
+ */
 class conn_piece {
 	package PGconn* conn;
 	private bool conn_created_flag;
@@ -109,7 +108,7 @@ class conn_piece {
 		);
 	}
 	
-	/// returns null if not notifies was received
+	/// returns null if no notifies was received
 	notify get_next_notify() {
 		consume_input();
 		auto n = PQnotifies(conn);
