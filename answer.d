@@ -119,7 +119,7 @@ class answer {
 }
 
 class notify {
-	package PGnotify* n;
+	private PGnotify* n;
 
 	this(){}
 	this( PGnotify* n ) { this.n = n; }
@@ -128,4 +128,8 @@ class notify {
 	string name() { return to!string( n.relname ); }
 	string extra() { return to!string( n.extra ); }
 	int pid() { return n.be_pid; }
-};
+
+	invariant(){
+		assert( n != null );
+	}
+}

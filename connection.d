@@ -114,6 +114,8 @@ class conn_piece {
 		);
 	}
 
+	
+
 	notify get_next_notify() {
 		auto n = PQnotifies(conn);
 		return n is null ? null : new notify(n);
