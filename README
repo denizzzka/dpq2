@@ -1,0 +1,6 @@
+This is yet another attempt to create a good interface to PostgreSQL from the D2 programming language.
+
+TODO:
+- Async queries support
+- LISTEN support
+- Sending binary data for type bytea
