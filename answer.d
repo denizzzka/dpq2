@@ -117,3 +117,11 @@ class answer {
 		}			
 	}
 }
+
+struct notify {
+	PGnotify n;
+
+	string name() { return to!string( n.relname ); }
+	string extra() { return to!string( n.extra ); }
+	int pid() { return n.be_pid; }
+};
