@@ -55,6 +55,10 @@ class answer {
 		return PQresultStatus(res);
 	}
 
+	string cmd_status() {
+		return to!string( PQcmdStatus(res) );
+	}
+
 	int rows_num(){ return PQntuples(res); }
 
 	int cols_num(){ return PQnfields(res); }
