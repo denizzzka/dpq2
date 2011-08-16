@@ -118,8 +118,12 @@ class answer {
 	}
 }
 
-struct notify {
-	PGnotify n;
+class notify {
+	package PGnotify* n;
+
+	this(){}
+	this( PGnotify* n ) { this.n = n; }
+	~this() { PQfreemem(n); }
 
 	string name() { return to!string( n.relname ); }
 	string extra() { return to!string( n.extra ); }

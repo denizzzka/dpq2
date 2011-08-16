@@ -114,8 +114,9 @@ class conn_piece {
 		);
 	}
 
-	void get_notify() {
-		PGnotify* n = PQnotifies(conn);
+	notify get_next_notify() {
+		auto n = PQnotifies(conn);
+		return n is null ? null : new notify(n);
 	}
 
 	private static string PQerrorMessage(PGconn* conn) {
