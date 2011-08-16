@@ -2,6 +2,7 @@
 module dpq2.connection;
 
 import dpq2.libpq;
+public import dpq2.libpq: valueFormat;
 import dpq2.answer;
 
 import std.conv: to;
