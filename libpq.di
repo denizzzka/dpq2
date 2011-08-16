@@ -123,7 +123,7 @@ extern (C) nothrow
 		int			be_pid;			/** process ID of notifying server process */
 		char	   *extra;			/** notification parameter */
 		/* Fields below here are private to libpq; apps should not use 'em */
-		PGnotify *next;		/* list link */
+		private PGnotify *next;		/* list link */
 	};
 
 	/* Function types for notice-handling callbacks */

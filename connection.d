@@ -114,6 +114,10 @@ class conn_piece {
 		);
 	}
 
+	void get_notify() {
+		PGnotify* n = PQnotifies(conn);
+	}
+
 	private static string PQerrorMessage(PGconn* conn) {
 		return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
 	}
