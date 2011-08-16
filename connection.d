@@ -67,24 +67,13 @@ class conn_piece {
 		if (conn_created_flag) PQfinish( conn );
 	}
 	
-	class exception : Exception {
-		alias ConnStatusType pq_type; /// libpq conn statuses
-
-		pq_type type;
-		
-		this() {
-			type = PQstatus(conn);
-			super( PQerrorMessage(conn), null, null );
-		}
-	}
-	
 	answer exec(string sql_command) {
 		return new answer(
 			PQexec(conn, toStringz(sql_command))
 		);
 	}
 
-	answer exec_params(ref const query_params p) {
+	answer exec(ref const query_params p) {
 		
 		// code above just preparing args for PQexecParams
 		Oid[] types = new Oid[p.args.length];
@@ -134,6 +123,17 @@ writeln("params num: ", to!int( p.args.length ));
 	private static string PQerrorMessage(PGconn* conn) {
 		return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
 	}
+	
+	class exception : Exception {
+		alias ConnStatusType pq_type; /// libpq conn statuses
+
+		pq_type type;
+		
+		this() {
+			type = PQstatus(conn);
+			super( PQerrorMessage(conn), null, null );
+		}
+	}
 }
 
 unittest {
@@ -178,7 +178,7 @@ unittest {
 		p.sql_command = sql_query2;
 		p.args = args;
 
-		r = conn.exec_params( p );		
+		r = conn.exec( p );		
 		assert( r.get_value( c2 ).str == "abc" );
 
 		string sql_query3 = "listen test_notify; notify test_notify";
