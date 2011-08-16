@@ -45,6 +45,11 @@ struct query_arg {
 class conn_piece {
 	package PGconn* conn;
 	private bool conn_created_flag;
+
+	private enum consume_result {
+		PQ_CONSUME_ERROR,
+		PQ_CONSUME_OK
+	}
 	
 	this( conn_args args ) {
 		conn = PQconnectdb(toStringz(args.conn_string));
@@ -55,7 +60,7 @@ class conn_piece {
 		
 		if(args.type == conn_variant.SYNC &&
 		   PQstatus(conn) != ConnStatusType.CONNECTION_OK)
-			throw new exception( PQstatus(conn) );
+			throw new exception();
 	}
 
 	~this() {
@@ -67,8 +72,8 @@ class conn_piece {
 
 		pq_type type;
 		
-		this( ConnStatusType t ) {
-			type = t;
+		this() {
+			type = PQstatus(conn);
 			super( PQerrorMessage(conn), null, null );
 		}
 	}
@@ -113,12 +118,17 @@ class conn_piece {
 			)
 		);
 	}
-
 	
 	/// returns null if not notifies was received
 	notify get_next_notify() {
+		consume_input();
 		auto n = PQnotifies(conn);
 		return n is null ? null : new notify(n);
+	}
+
+	private void consume_input() {
+		int r = PQconsumeInput( conn );
+		if( r != consume_result.PQ_CONSUME_OK ) throw new exception();
 	}
 
 	private static string PQerrorMessage(PGconn* conn) {
