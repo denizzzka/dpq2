@@ -2,8 +2,8 @@ This is yet another attempt to create a good interface to PostgreSQL from the D 
 
 Done:
 - LISTEN support
+- Sending binary data for type bytea
 
 TODO:
 - Async queries support
-- Sending binary data for type bytea
 - Binary reading to native D types
