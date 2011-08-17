@@ -170,7 +170,7 @@ unittest {
 		auto c = r.get_value( c1 );	
 		assert( c.str == "456" );
 		
-		string sql_query2 = "select * from test where t = $1 order by serial";
+		string sql_query2 = "select * from test.test where t = $1 order by serial";
 		static query_arg arg = { value_str: "abc" };
 		query_arg[1] args;
 		args[0] = arg;
