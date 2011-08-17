@@ -6,3 +6,4 @@ Done:
 TODO:
 - Async queries support
 - Sending binary data for type bytea
+- Binary reading to native D types
