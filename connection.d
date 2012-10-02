@@ -1,5 +1,5 @@
-
 module dpq2.connection;
+@safe
 
 import dpq2.libpq;
 public import dpq2.libpq: valueFormat;

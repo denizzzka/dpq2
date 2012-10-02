@@ -1,6 +1,6 @@
 @safe
 
-version(unittest) {
+version( unittest ) {
     int main(){
         return 0;
     }

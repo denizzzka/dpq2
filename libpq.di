@@ -12,6 +12,7 @@
  */
 
 module dpq2.libpq;
+@safe
 
 import std.c.stdio: FILE;
 
