@@ -35,7 +35,8 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 class BaseConnection
 {
     package PGconn* conn;
-    private bool conn_created_flag;
+    private bool connectingInProgress;
+    private bool readyForQuery;
     private enum ConsumeResult
     {
         PQ_CONSUME_ERROR,
@@ -44,22 +45,24 @@ class BaseConnection
 
     void connect( connArgs args )
     {
+		//TODO: нужны блокировки чтобы нельзя было несколько раз создать
+		// соединение из параллельных потоков или запрос через нерабочее соединение
         conn = PQconnectdb(toStringz(args.connString));
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        conn_created_flag = true;
-        
         if(args.type == connVariant.SYNC &&
            PQstatus(conn) != ConnStatusType.CONNECTION_OK)
             throw new exception();
+        
+        readyForQuery = true;
     }
 
     void disconnect()
     {
-        if( conn_created_flag )
+        if( readyForQuery )
         {
-            conn_created_flag = false;
+            readyForQuery = false;
             PQfinish( conn );
         }
         else
