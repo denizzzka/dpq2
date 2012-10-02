@@ -7,19 +7,19 @@ import dpq2.answer;
 
 struct queryParams
 {
-	string sqlCommand;
-	queryArg[] args;
-	valueFormat result_format = valueFormat.TEXT;
+    string sqlCommand;
+    queryArg[] args;
+    valueFormat result_format = valueFormat.TEXT;
 }
 
 struct queryArg
 {
-	Oid type = 0;
-	valueFormat format = valueFormat.TEXT;
-	union {
-		byte[] valueBin;
-		string valueStr;
-	};
+    Oid type = 0;
+    valueFormat format = valueFormat.TEXT;
+    union {
+        byte[] valueBin;
+        string valueStr;
+    };
 }
 
 final class Connection: BaseConnection
@@ -29,64 +29,64 @@ final class Connection: BaseConnection
         return new answer(
             PQexec(conn, toStringz(sql_command))
         );
-	}
+    }
 
-	answer exec(ref const queryParams p)
+    answer exec(ref const queryParams p)
     {
-		// code above just preparing args for PQexecParams
-		Oid[] types = new Oid[p.args.length];
-		int[] formats = new int[p.args.length];
-		int[] lengths = new int[p.args.length];
-		const(byte)*[] values = new const(byte)*[p.args.length];
+        // code above just preparing args for PQexecParams
+        Oid[] types = new Oid[p.args.length];
+        int[] formats = new int[p.args.length];
+        int[] lengths = new int[p.args.length];
+        const(byte)*[] values = new const(byte)*[p.args.length];
 
-		for( int i = 0; i < p.args.length; ++i )
+        for( int i = 0; i < p.args.length; ++i )
         {
-			types[i] = p.args[i].type;
-			formats[i] = p.args[i].format;	
-			values[i] = p.args[i].valueBin.ptr;
-			
-			final switch( p.args[i].format )
+            types[i] = p.args[i].type;
+            formats[i] = p.args[i].format;  
+            values[i] = p.args[i].valueBin.ptr;
+            
+            final switch( p.args[i].format )
             {
-				case valueFormat.TEXT:
-					lengths[i] = to!int( p.args[i].valueStr.length );
-					break;
-				case valueFormat.BINARY:
-					lengths[i] = to!int( p.args[i].valueBin.length );
-					break;
-			}
-		}
+                case valueFormat.TEXT:
+                    lengths[i] = to!int( p.args[i].valueStr.length );
+                    break;
+                case valueFormat.BINARY:
+                    lengths[i] = to!int( p.args[i].valueBin.length );
+                    break;
+            }
+        }
 
-		return new answer
+        return new answer
         (
-			PQexecParams (
-				conn,
-				toStringz( p.sqlCommand ),
-				to!int( p.args.length ),
-				types.ptr,
-				values.ptr,
-				lengths.ptr,
-				formats.ptr,
-				p.result_format
-			)
-		);
-	}
+            PQexecParams (
+                conn,
+                toStringz( p.sqlCommand ),
+                to!int( p.args.length ),
+                types.ptr,
+                values.ptr,
+                lengths.ptr,
+                formats.ptr,
+                p.result_format
+            )
+        );
+    }
 
-	/// returns null if no notifies was received
-	notify getNextNotify()
+    /// returns null if no notifies was received
+    notify getNextNotify()
     {
-		consumeInput();
-		auto n = PQnotifies(conn);
-		return n is null ? null : new notify(n);
-	}
+        consumeInput();
+        auto n = PQnotifies(conn);
+        return n is null ? null : new notify(n);
+    }
 
 }
 
 void _unittest( string connParam )
 {
-	connArgs cd = {
+    connArgs cd = {
         connString: connParam,
         type: connVariant.SYNC
-	};
+    };
 
     auto conn = new Connection;
     conn.connect( cd );
@@ -114,7 +114,7 @@ void _unittest( string connParam )
     assert( r.isNULL( c3 ) );
     assert( r.column_num( "string" ) == 1 );
 
-    auto c = r.get_value( c1 );	
+    auto c = r.get_value( c1 ); 
     assert( c.str == "456" );
     /*
     string sql_query2 = "select * from test where t = $1 order by serial";
@@ -125,7 +125,7 @@ void _unittest( string connParam )
     p.sql_command = sql_query2;
     p.args = args;
 
-    r = conn.exec( p );		
+    r = conn.exec( p );     
     assert( r.get_value( c2 ).str == "abc" );
     */
     string sql_query3 = "listen test_notify; notify test_notify";
