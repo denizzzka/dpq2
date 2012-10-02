@@ -108,7 +108,7 @@ class BaseConnection
 	}
 }
 
-void external_unittest( string connParam )
+void _unittest( string connParam )
 {
 	connArgs cd = {
 		connString: connParam,
