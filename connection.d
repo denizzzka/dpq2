@@ -108,7 +108,8 @@ class BaseConnection
 	}
 }
 
-void external_unittest( string conn_param ) {
+void external_unittest( string conn_param )
+{
 	conn_args cd = {
 		conn_string: conn_param,
 		type: conn_variant.SYNC

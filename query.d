@@ -58,26 +58,9 @@ final class Connection: BaseConnection
 	}
 
 }
-/*	
-	
-	/// returns null if no notifies was received
-	notify get_next_notify() {
-		consume_input();
-		auto n = PQnotifies(conn);
-		return n is null ? null : new notify(n);
-	}
 
-	private void consume_input() {
-		int r = PQconsumeInput( conn );
-		if( r != consume_result.PQ_CONSUME_OK ) throw new exception();
-	}
-
-	private static string PQerrorMessage(PGconn* conn) {
-		return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
-	}
-*/
-
-void external_unittest( string conn_param ) {
+void external_unittest( string conn_param )
+{
 	conn_args cd = {
 			conn_string: conn_param,
 			type: conn_variant.SYNC
@@ -126,5 +109,4 @@ void external_unittest( string conn_param ) {
     string sql_query3 = "listen test_notify; notify test_notify";
     r = conn.exec( sql_query3 );
     assert( conn.getNextNotify.name == "test_notify" );
-
 }
