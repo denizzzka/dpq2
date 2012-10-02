@@ -33,7 +33,7 @@ The code contains embedded unittests using a regular functions calls, not using
 standard D unittests. It is need because that unittests need to pass parameters
 to connect to the database in runtime.
 
-After building dpq2 with unittests libdpq2 can be executed. Option "--conninfo"
+After building dpq2 with unittests file libdpq2 can be executed. Option "--conninfo"
 may contains connection string as described in [PostgreSQL documentation]
 (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING).
 
