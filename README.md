@@ -35,7 +35,7 @@ For default connection to DB type:
 
     $ ./libdpq2 
 
-Local connection through unix socket:
+Connection to usually available database "postgres":
 
     $ ./libdpq2 --conninfo "dbname=postgres"
 
