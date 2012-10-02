@@ -11,9 +11,9 @@ import core.exception;
 
 enum connVariant { SYNC, ASYNC };
 
-struct connArgs {	
-	string connString;
-	connVariant type;
+struct connArgs {   
+    string connString;
+    connVariant type;
 }
 
 /*
@@ -34,72 +34,72 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 class BaseConnection
 {
-	package PGconn* conn;
-	private bool conn_created_flag;
-	private enum ConsumeResult
-	{
-		PQ_CONSUME_ERROR,
-		PQ_CONSUME_OK
-	}
+    package PGconn* conn;
+    private bool conn_created_flag;
+    private enum ConsumeResult
+    {
+        PQ_CONSUME_ERROR,
+        PQ_CONSUME_OK
+    }
 
-	void connect( connArgs args )
-	{
-		conn = PQconnectdb(toStringz(args.connString));
-		
-		enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
-		
-		conn_created_flag = true;
-		
-		if(args.type == connVariant.SYNC &&
-		   PQstatus(conn) != ConnStatusType.CONNECTION_OK)
-			throw new exception();
-	}
+    void connect( connArgs args )
+    {
+        conn = PQconnectdb(toStringz(args.connString));
+        
+        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+        
+        conn_created_flag = true;
+        
+        if(args.type == connVariant.SYNC &&
+           PQstatus(conn) != ConnStatusType.CONNECTION_OK)
+            throw new exception();
+    }
 
-	void disconnect()
-	{
-		if( conn_created_flag )
-		{
-			conn_created_flag = false;
-			PQfinish( conn );
-		}
-	}
+    void disconnect()
+    {
+        if( conn_created_flag )
+        {
+            conn_created_flag = false;
+            PQfinish( conn );
+        }
+    }
 
-	~this() {
-		disconnect();
-	}
+    ~this() {
+        disconnect();
+    }
 
-	package void consumeInput()
-	{
-		int r = PQconsumeInput( conn );
-		if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
-	}
+    package void consumeInput()
+    {
+        int r = PQconsumeInput( conn );
+        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
+    }
 
-	private static string PQerrorMessage(PGconn* conn)
-	{
-		return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
-	}
-	
-	class exception : Exception
-	{
-		alias ConnStatusType pq_type; /// libpq conn statuses
+    private static string PQerrorMessage(PGconn* conn)
+    {
+        return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
+    }
+    
+    class exception : Exception
+    {
+        alias ConnStatusType pq_type; /// libpq conn statuses
 
-		pq_type type;
-		
-		this() {
-			type = PQstatus(conn);
-			super( PQerrorMessage(conn), null, null );
-		}
-	}
+        pq_type type;
+        
+        this() {
+            type = PQstatus(conn);
+            super( PQerrorMessage(conn), null, null );
+        }
+    }
 }
 
 void _unittest( string connParam )
 {
-	connArgs cd = {
-		connString: connParam,
-		type: connVariant.SYNC
-	};
-	
-	auto c = new BaseConnection;
-	c.connect( cd );
-	c.disconnect();
+    connArgs cd = {
+        connString: connParam,
+        type: connVariant.SYNC
+    };
+    
+    auto c = new BaseConnection;
+    c.connect( cd );
+    c.disconnect();
 }
