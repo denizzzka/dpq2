@@ -179,8 +179,8 @@ void external_unittest( string conn_param ) {
 
 		auto c = r.get_value( c1 );	
 		assert( c.str == "456" );
-		
-		string sql_query2 = "select * from test.test where t = $1 order by serial";
+		/*
+		string sql_query2 = "select * from test where t = $1 order by serial";
 		static query_arg arg = { value_str: "abc" };
 		query_arg[1] args;
 		args[0] = arg;
@@ -190,7 +190,7 @@ void external_unittest( string conn_param ) {
 
 		r = conn.exec( p );		
 		assert( r.get_value( c2 ).str == "abc" );
-
+		*/
 		string sql_query3 = "listen test_notify; notify test_notify";
 		r = conn.exec( sql_query3 );
 		assert( conn.get_next_notify.name == "test_notify" );
