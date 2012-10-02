@@ -34,6 +34,8 @@ to connect to the database in runtime.
 After building dpq2 with unittests they can be executed:
 
     $ ./libdpq2 --conninfo "dbname=postgres"
+    or
+    $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
 
 (--conninfo contains connection string as described in [PostgreSQL documentation]
 (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING))
