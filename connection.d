@@ -87,7 +87,7 @@ class conn_piece {
 		Oid[] types = new Oid[p.args.length];
 		int[] formats = new int[p.args.length];
 		int[] lengths = new int[p.args.length];
-		const(byte)*[] values = new byte*[p.args.length];
+		const(byte)*[] values = new const(byte)*[p.args.length];
 
 		for( int i = 0; i < p.args.length; ++i ) {
 			types[i] = p.args[i].type;
@@ -97,8 +97,10 @@ class conn_piece {
 			final switch( p.args[i].format ) {
 				case valueFormat.TEXT:
 					lengths[i] = to!int( p.args[i].value_str.length );
+					break;
 				case valueFormat.BINARY:
 					lengths[i] = to!int( p.args[i].value_bin.length );
+					break;
 			}
 		}
 

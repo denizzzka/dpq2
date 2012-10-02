@@ -75,7 +75,7 @@ class answer {
 		return n;
 	}
 
-    cell* get_value( ref immutable cell_coords c ) {
+    cell* get_value( const cell_coords c ) {
 		assert_coords(c);
 		
 		cell* r = new cell;
@@ -85,17 +85,17 @@ class answer {
 		return r;
     }
 
-	int get_value_size( ref immutable cell_coords c ) {
+	int get_value_size( const cell_coords c ) {
 		assert_coords(c);
 		return PQgetlength(res, c.row, c.col);
 	}
     
-    bool isNULL( ref immutable cell_coords c ) {
+    bool isNULL( const cell_coords c ) {
 		assert_coords(c);
 		return PQgetisnull(res, c.row, c.col) != 0;
     }
 
-	private void assert_coords( ref immutable cell_coords c ) {
+	private void assert_coords( const cell_coords c ) {
 		assert( c.row < rows_num, to!string(c.row)~" row is out of range 0.."~to!string(rows_num-1)~" of result rows" );
 		assert( c.col < cols_num, to!string(c.col)~" col is out of range 0.."~to!string(rows_num-1)~" of result cols" );
 	}
