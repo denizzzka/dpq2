@@ -52,7 +52,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
  */
 class BaseConnection
 {
-	package PGconn* conn;
+	protected PGconn* conn;
 	private bool conn_created_flag;
 
 	private enum consume_result
