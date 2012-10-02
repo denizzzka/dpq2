@@ -1,12 +1,25 @@
 module dpq2.query;
-@safe:
+@trusted:
+
+import dpq2.libpq;
+import dpq2.connection;
+import dpq2.answer;
+
+class Query: conn_piece
+{
+    this( conn_args args )
+    {
+        super( args );
+    }
+    
+    answer exec(PGconn* conn, string sql_command) {
+        return new answer(
+            PQexec(conn, toStringz(sql_command))
+        );
+    }
+}
 
 /*	
-	answer exec(string sql_command) {
-		return new answer(
-			PQexec(conn, toStringz(sql_command))
-		);
-	}
 
 	answer exec(ref const query_params p) {
 		
