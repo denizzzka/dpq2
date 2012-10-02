@@ -25,8 +25,8 @@ for running unittests)
     or
     make
 
-Unittest
---------
+Unittests
+---------
 The code contains embedded unittests using a regular functions calls, not using
 standard D unittests. It is need because that unittests need to pass parameters
 to connect to the database in runtime.
