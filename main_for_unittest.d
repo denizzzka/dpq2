@@ -1,7 +1,11 @@
 @safe
 
 version( unittest ) {
-    int main(){
+    import std.getopt;
+
+    package string conninfo;
+
+    int main(string[] args){
         return 0;
     }
 }
