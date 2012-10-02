@@ -21,16 +21,22 @@ Building
 
 ####Release version
     make release
-    or
+
+or
+
     make
 
 Unittests
 ---------
+
 The code contains embedded unittests using a regular functions calls, not using
 standard D unittests. It is need because that unittests need to pass parameters
 to connect to the database in runtime.
 
-After building dpq2 with unittests they can be executed.
+After building dpq2 with unittests libdpq2 can be executed. Option "--conninfo"
+may contains connection string as described in [PostgreSQL documentation]
+(http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING)
+
 For default connection to DB type:
 
     $ ./libdpq2 
@@ -42,9 +48,6 @@ Connection to usually available database "postgres":
 Network connection:
 
     $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
-
-(--conninfo may contains connection string as described in [PostgreSQL documentation]
-(http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING))
 
 TODO
 ----
