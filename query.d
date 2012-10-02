@@ -6,13 +6,7 @@ import dpq2.connection;
 import dpq2.answer;
 
 class Connection: conn_piece
-{
-    // temp ctor
-    this( conn_args args )
-    {
-        super( args );
-    }
-    
+{    
     answer exec(PGconn* conn, string sql_command) {
         return new answer(
             PQexec(conn, toStringz(sql_command))
