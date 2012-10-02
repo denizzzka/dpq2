@@ -30,13 +30,20 @@ The code contains embedded unittests using a regular functions calls, not using
 standard D unittests. It is need because that unittests need to pass parameters
 to connect to the database in runtime.
 
-After building dpq2 with unittests they can be executed:
+After building dpq2 with unittests they can be executed.
+For default connection to DB type:
+
+    $ ./libdpq2 
+
+Local connection through unix socket:
 
     $ ./libdpq2 --conninfo "dbname=postgres"
-    or
+
+Network connection:
+
     $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
 
-(--conninfo contains connection string as described in [PostgreSQL documentation]
+(--conninfo may contains connection string as described in [PostgreSQL documentation]
 (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING))
 
 TODO
