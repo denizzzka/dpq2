@@ -1,9 +1,10 @@
 This is yet another attempt to create a good interface to PostgreSQL from the D 2.0 programming language.
 
-Done:
+Features:
 - LISTEN support
 - Sending binary data for type bytea
 
 TODO:
 - Async queries support
 - Binary reading to native D types
+- Make the code more transparent, CamelCasing and Autodoc
