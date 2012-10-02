@@ -105,6 +105,7 @@ void _unittest( string connParam )
     auto c1 = cell_coords(2,1);
     auto c2 = cell_coords(0,0);
     auto c3 = cell_coords(0,2);
+    auto c4 = cell_coords(2,0);
 
     assert( r.rows_num == 3 );
     assert( r.cols_num == 4);
@@ -115,19 +116,24 @@ void _unittest( string connParam )
     assert( r.column_num( "string" ) == 1 );
 
     auto c = r.get_value( c1 ); 
-    assert( c.str == "456" );
-    /*
-    string sql_query2 = "select * from test where t = $1 order by serial";
-    static query_arg arg = { value_str: "abc" };
-    query_arg[1] args;
+    assert( c.str == "456" );   
+
+    string sql_query2 =
+    "select * from (\n"
+    ~ sql_query ~
+    ") t\n"
+    "where string = $1";
+    
+    static queryArg arg = { valueStr: "def" };
+    queryArg[1] args;
     args[0] = arg;
-    query_params p;
-    p.sql_command = sql_query2;
+    queryParams p;
+    p.sqlCommand = sql_query2;
     p.args = args;
 
     r = conn.exec( p );     
-    assert( r.get_value( c2 ).str == "abc" );
-    */
+    assert( r.get_value( c4 ).str == "456" );
+
     string sql_query3 = "listen test_notify; notify test_notify";
     r = conn.exec( sql_query3 );
     assert( conn.getNextNotify.name == "test_notify" );

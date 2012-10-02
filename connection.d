@@ -62,6 +62,10 @@ class BaseConnection
             conn_created_flag = false;
             PQfinish( conn );
         }
+        else
+        {
+			assert("Not connected yet!");
+		}
     }
 
     ~this() {
