@@ -50,16 +50,19 @@ int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 
  */
-class BaseConnection {
+class BaseConnection
+{
 	package PGconn* conn;
 	private bool conn_created_flag;
 
-	private enum consume_result {
+	private enum consume_result
+	{
 		PQ_CONSUME_ERROR,
 		PQ_CONSUME_OK
 	}
 
-	void connect( conn_args args ) {
+	void connect( conn_args args )
+	{
 		conn = PQconnectdb(toStringz(args.conn_string));
 		
 		enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
@@ -71,8 +74,17 @@ class BaseConnection {
 			throw new exception();
 	}
 
+	void disconnect()
+	{
+		if( conn_created_flag )
+		{
+			conn_created_flag = false;
+			PQfinish( conn );
+		}
+	}
+
 	~this() {
-		if (conn_created_flag) PQfinish( conn );
+		disconnect();
 	}
 	
 	/// returns null if no notifies was received
@@ -109,6 +121,7 @@ void external_unittest( string conn_param ) {
 			type: conn_variant.SYNC
 		};
 		
-		auto conn = new BaseConnection;
-		conn.connect( cd );
+		auto c = new BaseConnection;
+		c.connect( cd );
+		c.disconnect();
 }
