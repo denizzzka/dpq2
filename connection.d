@@ -32,7 +32,7 @@ struct query_arg {
 }
 
 
-/**
+/*
  * Bugs: On Unix connection is not thread safe.
  * 
  * On Unix, forking a process with open libpq connections can lead
@@ -47,8 +47,7 @@ Returns the thread safety status of the libpq library.
 
 int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
-
- */
+*/
 class BaseConnection
 {
 	package PGconn* conn;
@@ -111,8 +110,8 @@ class BaseConnection
 
 void external_unittest( string conn_param ) {
 	conn_args cd = {
-			conn_string: conn_param,
-			type: conn_variant.SYNC
+		conn_string: conn_param,
+		type: conn_variant.SYNC
 	};
 	
 	auto c = new BaseConnection;
