@@ -1,5 +1,7 @@
-@trusted
+@safe
 
-int main(){
-    return 0;
+version(unittest) {
+    int main(){
+        return 0;
+    }
 }
