@@ -9,25 +9,25 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
-enum conn_variant { SYNC, ASYNC };
+enum connVariant { SYNC, ASYNC };
 
-struct conn_args {	
-	string conn_string;
-	conn_variant type;
+struct connArgs {	
+	string connString;
+	connVariant type;
 }
 
-struct query_params {
-	string sql_command;
-	query_arg[] args;
+struct queryParams {
+	string sqlCommand;
+	queryArg[] args;
 	valueFormat result_format = valueFormat.TEXT;
 }
 
-struct query_arg {
+struct queryArg {
 	Oid type = 0;
 	valueFormat format = valueFormat.TEXT;
 	union {
-		byte[] value_bin;
-		string value_str;
+		byte[] valueBin;
+		string valueStr;
 	};
 }
 
@@ -58,15 +58,15 @@ class BaseConnection
 		PQ_CONSUME_OK
 	}
 
-	void connect( conn_args args )
+	void connect( connArgs args )
 	{
-		conn = PQconnectdb(toStringz(args.conn_string));
+		conn = PQconnectdb(toStringz(args.connString));
 		
 		enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 		
 		conn_created_flag = true;
 		
-		if(args.type == conn_variant.SYNC &&
+		if(args.type == connVariant.SYNC &&
 		   PQstatus(conn) != ConnStatusType.CONNECTION_OK)
 			throw new exception();
 	}
@@ -108,11 +108,11 @@ class BaseConnection
 	}
 }
 
-void external_unittest( string conn_param )
+void external_unittest( string connParam )
 {
-	conn_args cd = {
-		conn_string: conn_param,
-		type: conn_variant.SYNC
+	connArgs cd = {
+		connString: connParam,
+		type: connVariant.SYNC
 	};
 	
 	auto c = new BaseConnection;

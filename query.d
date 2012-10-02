@@ -13,7 +13,7 @@ final class Connection: BaseConnection
         );
 	}
 
-	answer exec(ref const query_params p) {
+	answer exec(ref const queryParams p) {
 		
 		// code above just preparing args for PQexecParams
 		Oid[] types = new Oid[p.args.length];
@@ -24,14 +24,14 @@ final class Connection: BaseConnection
 		for( int i = 0; i < p.args.length; ++i ) {
 			types[i] = p.args[i].type;
 			formats[i] = p.args[i].format;	
-			values[i] = p.args[i].value_bin.ptr;
+			values[i] = p.args[i].valueBin.ptr;
 			
 			final switch( p.args[i].format ) {
 				case valueFormat.TEXT:
-					lengths[i] = to!int( p.args[i].value_str.length );
+					lengths[i] = to!int( p.args[i].valueStr.length );
 					break;
 				case valueFormat.BINARY:
-					lengths[i] = to!int( p.args[i].value_bin.length );
+					lengths[i] = to!int( p.args[i].valueBin.length );
 					break;
 			}
 		}
@@ -39,7 +39,7 @@ final class Connection: BaseConnection
 		return new answer(
 			PQexecParams (
 				conn,
-				toStringz( p.sql_command ),
+				toStringz( p.sqlCommand ),
 				to!int( p.args.length ),
 				types.ptr,
 				values.ptr,
@@ -59,12 +59,12 @@ final class Connection: BaseConnection
 
 }
 
-void external_unittest( string conn_param )
+void external_unittest( string connParam )
 {
-	conn_args cd = {
-			conn_string: conn_param,
-			type: conn_variant.SYNC
-		};
+	connArgs cd = {
+        connString: connParam,
+        type: connVariant.SYNC
+	};
 
     auto conn = new Connection;
     conn.connect( cd );
