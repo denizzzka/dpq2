@@ -53,8 +53,7 @@ class BaseConnection
 {
 	package PGconn* conn;
 	private bool conn_created_flag;
-
-	private enum consume_result
+	private enum ConsumeResult
 	{
 		PQ_CONSUME_ERROR,
 		PQ_CONSUME_OK
@@ -89,7 +88,7 @@ class BaseConnection
 	package void consumeInput()
 	{
 		int r = PQconsumeInput( conn );
-		if( r != consume_result.PQ_CONSUME_OK ) throw new exception();
+		if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
 	}
 
 	private static string PQerrorMessage(PGconn* conn)
