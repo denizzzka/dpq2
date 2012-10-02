@@ -1,4 +1,4 @@
-@trusted
+@trusted:
 
 version( unittest )
 {

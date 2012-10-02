@@ -1,5 +1,5 @@
 module dpq2.answer;
-@safe
+@trusted:
 
 import dpq2.libpq;
 
