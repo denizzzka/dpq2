@@ -5,8 +5,9 @@ import dpq2.libpq;
 import dpq2.connection;
 import dpq2.answer;
 
-class Query: conn_piece
+class Connection: conn_piece
 {
+    // temp ctor
     this( conn_args args )
     {
         super( args );

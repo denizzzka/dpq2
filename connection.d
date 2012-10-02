@@ -58,7 +58,7 @@ class conn_piece {
 		PQ_CONSUME_ERROR,
 		PQ_CONSUME_OK
 	}
-	
+
 	this( conn_args args ) {
 		conn = PQconnectdb(toStringz(args.conn_string));
 		
