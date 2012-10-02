@@ -25,12 +25,12 @@ class answer {
 		}
 
 		@property string str(){
-			assert( format == valueFormat.TEXT, "Format of the column is not text" );
+			debug assert( format == valueFormat.TEXT, "Format of the column is not text" );
 			return to!string( cast(immutable(char)*)val );
 		}
 
 		@property immutable (byte[]) bin(){
-			assert( format == valueFormat.BINARY, "Format of the column is not binary" );
+			debug assert( format == valueFormat.BINARY, "Format of the column is not binary" );
 			return val[0..size];
 		}
 	}

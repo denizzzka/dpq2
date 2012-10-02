@@ -1,11 +1,11 @@
 DFILES = connection.d answer.d libpq.di
 DC = dmd
 PQFLAGS = -L-lpq -L-lcom_err
-COMMON = $(DC) $(DFILES) $(PQFLAGS) -w -wi -ofdpq2
+COMMON = $(DC) $(DFILES) $(PQFLAGS) -w -wi -lib -ofdpq2
 
-DEBUG := $(COMMON) -g -debug -debug=5 -Dddoc -lib
+DEBUG := $(COMMON) -g -debug -debug=5
+RELEASE := $(COMMON) -release
 UNITTEST = $(DEBUG) -unittest
-RELEASE := $(COMMON) -release -lib
 
 unittest:
 	$(UNITTEST)
@@ -15,6 +15,9 @@ debug:
 
 release:
 	$(RELEASE)
+
+doc:
+	$(RELEASE) -o- -Dddoc
 
 clean:
 	rm -rf *.o *.a
