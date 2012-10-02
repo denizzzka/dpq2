@@ -1,11 +1,18 @@
-@safe
+@trusted
 
-version( unittest ) {
+version( unittest )
+{
     import std.getopt;
+    
+    import conn = dpq2.connection;
 
-    package string conninfo;
+    int main(string[] args)
+    {
+        string conninfo;
+        getopt( args, "conninfo", &conninfo );
 
-    int main(string[] args){
+        conn.external_unittest( conninfo );
+        
         return 0;
     }
 }

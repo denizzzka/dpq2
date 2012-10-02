@@ -146,9 +146,9 @@ class conn_piece {
 	}
 }
 
-unittest {
+void external_unittest( string conn_param ) {
 	conn_args cd = {
-			conn_string: "host=db dbname=testdb user=testuser password=123123",
+			conn_string: conn_param,
 			type: conn_variant.SYNC
 		};
 		
