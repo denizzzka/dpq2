@@ -5,13 +5,15 @@ import dpq2.libpq;
 import dpq2.connection;
 import dpq2.answer;
 
-struct queryParams {
+struct queryParams
+{
 	string sqlCommand;
 	queryArg[] args;
 	valueFormat result_format = valueFormat.TEXT;
 }
 
-struct queryArg {
+struct queryArg
+{
 	Oid type = 0;
 	valueFormat format = valueFormat.TEXT;
 	union {
@@ -22,26 +24,29 @@ struct queryArg {
 
 final class Connection: BaseConnection
 {
-    answer exec(string sql_command) {
+    answer exec(string sql_command)
+    {
         return new answer(
             PQexec(conn, toStringz(sql_command))
         );
 	}
 
-	answer exec(ref const queryParams p) {
-		
+	answer exec(ref const queryParams p)
+    {
 		// code above just preparing args for PQexecParams
 		Oid[] types = new Oid[p.args.length];
 		int[] formats = new int[p.args.length];
 		int[] lengths = new int[p.args.length];
 		const(byte)*[] values = new const(byte)*[p.args.length];
 
-		for( int i = 0; i < p.args.length; ++i ) {
+		for( int i = 0; i < p.args.length; ++i )
+        {
 			types[i] = p.args[i].type;
 			formats[i] = p.args[i].format;	
 			values[i] = p.args[i].valueBin.ptr;
 			
-			final switch( p.args[i].format ) {
+			final switch( p.args[i].format )
+            {
 				case valueFormat.TEXT:
 					lengths[i] = to!int( p.args[i].valueStr.length );
 					break;
@@ -51,7 +56,8 @@ final class Connection: BaseConnection
 			}
 		}
 
-		return new answer(
+		return new answer
+        (
 			PQexecParams (
 				conn,
 				toStringz( p.sqlCommand ),
@@ -66,7 +72,8 @@ final class Connection: BaseConnection
 	}
 
 	/// returns null if no notifies was received
-	notify getNextNotify() {
+	notify getNextNotify()
+    {
 		consumeInput();
 		auto n = PQnotifies(conn);
 		return n is null ? null : new notify(n);
