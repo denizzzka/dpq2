@@ -25,6 +25,19 @@ for running unittests)
     or
     make
 
+Unittest
+--------
+The code contains embedded unittests using a regular functions calls, not using
+standard D unittests. It is need because that unittests need to pass parameters
+to connect to the database in runtime.
+
+After building dpq2 with unittests they can be executed:
+
+    $ ./libdpq2 --conninfo "dbname=postgres"
+
+(--conninfo contains connection string as described in [PostgreSQL documentation]
+(http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING))
+
 TODO
 ----
 
