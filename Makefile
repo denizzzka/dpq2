@@ -1,4 +1,4 @@
-DFILES = connection.d query.d answer.d libpq.di unitstests_main.d
+DFILES = connection.d query.d answer.d libpq.di unittests_main.d
 ONAME = libdpq2
 DC = dmd
 PQFLAGS = -L-lpq -L-lcom_err
