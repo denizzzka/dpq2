@@ -41,6 +41,14 @@ struct query_arg {
  * the same sockets and operating system resources. For this reason,
  * such usage is not recommended, though doing an exec from the child
  * process to load a new executable is safe.
+
+TODO: запрет копирования класса conn_piece:
+
+Returns the thread safety status of the libpq library.
+
+int PQisthreadsafe();
+Returns 1 if the libpq is thread-safe and 0 if it is not.
+
  */
 class conn_piece {
 	package PGconn* conn;
