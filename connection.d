@@ -3,7 +3,6 @@ module dpq2.connection;
 
 import dpq2.libpq;
 public import dpq2.libpq: valueFormat;
-import dpq2.answer;
 
 import std.conv: to;
 import std.string: toStringz;
@@ -87,16 +86,19 @@ class BaseConnection
 		disconnect();
 	}
 
-	package void consumeInput() {
+	package void consumeInput()
+	{
 		int r = PQconsumeInput( conn );
 		if( r != consume_result.PQ_CONSUME_OK ) throw new exception();
 	}
 
-	private static string PQerrorMessage(PGconn* conn) {
+	private static string PQerrorMessage(PGconn* conn)
+	{
 		return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
 	}
 	
-	class exception : Exception {
+	class exception : Exception
+	{
 		alias ConnStatusType pq_type; /// libpq conn statuses
 
 		pq_type type;
