@@ -18,6 +18,7 @@ Building
 
 ####Release version
     make release
+
 or just
     make
 
