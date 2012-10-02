@@ -5,6 +5,21 @@ import dpq2.libpq;
 import dpq2.connection;
 import dpq2.answer;
 
+struct queryParams {
+	string sqlCommand;
+	queryArg[] args;
+	valueFormat result_format = valueFormat.TEXT;
+}
+
+struct queryArg {
+	Oid type = 0;
+	valueFormat format = valueFormat.TEXT;
+	union {
+		byte[] valueBin;
+		string valueStr;
+	};
+}
+
 final class Connection: BaseConnection
 {
     answer exec(string sql_command) {

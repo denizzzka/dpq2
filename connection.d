@@ -16,22 +16,6 @@ struct connArgs {
 	connVariant type;
 }
 
-struct queryParams {
-	string sqlCommand;
-	queryArg[] args;
-	valueFormat result_format = valueFormat.TEXT;
-}
-
-struct queryArg {
-	Oid type = 0;
-	valueFormat format = valueFormat.TEXT;
-	union {
-		byte[] valueBin;
-		string valueStr;
-	};
-}
-
-
 /*
  * Bugs: On Unix connection is not thread safe.
  * 
