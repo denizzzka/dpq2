@@ -119,9 +119,9 @@ void external_unittest( string conn_param ) {
 	conn_args cd = {
 			conn_string: conn_param,
 			type: conn_variant.SYNC
-		};
-		
-		auto c = new BaseConnection;
-		c.connect( cd );
-		c.disconnect();
+	};
+	
+	auto c = new BaseConnection;
+	c.connect( cd );
+	c.disconnect();
 }
