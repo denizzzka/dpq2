@@ -4,7 +4,7 @@ version( unittest )
 {
     import std.getopt;
     
-    import conn = dpq2.connection;
+    import conn = dpq2.connection: external_unittest;
 
     int main(string[] args)
     {
