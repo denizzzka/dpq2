@@ -24,10 +24,10 @@ struct queryArg
 
 final class Connection: BaseConnection
 {
-    answer exec(string sql_command)
+    answer exec(string SQLcmd )
     {
         return new answer(
-            PQexec(conn, toStringz(sql_command))
+            PQexec(conn, toStringz( SQLcmd ))
         );
     }
 
