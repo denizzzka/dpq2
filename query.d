@@ -5,7 +5,7 @@ import dpq2.libpq;
 import dpq2.connection;
 import dpq2.answer;
 
-class Connection: conn_piece
+class Connection: BaseConnection
 {    
     answer exec(PGconn* conn, string sql_command) {
         return new answer(

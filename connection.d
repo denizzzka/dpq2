@@ -50,7 +50,7 @@ int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 
  */
-class conn_piece {
+class BaseConnection {
 	package PGconn* conn;
 	private bool conn_created_flag;
 
@@ -152,7 +152,7 @@ void external_unittest( string conn_param ) {
 			type: conn_variant.SYNC
 		};
 		
-		auto conn = new conn_piece;
+		auto conn = new BaseConnection;
 		conn.connect( cd );
 
 		string sql_query =
