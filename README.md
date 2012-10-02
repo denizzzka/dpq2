@@ -16,7 +16,8 @@ Building
 ####Debug version (with debugging symbols)
     make debug
 
-####Unittest version (executable with --conninfo option for connecting to DB)
+####Unittest version (executable with --conninfo option for connecting to DB
+for running unittests)
     make unittest
 
 ####Release version
