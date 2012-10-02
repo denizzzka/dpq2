@@ -24,3 +24,4 @@ clean:
 	rm -rf *.o *.a
 	rm -rf doc
 	rm $(ONAME)
+	rm $(ONAME).di
