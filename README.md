@@ -35,7 +35,7 @@ to connect to the database in runtime.
 
 After building dpq2 with unittests libdpq2 can be executed. Option "--conninfo"
 may contains connection string as described in [PostgreSQL documentation]
-(http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING)
+(http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING).
 
 For default connection to DB type:
 
