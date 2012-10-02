@@ -18,8 +18,7 @@ Building
 
 ####Release version
     make release
-
-or just
+    or
     make
 
 TODO
