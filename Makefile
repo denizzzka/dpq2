@@ -1,12 +1,12 @@
-DFILES = connection.d answer.d libpq.di
+DFILES = connection.d answer.d libpq.di main_for_unittest.d
 ONAME = libdpq2
 DC = dmd
 PQFLAGS = -L-lpq -L-lcom_err
-COMMON = $(DC) $(DFILES) $(PQFLAGS) -w -lib -Hf$(ONAME).di -of$(ONAME)
+COMMON = $(DC) $(DFILES) $(PQFLAGS) -w -Hf$(ONAME).di -of$(ONAME)
 
-DEBUG := $(COMMON) -g -debug -debug=5
-RELEASE := $(COMMON) -release
-UNITTEST = $(DEBUG) -unittest
+DEBUG = $(COMMON) -g -debug -lib
+RELEASE = $(COMMON) -release -lib
+UNITTEST = $(COMMON) -g -debug -unittest
 
 release:
 	$(RELEASE)
@@ -23,3 +23,4 @@ doc:
 clean:
 	rm -rf *.o *.a
 	rm -rf doc
+	rm $(ONAME)
