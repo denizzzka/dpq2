@@ -12,7 +12,7 @@ class Connection: BaseConnection
             PQexec(conn, toStringz(sql_command))
         );
 	}
-/*
+
 	answer exec(ref const query_params p) {
 		
 		// code above just preparing args for PQexecParams
@@ -49,7 +49,6 @@ class Connection: BaseConnection
 			)
 		);
 	}
-*/
 }
 /*	
 	

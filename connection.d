@@ -75,43 +75,6 @@ class BaseConnection {
 		if (conn_created_flag) PQfinish( conn );
 	}
 	
-	answer exec(ref const query_params p) {
-		
-		// code above just preparing args for PQexecParams
-		Oid[] types = new Oid[p.args.length];
-		int[] formats = new int[p.args.length];
-		int[] lengths = new int[p.args.length];
-		const(byte)*[] values = new const(byte)*[p.args.length];
-
-		for( int i = 0; i < p.args.length; ++i ) {
-			types[i] = p.args[i].type;
-			formats[i] = p.args[i].format;	
-			values[i] = p.args[i].value_bin.ptr;
-			
-			final switch( p.args[i].format ) {
-				case valueFormat.TEXT:
-					lengths[i] = to!int( p.args[i].value_str.length );
-					break;
-				case valueFormat.BINARY:
-					lengths[i] = to!int( p.args[i].value_bin.length );
-					break;
-			}
-		}
-
-		return new answer(
-			PQexecParams (
-				conn,
-				toStringz( p.sql_command ),
-				to!int( p.args.length ),
-				types.ptr,
-				values.ptr,
-				lengths.ptr,
-				formats.ptr,
-				p.result_format
-			)
-		);
-	}
-	
 	/// returns null if no notifies was received
 	notify get_next_notify() {
 		consume_input();
