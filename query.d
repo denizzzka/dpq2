@@ -49,6 +49,14 @@ final class Connection: BaseConnection
 			)
 		);
 	}
+
+	/// returns null if no notifies was received
+	notify getNextNotify() {
+		consumeInput();
+		auto n = PQnotifies(conn);
+		return n is null ? null : new notify(n);
+	}
+
 }
 /*	
 	
@@ -117,6 +125,6 @@ void external_unittest( string conn_param ) {
     */
     string sql_query3 = "listen test_notify; notify test_notify";
     r = conn.exec( sql_query3 );
-    assert( conn.get_next_notify.name == "test_notify" );
+    assert( conn.getNextNotify.name == "test_notify" );
 
 }

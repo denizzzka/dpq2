@@ -52,7 +52,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
  */
 class BaseConnection
 {
-	protected PGconn* conn;
+	package PGconn* conn;
 	private bool conn_created_flag;
 
 	private enum consume_result
@@ -86,15 +86,8 @@ class BaseConnection
 	~this() {
 		disconnect();
 	}
-	
-	/// returns null if no notifies was received
-	notify get_next_notify() {
-		consume_input();
-		auto n = PQnotifies(conn);
-		return n is null ? null : new notify(n);
-	}
 
-	private void consume_input() {
+	package void consumeInput() {
 		int r = PQconsumeInput( conn );
 		if( r != consume_result.PQ_CONSUME_OK ) throw new exception();
 	}
