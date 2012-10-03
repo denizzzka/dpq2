@@ -86,7 +86,7 @@ class answer
         debug r.format = columnFormat( c.Col );
         return r;
     }
-    /*
+    
     cell* opIndex( size_t Row, size_t Col )
     {
         assertCoords( Row, Col );
@@ -97,7 +97,7 @@ class answer
         debug r.format = column_format( Col );
         return r;        
     };
-    */
+    
     int size( const Coords c ) {
         assertCoords(c);
         return PQgetlength(res, c.Row, c.Col);
