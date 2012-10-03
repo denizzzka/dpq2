@@ -27,7 +27,7 @@ class answer
     struct cell {
         package {
             immutable (byte)* val;
-            int size; // currently used only for bin
+            size_t size; // currently used only for bin
             debug valueFormat format;
         }
 
@@ -83,11 +83,14 @@ class answer
     @property size_t columnCount(){ return PQnfields(res); }
 
     /// Returns column format
-    valueFormat columnFormat( size_t colNum ) {
+    valueFormat columnFormat( size_t colNum )
+    {
         return PQfformat(res, colNum);
     }
     
-    size_t columnNum( string column_name ) {    
+    /// Returns column number by field name
+    size_t columnNum( string column_name )
+    {    
         size_t n = PQfnumber(res, toStringz(column_name));
         if( n == -1 )
             throw new exception(exception.exception_types.COLUMN_NOT_FOUND,
@@ -95,7 +98,7 @@ class answer
         return n;
     }
 
-    private cell* getValue( const Coords c )
+    private const(cell)* getValue( const Coords c )
     {
         assertCoords(c);
         
@@ -106,12 +109,13 @@ class answer
         return r;
     }
     
-    cell* opIndex( size_t Row, size_t Col )
+    /// Returns pointer to cell
+    const (cell)* opIndex( size_t Row, size_t Col )
     {
         return getValue( Coords( Row, Col ) );
     };
     
-    int size( const Coords c ) {
+    size_t size( const Coords c ) {
         assertCoords(c);
         return PQgetlength(res, c.Row, c.Col);
     }

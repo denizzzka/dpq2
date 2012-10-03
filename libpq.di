@@ -352,7 +352,7 @@ extern (C) nothrow
     Oid PQoidValue( PGresult *res);
     char *PQcmdTuples(PGresult *res);
     immutable(byte)* PQgetvalue( PGresult *res, size_t tup_num, size_t field_num); /// used!
-    int PQgetlength( PGresult *res, size_t tup_num, size_t field_num); /// used!
+    size_t PQgetlength( PGresult *res, size_t tup_num, size_t field_num); /// used!
     int PQgetisnull( PGresult *res, size_t tup_num, size_t field_num); ///used!
     int PQnparams( PGresult *res);
     Oid PQparamtype( PGresult *res, int param_num);
