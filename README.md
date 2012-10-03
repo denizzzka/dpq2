@@ -1,6 +1,8 @@
 dpq2
 ====
 
+(Under heavy development, do not use it now!)
+
 This is yet another attempt to create a good interface to PostgreSQL from the
 D 2.0 programming language.
 
