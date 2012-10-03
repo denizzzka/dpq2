@@ -1,8 +1,6 @@
 dpq2
 ====
 
-(Under heavy development, do not use it now!)
-
 This is yet another attempt to create a good interface to PostgreSQL from the
 D 2.0 programming language.
 
@@ -31,14 +29,17 @@ or
 Usage
 -----
 
-(coming soon)
+
 
 Unittests
 ---------
 
-The code contains embedded unittests using a regular functions calls, not using
-standard D unittests. It is need because that unittests need to pass parameters
-to connect to the database in runtime.
+Code contains embedded unittests using a regular functions calls, not using
+standard D unittests. (It is need because that unittests need to pass parameters
+of connection to the database in runtime.)
+
+To perform unit test it is required access to any PostgreSQL server with
+permissions to run SELECT statements.
 
 After building dpq2 with unittests file libdpq2 can be executed. Option "--conninfo"
 may contains connection string as described in [PostgreSQL documentation]
