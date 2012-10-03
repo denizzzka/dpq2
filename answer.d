@@ -174,7 +174,7 @@ void _unittest( string connParam )
 
     assert( r.rowCount == 3 );
     assert( r.columnCount == 4);
-    assert( r.columnFormat(2) == dpq2.libpq.valueFormat.TEXT );
+    assert( r.columnFormat(2) == valueFormat.TEXT );
     assert( r[1,2].str == "456" );
     assert( !r.isNULL( Coords(0,0) ) );
     assert( r.isNULL( Coords(0,2) ) );
