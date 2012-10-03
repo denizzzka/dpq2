@@ -1,10 +1,13 @@
 dpq2
 ====
 
-This is yet another attempt to create a good interface to PostgreSQL from the
-D 2.0 programming language.
+(Under development - undocumented functions should be used with care.)
 
-Under development - undocumented functions should be used care.
+This is yet another attempt to create a good interface to PostgreSQL from the 
+D programming language.
+
+It is designed to do not add overhead to the original low level library libpq but
+make convenient use PostgreSQL from D.
 
 Features
 --------
@@ -15,6 +18,9 @@ Features
 
 Building
 --------
+
+###Requirements:
+Currently code builds with compiler dmd 2.060 and GNU make
 
 ####Debug version (with debugging symbols)
     make debug
