@@ -16,8 +16,8 @@ class answer
 {  
     struct Coords
     {
-        size_t Col;
         size_t Row;
+        size_t Col;
     }
 
     // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
@@ -71,8 +71,8 @@ class answer
         return PQfformat(res, colNum);
     }
     
-    int column_num( string column_name ) {    
-        int n = PQfnumber(res, toStringz(column_name));
+    size_t columnNum( string column_name ) {    
+        size_t n = PQfnumber(res, toStringz(column_name));
         if( n == -1 )
             throw new exception(exception.exception_types.COLUMN_NOT_FOUND,
                                 "Column '"~column_name~"' is not found");
@@ -92,7 +92,7 @@ class answer
     
     cell* opIndex( size_t Row, size_t Col )
     {
-        return getValue( Coords( Col, Row ) );
+        return getValue( Coords( Row, Col ) );
     };
     
     int size( const Coords c ) {
@@ -102,7 +102,7 @@ class answer
     
     bool isNULL( const Coords c ) {
         assertCoords(c);
-        return PQgetisnull(res, c.Row, c.Col) != 0;
+        return PQgetisnull(res, c.Col, c.Row) != 0;
     }
 
     private void assertCoords( const Coords c )
@@ -160,11 +160,13 @@ void _unittest( string connParam )
     conn.connect( cd );
 
     string sql_query =
-    "select now() as time,  'abc'::text as string,  123,  456.78\n"
+    "select now() as time,  'abc'::text as field_name,   123,  456.78\n"
     "union all\n"
-    "select now(),          'def'::text,            456,  910.11\n"
+
+    "select now(),          'def'::text,                 456,  910.11\n"
     "union all\n"
-    "select NULL,           'ijk'::text,            789,  12345.115345";
+
+    "select NULL,           'ijk'::text,                 789,  12345.115345";
 
     auto r = conn.exec( sql_query );
     
@@ -176,16 +178,13 @@ void _unittest( string connParam )
     assert( r[1,2].str == "456" );
     assert( !r.isNULL( Coords(0,0) ) );
     assert( r.isNULL( Coords(0,2) ) );
-    assert( r.column_num( "string" ) == 1 );
-
-    auto c = r.getValue( Coords(2,1) ); 
-    assert( c.str == "456" );   
+    assert( r.columnNum( "field_name" ) == 1 );
 
     string sql_query2 =
     "select * from (\n"
     ~ sql_query ~
     ") t\n"
-    "where string = $1";
+    "where field_name = $1";
     
     static queryArg arg = { valueStr: "def" };
     queryArg[1] args;
@@ -195,7 +194,7 @@ void _unittest( string connParam )
     p.args = args;
 
     r = conn.exec( p );     
-    assert( r.getValue( Coords(2,0) ).str == "456" );
+    assert( r[0,2].str == "456" );
 
     string sql_query3 = "listen test_notify; notify test_notify";
     r = conn.exec( sql_query3 );

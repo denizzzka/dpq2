@@ -340,7 +340,7 @@ extern (C) nothrow
     int PQnfields( PGresult *res);
     int PQbinaryTuples( PGresult *res);
     char *PQfname( PGresult *res, int field_num);
-    int PQfnumber( PGresult *res,  immutable char *field_name);
+    size_t PQfnumber( PGresult *res,  immutable char *field_name); /// used!
     Oid PQftable( PGresult *res, int field_num);
     int PQftablecol( PGresult *res, int field_num);
     valueFormat PQfformat( PGresult *res, size_t field_num); /// used!
