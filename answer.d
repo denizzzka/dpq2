@@ -89,13 +89,7 @@ class answer
     
     cell* opIndex( size_t Row, size_t Col )
     {
-        assertCoords( Row, Col );
-        
-        cell* r = new cell;
-        r.val = PQgetvalue(res, Row, Col);
-        r.size = get_value_size( c );
-        debug r.format = column_format( Col );
-        return r;        
+        return getValue( Coords( Col, Row ) );
     };
     
     int size( const Coords c ) {
