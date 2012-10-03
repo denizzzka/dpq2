@@ -21,6 +21,11 @@ Building
 
 ####Requirements:
 Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.060 and GNU make.
+```sh
+git clone https://github.com/denizzzka/dpq2.git
+cd dpq2
+```
+and type:
 
 ####Debug version (with debugging symbols and asserts)
     make debug
