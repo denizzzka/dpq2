@@ -74,7 +74,8 @@ class BaseConnection
 		}
     }
 
-    ~this() {
+    ~this()
+    {
         disconnect();
     }
 
@@ -95,7 +96,8 @@ class BaseConnection
 
         pq_type type;
         
-        this() {
+        this()
+        {
             type = PQstatus(conn);
             super( PQerrorMessage(conn), null, null );
         }
