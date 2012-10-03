@@ -55,17 +55,17 @@ return:
 456.78
 ```
 
-Unittests
----------
+Unit tests
+----------
 
-Code contains embedded unittests using a regular functions calls, not using
-standard D unittests. (Non standard because that unittests need to pass
+Code contains embedded unit tests using a regular functions calls, not using
+standard D unit tests. (Non standard because that unit tests need to pass
 parameters of connection to the database in runtime.)
 
 To perform unit test it is required access to any PostgreSQL server with
 permissions to run SELECT statements.
 
-After building dpq2 with unittests file libdpq2 can be executed. Option "--conninfo"
+After building dpq2 with the unit tests file libdpq2 can be executed. Option "--conninfo"
 may contains connection string as described in [PostgreSQL documentation]
 (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING).
 
