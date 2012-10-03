@@ -8,14 +8,14 @@ import dpq2.answer;
 /// Query parameters
 struct queryParams
 {
-    string sqlCommand;
-    queryArg[] args;
-    valueFormat result_format = valueFormat.TEXT;
+    string sqlCommand; /// SQL command
+    queryArg[] args; /// SQL command arguments
+    valueFormat result_format = valueFormat.TEXT; /// Result value format
 }
 /// Query argument
 struct queryArg
 {
-    Oid type = 0; ///TODO: document this
+    Oid type = 0; ///OID type
     valueFormat format = valueFormat.TEXT; /// Value format
 
     /// Argument value
