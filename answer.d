@@ -25,7 +25,7 @@ class answer
     /// Result table's cell
     // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
     struct Cell {
-        package {
+        private {
             const (byte)* val;
             size_t size; // currently used only for bin
             debug valueFormat format;
