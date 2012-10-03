@@ -29,7 +29,7 @@ int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
-/// Connection (abstract)
+/// BaseConnection
 class BaseConnection
 {
     package PGconn* conn;
