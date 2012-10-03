@@ -9,6 +9,7 @@ Under development - undocumented functions use with care.
 Features
 --------
 
+* Arguments list support
 * LISTEN support
 * Sending binary data for type bytea
 
