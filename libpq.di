@@ -347,7 +347,7 @@ extern (C) nothrow
     Oid PQftype( PGresult *res, int field_num);
     int PQfsize( PGresult *res, int field_num);
     int PQfmod( PGresult *res, int field_num);
-    char *PQcmdStatus(PGresult *res);
+    char *PQcmdStatus(PGresult *res); ///used!
     char *PQoidStatus( PGresult *res);
     Oid PQoidValue( PGresult *res);
     char *PQcmdTuples(PGresult *res);

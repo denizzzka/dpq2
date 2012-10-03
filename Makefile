@@ -23,5 +23,5 @@ doc:
 clean:
 	rm -rf *.o *.a
 	rm -rf doc
-	rm $(ONAME)
-	rm $(ONAME).di
+	rm -f $(ONAME)
+	rm -f $(ONAME).di

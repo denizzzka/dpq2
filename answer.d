@@ -12,14 +12,17 @@ import core.exception;
 
 debug import std.stdio: writeln;
 
+/// Answer
 class answer
 {  
+    /// Result table's cell coordinates 
     struct Coords
     {
         size_t Row;
         size_t Col;
     }
 
+    /// Result table's cell
     // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
     struct cell {
         package {
@@ -28,11 +31,13 @@ class answer
             debug valueFormat format;
         }
 
+        /// Return value from text result formatted fields
         @property string str(){
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
             return to!string( cast(immutable(char)*)val );
         }
 
+        /// Return value from binary result formatted fields
         @property immutable (byte[]) bin(){
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
@@ -59,7 +64,15 @@ class answer
         return PQresultStatus(res);
     }
 
-    string cmd_status() {
+    /// Returns the command status tag from the SQL command that generated the PGresult
+    /**
+     * Commonly this is just the name of the command, but it might include 
+     * additional data such as the number of rows processed. The caller should 
+     * not free the result directly. It will be freed when the associated 
+     * PGresult handle is passed to PQclear.
+     */
+    string cmdStatus()
+    {
         return to!string( PQcmdStatus(res) );
     }
 
