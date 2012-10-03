@@ -11,6 +11,8 @@
  * them if they are wrong.
  */
 
+/// TODO: remove excess and may be change storage class qualifiers
+
 module dpq2.libpq;
 @safe
 
