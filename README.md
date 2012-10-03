@@ -25,20 +25,19 @@ Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.060 and GNU ma
 git clone https://github.com/denizzzka/dpq2.git
 cd dpq2
 ```
-and type:
 
 ####Debug version (with debugging symbols and asserts)
-    make debug
+    $ make debug
 
 ####Unittest version (see below)
-    make unittest
+    $ make unittest
 
 ####Release version
-    make release
+    $ make release
 
 or
 
-    make
+    $ make
 
 Example
 -------
