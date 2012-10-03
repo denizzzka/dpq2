@@ -12,6 +12,7 @@ struct queryParams
     queryArg[] args; /// SQL command arguments
     valueFormat result_format = valueFormat.TEXT; /// Result value format
 }
+
 /// Query argument
 struct queryArg
 {
