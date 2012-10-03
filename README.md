@@ -52,15 +52,17 @@ may contains connection string as described in [PostgreSQL documentation]
 
 For default connection to DB type:
 
-    $ ./libdpq2 
-
+```bash
+$ ./libdpq2 
+```
 Connection to usually available database "postgres":
-
+```bash
     $ ./libdpq2 --conninfo "dbname=postgres"
-
+```
 Network connection:
-
+```bash
     $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
+```
 
 TODO
 ----
