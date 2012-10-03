@@ -79,7 +79,7 @@ class answer
         return n;
     }
 
-    cell* getValue( const Coords c )
+    private cell* getValue( const Coords c )
     {
         assertCoords(c);
         
@@ -107,8 +107,8 @@ class answer
 
     private void assertCoords( const Coords c )
     {
-        assert( c.Row < rows_num, to!string(c.Row)~" row is out of range 0.."~to!string(rows_num-1)~" of result rows" );
-        assert( c.Col < cols_num, to!string(c.Col)~" col is out of range 0.."~to!string(rows_num-1)~" of result cols" );
+        assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
+        assert( c.Col < columnCount, to!string(c.Col)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
     }
 
     class exception : Exception {       
@@ -170,8 +170,8 @@ void _unittest( string connParam )
     
     alias dpq2.answer.answer.Coords Coords;
 
-    assert( r.rows_num == 3 );
-    assert( r.cols_num == 4);
+    assert( r.rowCount == 3 );
+    assert( r.columnCount == 4);
     assert( r.columnFormat(2) == dpq2.libpq.valueFormat.TEXT );
     assert( r[1,2].str == "456" );
     assert( !r.isNULL( Coords(0,0) ) );
