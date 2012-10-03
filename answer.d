@@ -18,8 +18,8 @@ class answer
     /// Result table's cell coordinates 
     struct Coords
     {
-        size_t Row;
-        size_t Col;
+        size_t Row; /// Row
+        size_t Col; /// Column
     }
 
     /// Result table's cell
@@ -93,7 +93,7 @@ class answer
     {    
         size_t n = PQfnumber(res, toStringz(column_name));
         if( n == -1 )
-            throw new exception(exception.exception_types.COLUMN_NOT_FOUND,
+            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
                                 "Column '"~column_name~"' is not found");
         return n;
     }
@@ -115,11 +115,13 @@ class answer
         return getValue( Coords( Row, Col ) );
     };
     
+    /// Returns cell size
     size_t size( const Coords c ) {
         assertCoords(c);
         return PQgetlength(res, c.Row, c.Col);
     }
     
+    /// Cell NULL checking
     bool isNULL( const Coords c ) {
         assertCoords(c);
         return PQgetisnull(res, c.Col, c.Row) != 0;
@@ -130,30 +132,39 @@ class answer
         assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
         assert( c.Col < columnCount, to!string(c.Col)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
     }
-
-    class exception : Exception {       
-        enum exception_types {
-            COLUMN_NOT_FOUND
+    
+    /// Exception
+    class exception : Exception
+    {       
+        /// Exception types
+        enum exceptionTypes
+        {
+            COLUMN_NOT_FOUND /// Column not found
         }
         
-        exception_types type;
-
-        string error_msg() {
+        exceptionTypes type; /// Exception type
+        
+        /// Returns the error message associated with the command
+        string resultErrorMessage()
+        {
             return to!string( PQresultErrorMessage(res) );
         }
         
-        this( exception_types t, string msg ) {
+        this( exceptionTypes t, string msg )
+        {
             type = t;
             super( msg, null, null );
         }
         
-        this() {
-            super( error_msg~" ("~to!string(status)~")", null, null );
+        this()
+        {
+            super( resultErrorMessage~" ("~to!string(status)~")", null, null );
         }           
     }
 }
 
-class notify {
+class notify
+{
     private PGnotify* n;
 
     this(){}
