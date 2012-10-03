@@ -31,13 +31,13 @@ class answer
             debug valueFormat format;
         }
 
-        /// Return value from text result formatted fields
+        /// Returns value from text formatted fields
         @property string str(){
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
             return to!string( cast(immutable(char)*)val );
         }
 
-        /// Return value from binary result formatted fields
+        /// Returns value from binary formatted fields
         @property immutable (byte[]) bin(){
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
@@ -76,10 +76,13 @@ class answer
         return to!string( PQcmdStatus(res) );
     }
 
+    /// Returns row count
     @property size_t rowCount(){ return PQntuples(res); }
 
+    /// Returns column count
     @property size_t columnCount(){ return PQnfields(res); }
 
+    /// Returns column format
     valueFormat columnFormat( size_t colNum ) {
         return PQfformat(res, colNum);
     }
