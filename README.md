@@ -39,7 +39,7 @@ Example
 -------
 
 ```D
-import dpq2.answer; // sorry, meaningless name will be fixed later :-)
+import dpq2.answer;
 
 auto conn = new Connection;
 conn.connString = "dbname=postgres";
