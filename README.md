@@ -26,8 +26,8 @@ or
 
     make
 
-Usage
------
+Brief usage
+-----------
 
 ```D
 auto conn = new Connection;
@@ -37,6 +37,12 @@ auto res = conn.exec(
     "SELECT now() as current_time, 'abc'::text as field_name,"
     "123 as field_3, 456.78 as field_4"
     );
+    
+writeln( res[0,3].str );
+```
+returns:
+```sh
+456.78
 ```
 
 Unittests

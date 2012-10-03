@@ -162,7 +162,6 @@ void _unittest( string connParam )
     "union all\n"
 
     "select NULL,           'ijk'::text,                 789,  12345.115345";
-
     auto r = conn.exec( sql_query );
     
     alias dpq2.answer.answer.Coords Coords;
