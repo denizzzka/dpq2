@@ -24,21 +24,25 @@ class answer
 
     /// Result table's cell
     // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
-    struct Cell {
-        private {
+    struct Cell
+    {
+        private
+        {
             const (byte)* val;
             size_t size; // currently used only for bin
             debug valueFormat format;
         }
 
         /// Returns value from text formatted fields
-        @property string str() const {
+        @property string str() const
+        {
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
             return to!string( cast(immutable(char)*)val );
         }
 
         /// Returns value from binary formatted fields
-        @property const (byte)[] bin() const {
+        @property const (byte)[] bin() const
+        {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
         }
@@ -48,7 +52,8 @@ class answer
     
     private this(){}
     
-    package this(PGresult* r){
+    package this(PGresult* r)
+    {
         res = r;
         enforceEx!OutOfMemoryError(r, "Can't write query result");
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
@@ -60,7 +65,8 @@ class answer
         PQclear(res);
     }
 
-    ExecStatusType status() {
+    ExecStatusType status() 
+    {
         return PQresultStatus(res);
     }
 
@@ -116,13 +122,15 @@ class answer
     };
     
     /// Returns cell size
-    size_t size( const Coords c ) {
+    size_t size( const Coords c ) 
+    {
         assertCoords(c);
         return PQgetlength(res, c.Row, c.Col);
     }
     
     /// Cell NULL checking
-    bool isNULL( const Coords c ) {
+    bool isNULL( const Coords c ) 
+    {
         assertCoords(c);
         return PQgetisnull(res, c.Col, c.Row) != 0;
     }
