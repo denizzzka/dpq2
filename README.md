@@ -33,7 +33,10 @@ Usage
 auto conn = new Connection;
 conn.connect( connArgs( "dbname=postgres", connVariant.SYNC ));
 
-auto res = conn.exec( "SELECT now() as current_time, 'abc'::text as field_name, 123 as field_3, 456.78 as field_4" );
+auto res = conn.exec(
+    "SELECT now() as current_time, 'abc'::text as field_name,"
+    "123 as field_3, 456.78 as field_4"
+    );
 ```
 
 Unittests
