@@ -39,6 +39,8 @@ Example
 -------
 
 ```D
+import dpq2.answer; // sorry, meaningless name will be fixed later :-)
+
 auto conn = new Connection;
 conn.connString = "dbname=postgres";
 conn.connect();
