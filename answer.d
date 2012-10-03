@@ -163,6 +163,7 @@ class answer
     }
 }
 
+/// Notify
 class notify
 {
     private PGnotify* n;
@@ -171,11 +172,17 @@ class notify
     this( PGnotify* n ) { this.n = n; }
     ~this() { PQfreemem(n); }
 
-    string name() { return to!string( n.relname ); }
-    string extra() { return to!string( n.extra ); }
-    int pid() { return n.be_pid; }
+    /// Returns notification condition name
+    @property string name() { return to!string( n.relname ); }
 
-    invariant(){
+    /// Returns notification parameter
+    @property string extra() { return to!string( n.extra ); }
+
+    /// Returns process ID of notifying server process
+    @property size_t pid() { return n.be_pid; }
+
+    invariant()
+    {
         assert( n != null );
     }
 }

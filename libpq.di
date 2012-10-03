@@ -118,10 +118,10 @@ extern (C) nothrow
      * NOTE: in Postgres 6.4 and later, the be_pid is the notifying backend's,
      * whereas in earlier versions it was always your own backend's PID.
      */
-    struct PGnotify
+    struct PGnotify /// used!
     {
         char       *relname;        /** notification condition name */
-        int         be_pid;         /** process ID of notifying server process */
+        size_t     be_pid;          /** process ID of notifying server process */
         char       *extra;          /** notification parameter */
         /* Fields below here are private to libpq; apps should not use 'em */
         private PGnotify *next;     /* list link */
