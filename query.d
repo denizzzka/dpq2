@@ -26,7 +26,7 @@ struct queryArg
     };
 }
 
-/// Connection (Should be used instead of BaseConnection)
+/// Connection
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
