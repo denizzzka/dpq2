@@ -68,11 +68,11 @@ $ ./libdpq2
 ```
 Connection to usually available database "postgres":
 ```sh
-    $ ./libdpq2 --conninfo "dbname=postgres"
+$ ./libdpq2 --conninfo "dbname=postgres"
 ```
 Network connection:
 ```sh
-    $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
+$ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
 ```
 
 TODO
