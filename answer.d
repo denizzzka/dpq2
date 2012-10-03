@@ -24,21 +24,21 @@ class answer
 
     /// Result table's cell
     // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
-    struct cell {
+    struct Cell {
         package {
-            immutable (byte)* val;
+            const (byte)* val;
             size_t size; // currently used only for bin
             debug valueFormat format;
         }
 
         /// Returns value from text formatted fields
-        @property string str(){
+        @property string str() const {
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
             return to!string( cast(immutable(char)*)val );
         }
 
         /// Returns value from binary formatted fields
-        @property immutable (byte[]) bin(){
+        @property const (byte)[] bin() const {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
         }
@@ -98,11 +98,11 @@ class answer
         return n;
     }
 
-    private const(cell)* getValue( const Coords c )
+    private const (Cell)* getValue( const Coords c )
     {
         assertCoords(c);
         
-        cell* r = new cell;
+        Cell* r = new Cell;
         r.val = PQgetvalue(res, c.Row, c.Col);
         r.size = size( c );
         debug r.format = columnFormat( c.Col );
@@ -110,7 +110,7 @@ class answer
     }
     
     /// Returns pointer to cell
-    const (cell)* opIndex( size_t Row, size_t Col )
+    const (Cell)* opIndex( size_t Row, size_t Col )
     {
         return getValue( Coords( Row, Col ) );
     };
