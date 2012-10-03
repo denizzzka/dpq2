@@ -152,7 +152,8 @@ class notify {
 void _unittest( string connParam )
 {
     auto conn = new Connection;
-    conn.connect( connArgs( connParam, connVariant.SYNC ) );
+	conn.connString = connParam;
+    conn.connect();
 
     string sql_query =
     "select now() as time,  'abc'::text as field_name,   123,  456.78\n"

@@ -83,15 +83,9 @@ final class Connection: BaseConnection
 
 void _unittest( string connParam )
 {
-    //TODO: отсюда всё вынести, кроме проверки запросов. Ответы првоерять в answer.d
-    
-    connArgs cd = {
-        connString: connParam,
-        type: connVariant.SYNC
-    };
-
     auto conn = new Connection;
-    conn.connect( cd );
+	conn.connString = connParam;
+    conn.connect();
 
     string sql_query =
     "select now() as time, 'abc'::text as string, 123, 456.78\n"

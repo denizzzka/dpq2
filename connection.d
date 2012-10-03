@@ -11,11 +11,6 @@ import core.exception;
 
 enum connVariant { SYNC, ASYNC };
 
-struct connArgs {   
-    string connString;
-    connVariant type;
-}
-
 /*
  * Bugs: On Unix connection is not thread safe.
  * 
@@ -42,16 +37,19 @@ class BaseConnection
         PQ_CONSUME_ERROR,
         PQ_CONSUME_OK
     }
+    
+    string connString; /// Database connection the parameters
+	connVariant connType = connVariant.SYNC; /// Connection variant
 
-    void connect( connArgs args )
+    void connect()
     {
-		//TODO: нужны блокировки чтобы нельзя было несколько раз создать
+		// TODO: нужны блокировки чтобы нельзя было несколько раз создать
 		// соединение из параллельных потоков или запрос через нерабочее соединение
-        conn = PQconnectdb(toStringz(args.connString));
+        conn = PQconnectdb(toStringz(connString));
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if(args.type == connVariant.SYNC &&
+        if(connType == connVariant.SYNC &&
            PQstatus(conn) != ConnStatusType.CONNECTION_OK)
             throw new exception();
         
@@ -100,13 +98,9 @@ class BaseConnection
 }
 
 void _unittest( string connParam )
-{
-    connArgs cd = {
-        connString: connParam,
-        type: connVariant.SYNC
-    };
-    
+{    
     auto c = new BaseConnection;
-    c.connect( cd );
+	c.connString = connParam;
+    c.connect();
     c.disconnect();
 }
