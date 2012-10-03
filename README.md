@@ -26,8 +26,8 @@ or
 
     make
 
-Brief usage
------------
+Example
+-------
 
 ```D
 auto conn = new Connection;
@@ -40,7 +40,7 @@ auto res = conn.exec(
     
 writeln( res[0,3].str );
 ```
-returns:
+return:
 ```sh
 456.78
 ```
