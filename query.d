@@ -5,25 +5,30 @@ import dpq2.libpq;
 import dpq2.connection;
 import dpq2.answer;
 
+/// Query parameters
 struct queryParams
 {
     string sqlCommand;
     queryArg[] args;
     valueFormat result_format = valueFormat.TEXT;
 }
-
+/// Query argument
 struct queryArg
 {
-    Oid type = 0;
-    valueFormat format = valueFormat.TEXT;
+    Oid type = 0; ///TODO: document this
+    valueFormat format = valueFormat.TEXT; /// Value format
+
+    /// Argument value
     union {
-        byte[] valueBin;
-        string valueStr;
+        byte[] valueBin; /// Binary variant
+        string valueStr; /// Text variant
     };
 }
 
+/// Connection (Should be used instead of BaseConnection)
 final class Connection: BaseConnection
 {
+    /// Perform SQL query to DB
     answer exec(string SQLcmd )
     {
         return new answer(
@@ -31,6 +36,7 @@ final class Connection: BaseConnection
         );
     }
 
+    /// Perform SQL query to DB
     answer exec(ref const queryParams p)
     {
         // code above just preparing args for PQexecParams
@@ -71,7 +77,7 @@ final class Connection: BaseConnection
         );
     }
 
-    /// returns null if no notifies was received
+    /// Returns null if no notifies was received
     notify getNextNotify()
     {
         consumeInput();
