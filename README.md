@@ -22,7 +22,7 @@ Building
 ###Requirements:
 Currently code builds with compiler dmd 2.060 and GNU make
 
-####Debug version (with debugging symbols)
+####Debug version (with debugging symbols and asserts)
     make debug
 
 ####Unittest version (see below)
