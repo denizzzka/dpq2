@@ -63,9 +63,9 @@ class answer
         return to!string( PQcmdStatus(res) );
     }
 
-    int rows_num(){ return PQntuples(res); }
+    @property size_t rowCount(){ return PQntuples(res); }
 
-    int cols_num(){ return PQnfields(res); }
+    @property size_t columnCount(){ return PQnfields(res); }
 
     valueFormat columnFormat( size_t colNum ) {
         return PQfformat(res, colNum);
