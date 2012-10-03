@@ -90,15 +90,14 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
+    /// Exception
     class exception : Exception
     {
-        alias ConnStatusType pq_type; /// libpq conn statuses
-
-        pq_type type;
+        ConnStatusType statusType; /// libpq conn status
         
         this()
         {
-            type = PQstatus(conn);
+            statusType = PQstatus(conn);
             super( PQerrorMessage(conn), null, null );
         }
     }
