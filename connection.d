@@ -106,6 +106,8 @@ class BaseConnection
 
 void _unittest( string connParam )
 {    
+    assert( PQlibVersion() >= 90100 );
+    
     auto c = new BaseConnection;
 	c.connString = connParam;
     c.connect();

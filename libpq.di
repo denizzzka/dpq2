@@ -419,6 +419,9 @@ extern (C) nothrow
 
     /* === in fe-misc.c === */
 
+    /* Get the version of the libpq library in use */
+    size_t PQlibVersion();
+
     /* Determine length of multibyte encoded char at *s */
     int PQmblen( char *s, int encoding);
 
