@@ -12,9 +12,14 @@ debug import std.stdio: writeln;
 
 class answer {  
 
-    struct cell_coords {
+    deprecated struct cell_coords {
         int col;
         int row;
+    }
+
+    struct Coords {
+        size_t Col;
+        size_t Row;
     }
 
     struct cell {
@@ -63,8 +68,8 @@ class answer {
 
     int cols_num(){ return PQnfields(res); }
 
-    valueFormat column_format( int col_num ) {
-        return PQfformat(res, col_num);
+    valueFormat columnFormat( size_t colNum ) {
+        return PQfformat(res, colNum);
     }
     
     int column_num( string column_name ) {    
@@ -75,29 +80,48 @@ class answer {
         return n;
     }
 
-    cell* get_value( const cell_coords c ) {
-        assert_coords(c);
+    cell* getValue( const Coords c )
+    {
+        assertCoords(c);
         
         cell* r = new cell;
-        r.val = PQgetvalue(res, c.row, c.col);
-        r.size = get_value_size( c );
-        debug r.format = column_format( c.col );
+        r.val = PQgetvalue(res, c.Row, c.Col);
+        r.size = size( c );
+        debug r.format = columnFormat( c.Col );
         return r;
     }
-
-    int get_value_size( const cell_coords c ) {
-        assert_coords(c);
-        return PQgetlength(res, c.row, c.col);
+    /*
+    cell* opIndex( size_t Row, size_t Col )
+    {
+        assertCoords( Row, Col );
+        
+        cell* r = new cell;
+        r.val = PQgetvalue(res, Row, Col);
+        r.size = get_value_size( c );
+        debug r.format = column_format( Col );
+        return r;        
+    };
+    */
+    int size( const Coords c ) {
+        assertCoords(c);
+        return PQgetlength(res, c.Row, c.Col);
     }
     
-    bool isNULL( const cell_coords c ) {
-        assert_coords(c);
-        return PQgetisnull(res, c.row, c.col) != 0;
+    bool isNULL( const Coords c ) {
+        assertCoords(c);
+        return PQgetisnull(res, c.Row, c.Col) != 0;
     }
 
-    private void assert_coords( const cell_coords c ) {
+    private void assert_coords( const cell_coords c )
+    {
         assert( c.row < rows_num, to!string(c.row)~" row is out of range 0.."~to!string(rows_num-1)~" of result rows" );
         assert( c.col < cols_num, to!string(c.col)~" col is out of range 0.."~to!string(rows_num-1)~" of result cols" );
+    }
+
+    private void assertCoords( const Coords c )
+    {
+        assert( c.Row < rows_num, to!string(c.Row)~" row is out of range 0.."~to!string(rows_num-1)~" of result rows" );
+        assert( c.Col < cols_num, to!string(c.Col)~" col is out of range 0.."~to!string(rows_num-1)~" of result cols" );
     }
 
     class exception : Exception {       

@@ -343,7 +343,7 @@ extern (C) nothrow
     int PQfnumber( PGresult *res,  immutable char *field_name);
     Oid PQftable( PGresult *res, int field_num);
     int PQftablecol( PGresult *res, int field_num);
-    valueFormat PQfformat( PGresult *res, int field_num);
+    valueFormat PQfformat( PGresult *res, size_t field_num); /// used!
     Oid PQftype( PGresult *res, int field_num);
     int PQfsize( PGresult *res, int field_num);
     int PQfmod( PGresult *res, int field_num);
@@ -351,9 +351,9 @@ extern (C) nothrow
     char *PQoidStatus( PGresult *res);
     Oid PQoidValue( PGresult *res);
     char *PQcmdTuples(PGresult *res);
-    immutable(byte)* PQgetvalue( PGresult *res, int tup_num, int field_num);
-    int PQgetlength( PGresult *res, int tup_num, int field_num);
-    int PQgetisnull( PGresult *res, int tup_num, int field_num);
+    immutable(byte)* PQgetvalue( PGresult *res, size_t tup_num, size_t field_num); /// used!
+    int PQgetlength( PGresult *res, size_t tup_num, size_t field_num); /// used!
+    int PQgetisnull( PGresult *res, size_t tup_num, size_t field_num); ///used!
     int PQnparams( PGresult *res);
     Oid PQparamtype( PGresult *res, int param_num);
 

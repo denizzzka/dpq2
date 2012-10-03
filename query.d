@@ -83,6 +83,8 @@ final class Connection: BaseConnection
 
 void _unittest( string connParam )
 {
+    //TODO: отсюда всё вынести, кроме проверки запросов. Ответы првоерять в answer.d
+    
     connArgs cd = {
         connString: connParam,
         type: connVariant.SYNC
@@ -100,22 +102,22 @@ void _unittest( string connParam )
 
     auto r = conn.exec( sql_query );
     
-    alias dpq2.answer.answer.cell_coords cell_coords;
+    alias dpq2.answer.answer.Coords Coords;
     
-    auto c1 = cell_coords(2,1);
-    auto c2 = cell_coords(0,0);
-    auto c3 = cell_coords(0,2);
-    auto c4 = cell_coords(2,0);
+    auto c1 = Coords(2,1);
+    auto c2 = Coords(0,0);
+    auto c3 = Coords(0,2);
+    auto c4 = Coords(2,0);
 
     assert( r.rows_num == 3 );
     assert( r.cols_num == 4);
-    assert( r.column_format(2) == dpq2.libpq.valueFormat.TEXT );
-    assert( r.get_value(c1).str == "456" );
+    assert( r.columnFormat(2) == dpq2.libpq.valueFormat.TEXT );
+    assert( r.getValue(c1).str == "456" );
     assert( !r.isNULL( c2 ) );
     assert( r.isNULL( c3 ) );
     assert( r.column_num( "string" ) == 1 );
 
-    auto c = r.get_value( c1 ); 
+    auto c = r.getValue( c1 ); 
     assert( c.str == "456" );   
 
     string sql_query2 =
@@ -132,7 +134,7 @@ void _unittest( string connParam )
     p.args = args;
 
     r = conn.exec( p );     
-    assert( r.get_value( c4 ).str == "456" );
+    assert( r.getValue( c4 ).str == "456" );
 
     string sql_query3 = "listen test_notify; notify test_notify";
     r = conn.exec( sql_query3 );
