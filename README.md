@@ -6,7 +6,7 @@ dpq2
 This is yet another attempt to create a good interface to PostgreSQL from the 
 D programming language.
 
-It is designed to do not add overhead to the original low level library libpq but
+It is doesn't add overhead to the original low level library libpq but
 make convenient use PostgreSQL from D.
 
 Features
