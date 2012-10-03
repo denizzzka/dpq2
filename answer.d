@@ -10,14 +10,10 @@ import core.exception;
 
 debug import std.stdio: writeln;
 
-class answer {  
-
-    deprecated struct cell_coords {
-        int col;
-        int row;
-    }
-
-    struct Coords {
+class answer
+{  
+    struct Coords
+    {
         size_t Col;
         size_t Row;
     }
@@ -110,12 +106,6 @@ class answer {
     bool isNULL( const Coords c ) {
         assertCoords(c);
         return PQgetisnull(res, c.Row, c.Col) != 0;
-    }
-
-    private void assert_coords( const cell_coords c )
-    {
-        assert( c.row < rows_num, to!string(c.row)~" row is out of range 0.."~to!string(rows_num-1)~" of result rows" );
-        assert( c.col < cols_num, to!string(c.col)~" col is out of range 0.."~to!string(rows_num-1)~" of result cols" );
     }
 
     private void assertCoords( const Coords c )
