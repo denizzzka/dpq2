@@ -116,4 +116,5 @@ void _unittest( string connParam )
     p.args = args;
 
     r = conn.exec( p );     
+    assert( r[0,2].str == "456" );
 }

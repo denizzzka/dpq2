@@ -152,7 +152,7 @@ class notify {
 void _unittest( string connParam )
 {
     auto conn = new Connection;
-    conn.connect( connArgs( connParam, connVariant.SYNC ));
+    conn.connect( connArgs( connParam, connVariant.SYNC ) );
 
     string sql_query =
     "select now() as time,  'abc'::text as field_name,   123,  456.78\n"
@@ -162,9 +162,10 @@ void _unittest( string connParam )
     "union all\n"
 
     "select NULL,           'ijk'::text,                 789,  12345.115345";
+
     auto r = conn.exec( sql_query );
     
-    alias dpq2.answer.answer.Coords Coords;
+    alias answer.Coords Coords;
 
     assert( r.rowCount == 3 );
     assert( r.columnCount == 4);
@@ -173,22 +174,6 @@ void _unittest( string connParam )
     assert( !r.isNULL( Coords(0,0) ) );
     assert( r.isNULL( Coords(0,2) ) );
     assert( r.columnNum( "field_name" ) == 1 );
-
-    string sql_query2 =
-    "select * from (\n"
-    ~ sql_query ~
-    ") t\n"
-    "where field_name = $1";
-    
-    static queryArg arg = { valueStr: "def" };
-    queryArg[1] args;
-    args[0] = arg;
-    queryParams p;
-    p.sqlCommand = sql_query2;
-    p.args = args;
-
-    r = conn.exec( p );     
-    assert( r[0,2].str == "456" );
 
     string sql_query3 = "listen test_notify; notify test_notify";
     r = conn.exec( sql_query3 );
