@@ -16,7 +16,7 @@ struct queryParams
 /// Query argument
 struct queryArg
 {
-    Oid type = 0; ///OID type
+    Oid type = 0;
     valueFormat format = valueFormat.TEXT; /// Value format
 
     /// Argument value
