@@ -4,7 +4,7 @@ dpq2
 This is yet another attempt to create a good interface to PostgreSQL from the
 D 2.0 programming language.
 
-Under development - undocumented functions use with care.
+Under development - undocumented functions should be used care.
 
 Features
 --------
