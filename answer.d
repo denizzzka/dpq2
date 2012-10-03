@@ -20,6 +20,7 @@ class answer
         size_t Row;
     }
 
+    // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
     struct cell {
         package {
             immutable (byte)* val;
@@ -177,6 +178,7 @@ void _unittest( string connParam )
     assert( r.rows_num == 3 );
     assert( r.cols_num == 4);
     assert( r.columnFormat(2) == dpq2.libpq.valueFormat.TEXT );
+    assert( r.getValue(c1).str == "456" );
     assert( r[1,2].str == "456" );
     assert( !r.isNULL( c2 ) );
     assert( r.isNULL( c3 ) );
