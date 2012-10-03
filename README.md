@@ -83,4 +83,4 @@ TODO
 * Async queries support
 * Binary reading to native D types
 * Thread safe behaviour
-* Make the code more transparent, CamelCasing and Autodoc
+* Make code more transparent, CamelCased and Autodoc
