@@ -34,7 +34,8 @@ Example
 
 ```D
 auto conn = new Connection;
-conn.connect( connArgs( "dbname=postgres", connVariant.SYNC ) );
+conn.connString = "dbname=postgres";
+conn.connect();
 
 auto res = conn.exec(
     "SELECT now() as current_time, 'abc'::text as field_name,"
