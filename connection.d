@@ -1,4 +1,4 @@
-///TODO: защита класса BaseConnection на тему мультитредности:
+///TODO: защита класса BaseConnection на тему мультитредности
 
 module dpq2.connection;
 @trusted:
@@ -93,7 +93,7 @@ class BaseConnection
     /// Exception
     class exception : Exception
     {
-        ConnStatusType statusType; /// libpq conn status
+        ConnStatusType statusType; /// libpq connection status
         
         this()
         {
@@ -102,6 +102,7 @@ class BaseConnection
         }
     }
 }
+
 
 void _unittest( string connParam )
 {    
