@@ -19,7 +19,7 @@ Features
 Building
 --------
 
-###Requirements:
+####Requirements:
 Currently code builds with compiler dmd 2.060 and GNU make
 
 ####Debug version (with debugging symbols and asserts)
