@@ -11,7 +11,7 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
-/// Avail connection types
+/// Available connection types
 enum connVariant { SYNC, ASYNC };
 
 /*
