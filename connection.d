@@ -1,3 +1,5 @@
+///TODO: защита класса BaseConnection на тему мультитредности:
+
 module dpq2.connection;
 @trusted:
 
@@ -9,6 +11,7 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
+/// Avail connection types
 enum connVariant { SYNC, ASYNC };
 
 /*
@@ -20,13 +23,13 @@ enum connVariant { SYNC, ASYNC };
  * such usage is not recommended, though doing an exec from the child
  * process to load a new executable is safe.
 
-TODO: запрет копирования класса conn_piece:
 
-Returns the thread safety status of the libpq library.
 
 int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
+
+/// Connection
 class BaseConnection
 {
     package PGconn* conn;
@@ -38,9 +41,10 @@ class BaseConnection
         PQ_CONSUME_OK
     }
     
-    string connString; /// Database connection the parameters
-	connVariant connType = connVariant.SYNC; /// Connection variant
+    string connString; /// Database connection parameters
+	connVariant connType = connVariant.SYNC; /// Connection type variant
 
+	/// Connect to DB
     void connect()
     {
 		// TODO: нужны блокировки чтобы нельзя было несколько раз создать
@@ -56,6 +60,7 @@ class BaseConnection
         readyForQuery = true;
     }
 
+	/// Disconnect from DB
     void disconnect()
     {
         if( readyForQuery )
