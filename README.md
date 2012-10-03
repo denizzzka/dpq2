@@ -20,7 +20,7 @@ Building
 --------
 
 ####Requirements:
-Currently code builds with compiler dmd 2.060 and GNU make
+Currently code builds with libpq 9.1.0, compiler dmd 2.060 and GNU make
 
 ####Debug version (with debugging symbols and asserts)
     make debug
