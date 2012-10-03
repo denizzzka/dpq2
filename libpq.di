@@ -12,6 +12,7 @@
  */
 
 /// TODO: remove excess and may be change storage class qualifiers
+/// ("used!" marks used in dpq2 elements)
 
 module dpq2.libpq;
 @safe
@@ -120,7 +121,7 @@ extern (C) nothrow
      * NOTE: in Postgres 6.4 and later, the be_pid is the notifying backend's,
      * whereas in earlier versions it was always your own backend's PID.
      */
-    struct PGnotify /// used!
+    struct PGnotify // used!
     {
         char       *relname;        /** notification condition name */
         size_t     be_pid;          /** process ID of notifying server process */
@@ -342,10 +343,10 @@ extern (C) nothrow
     int PQnfields( PGresult *res);
     int PQbinaryTuples( PGresult *res);
     char *PQfname( PGresult *res, int field_num);
-    size_t PQfnumber( PGresult *res,  immutable char *field_name); /// used!
+    size_t PQfnumber( PGresult *res,  immutable char *field_name); // used!
     Oid PQftable( PGresult *res, int field_num);
     int PQftablecol( PGresult *res, int field_num);
-    valueFormat PQfformat( PGresult *res, size_t field_num); /// used!
+    valueFormat PQfformat( PGresult *res, size_t field_num); // used!
     Oid PQftype( PGresult *res, int field_num);
     int PQfsize( PGresult *res, int field_num);
     int PQfmod( PGresult *res, int field_num);
@@ -353,9 +354,9 @@ extern (C) nothrow
     char *PQoidStatus( PGresult *res);
     Oid PQoidValue( PGresult *res);
     char *PQcmdTuples(PGresult *res);
-    immutable(byte)* PQgetvalue( PGresult *res, size_t tup_num, size_t field_num); /// used!
-    size_t PQgetlength( PGresult *res, size_t tup_num, size_t field_num); /// used!
-    int PQgetisnull( PGresult *res, size_t tup_num, size_t field_num); ///used!
+    immutable(byte)* PQgetvalue( PGresult *res, size_t tup_num, size_t field_num); // used!
+    size_t PQgetlength( PGresult *res, size_t tup_num, size_t field_num); // used!
+    int PQgetisnull( PGresult *res, size_t tup_num, size_t field_num); // used!
     int PQnparams( PGresult *res);
     Oid PQparamtype( PGresult *res, int param_num);
 
