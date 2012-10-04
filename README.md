@@ -45,7 +45,7 @@ Example
 -------
 
 ```D
-import dpq2.answer;
+import libdpq2.di;
 
 auto conn = new Connection;
 conn.connString = "dbname=postgres";
