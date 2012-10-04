@@ -11,8 +11,6 @@ T convert(T)(immutable ubyte[] data)
 {
     assert( data.length == T.sizeof );
 
-//	return to!(T)( data[0..T.sizeof].ptr );
-
     auto res = *( cast(T*) data[0..T.sizeof].ptr );
 
 	return ntohs( res );
@@ -33,12 +31,12 @@ void _unittest( string connParam )
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
-        "32761::smallint, "
+        "-32761::smallint, "
         "2::smallint";
 
     auto r = conn.exec( p );
     
     writeln( convert!( PGtypes.PGsmallint )( r[0,0].bin ) );
 //    writeln( PGsmallint( r[0,0].bin ) );
-//    assert( from_smallint( r[0,0].bin ) == -32761 );
+    assert( convert!( PGtypes.PGsmallint )( r[0,0].bin ) == -32761 );
 }
