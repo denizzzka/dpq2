@@ -14,8 +14,8 @@ Features
 
 * Arguments list support
 * Binary reading to native D types
-** Integer and decimal types (except "numeric")
-** Timestamp type (with and without timezone)
+    * Integer and decimal types (except "numeric")
+    * Timestamp type (with and without timezone)
 * LISTEN support
 * Sending binary data for type bytea
 
