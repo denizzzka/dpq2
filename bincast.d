@@ -1,4 +1,4 @@
-/// Binary data convertation
+/// Binary data access templates
 module dpq2.bincast;
 @trusted:
 
@@ -40,8 +40,6 @@ void _unittest( string connParam )
         "-1234.56789012345::double precision";
 
     auto r = conn.exec( p );
-    
-//    writeln( convert!( PGreal )( r[0,3].bin ) );
 
     assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
     assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
