@@ -5,23 +5,21 @@ module dpq2.bincast;
 import dpq2.answer;
 
 import std.conv: to;
+import std.socket: ntohl;
 
 T convert(T)(immutable ubyte[] data)
 {
     assert( data.length == T.sizeof );
-	return *( cast(T*)data[0..T.sizeof].ptr );
+
+//	return to!(T)( data[0..T.sizeof].ptr );
+
+	return *( cast(T*) data[0..T.sizeof].ptr );
 }
 
-/*
-short PGsmallint( immutable byte[] b )
+struct PGtypes /// Supported PostgreSQL binary types
 {
-    assert( b.length == 2 );
-    ushort r = b[1];
-    r <<= 8;
-    r = b[0];
-    return cast(short) r;
+    alias short PGsmallint; /// smallint
 }
-*/
 
 void _unittest( string connParam )
 {
@@ -39,7 +37,7 @@ void _unittest( string connParam )
 
     auto r = conn.exec( p );
     
-    writeln( convert!( short )( r[0,0].bin ) );
+    writeln( convert!( PGtypes.PGsmallint )( r[0,0].bin ) );
 //    writeln( PGsmallint( r[0,0].bin ) );
 //    assert( from_smallint( r[0,0].bin ) == -32761 );
 }
