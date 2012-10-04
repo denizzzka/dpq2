@@ -18,6 +18,7 @@ T convert(T)(immutable ubyte[] b)
 
 /// Supported PostgreSQL binary types
 alias short PGsmallint; /// smallint
+alias int   PGinteger; /// integer
 alias long  PGbigint; /// bigint
 
 void _unittest( string connParam )
@@ -31,6 +32,7 @@ void _unittest( string connParam )
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
         "-32761::smallint, "
+        "-2147483646::integer, "
         "-9223372036854775806::bigint, "
         "2::smallint";
 
@@ -39,5 +41,6 @@ void _unittest( string connParam )
 //    writeln( convert!( PGsmallint )( r[0,0].bin ) );
 
     assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
-    assert( convert!( PGbigint )( r[0,1].bin ) == -9223372036854775806 );
+    assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
+    assert( convert!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
 }
