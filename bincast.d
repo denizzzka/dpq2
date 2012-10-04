@@ -10,6 +10,7 @@ import std.bitmanip;
 T convert(T)(immutable ubyte[] b)
 {
     assert( b.length == T.sizeof );
+    // добавить проверку передаваемого сюда типа T (std.traits)
      
     ubyte[T.sizeof] s = b[0..T.sizeof];
 	return bigEndianToNative!(T)( s );
@@ -30,12 +31,13 @@ void _unittest( string connParam )
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
         "-32761::smallint, "
-        "123::bigint, "
+        "-9223372036854775806::bigint, "
         "2::smallint";
 
     auto r = conn.exec( p );
     
-    writeln( convert!( PGsmallint )( r[0,0].bin ) );
+//    writeln( convert!( PGsmallint )( r[0,0].bin ) );
 
-//    assert( convert!( PGtypes.PGsmallint )( r[0,0].bin ) == -32761 );
+    assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
+    assert( convert!( PGbigint )( r[0,1].bin ) == -9223372036854775806 );
 }
