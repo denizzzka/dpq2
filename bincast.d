@@ -8,6 +8,9 @@ import std.conv: to;
 import std.bitmanip;
 import std.datetime;
 
+import std.stdio;
+
+
 T convert(T)(immutable ubyte[] b)
 {
     assert( b.length == T.sizeof );
