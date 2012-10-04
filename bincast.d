@@ -4,6 +4,17 @@ module dpq2.bincast;
 
 import dpq2.answer;
 
+import std.conv: to;
+
+short from_smallint( immutable byte[] b )
+{
+    assert( b.length == 2 );
+    short r = b[0];
+    r = r >> 8;
+    r = b[1];
+    return r;
+}
+
 void _unittest( string connParam )
 {
     auto conn = new Connection;
@@ -12,11 +23,13 @@ void _unittest( string connParam )
 
     static queryArg arg;
     queryParams p;
-    p.sqlCommand =
-        "SELECT now() as current_time, 'abc'::text as field_name,"
-        "123 as field_3, 456.78 as field_4";
     p.resultFormat = valueFormat.BINARY;
+    p.sqlCommand = "SELECT "
+        "-32761::smallint, "
+        "2::smallint";
 
-    auto r = conn.exec( p );     
-//    assert( r[0,2].str == "456" );
+    auto r = conn.exec( p );
+    
+    writeln( from_smallint( r[0,0].bin ) );
+//    assert( from_smallint( r[0,0].bin ) == -32761 );
 }

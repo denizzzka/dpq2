@@ -4,7 +4,6 @@ module dpq2.answer;
 import dpq2.libpq;
 public import dpq2.query;
 
-import std.conv: to;
 import std.string: toStringz;
 import std.exception;
 import core.exception;
@@ -27,7 +26,7 @@ class answer
     {
         private
         {
-            const (byte)* val;
+            immutable (byte)* val;
             size_t size; // currently used only for bin
             debug valueFormat format;
         }
@@ -40,7 +39,7 @@ class answer
         }
 
         /// Returns value from binary formatted fields
-        @property const (byte)[] bin() const
+        @property immutable (byte)[] bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
