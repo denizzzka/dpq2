@@ -100,5 +100,6 @@ TODO
 
 * Async queries support
 * PostGIS binary data support
+* Arrays
 * Thread safe behaviour
 * Make code more transparent, CamelCased and Autodoc
