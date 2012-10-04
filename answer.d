@@ -3,6 +3,7 @@ module dpq2.answer;
 
 import dpq2.libpq;
 public import dpq2.query;
+import std.bitmanip;
 
 import std.string: toStringz;
 import std.exception;
@@ -45,7 +46,7 @@ class answer
             return val[0..size];
         }
     }
-    
+            
     private PGresult* res;
     
     private this(){}
@@ -117,7 +118,7 @@ class answer
     const (Cell)* opIndex( size_t Row, size_t Col )
     {
         return getValue( Coords( Row, Col ) );
-    };
+    }
     
     /// Returns cell size
     size_t size( const Coords c ) 
