@@ -11,6 +11,7 @@ import std.datetime;
 import std.stdio;
 import std.traits;
 
+
 T convert(T)(immutable ubyte[] b)
 if( isNumeric!(T) )
 {
@@ -27,20 +28,22 @@ if( isSomeString!(T) )
 }
 
 /// Returns date and time from binary formatted cell
-SysTime* getSysTime( immutable ubyte[] b )
+T* convert(T)(immutable ubyte[] b)
+if( is( T == SysTime ) )
 {
     ulong pre_time = convert!(ulong)( b );
-    // UTC because server always sends binary timestamps in UTC, not server TZ
+    // UTC because server always sends binary timestamps in UTC, not in TZ
     return new SysTime( pre_time * 10, UTC() );
 }
 
 // Supported PostgreSQL binary types
-alias short  PGsmallint; /// smallint
-alias int    PGinteger; /// integer
-alias long   PGbigint; /// bigint
-alias float  PGreal; /// real
-alias double PGdouble_precision; /// double precision
-alias string PGtext; /// text
+alias short   PGsmallint; /// smallint
+alias int     PGinteger; /// integer
+alias long    PGbigint; /// bigint
+alias float   PGreal; /// real
+alias double  PGdouble_precision; /// double precision
+alias string  PGtext; /// text
+alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 void _unittest( string connParam )
 {
@@ -71,10 +74,10 @@ void _unittest( string connParam )
     assert( convert!( PGreal )( r[0,3].bin ) == -12.3456f );
     assert( convert!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
 
-    assert( getSysTime( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
-    assert( getSysTime( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( getSysTime( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( getSysTime( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( convert!( PGtime_stamp )( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
+    assert( convert!( PGtime_stamp )( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( convert!( PGtime_stamp )( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( convert!( PGtime_stamp )( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 
     assert( convert!( PGtext )( r[0,9].bin ) == "first line\nsecond line" );
 }
