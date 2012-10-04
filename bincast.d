@@ -17,16 +17,14 @@ immutable enum {
         bigint = "long"
     };
 
-T convert(string P)(immutable ubyte[] b)
+T convert(T)(immutable ubyte[] b)
 {
-    static assert( P == "short" );
-    static T = typeid( P );
     assert( b.length == T.sizeof );
      
     ubyte[T.sizeof] s = b[0..T.sizeof];
 	return bigEndianToNative!(T)( s );
 }
-/*
+
 /// Returns date and time from binary formatted cell
 SysTime* getSysTime( immutable ubyte[] b )
 {
@@ -34,7 +32,7 @@ SysTime* getSysTime( immutable ubyte[] b )
     // UTC because server always sends binary timestamps in UTC, not server TZ
     return new SysTime( pre_time * 10, UTC() );
 }
-*/
+
 // Supported PostgreSQL binary types
 alias short  PGsmallint; /// smallint
 alias int    PGinteger; /// integer
@@ -66,8 +64,7 @@ void _unittest( string connParam )
 
 //    assert( r[0,0].convert!("smallint") == -32761 );
 
-    assert( convert!( smallint )( r[0,0].bin ) == -32761 );
-/*
+    assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
     assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
     assert( convert!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
     assert( convert!( PGreal )( r[0,3].bin ) == -12.3456f );
@@ -77,5 +74,7 @@ void _unittest( string connParam )
     assert( getSysTime( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( getSysTime( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( getSysTime( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-*/
+
+//    writeln( typeid(int)  );
+
 }
