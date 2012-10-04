@@ -2,7 +2,7 @@
 module dpq2.bincast;
 @trusted:
 
-public import dpq2.answer;
+import dpq2.answer;
 
 void _unittest( string connParam )
 {
