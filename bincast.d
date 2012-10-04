@@ -9,15 +9,21 @@ import std.bitmanip;
 import std.datetime;
 
 import std.stdio;
-import std.math: modf;
-import std.c.time: tm;
+import std.traits;
 
 T convert(T)(immutable ubyte[] b)
+if( isNumeric!(T) )
 {
     assert( b.length == T.sizeof );
      
     ubyte[T.sizeof] s = b[0..T.sizeof];
 	return bigEndianToNative!(T)( s );
+}
+
+T convert(T)(immutable ubyte[] b)
+if( isSomeString!(T) )
+{
+    return to!string( cast(immutable(char)*) b );
 }
 
 /// Returns date and time from binary formatted cell
@@ -34,6 +40,7 @@ alias int    PGinteger; /// integer
 alias long   PGbigint; /// bigint
 alias float  PGreal; /// real
 alias double PGdouble_precision; /// double precision
+alias string PGtext; /// text
 
 void _unittest( string connParam )
 {
@@ -53,7 +60,8 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
         "'2012-10-04 11:00:21.227803+08'::timestamp without time zone, "
         "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
-        "'2012-10-04 11:00:21.227803+00'::timestamp without time zone";
+        "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
+        "'first line\nsecond line'::text";
 
     auto r = conn.exec( p );
 
@@ -67,4 +75,6 @@ void _unittest( string connParam )
     assert( getSysTime( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( getSysTime( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( getSysTime( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+
+    assert( convert!( PGtext )( r[0,9].bin ) == "first line\nsecond line" );
 }
