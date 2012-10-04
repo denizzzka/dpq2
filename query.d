@@ -1,8 +1,7 @@
 module dpq2.query;
 @trusted:
 
-import dpq2.libpq;
-import dpq2.connection;
+public import dpq2.connection;
 import dpq2.answer;
 
 /// Query parameters
@@ -10,7 +9,7 @@ struct queryParams
 {
     string sqlCommand; /// SQL command
     queryArg[] args; /// SQL command arguments
-    valueFormat result_format = valueFormat.TEXT; /// Result value format
+    valueFormat resultFormat = valueFormat.TEXT; /// Result value format
 }
 
 /// Query argument
@@ -73,7 +72,7 @@ final class Connection: BaseConnection
                 values.ptr,
                 lengths.ptr,
                 formats.ptr,
-                p.result_format
+                p.resultFormat
             )
         );
     }

@@ -3,8 +3,7 @@
 module dpq2.connection;
 @trusted:
 
-import dpq2.libpq;
-public import dpq2.libpq: valueFormat;
+public import dpq2.libpq;
 
 import std.conv: to;
 import std.string: toStringz;
