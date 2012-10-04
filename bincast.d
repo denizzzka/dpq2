@@ -4,3 +4,6 @@ module dpq2.bincast;
 
 import dpq2.answer;
 
+void _unittest( string connParam )
+{
+}
