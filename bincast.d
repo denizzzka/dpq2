@@ -9,6 +9,8 @@ import std.bitmanip;
 import std.datetime;
 
 import std.stdio;
+import std.math: modf;
+import std.c.time: tm;
 
 
 T convert(T)(immutable ubyte[] b)
@@ -22,7 +24,30 @@ T convert(T)(immutable ubyte[] b)
 
 DateTime* toDateTime( immutable ubyte[] b )
 {
-    auto r = new DateTime(0,0,0);
+    immutable auto SECS_PER_DAY = 86400;
+//    ubyte[float.sizeof] m = b[4..8];
+
+    double pre_time = convert!(double)( b );
+    real time, date;
+    
+    time = modf( cast(real) pre_time / SECS_PER_DAY, date );
+
+	if (time < 0)
+	{
+		time += SECS_PER_DAY;
+		date -= 1;
+	}
+    
+    // конвертация date в юлианскую
+    
+    writeln("time: ", time, " date: ", date);
+    
+//    auto milliseconds = bigEndianToNative!(uint)( m );
+//    writeln( "Milliseconds: ", milliseconds );
+    auto r = new DateTime(2013, 10, 14);
+
+
+    r = new DateTime(2013, 10, 14, 6, 18, 19);
     return r;
 }
 
@@ -48,7 +73,8 @@ void _unittest( string connParam )
         "-9223372036854775806::bigint, "
         "-12.3456::real, "
         "-1234.56789012345::double precision, "
-        "'2012-10-04 19:00:21.227803+08'::timestamp without time zone, "
+//        "'2012-10-04 19:00:21.227803+08'::timestamp without time zone, "
+        "'2012-10-04 19:00:00.000000+08'::timestamp without time zone, "
         "'2012-10-04 19:00:21.227804+08'::timestamp without time zone, "
         "'2012-10-04 19:00:21.227803+08'::timestamp with time zone";
 
@@ -67,4 +93,8 @@ void _unittest( string connParam )
     writeln( r[0,5].bin );
     writeln( r[0,6].bin );
     writeln( r[0,7].bin );
+    
+    writeln( toDateTime( r[0,5].bin ).toSimpleString() );
+    writeln( toDateTime( r[0,6].bin ).toSimpleString() );
+    writeln( toDateTime( r[0,7].bin ).toSimpleString() );
 }
