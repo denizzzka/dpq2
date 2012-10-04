@@ -68,16 +68,16 @@ void _unittest( string connParam )
 
     auto r = conn.exec( p );
 
-    assert( to!( PGsmallint )( r[0,0].bin ) == -32761 );
-    assert( to!( PGinteger )( r[0,1].bin ) == -2147483646 );
-    assert( to!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
-    assert( to!( PGreal )( r[0,3].bin ) == -12.3456f );
-    assert( to!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
+    assert( to!PGsmallint( r[0,0].bin ) == -32761 );
+    assert( to!PGinteger( r[0,1].bin ) == -2147483646 );
+    assert( to!PGbigint( r[0,2].bin ) == -9223372036854775806 );
+    assert( to!PGreal( r[0,3].bin ) == -12.3456f );
+    assert( to!PGdouble_precision( r[0,4].bin ) == -1234.56789012345 );
 
-    assert( to!( PGtime_stamp )( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
-    assert( to!( PGtime_stamp )( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( to!( PGtime_stamp )( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( to!( PGtime_stamp )( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( to!PGtime_stamp( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
+    assert( to!PGtime_stamp( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( to!PGtime_stamp( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( to!PGtime_stamp( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 
-    assert( to!( PGtext )( r[0,9].bin ) == "first line\nsecond line" );
+    assert( to!PGtext( r[0,9].bin ) == "first line\nsecond line" );
 }
