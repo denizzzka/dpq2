@@ -48,7 +48,9 @@ void _unittest( string connParam )
         "-9223372036854775806::bigint, "
         "-12.3456::real, "
         "-1234.56789012345::double precision, "
-        "now()";
+        "'2012-10-04 19:00:21.227803+08'::timestamp without time zone, "
+        "'2012-10-04 19:00:21.227804+08'::timestamp without time zone, "
+        "'2012-10-04 19:00:21.227803+08'::timestamp with time zone";
 
     auto r = conn.exec( p );
 
@@ -59,4 +61,10 @@ void _unittest( string connParam )
     assert( convert!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
 
     writeln( convert!( long )( r[0,5].bin ) );
+    writeln( convert!( long )( r[0,6].bin ) );
+    writeln( convert!( long )( r[0,7].bin ) );
+
+    writeln( r[0,5].bin );
+    writeln( r[0,6].bin );
+    writeln( r[0,7].bin );
 }
