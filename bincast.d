@@ -6,14 +6,22 @@ import dpq2.answer;
 
 import std.conv: to;
 
-short from_smallint( immutable byte[] b )
+T convert(T)(immutable ubyte[] data)
+{
+    assert( data.length == T.sizeof );
+	return *( cast(T*)data[0..T.sizeof].ptr );
+}
+
+/*
+short PGsmallint( immutable byte[] b )
 {
     assert( b.length == 2 );
-    short r = b[0];
-    r = r >> 8;
-    r = b[1];
-    return r;
+    ushort r = b[1];
+    r <<= 8;
+    r = b[0];
+    return cast(short) r;
 }
+*/
 
 void _unittest( string connParam )
 {
@@ -25,11 +33,13 @@ void _unittest( string connParam )
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
-        "-32761::smallint, "
+        "250::smallint, "
+        "32761::smallint, "
         "2::smallint";
 
     auto r = conn.exec( p );
     
-    writeln( from_smallint( r[0,0].bin ) );
+    writeln( convert!( short )( r[0,0].bin ) );
+//    writeln( PGsmallint( r[0,0].bin ) );
 //    assert( from_smallint( r[0,0].bin ) == -32761 );
 }

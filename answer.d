@@ -26,7 +26,7 @@ class answer
     {
         private
         {
-            immutable (byte)* val;
+            immutable (ubyte)* val;
             size_t size; // currently used only for bin
             debug valueFormat format;
         }
@@ -39,7 +39,7 @@ class answer
         }
 
         /// Returns value from binary formatted fields
-        @property immutable (byte)[] bin() const
+        @property immutable (ubyte)[] bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
