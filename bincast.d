@@ -11,7 +11,7 @@ T convert(T)(immutable ubyte[] b)
 {
     assert( b.length == T.sizeof );
      
-    ubyte[2] s = b[0..b.length];
+    ubyte[T.sizeof] s = b[0..T.sizeof];
 	return bigEndianToNative!(T)( s );
 }
 
