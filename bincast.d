@@ -26,7 +26,8 @@ T convert(T)(immutable ubyte[] b)
 SysTime* getSysTime( immutable ubyte[] b )
 {
     ulong pre_time = convert!(ulong)( b );
-    return new SysTime( pre_time * 10 );
+    // UTC because server always sends binary timestamps in UTC, not in local TZ
+    return new SysTime( pre_time * 10, UTC() );
 }
 
 // Supported PostgreSQL binary types
@@ -64,17 +65,8 @@ void _unittest( string connParam )
     assert( convert!( PGreal )( r[0,3].bin ) == -12.3456f );
     assert( convert!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
 
-    writeln( convert!( long )( r[0,5].bin ) );
-    writeln( convert!( long )( r[0,6].bin ) );
-    writeln( convert!( long )( r[0,7].bin ) );
-    writeln( convert!( long )( r[0,8].bin ) );
-
-    writeln( r[0,5].bin );
-    writeln( r[0,6].bin );
-    writeln( r[0,7].bin );
-    
-    writeln( getSysTime( r[0,5].bin ).toSimpleString() );
-    writeln( getSysTime( r[0,6].bin ).toSimpleString() );
-    writeln( getSysTime( r[0,7].bin ).toSimpleString() );
-    writeln( getSysTime( r[0,8].bin ).toSimpleString() );
+    assert( getSysTime( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
+    assert( getSysTime( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( getSysTime( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( getSysTime( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 }
