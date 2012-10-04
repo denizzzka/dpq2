@@ -2,8 +2,7 @@ module dpq2.answer;
 @trusted:
 
 import dpq2.libpq;
-import dpq2.connection;
-import dpq2.query;
+public import dpq2.query;
 
 import std.conv: to;
 import std.string: toStringz;
