@@ -31,7 +31,7 @@ void _unittest( string connParam )
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
-        "250::smallint, "
+        "0::smallint, "
         "32761::smallint, "
         "2::smallint";
 
