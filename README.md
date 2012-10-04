@@ -13,6 +13,9 @@ Features
 --------
 
 * Arguments list support
+* Binary reading to native D types
+** Integer and decimal types (except "numeric")
+** Timestamp type (with and without timezone)
 * LISTEN support
 * Sending binary data for type bytea
 
@@ -95,7 +98,6 @@ TODO
 ----
 
 * Async queries support
-* Binary reading to native D types
 * PostGIS binary data support
 * Thread safe behaviour
 * Make code more transparent, CamelCased and Autodoc

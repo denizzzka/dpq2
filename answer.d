@@ -3,7 +3,6 @@ module dpq2.answer;
 
 import dpq2.libpq;
 public import dpq2.query;
-import std.bitmanip;
 
 import std.string: toStringz;
 import std.exception;
