@@ -12,7 +12,7 @@ import std.stdio;
 import std.traits;
 
 
-T convert(T)(immutable ubyte[] b)
+T to(T)(immutable ubyte[] b)
 if( isNumeric!(T) )
 {
     assert( b.length == T.sizeof );
@@ -21,17 +21,17 @@ if( isNumeric!(T) )
 	return bigEndianToNative!(T)( s );
 }
 
-T convert(T)(immutable ubyte[] b)
+T to(T)(immutable ubyte[] b)
 if( isSomeString!(T) )
 {
     return to!string( cast(immutable(char)*) b );
 }
 
 /// Returns date and time from binary formatted cell
-T* convert(T)(immutable ubyte[] b)
+T* to(T)(immutable ubyte[] b)
 if( is( T == SysTime ) )
 {
-    ulong pre_time = convert!(ulong)( b );
+    ulong pre_time = to!(ulong)( b );
     // UTC because server always sends binary timestamps in UTC, not in TZ
     return new SysTime( pre_time * 10, UTC() );
 }
@@ -68,16 +68,16 @@ void _unittest( string connParam )
 
     auto r = conn.exec( p );
 
-    assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
-    assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
-    assert( convert!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
-    assert( convert!( PGreal )( r[0,3].bin ) == -12.3456f );
-    assert( convert!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
+    assert( to!( PGsmallint )( r[0,0].bin ) == -32761 );
+    assert( to!( PGinteger )( r[0,1].bin ) == -2147483646 );
+    assert( to!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
+    assert( to!( PGreal )( r[0,3].bin ) == -12.3456f );
+    assert( to!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
 
-    assert( convert!( PGtime_stamp )( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
-    assert( convert!( PGtime_stamp )( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( convert!( PGtime_stamp )( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( convert!( PGtime_stamp )( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( to!( PGtime_stamp )( r[0,5].bin ).toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
+    assert( to!( PGtime_stamp )( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( to!( PGtime_stamp )( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( to!( PGtime_stamp )( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 
-    assert( convert!( PGtext )( r[0,9].bin ) == "first line\nsecond line" );
+    assert( to!( PGtext )( r[0,9].bin ) == "first line\nsecond line" );
 }
