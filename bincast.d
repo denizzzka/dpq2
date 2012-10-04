@@ -17,10 +17,11 @@ T convert(T)(immutable ubyte[] b)
 }
 
 /// Supported PostgreSQL binary types
-alias short PGsmallint; /// smallint
-alias int   PGinteger; /// integer
-alias long  PGbigint; /// bigint
-alias float PGreal; /// real
+alias short  PGsmallint; /// smallint
+alias int    PGinteger; /// integer
+alias long   PGbigint; /// bigint
+alias float  PGreal; /// real
+alias double PGdouble_precision; /// double precision
 
 void _unittest( string connParam )
 {
@@ -35,7 +36,8 @@ void _unittest( string connParam )
         "-32761::smallint, "
         "-2147483646::integer, "
         "-9223372036854775806::bigint, "
-        "-12.3456::real";
+        "-12.3456::real, "
+        "-1234.56789012345::double precision";
 
     auto r = conn.exec( p );
     
@@ -45,4 +47,5 @@ void _unittest( string connParam )
     assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
     assert( convert!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
     assert( convert!( PGreal )( r[0,3].bin ) == -12.3456f );
+    assert( convert!( PGdouble_precision )( r[0,4].bin ) == -1234.56789012345 );
 }
