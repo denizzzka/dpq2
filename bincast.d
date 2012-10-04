@@ -26,7 +26,7 @@ T convert(T)(immutable ubyte[] b)
 SysTime* getSysTime( immutable ubyte[] b )
 {
     ulong pre_time = convert!(ulong)( b );
-    // UTC because server always sends binary timestamps in UTC, not in local TZ
+    // UTC because server always sends binary timestamps in UTC, not server TZ
     return new SysTime( pre_time * 10, UTC() );
 }
 
