@@ -13,11 +13,12 @@ Features
 --------
 
 * Arguments list support
+* Binary and text data queries
+* Text representation of the query result
 * Binary reading to native D types
  * Integer and decimal types (except "numeric")
  * Timestamp type (with and without timezone)
 * LISTEN support
-* Sending binary data for type bytea
 
 Building
 --------
