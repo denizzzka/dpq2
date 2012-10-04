@@ -5,7 +5,7 @@ module dpq2.bincast;
 import dpq2.answer;
 
 import std.conv: to;
-import std.socket: ntohl;
+import std.socket: ntohl, ntohs;
 
 T convert(T)(immutable ubyte[] data)
 {
@@ -13,7 +13,9 @@ T convert(T)(immutable ubyte[] data)
 
 //	return to!(T)( data[0..T.sizeof].ptr );
 
-	return *( cast(T*) data[0..T.sizeof].ptr );
+    auto res = *( cast(T*) data[0..T.sizeof].ptr );
+
+	return ntohs( res );
 }
 
 struct PGtypes /// Supported PostgreSQL binary types
@@ -31,7 +33,6 @@ void _unittest( string connParam )
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
-        "0::smallint, "
         "32761::smallint, "
         "2::smallint";
 
