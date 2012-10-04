@@ -11,9 +11,14 @@ T convert(T)(immutable ubyte[] data)
 {
     assert( data.length == T.sizeof );
 
-    auto res = *( cast(T*) data[0..T.sizeof].ptr );
+    auto r = *( cast(T*) data[0..T.sizeof].ptr );
 
-	return ntohs( res );
+    static if( T.sizeof == 2 )
+        r = ntohs( r );
+    else if( T.sizeof == 8 )
+        r = ntohl( r );
+        
+	return r;
 }
 
 struct PGtypes /// Supported PostgreSQL binary types
@@ -37,6 +42,6 @@ void _unittest( string connParam )
     auto r = conn.exec( p );
     
     writeln( convert!( PGtypes.PGsmallint )( r[0,0].bin ) );
-//    writeln( PGsmallint( r[0,0].bin ) );
+
     assert( convert!( PGtypes.PGsmallint )( r[0,0].bin ) == -32761 );
 }
