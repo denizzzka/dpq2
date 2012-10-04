@@ -4,7 +4,7 @@ module dpq2.bincast;
 
 import dpq2.answer;
 
-import std.conv: to;
+import std.conv: std_to = to;
 import std.bitmanip;
 import std.datetime;
 
@@ -24,7 +24,7 @@ if( isNumeric!(T) )
 T to(T)(immutable ubyte[] b)
 if( isSomeString!(T) )
 {
-    return to!string( cast(immutable(char)*) b );
+    return std_to!string( cast(immutable(char)*) b );
 }
 
 /// Returns date and time from binary formatted cell
