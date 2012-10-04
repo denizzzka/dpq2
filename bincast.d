@@ -16,7 +16,7 @@ T convert(T)(immutable ubyte[] b)
 	return bigEndianToNative!(T)( s );
 }
 
-/// Supported PostgreSQL binary types
+// Supported PostgreSQL binary types
 alias short  PGsmallint; /// smallint
 alias int    PGinteger; /// integer
 alias long   PGbigint; /// bigint
