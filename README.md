@@ -39,6 +39,8 @@ or
 
     $ make
 
+After build header file libdpq2.di will be created automatically.
+
 Example
 -------
 
@@ -94,5 +96,6 @@ TODO
 
 * Async queries support
 * Binary reading to native D types
+* PostGIS binary data support
 * Thread safe behaviour
 * Make code more transparent, CamelCased and Autodoc
