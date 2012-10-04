@@ -12,11 +12,6 @@ import std.stdio;
 import std.math: modf;
 import std.c.time: tm;
 
-immutable enum {
-        smallint = "short",
-        bigint = "long"
-    };
-
 T convert(T)(immutable ubyte[] b)
 {
     assert( b.length == T.sizeof );
@@ -62,8 +57,6 @@ void _unittest( string connParam )
 
     auto r = conn.exec( p );
 
-//    assert( r[0,0].convert!("smallint") == -32761 );
-
     assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
     assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
     assert( convert!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
@@ -74,7 +67,4 @@ void _unittest( string connParam )
     assert( getSysTime( r[0,6].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( getSysTime( r[0,7].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( getSysTime( r[0,8].bin ).toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-
-//    writeln( typeid(int)  );
-
 }
