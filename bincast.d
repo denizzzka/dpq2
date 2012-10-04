@@ -22,7 +22,8 @@ T convert(T)(immutable ubyte[] b)
 	return bigEndianToNative!(T)( s );
 }
 
-SysTime* getTime( immutable ubyte[] b )
+/// Returns date and time from binary formatted cell
+SysTime* getSysTime( immutable ubyte[] b )
 {
     ulong pre_time = convert!(ulong)( b );
     return new SysTime( pre_time * 10 );
@@ -72,8 +73,8 @@ void _unittest( string connParam )
     writeln( r[0,6].bin );
     writeln( r[0,7].bin );
     
-    writeln( getTime( r[0,5].bin ).toSimpleString() );
-    writeln( getTime( r[0,6].bin ).toSimpleString() );
-    writeln( getTime( r[0,7].bin ).toSimpleString() );
-    writeln( getTime( r[0,8].bin ).toSimpleString() );
+    writeln( getSysTime( r[0,5].bin ).toSimpleString() );
+    writeln( getSysTime( r[0,6].bin ).toSimpleString() );
+    writeln( getSysTime( r[0,7].bin ).toSimpleString() );
+    writeln( getSysTime( r[0,8].bin ).toSimpleString() );
 }

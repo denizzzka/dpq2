@@ -31,14 +31,14 @@ class answer
             debug valueFormat format;
         }
 
-        /// Returns value from text formatted fields
+        /// Returns value from text formatted field
         @property string str() const
         {
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
             return to!string( cast(immutable(char)*)val );
         }
 
-        /// Returns value as bytes array from binary formatted fields
+        /// Returns value as bytes array from binary formatted field
         @property immutable (ubyte)[] bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
