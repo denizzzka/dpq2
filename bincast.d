@@ -20,6 +20,7 @@ T convert(T)(immutable ubyte[] b)
 alias short PGsmallint; /// smallint
 alias int   PGinteger; /// integer
 alias long  PGbigint; /// bigint
+alias float PGreal; /// real
 
 void _unittest( string connParam )
 {
@@ -34,13 +35,14 @@ void _unittest( string connParam )
         "-32761::smallint, "
         "-2147483646::integer, "
         "-9223372036854775806::bigint, "
-        "2::smallint";
+        "-12.3456::real";
 
     auto r = conn.exec( p );
     
-//    writeln( convert!( PGsmallint )( r[0,0].bin ) );
+//    writeln( convert!( PGreal )( r[0,3].bin ) );
 
     assert( convert!( PGsmallint )( r[0,0].bin ) == -32761 );
     assert( convert!( PGinteger )( r[0,1].bin ) == -2147483646 );
     assert( convert!( PGbigint )( r[0,2].bin ) == -9223372036854775806 );
+    assert( convert!( PGreal )( r[0,3].bin ) == -12.3456f );
 }
