@@ -5,26 +5,19 @@ module dpq2.bincast;
 import dpq2.answer;
 
 import std.conv: to;
-import std.socket: ntohl, ntohs;
+import std.bitmanip;
 
-T convert(T)(immutable ubyte[] data)
+T convert(T)(immutable ubyte[] b)
 {
-    assert( data.length == T.sizeof );
-
-    auto r = *( cast(T*) data[0..T.sizeof].ptr );
-
-    static if( T.sizeof == 2 )
-        r = ntohs( r );
-    else if( T.sizeof == 8 )
-        r = ntohl( r );
-        
-	return r;
+    assert( b.length == T.sizeof );
+     
+    ubyte[2] s = b[0..b.length];
+	return bigEndianToNative!(T)( s );
 }
 
-struct PGtypes /// Supported PostgreSQL binary types
-{
-    alias short PGsmallint; /// smallint
-}
+/// Supported PostgreSQL binary types
+alias short PGsmallint; /// smallint
+alias long  PGbigint; /// bigint
 
 void _unittest( string connParam )
 {
@@ -37,11 +30,12 @@ void _unittest( string connParam )
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
         "-32761::smallint, "
+        "123::bigint, "
         "2::smallint";
 
     auto r = conn.exec( p );
     
-    writeln( convert!( PGtypes.PGsmallint )( r[0,0].bin ) );
+    writeln( convert!( PGsmallint )( r[0,0].bin ) );
 
-    assert( convert!( PGtypes.PGsmallint )( r[0,0].bin ) == -32761 );
+//    assert( convert!( PGtypes.PGsmallint )( r[0,0].bin ) == -32761 );
 }
