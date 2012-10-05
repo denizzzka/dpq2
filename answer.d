@@ -19,7 +19,7 @@ alias float   PGreal; /// real
 alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
-alias ubyte[] PGbytea; /// bytea
+alias immutable (ubyte)[] PGbytea; /// bytea
 
 /// Answer
 class answer
@@ -36,7 +36,7 @@ class answer
     struct Cell
     {
         private immutable ubyte[] value;
-        debug dpq2.libpq.valueFormat format;
+        debug private immutable dpq2.libpq.valueFormat format;
         
         this( immutable (ubyte)* value, size_t valueSize )
         {
@@ -54,6 +54,14 @@ class answer
         @property immutable (ubyte)[] bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+            return value;
+        }
+
+        /// Returns value as bytes from binary formatted field
+        @property T as(T)() const
+        if( is( T == immutable(ubyte)[] ) )
+        {
+            ubyte a[];
             return value;
         }
 
@@ -303,7 +311,7 @@ void _unittest( string connParam )
 
     import std.stdio: writeln;
 //    writeln( r[0,10].as!PGbytea.c_str );
-//    r[0,10].as_ubyte;
+    r[0,10].as!PGbytea;
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
