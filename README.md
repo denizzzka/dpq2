@@ -14,8 +14,9 @@ Features
 
 * Arguments list support
 * Binary and text data queries
-* Text reading of the query result to native D text types
-* Binary representation of the query result to native D types
+* Reading of the text query results to native D text types
+* Representation of the binary query results to native D types
+ * Text types
  * Integer and decimal types (except "numeric")
  * Timestamp type (with and without timezone)
 * LISTEN/NOTIFY support
