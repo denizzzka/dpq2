@@ -19,7 +19,7 @@ alias float   PGreal; /// real
 alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
-alias immutable (ubyte)[] PGbytea; /// bytea
+alias immutable (ubyte[]) PGbytea; /// bytea
 
 /// Answer
 class answer
@@ -35,7 +35,7 @@ class answer
     //immutable 
     struct Cell
     {
-        private immutable ubyte[] value;
+        private immutable (ubyte[]) value;
         debug private immutable dpq2.libpq.valueFormat format;
         
         this( immutable (ubyte)* value, size_t valueSize )
@@ -51,7 +51,7 @@ class answer
         }
 
         /// Returns value as ubytes array from binary formatted field
-        @property immutable (ubyte)[] bin() const
+        @property immutable (ubyte[]) bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return value;
@@ -59,7 +59,7 @@ class answer
 
         /// Returns value as bytes from binary formatted field
         @property T as(T)() const
-        if( is( T == immutable(ubyte)[] ) )
+        if( is( T == immutable(ubyte[]) ) )
         {
             return value;
         }
@@ -290,7 +290,8 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
         "'first line\nsecond line'::text, "
-        "'abc'::bytea";
+//        "E'\\x4400'::bytea -- D (big endian UTF-8)";
+        "E'\\x44000000'::bytea -- D (big endian UTF-8)";
 
     r = conn.exec( p );
 
@@ -309,8 +310,10 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
 
     import std.stdio: writeln;
-//    writeln( r[0,10].as!PGbytea.c_str );
-    r[0,10].as!PGbytea;
+    ubyte[] m = [ 0x00,  0x44 ];
+    writeln( r[0,10].as!PGbytea, r[0,10].as!PGbytea.sizeof );
+    writeln( m );
+    assert( r[0,10].as!PGbytea == m );
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
