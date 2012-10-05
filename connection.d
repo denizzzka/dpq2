@@ -103,7 +103,7 @@ export class BaseConnection
 }
 
 
-void _unittest( string connParam )
+package void _unittest( string connParam )
 {    
     assert( PQlibVersion() >= 90100 );
     
