@@ -18,7 +18,7 @@ struct queryParams
 struct queryArg
 {
     Oid type = 0;
-    valueFormat format = valueFormat.TEXT; /// Value format
+    valueFormat queryFormat = valueFormat.TEXT; /// Value format
 
     /// Argument value
     union
@@ -51,10 +51,10 @@ final class Connection: BaseConnection
         for( int i = 0; i < p.args.length; ++i )
         {
             types[i] = p.args[i].type;
-            formats[i] = p.args[i].format;  
+            formats[i] = p.args[i].queryFormat;  
             values[i] = p.args[i].valueBin.ptr;
             
-            final switch( p.args[i].format )
+            final switch( p.args[i].queryFormat )
             {
                 case valueFormat.TEXT:
                     lengths[i] = p.args[i].valueStr.length;

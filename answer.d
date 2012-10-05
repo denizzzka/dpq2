@@ -311,9 +311,9 @@ void _unittest( string connParam )
 
     import std.stdio: writeln;
     ubyte[] m = [ 0x00,  0x44 ];
-//    writeln( r[0,10].as!PGbytea, r[0,10].as!PGbytea.sizeof );
+    writeln( r[0,10].as!PGbytea, r[0,10].as!PGbytea.sizeof );
     writeln( m );
-//    assert( r[0,10].as!PGbytea == m );
+    assert( r[0,10].as!PGbytea == m );
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
