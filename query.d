@@ -2,9 +2,9 @@ module dpq2.query;
 @trusted:
 
 import dpq2.libpq;
-
-public import dpq2.connection;
 import dpq2.answer;
+public import dpq2.connection;
+public import dpq2.libpq: valueFormat;
 
 /// Query parameters
 struct queryParams
