@@ -8,7 +8,7 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 import std.traits;
-import std.bitmanip: bigEndianToNative;
+import std.bitmanip: bigEndianToNative, littleEndianToNative;
 import std.datetime;
 
 // Supported PostgreSQL binary types
@@ -290,8 +290,7 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
         "'first line\nsecond line'::text, "
-//        "E'\\x4400'::bytea -- D (big endian UTF-8)";
-        "E'\\x440000000000'::bytea -- D (big endian UTF-8)";
+        r"E'\\x2044 7572 656c 217a'::bytea"; // D rulez! (little endian UTF-8)
 
     r = conn.exec( p );
 
@@ -310,10 +309,10 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
 
     import std.stdio: writeln;
-    ubyte[] m = [ 0x00,  0x44 ];
-    writeln( r[0,10].as!PGbytea, r[0,10].as!PGbytea.sizeof );
-    writeln( m );
-    assert( r[0,10].as!PGbytea == m );
+    
+    PGbytea b = r[0,10].as!PGbytea;
+    n = littleEndianToNative!(ubyte[], b.length)( b );
+    assert( b == m );
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
