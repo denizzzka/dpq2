@@ -13,6 +13,15 @@ import std.datetime;
 
 debug import std.stdio: writeln;
 
+// Supported PostgreSQL binary types
+alias short   PGsmallint; /// smallint
+alias int     PGinteger; /// integer
+alias long    PGbigint; /// bigint
+alias float   PGreal; /// real
+alias double  PGdouble_precision; /// double precision
+alias string  PGtext; /// text
+alias SysTime PGtime_stamp; /// time stamp with/without timezone
+
 /// Answer
 class answer
 {  
