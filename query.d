@@ -44,8 +44,8 @@ final class Connection: BaseConnection
     {
         // code above just preparing args for PQexecParams
         Oid[] types = new Oid[p.args.length];
-        int[] formats = new int[p.args.length];
-        int[] lengths = new int[p.args.length];
+        size_t[] formats = new size_t[p.args.length];
+        size_t[] lengths = new size_t[p.args.length];
         const(byte)*[] values = new const(byte)*[p.args.length];
 
         for( int i = 0; i < p.args.length; ++i )
@@ -57,10 +57,10 @@ final class Connection: BaseConnection
             final switch( p.args[i].format )
             {
                 case valueFormat.TEXT:
-                    lengths[i] = to!int( p.args[i].valueStr.length );
+                    lengths[i] = p.args[i].valueStr.length;
                     break;
                 case valueFormat.BINARY:
-                    lengths[i] = to!int( p.args[i].valueBin.length );
+                    lengths[i] = p.args[i].valueBin.length;
                     break;
             }
         }
@@ -70,7 +70,7 @@ final class Connection: BaseConnection
             PQexecParams (
                 conn,
                 toStringz( p.sqlCommand ),
-                to!int( p.args.length ),
+                p.args.length,
                 types.ptr,
                 values.ptr,
                 lengths.ptr,

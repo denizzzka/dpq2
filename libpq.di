@@ -151,7 +151,7 @@ PQERRORS_VERBOSE,
     alias void function(int acquire) pgthreadlock_t;
     pgthreadlock_t PQregisterThreadLock(pgthreadlock_t newhandler);
     PGresult* PQexec(PGconn* conn, const char* query);
-    PGresult* PQexecParams(PGconn* conn, const char* command, int nParams, Oid* paramTypes, const byte** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
+    PGresult* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const byte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     PGresult* PQprepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     PGresult* PQexecPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
     int PQsendQuery(PGconn* conn, char* query);
