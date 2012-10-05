@@ -29,10 +29,10 @@ struct queryArg
 }
 
 /// Connection
-export final class Connection: BaseConnection
+final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    export answer exec(string SQLcmd )
+    answer exec(string SQLcmd )
     {
         return new answer(
             PQexec(conn, toStringz( SQLcmd ))

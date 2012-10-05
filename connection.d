@@ -40,11 +40,11 @@ class BaseConnection
         PQ_CONSUME_OK
     }
     
-    export string connString; /// Database connection parameters
+    string connString; /// Database connection parameters
 	connVariant connType = connVariant.SYNC; /// Connection type variant
 
 	/// Connect to DB
-    export void connect()
+    void connect()
     {
 		// TODO: нужны блокировки чтобы нельзя было несколько раз создать
 		// соединение из параллельных потоков или запрос через нерабочее соединение
@@ -60,7 +60,7 @@ class BaseConnection
     }
 
 	/// Disconnect from DB
-    export void disconnect()
+    void disconnect()
     {
         if( readyForQuery )
         {
@@ -73,7 +73,7 @@ class BaseConnection
         }
     }
 
-    export ~this()
+    ~this()
     {
         disconnect();
     }
