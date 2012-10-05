@@ -281,8 +281,6 @@ void _unittest( string connParam )
 
     r = conn.exec( p );
 
-    assert( r[0,9].as!PGtext == "first line\nsecond line" );
-
     assert( r[0,0].as!PGsmallint == -32761 );
     assert( r[0,1].as!PGinteger == -2147483646 );
     assert( r[0,2].as!PGbigint == -9223372036854775806 );
@@ -293,6 +291,9 @@ void _unittest( string connParam )
     assert( r[0,6].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( r[0,7].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( r[0,8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+
+    assert( r[0,9].as!PGtext == "first line\nsecond line" );
+
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
