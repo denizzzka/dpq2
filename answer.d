@@ -18,8 +18,8 @@ alias long    PGbigint; /// bigint
 alias float   PGreal; /// real
 alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
-alias SysTime PGtime_stamp; /// time stamp with/without timezone
 alias immutable (ubyte[]) PGbytea; /// bytea
+alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
 class answer
