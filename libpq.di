@@ -1,6 +1,12 @@
 // D import file generated from 'libpq.di'
 module dpq2.libpq;
-@safe import std.c.stdio : FILE;
+
+pragma(lib, "pq");
+pragma(lib, "com_err");
+
+@safe:
+
+import std.c.stdio : FILE;
 
 extern (C) nothrow 
 {
