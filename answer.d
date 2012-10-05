@@ -8,7 +8,7 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 import std.traits;
-import std.bitmanip;
+import std.bitmanip: bigEndianToNative;
 import std.datetime;
 
 // Supported PostgreSQL binary types
@@ -35,14 +35,12 @@ class answer
     //immutable 
     struct Cell
     {
-        private immutable (ubyte*) val;
-        private immutable size_t size; // currently used only for bin, text fields have 0 end byte
+        private immutable ubyte[] value;
         debug dpq2.libpq.valueFormat format;
         
         this( immutable (ubyte)* value, size_t valueSize )
         {
-            val = value;
-            size = valueSize;
+            Cell.value = value[0..valueSize];
         }
         
         /// Returns value as string from text formatted field
@@ -56,14 +54,14 @@ class answer
         @property immutable (ubyte)[] bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-            return val[0..size];
+            return value;
         }
 
         /// Returns cell value as native string type
         @property T as(T)() const
         if( isSomeString!(T) )
         {
-            return to!T( cast(immutable(char)*) val );
+            return to!T( cast(immutable(char)*) value );
         }
         
         /// Returns cell value as native integer or decimal values
@@ -72,12 +70,13 @@ class answer
         @property T as(T)() const
         if( isNumeric!(T) )
         {
-            assert( size == T.sizeof, "Cell size isn't equal to type size" );
+            assert( value.length == T.sizeof, "Cell size isn't equal to type size" );
             
-            ubyte[T.sizeof] s = val[0..T.sizeof];
-            return bigEndianToNative!(T)( s );
+//            ubyte[T.sizeof] s = val[0..T.sizeof];
+            writeln( typeid( bigEndianToNative!(T)( value ) ) );
+            return 1; // bigEndianToNative!(T)( value );
         }
-        
+/*        
         /// Returns cell value as native date and time
         @property T* as(T)() const
         if( is( T == SysTime ) )
@@ -86,6 +85,7 @@ class answer
             // UTC because server always sends binary timestamps in UTC, not in TZ
             return new SysTime( pre_time * 10, UTC() );
         }
+*/
     }
     
     private PGresult* res;
@@ -289,6 +289,7 @@ void _unittest( string connParam )
     r = conn.exec( p );
 
     assert( r[0,0].as!PGsmallint == -32761 );
+    /*
     assert( r[0,1].as!PGinteger == -2147483646 );
     assert( r[0,2].as!PGbigint == -9223372036854775806 );
     assert( r[0,3].as!PGreal == -12.3456f );
@@ -308,4 +309,5 @@ void _unittest( string connParam )
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
+    */
 }
