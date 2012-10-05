@@ -135,7 +135,7 @@ PQERRORS_VERBOSE,
     char* PQport(PGconn* conn);
     char* PQtty(PGconn* conn);
     char* PQoptions(PGconn* conn);
-    ConnStatusType PQstatus(PGconn* conn);
+    ConnStatusType PQstatus(PGconn* conn); // used!
     PGTransactionStatusType PQtransactionStatus(PGconn* conn);
     char* PQparameterStatus(PGconn* conn, char* paramName);
     int PQprotocolVersion(PGconn* conn);
@@ -156,8 +156,8 @@ PQERRORS_VERBOSE,
     PQnoticeProcessor PQsetNoticeProcessor(PGconn* conn, PQnoticeProcessor proc, void* arg);
     alias void function(int acquire) pgthreadlock_t;
     pgthreadlock_t PQregisterThreadLock(pgthreadlock_t newhandler);
-    PGresult* PQexec(PGconn* conn, const char* query);
-    PGresult* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
+    immutable (PGresult)* PQexec(PGconn* conn, const char* query); // used!
+    immutable (PGresult)* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     PGresult* PQprepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     PGresult* PQexecPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
     int PQsendQuery(PGconn* conn, char* query);
@@ -181,35 +181,35 @@ PQERRORS_VERBOSE,
     int PQisthreadsafe();
     int PQflush(PGconn* conn);
     PGresult* PQfn(PGconn* conn, int fnid, int* result_buf, int* result_len, int result_is_int, PQArgBlock* args, int nargs);
-    ExecStatusType PQresultStatus(PGresult* res);
+    ExecStatusType PQresultStatus( immutable PGresult* res ); // used!
     char* PQresStatus(ExecStatusType status);
-    char* PQresultErrorMessage(PGresult* res);
+    char* PQresultErrorMessage(immutable PGresult* res);
     char* PQresultErrorField(PGresult* res, int fieldcode);
-    int PQntuples(PGresult* res);
-    int PQnfields(PGresult* res);
+    size_t PQntuples(immutable PGresult* res); // used!
+    size_t PQnfields(immutable PGresult* res);
     int PQbinaryTuples(PGresult* res);
     char* PQfname(PGresult* res, int field_num);
-    size_t PQfnumber(PGresult* res, immutable char* field_name);
+    size_t PQfnumber(immutable PGresult* res, immutable char* field_name); // used!
     Oid PQftable(PGresult* res, int field_num);
     int PQftablecol(PGresult* res, int field_num);
-    valueFormat PQfformat(PGresult* res, size_t field_num);
+    valueFormat PQfformat(immutable PGresult* res, size_t field_num); // used!
     Oid PQftype(PGresult* res, int field_num);
     int PQfsize(PGresult* res, int field_num);
     int PQfmod(PGresult* res, int field_num);
-    char* PQcmdStatus(PGresult* res);
+    char* PQcmdStatus( immutable PGresult* res); // used!
     char* PQoidStatus(PGresult* res);
     Oid PQoidValue(PGresult* res);
     char* PQcmdTuples(PGresult* res);
-    immutable(ubyte)* PQgetvalue(PGresult* res, size_t tup_num, size_t field_num);
-    size_t PQgetlength(PGresult* res, size_t tup_num, size_t field_num);
-    int PQgetisnull(PGresult* res, size_t tup_num, size_t field_num);
+    immutable(ubyte)* PQgetvalue(immutable PGresult* res, size_t tup_num, size_t field_num); // used!
+    size_t PQgetlength(immutable PGresult* res, size_t tup_num, size_t field_num); // used!
+    int PQgetisnull(immutable PGresult* res, size_t tup_num, size_t field_num); // used!
     int PQnparams(PGresult* res);
     Oid PQparamtype(PGresult* res, int param_num);
     PGresult* PQdescribePrepared(PGconn* conn, char* stmt);
     PGresult* PQdescribePortal(PGconn* conn, char* portal);
     int PQsendDescribePrepared(PGconn* conn, char* stmt);
     int PQsendDescribePortal(PGconn* conn, char* portal);
-    void PQclear(PGresult* res);
+    void PQclear(immutable PGresult* res); //used!
     void PQfreemem(void* ptr);
     PGresult* PQmakeEmptyPGresult(PGconn* conn, ExecStatusType status);
     size_t PQescapeStringConn(PGconn* conn, char* to, char* from, size_t length, int* error);

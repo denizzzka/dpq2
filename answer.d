@@ -99,11 +99,9 @@ class answer
 
     }
     
-    private PGresult* res;
+    private immutable PGresult* res;
     
-    private this(){}
-    
-    package this(PGresult* r)
+    package this(immutable PGresult* r)
     {
         res = r;
         enforceEx!OutOfMemoryError(r, "Can't write query result");
