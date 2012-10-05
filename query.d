@@ -21,17 +21,18 @@ struct queryArg
     valueFormat format = valueFormat.TEXT; /// Value format
 
     /// Argument value
-    union {
+    union
+    {
         byte[] valueBin; /// Binary variant
         string valueStr; /// Text variant
     };
 }
 
 /// Connection
-final class Connection: BaseConnection
+export final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    answer exec(string SQLcmd )
+    export answer exec(string SQLcmd )
     {
         return new answer(
             PQexec(conn, toStringz( SQLcmd ))

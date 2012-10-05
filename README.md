@@ -50,21 +50,27 @@ Example
 -------
 
 ```D
-import libdpq2.di;
+import dpq2.answer;
+import std.stdio: writeln;
 
-auto conn = new Connection;
-conn.connString = "dbname=postgres";
-conn.connect();
+void main()
+{
+    Connection conn = new Connection;
+    conn.connString = "dbname=postgres";
+    conn.connect();
 
-auto res = conn.exec(
-    "SELECT now() as current_time, 'abc'::text as field_name,"
-    "123 as field_3, 456.78 as field_4"
-    );
-    
-writeln( res[0,3].str );
+    auto res = conn.exec(
+        "SELECT now() as current_time, 'abc'::text as field_name,"
+        "123 as field_3, 456.78 as field_4"
+        );
+        
+    writeln( res[0,3].str );
+}
 ```
-return:
+Compile and run:
 ```sh
+$ dmd example.d -Ldpq2/libdpq2.a -L-lpq -L-lcom_err
+$ ./example 
 456.78
 ```
 
