@@ -1,4 +1,9 @@
 module dpq2.answer;
+
+// for rdmd
+pragma(lib, "pq");
+pragma(lib, "com_err");
+
 @trusted:
 
 import dpq2.libpq;
