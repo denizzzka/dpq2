@@ -25,4 +25,3 @@ clean:
 	rm -rf headers
 	rm -rf doc
 	rm -f $(ONAME)
-	rm -f $(ONAME).di
