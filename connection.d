@@ -3,6 +3,8 @@
 module dpq2.connection;
 @trusted:
 
+export {
+
 public import dpq2.libpq;
 
 import std.conv: to;
@@ -111,4 +113,5 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.disconnect();
+}
 }
