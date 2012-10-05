@@ -11,8 +11,6 @@ import std.traits;
 import std.bitmanip;
 import std.datetime;
 
-debug import std.stdio: writeln;
-
 // Supported PostgreSQL binary types
 alias short   PGsmallint; /// smallint
 alias int     PGinteger; /// integer
@@ -34,15 +32,22 @@ class answer
     }
 
     /// Result table's cell
+    //immutable 
     struct Cell
     {
         private
         {
             immutable (ubyte)* val;
             size_t size; // currently used only for bin, text fields have 0 end byte
-            debug valueFormat format;
+            debug dpq2.libpq.valueFormat format;
         }
-
+        
+        this( immutable (ubyte)* value, size_t valueSize )
+        {
+            val = value;
+            size = valueSize;
+        }
+        
         /// Returns value as string from text formatted field
         @property string str() const
         {
@@ -127,7 +132,7 @@ class answer
     @property size_t columnCount(){ return PQnfields(res); }
 
     /// Returns column format
-    valueFormat columnFormat( size_t colNum )
+    dpq2.libpq.valueFormat columnFormat( size_t colNum )
     {
         return PQfformat(res, colNum);
     }
@@ -146,10 +151,15 @@ class answer
     {
         assertCoords(c);
         
-        Cell* r = new Cell;
-        r.val = PQgetvalue(res, c.Row, c.Col);
-        r.size = size( c );
-        debug r.format = columnFormat( c.Col );
+        Cell* r;
+        auto v = PQgetvalue(res, c.Row, c.Col);
+        auto s = size( c );
+                
+        static if( is( Cell.format ) )
+            r = new Cell( v, s, columnFormat( c.Col ));
+        else
+            r = new Cell( v, s);
+        
         return r;
     }
     
