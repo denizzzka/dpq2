@@ -61,7 +61,6 @@ class answer
         @property T as(T)() const
         if( is( T == immutable(ubyte)[] ) )
         {
-            ubyte a[];
             return value;
         }
 
