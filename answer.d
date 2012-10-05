@@ -291,7 +291,7 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
         "'first line\nsecond line'::text, "
 //        "E'\\x4400'::bytea -- D (big endian UTF-8)";
-        "E'\\x44000000'::bytea -- D (big endian UTF-8)";
+        "E'\\x440000000000'::bytea -- D (big endian UTF-8)";
 
     r = conn.exec( p );
 

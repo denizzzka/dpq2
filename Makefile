@@ -2,7 +2,7 @@ DFILES = libpq.di connection.d query.d answer.d unittests_main.d
 ONAME = libdpq2
 DC = dmd
 PQFLAGS = -L-lpq -L-lcom_err
-COMMON = $(DC) $(DFILES) $(PQFLAGS) -w -d -Hdheaders -of$(ONAME)
+COMMON = $(DC) $(DFILES) $(PQFLAGS) -w -d -of$(ONAME)
 
 DEBUG = $(COMMON) -g -debug -lib
 RELEASE = $(COMMON) -release -lib
@@ -23,5 +23,4 @@ doc:
 clean:
 	rm -rf *.o *.a
 	rm -rf headers
-	rm -rf doc
 	rm -f $(ONAME)
