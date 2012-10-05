@@ -7,6 +7,7 @@ public import dpq2.query;
 import std.string: toStringz;
 import std.exception;
 import core.exception;
+import std.traits;
 
 debug import std.stdio: writeln;
 
@@ -44,6 +45,13 @@ class answer
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
         }
+        
+        T as(T)() const
+        if( isSomeString!(T) )
+        {
+            return to!string( cast(immutable(char)*) val );
+        }
+
     }
             
     private PGresult* res;
@@ -220,7 +228,8 @@ void _unittest( string connParam )
     assert( r.isNULL( Coords(0,2) ) );
     assert( r.columnNum( "field_name" ) == 1 );
 
-    string sql_query3 = "listen test_notify; notify test_notify";
-    r = conn.exec( sql_query3 );
+    assert( r[1,2].as!(string) == "456" );
+
+    r = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
 }

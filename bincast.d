@@ -8,7 +8,6 @@ import std.conv: std_to = to;
 import std.bitmanip;
 import std.datetime;
 
-import std.stdio;
 import std.traits;
 
 
