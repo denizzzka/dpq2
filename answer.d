@@ -35,8 +35,8 @@ class answer
     //immutable 
     struct Cell
     {
-        private immutable (ubyte)* val;
-        private size_t size; // currently used only for bin, text fields have 0 end byte
+        private immutable (ubyte*) val;
+        private immutable size_t size; // currently used only for bin, text fields have 0 end byte
         debug dpq2.libpq.valueFormat format;
         
         this( immutable (ubyte)* value, size_t valueSize )
