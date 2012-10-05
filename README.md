@@ -71,8 +71,8 @@ Unit tests
 ----------
 
 Code contains embedded unit tests using a regular functions calls, not using
-standard D unit tests. (Non standard because that unit tests need to pass
-parameters of connection to the database in runtime.)
+standard D unit tests. It is because unit tests need to receive parameters of
+connection to the database in runtime.
 
 To perform unit test it is required access to any PostgreSQL server with
 permissions to run SELECT statements.
