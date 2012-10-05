@@ -23,7 +23,7 @@ struct queryArg
     /// Argument value
     union
     {
-        byte[] valueBin; /// Binary variant
+        ubyte[] valueBin; /// Binary variant
         string valueStr; /// Text variant
     };
 }
@@ -46,7 +46,7 @@ final class Connection: BaseConnection
         Oid[] types = new Oid[p.args.length];
         size_t[] formats = new size_t[p.args.length];
         size_t[] lengths = new size_t[p.args.length];
-        const(byte)*[] values = new const(byte)*[p.args.length];
+        const(ubyte)*[] values = new const(ubyte)*[p.args.length];
 
         for( int i = 0; i < p.args.length; ++i )
         {
