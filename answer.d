@@ -8,6 +8,8 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 import std.traits;
+import std.bitmanip;
+import std.datetime;
 
 debug import std.stdio: writeln;
 
@@ -36,22 +38,43 @@ class answer
         @property string str() const
         {
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
-            return to!string( cast(immutable(char)*)val );
+            return as!string();
         }
 
-        /// Returns value as bytes array from binary formatted field
+        /// Returns value as ubytes array from binary formatted field
         @property immutable (ubyte)[] bin() const
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return val[0..size];
         }
-        
-        T as(T)() const
+
+        /// Returns cell value as native string type
+        @property T as(T)() const
         if( isSomeString!(T) )
         {
-            return to!string( cast(immutable(char)*) val );
+            return to!T( cast(immutable(char)*) val );
         }
-
+        
+        /// Returns cell value as native integer or decimal values
+        ///
+        /// Postgres type "numeric" is oversized and not supported by now
+        @property T as(T)() const
+        if( isNumeric!(T) )
+        {
+            assert( size == T.sizeof );
+             
+            ubyte[T.sizeof] s = b[0..T.sizeof];
+            return bigEndianToNative!(T)( val );
+        }
+        
+        /// Returns cell value as native date and time
+        @property T* as(T)()
+        if( is( T == SysTime ) )
+        {
+            ulong pre_time = to!(ulong)( val[0..size] );
+            // UTC because server always sends binary timestamps in UTC, not in TZ
+            return new SysTime( pre_time * 10, UTC() );
+        }
     }
             
     private PGresult* res;
