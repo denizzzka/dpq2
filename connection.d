@@ -3,8 +3,6 @@
 module dpq2.connection;
 @trusted:
 
-export {
-
 public import dpq2.libpq;
 
 import std.conv: to;
@@ -31,7 +29,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
 /// BaseConnection
-class BaseConnection
+export class BaseConnection
 {
     package PGconn* conn;
     private bool connectingInProgress;
@@ -46,7 +44,7 @@ class BaseConnection
 	connVariant connType = connVariant.SYNC; /// Connection type variant
 
 	/// Connect to DB
-    void connect()
+    export void connect()
     {
 		// TODO: нужны блокировки чтобы нельзя было несколько раз создать
 		// соединение из параллельных потоков или запрос через нерабочее соединение
@@ -62,7 +60,7 @@ class BaseConnection
     }
 
 	/// Disconnect from DB
-    void disconnect()
+    export void disconnect()
     {
         if( readyForQuery )
         {
@@ -75,7 +73,7 @@ class BaseConnection
         }
     }
 
-    ~this()
+    export ~this()
     {
         disconnect();
     }
@@ -113,5 +111,4 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.disconnect();
-}
 }
