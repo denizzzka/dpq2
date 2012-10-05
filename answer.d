@@ -43,7 +43,7 @@ class answer
             debug valueFormat format;
         }
 
-        /// Returns value from text formatted field
+        /// Returns value as string from text formatted field
         @property string str() const
         {
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
