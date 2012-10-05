@@ -21,6 +21,7 @@ alias float   PGreal; /// real
 alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
+alias ubyte[] PGbytea; /// bytea
 
 /// Answer
 class answer
@@ -70,22 +71,22 @@ class answer
         @property T as(T)() const
         if( isNumeric!(T) )
         {
-            assert( size == T.sizeof );
-             
-            ubyte[T.sizeof] s = b[0..T.sizeof];
-            return bigEndianToNative!(T)( val );
+            assert( size == T.sizeof, "Cell size isn't equal to type size" );
+            
+            ubyte[T.sizeof] s = val[0..T.sizeof];
+            return bigEndianToNative!(T)( s );
         }
         
         /// Returns cell value as native date and time
-        @property T* as(T)()
+        @property T* as(T)() const
         if( is( T == SysTime ) )
         {
-            ulong pre_time = to!(ulong)( val[0..size] );
+            ulong pre_time = as!(ulong)();
             // UTC because server always sends binary timestamps in UTC, not in TZ
             return new SysTime( pre_time * 10, UTC() );
         }
     }
-            
+    
     private PGresult* res;
     
     private this(){}
@@ -235,6 +236,7 @@ class notify
 
 void _unittest( string connParam )
 {
+    // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
@@ -260,8 +262,39 @@ void _unittest( string connParam )
     assert( r.isNULL( Coords(0,2) ) );
     assert( r.columnNum( "field_name" ) == 1 );
 
-    assert( r[1,2].as!(string) == "456" );
 
+    // Cell properties test
+    static queryArg arg;
+    queryParams p;
+    p.resultFormat = valueFormat.BINARY;
+    p.sqlCommand = "SELECT "
+        "-32761::smallint, "
+        "-2147483646::integer, "
+        "-9223372036854775806::bigint, "
+        "-12.3456::real, "
+        "-1234.56789012345::double precision, "
+        "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
+        "'2012-10-04 11:00:21.227803+08'::timestamp without time zone, "
+        "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
+        "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
+        "'first line\nsecond line'::text";
+
+    r = conn.exec( p );
+
+    assert( r[0,9].as!PGtext == "first line\nsecond line" );
+
+    assert( r[0,0].as!PGsmallint == -32761 );
+    assert( r[0,1].as!PGinteger == -2147483646 );
+    assert( r[0,2].as!PGbigint == -9223372036854775806 );
+    assert( r[0,3].as!PGreal == -12.3456f );
+    assert( r[0,4].as!PGdouble_precision == -1234.56789012345 );
+
+    assert( r[0,5].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
+    assert( r[0,6].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( r[0,7].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( r[0,8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+
+    // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
 }
