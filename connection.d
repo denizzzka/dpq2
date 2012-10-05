@@ -69,8 +69,8 @@ class BaseConnection
         }
         else
         {
-			assert("Not connected yet!");
-		}
+            assert("Not connected yet!");
+        }
     }
 
     ~this()
