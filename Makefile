@@ -4,7 +4,7 @@ DC = dmd
 COMMON = $(DC) $(DFILES) -w -d -of$(ONAME)
 
 DEBUG = $(COMMON) -g -debug -lib
-RELEASE = $(COMMON) -release -lib
+RELEASE = $(COMMON) -release -O -lib
 UNITTEST = $(COMMON) -g -debug -unittest
 
 release:
