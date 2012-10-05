@@ -50,7 +50,6 @@ Example
 -------
 
 ```D
-import dpq2.answer;
 import std.stdio: writeln;
 
 void main()
@@ -59,19 +58,38 @@ void main()
     conn.connString = "dbname=postgres";
     conn.connect();
 
+    // Text query result
     auto res = conn.exec(
         "SELECT now() as current_time, 'abc'::text as field_name,"
         "123 as field_3, 456.78 as field_4"
         );
         
-    writeln( res[0,3].str );
+    writeln( "1: ", res[0,3].str );
+
+    // Binary query result
+    static queryArg arg;
+    queryParams p;
+    p.resultFormat = dpq2.answer.valueFormat.BINARY;
+    p.sqlCommand = "SELECT "
+        "-1234.56789012345::double precision, "
+        "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
+        "'first line\nsecond line'::text";
+    res = conn.exec( p );    
+    
+    writeln( "2: ", res[0,0].as!PGdouble_precision );
+    writeln( "3: ", res[0,1].as!PGtime_stamp.toSimpleString );
+    writeln( "4: ", res[0,2].as!PGtext );
 }
 ```
 Compile and run:
 ```sh
 $ dmd example.d -Ldpq2/libdpq2.a -L-lpq -L-lcom_err
 $ ./example 
-456.78
+1: 456.78
+2: -1234.57
+3: 0013-Oct-05 03:00:21.227803Z
+4: first line
+second line
 ```
 
 Unit tests
