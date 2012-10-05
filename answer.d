@@ -34,7 +34,6 @@ class answer
     }
 
     /// Result table's cell
-    // внимание: ячейка не знает своих собственных координат - так задумано, для экономии
     struct Cell
     {
         private
