@@ -14,11 +14,11 @@ Features
 
 * Arguments list support
 * Binary and text data queries
-* Text representation of the query result
-* Binary reading to native D types
+* Text reading of the query result to native D text types
+* Binary representation of the query result to native D types
  * Integer and decimal types (except "numeric")
  * Timestamp type (with and without timezone)
-* LISTEN support
+* LISTEN/NOTIFY support
 
 Building
 --------
