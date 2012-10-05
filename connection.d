@@ -3,7 +3,7 @@
 module dpq2.connection;
 @trusted:
 
-public import dpq2.libpq;
+import dpq2.libpq;
 
 import std.conv: to;
 import std.string: toStringz;
@@ -40,7 +40,7 @@ export class BaseConnection
         PQ_CONSUME_OK
     }
     
-    string connString; /// Database connection parameters
+    export string connString; /// Database connection parameters
 	connVariant connType = connVariant.SYNC; /// Connection type variant
 
 	/// Connect to DB

@@ -1,6 +1,8 @@
 module dpq2.query;
 @trusted:
 
+import dpq2.libpq;
+
 public import dpq2.connection;
 import dpq2.answer;
 
@@ -115,6 +117,5 @@ void _unittest( string connParam )
     p.sqlCommand = sql_query2;
     p.args = args;
 
-    r = conn.exec( p );     
-    assert( r[0,2].str == "456" );
+    r = conn.exec( p );
 }
