@@ -283,7 +283,8 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+08'::timestamp without time zone, "
         "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
-        "'first line\nsecond line'::text";
+        "'first line\nsecond line'::text, "
+        "'abc'::bytea";
 
     r = conn.exec( p );
 
@@ -300,6 +301,9 @@ void _unittest( string connParam )
 
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
 
+    import std.stdio: writeln;
+//    writeln( r[0,10].as!PGbytea.c_str );
+//    r[0,10].as_ubyte;
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
