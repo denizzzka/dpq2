@@ -288,7 +288,7 @@ void _unittest( string connParam )
     r = conn.exec( p );
 
     assert( r[0,0].as!PGsmallint == -32761 );
-    /*
+
     assert( r[0,1].as!PGinteger == -2147483646 );
     assert( r[0,2].as!PGbigint == -9223372036854775806 );
     assert( r[0,3].as!PGreal == -12.3456f );
@@ -308,5 +308,4 @@ void _unittest( string connParam )
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
-    */
 }
