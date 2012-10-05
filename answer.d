@@ -72,11 +72,10 @@ class answer
         {
             assert( value.length == T.sizeof, "Cell size isn't equal to type size" );
             
-//            ubyte[T.sizeof] s = val[0..T.sizeof];
-            writeln( typeid( bigEndianToNative!(T)( value ) ) );
-            return 1; // bigEndianToNative!(T)( value );
+            ubyte[T.sizeof] s = value[0..T.sizeof];
+            return bigEndianToNative!(T)( s );
         }
-/*        
+        
         /// Returns cell value as native date and time
         @property T* as(T)() const
         if( is( T == SysTime ) )
@@ -85,7 +84,7 @@ class answer
             // UTC because server always sends binary timestamps in UTC, not in TZ
             return new SysTime( pre_time * 10, UTC() );
         }
-*/
+
     }
     
     private PGresult* res;
