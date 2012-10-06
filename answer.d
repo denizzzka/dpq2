@@ -23,7 +23,7 @@ alias long    PGbigint; /// bigint
 alias float   PGreal; /// real
 alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
-alias immutable (ubyte[]) PGbytea; /// bytea
+alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 
@@ -301,7 +301,6 @@ void _unittest( string connParam )
     assert( !e.isNULL( Coords(0,0) ) );
     assert( e.isNULL( Coords(0,2) ) );
     assert( e.columnNum( "field_name" ) == 1 );
-
 
     // Cell properties test
     static queryArg arg;
