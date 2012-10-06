@@ -57,13 +57,6 @@ immutable class answer
             Cell.value = value[0..valueSize];
             format = f;
         }
-        
-        /// Returns value as string from text formatted field
-        @property string str()
-        {
-            debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
-            return as!string();
-        }
 
         /// Returns value as bytes from binary formatted field
         @property T as(T)()
@@ -304,7 +297,7 @@ void _unittest( string connParam )
     assert( e.columnCount == 4);
     assert( e.columnFormat(2) == valueFormat.TEXT );
 
-    assert( e[1,2].str == "456" );
+    assert( e[1,2].as!PGtext == "456" );
     assert( !e.isNULL( Coords(0,0) ) );
     assert( e.isNULL( Coords(0,2) ) );
     assert( e.columnNum( "field_name" ) == 1 );
