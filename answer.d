@@ -27,7 +27,7 @@ alias immutable (ubyte[]) PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
-final immutable class answer
+immutable class answer
 {      
     private PGresult* res;
     
@@ -48,6 +48,12 @@ final immutable class answer
         this( immutable (ubyte)* value, size_t valueSize )
         {
             Cell.value = value[0..valueSize];
+        }
+
+        this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f )
+        {
+            Cell.value = value[0..valueSize];
+            format = f;
         }
         
         /// Returns value as string from text formatted field
@@ -161,10 +167,10 @@ final immutable class answer
         auto v = PQgetvalue(res, c.Row, c.Col);
         auto s = size( c );
                 
-        static if( is( Cell.format ) )
+//        static if( is( Cell.format ) ) // version(debug) don't work here!
             r = new Cell( v, s, columnFormat( c.Col ));
-        else
-            r = new Cell( v, s);
+//        else
+//            r = new Cell( v, s);
         
         return r;
     }
@@ -196,7 +202,7 @@ final immutable class answer
     }
     
     /// Exception
-    final immutable class exception : Exception
+    immutable class exception : Exception
     {       
         /// Exception types
         enum exceptionTypes
@@ -213,13 +219,13 @@ final immutable class answer
             return to!string( PQresultErrorMessage(res) );
         }
         
-        this( exceptionTypes t, string msg ) immutable
+        this( exceptionTypes t, string msg )
         {
             type = t;
             super( msg, null, null );
         }
         
-        this() immutable
+        this()
         {
             type = exceptionTypes.UNDEFINED;
             super( resultErrorMessage~" ("~to!string(status)~")", null, null );
