@@ -101,7 +101,6 @@ immutable class answer
             // UTC because server always sends binary timestamps in UTC, not in TZ
             return new SysTime( pre_time * 10, UTC() );
         }
-
     }
     
     package this(immutable PGresult* r) immutable
