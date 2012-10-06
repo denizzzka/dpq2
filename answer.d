@@ -40,46 +40,47 @@ immutable class answer
     }
 
     /// Result table's cell
-    //immutable 
-    struct Cell
+    immutable struct Cell
     {
-        private immutable (ubyte[]) value;
-        debug private immutable dpq2.libpq.valueFormat format;
+        private ubyte[] value;
+        debug private dpq2.libpq.valueFormat format;
         
-        this( immutable (ubyte)* value, size_t valueSize )
+        version(Debug){} else
+        this( immutable (ubyte)* value, size_t valueSize ) immutable
         {
             Cell.value = value[0..valueSize];
         }
-
-        debug this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f )
+        
+        debug
+        this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f ) immutable
         {
             Cell.value = value[0..valueSize];
             format = f;
         }
         
         /// Returns value as string from text formatted field
-        @property string str() const
+        @property string str()
         {
             debug enforce( format == valueFormat.TEXT, "Format of the column is not text" );
             return as!string();
         }
 
         /// Returns value as ubytes array from binary formatted field
-        @property immutable (ubyte[]) bin() const
+        @property immutable (ubyte[]) bin()
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return value;
         }
 
         /// Returns value as bytes from binary formatted field
-        @property T as(T)() const
+        @property T as(T)()
         if( is( T == immutable(ubyte[]) ) )
         {
             return value;
         }
 
         /// Returns cell value as native string type
-        @property T as(T)() const
+        @property T as(T)()
         if( isSomeString!(T) )
         {
             return to!T( cast(immutable(char)*) value );
@@ -88,7 +89,7 @@ immutable class answer
         /// Returns cell value as native integer or decimal values
         ///
         /// Postgres type "numeric" is oversized and not supported by now
-        @property T as(T)() const
+        @property T as(T)()
         if( isNumeric!(T) )
         {
             assert( value.length == T.sizeof, "Cell size isn't equal to type size" );
@@ -98,7 +99,7 @@ immutable class answer
         }
         
         /// Returns cell value as native date and time
-        @property T* as(T)() const
+        @property T* as(T)()
         if( is( T == SysTime ) )
         {
             ulong pre_time = as!(ulong)();
@@ -163,24 +164,23 @@ immutable class answer
         return n;
     }
 
-    private const (Cell)* getValue( const Coords c )
+    private immutable (Cell)* getValue( const Coords c )
     {
         assertCoords(c);
         
-        Cell* r;
         auto v = PQgetvalue(res, c.Row, c.Col);
         auto s = size( c );
 
         version(Debug)
-            r = new Cell( v, s, columnFormat( c.Col ) );
+            auto r = new Cell( v, s, columnFormat( c.Col ) );
         else
-            r = new Cell( v, s );
+            auto r = new Cell( v, s );
         
         return r;
     }
     
     /// Returns pointer to cell
-    const (Cell)* opIndex( size_t Row, size_t Col )
+    immutable (Cell)* opIndex( size_t Row, size_t Col )
     {
         return getValue( Coords( Row, Col ) );
     }
@@ -280,6 +280,7 @@ void _unittest( string connParam )
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
     assert( e.columnFormat(2) == valueFormat.TEXT );
+
     assert( e[1,2].str == "456" );
     assert( !e.isNULL( Coords(0,0) ) );
     assert( e.isNULL( Coords(0,2) ) );
