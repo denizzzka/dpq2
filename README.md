@@ -44,8 +44,6 @@ or
 
     $ make
 
-After build header file libdpq2.di will be created automatically.
-
 Example
 -------
 
