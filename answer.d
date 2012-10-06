@@ -26,6 +26,7 @@ alias string  PGtext; /// text
 alias immutable (ubyte[]) PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
+
 /// Answer
 immutable class answer
 {      
@@ -50,7 +51,7 @@ immutable class answer
             Cell.value = value[0..valueSize];
         }
 
-        this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f )
+        debug this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f )
         {
             Cell.value = value[0..valueSize];
             format = f;
@@ -169,11 +170,11 @@ immutable class answer
         Cell* r;
         auto v = PQgetvalue(res, c.Row, c.Col);
         auto s = size( c );
-                
-//        static if( is( Cell.format ) ) // version(debug) don't work here!
-            r = new Cell( v, s, columnFormat( c.Col ));
-//        else
-//            r = new Cell( v, s);
+
+        version(Debug)
+            r = new Cell( v, s, columnFormat( c.Col ) );
+        else
+            r = new Cell( v, s );
         
         return r;
     }
@@ -210,6 +211,7 @@ immutable class answer
     }    
 }
 
+
 /// Notify
 class notify
 {
@@ -233,6 +235,7 @@ class notify
         assert( n != null );
     }
 }
+
 
 /// Exception
 immutable class exception : Exception
