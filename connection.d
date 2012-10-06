@@ -73,11 +73,6 @@ class BaseConnection
         }
     }
 
-    ~this()
-    {
-        disconnect();
-    }
-
     package void consumeInput()
     {
         int r = PQconsumeInput( conn );
@@ -87,6 +82,11 @@ class BaseConnection
     private static string PQerrorMessage(PGconn* conn)
     {
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
+    }
+
+    ~this()
+    {
+        disconnect();
     }
     
     /// Exception
