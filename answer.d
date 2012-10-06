@@ -202,7 +202,7 @@ immutable class answer
     }
     
     /// Exception
-    immutable class exception : Exception
+    class exception : Exception
     {       
         /// Exception types
         enum exceptionTypes
