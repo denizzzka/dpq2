@@ -50,6 +50,9 @@ Example
 -------
 
 ```D
+#!/usr/bin/env rdmd
+
+import dpq2.answer;
 import std.stdio: writeln;
 
 void main()
@@ -59,12 +62,13 @@ void main()
     conn.connect();
 
     // Text query result
-    auto res = conn.exec(
-        "SELECT now() as current_time, 'abc'::text as field_name,"
-        "123 as field_3, 456.78 as field_4"
+    auto s = conn.exec(
+        "SELECT now() as current_time, 'abc'::text as field_name, "
+        "123 as field_3, 456.78 as field_4, "
+        r"array[ E'\\000', E'\\001', E'\\002' ]::bytea[]"
         );
         
-    writeln( "1: ", res[0,3].str );
+    writeln( "1: ", s[0,3].str );
 
     // Binary query result
     static queryArg arg;
@@ -74,11 +78,12 @@ void main()
         "-1234.56789012345::double precision, "
         "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
         "'first line\nsecond line'::text";
-    res = conn.exec( p );    
-    
-    writeln( "2: ", res[0,0].as!PGdouble_precision );
-    writeln( "3: ", res[0,1].as!PGtime_stamp.toSimpleString );
-    writeln( "4: ", res[0,2].as!PGtext );
+    auto r = conn.exec( p );    
+ 
+    writeln( "2: ", r[0,0].as!PGdouble_precision );
+    writeln( "3: ", r[0,1].as!PGtime_stamp.toSimpleString );
+    writeln( "4: ", r[0,2].as!PGtext );
+    writeln( "2: ", r[0,0].as!PGbytea );
 }
 ```
 Compile and run:

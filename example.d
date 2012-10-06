@@ -1,7 +1,5 @@
 #!/usr/bin/env rdmd
 
-// This is example from README.md
-
 import dpq2.answer;
 import std.stdio: writeln;
 
