@@ -154,9 +154,8 @@ immutable class answer
     {    
         size_t n = PQfnumber(res, toStringz(column_name));
         if( n == -1 ) {}
-//            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
-//                                "Column '"~column_name~"' is not found");
-        return n;
+            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
+                                "Column '"~column_name~"' is not found");
     }
 
     private const (Cell)* getValue( const Coords c )
