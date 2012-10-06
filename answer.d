@@ -121,7 +121,7 @@ immutable class answer
             //immutable Oid INT4OID = 23;
             
             import std.stdio;
-            Array* r = cast(Array*) value;
+            Array* r = cast(Array*) value + 3;
             auto d = cast(immutable Dimension*) r + Dimension.sizeof;
             
             writeln( "Array sizeof: ", Array.sizeof );
