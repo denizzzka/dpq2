@@ -103,6 +103,14 @@ immutable class answer
         }
     }
     
+    struct Array
+    {
+        int vl_len_; // standard varlena header word
+        size_t ndim; // number of dimensions of the array
+        int dataoffset; // offset to stored data, or 0 if no nulls bitmap
+        Oid elemtype; // element type OID
+    }
+    
     package this(immutable PGresult* r) immutable
     {
         res = r;
