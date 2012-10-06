@@ -310,7 +310,7 @@ void _unittest( string connParam )
     assert( r[0,8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
-    assert( r[0,10].as!PGbytea == [68, 32, 114, 117, 108, 101, 115, 0, 33] ); // "D rules\x00!" octal
+    assert( r[0,10].as!PGbytea == [ 0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
 
     // Notifies test
     r = conn.exec( "listen test_notify; notify test_notify" );
