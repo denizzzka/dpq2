@@ -104,16 +104,31 @@ immutable class answer
         
         immutable struct Array
         {
-            int vl_len_; // standard varlena header word
-            size_t ndim; // number of dimensions of the array
-            int dataoffset; // offset to stored data, or 0 if no nulls bitmap
+            int ndim; // number of dimensions of the array
+            int dataoffset_ign; // offset for data, removed by libpq
             Oid elemtype; // element type OID
         }
         
-        immutable ulong array_cell( size_t x )
+        immutable struct Dimension
         {
-            auto r = cast(immutable Array*) value;
-            return r.ndim;
+          int size; // Number of elements
+          int index; // Index of first element
+          int first_value; // Beginning of integer data
+        }
+        
+        auto array_cell( size_t x )
+        {
+            //immutable Oid INT4OID = 23;
+            
+            import std.stdio;
+            Array* r = cast(Array*) value;
+            auto d = cast(immutable Dimension*) r + Dimension.sizeof;
+            
+            writeln( "Array sizeof: ", Array.sizeof );
+            writeln( "Dimensions: ", r.ndim );
+            
+            //return value[ Array.sizeof + Dimension.sizeof ];
+            return d.first_value;
         }
     }
     
