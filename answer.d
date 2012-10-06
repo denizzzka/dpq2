@@ -120,7 +120,7 @@ immutable class answer
         PQclear(res);
     }
 
-    ExecStatusType status() 
+    ExecStatusType status()
     {
         return PQresultStatus(res);
     }
@@ -132,7 +132,7 @@ immutable class answer
      * not free the result directly. It will be freed when the associated 
      * PGresult handle is passed to PQclear.
      */
-    string cmdStatus()
+    @property string cmdStatus()
     {
         return to!string( PQcmdStatus(res) );
     }
@@ -153,9 +153,9 @@ immutable class answer
     size_t columnNum( string column_name )
     {    
         size_t n = PQfnumber(res, toStringz(column_name));
-        if( n == -1 )
-            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
-                                "Column '"~column_name~"' is not found");
+        if( n == -1 ) {}
+//            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
+//                                "Column '"~column_name~"' is not found");
         return n;
     }
 
@@ -202,12 +202,12 @@ immutable class answer
     }
     
     /// Exception
-    class exception : Exception
+    immutable class exception : Exception
     {       
         /// Exception types
         enum exceptionTypes
         {
-            UNDEFINED, /// Undefined
+            UNDEFINED_FIX_IT, /// Undefined
             COLUMN_NOT_FOUND /// Column not found
         }
         
@@ -227,8 +227,8 @@ immutable class answer
         
         this()
         {
-            type = exceptionTypes.UNDEFINED;
-            super( resultErrorMessage~" ("~to!string(status)~")", null, null );
+            type = exceptionTypes.UNDEFINED_FIX_IT;
+            super( resultErrorMessage~" ("~to!string(answer.status)~")", null, null );
         }           
     }
 }

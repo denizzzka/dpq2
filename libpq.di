@@ -36,7 +36,7 @@ PGRES_POLLING_WRITING,
 PGRES_POLLING_OK,
 PGRES_POLLING_ACTIVE,
 }
-    enum ExecStatusType 
+    enum ExecStatusType // used!
 {
 PGRES_EMPTY_QUERY = 0,
 PGRES_COMMAND_OK,
