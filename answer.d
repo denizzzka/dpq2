@@ -102,7 +102,7 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
-        struct Array
+        immutable struct Array
         {
             int vl_len_; // standard varlena header word
             size_t ndim; // number of dimensions of the array
@@ -110,9 +110,10 @@ immutable class answer
             Oid elemtype; // element type OID
         }
         
-        immutable ubyte array_cell( size_t x )
+        immutable ulong array_cell( size_t x )
         {
-            return value[Array.sizeof + x];
+            auto r = cast(immutable Array*) value;
+            return r.ndim;
         }
     }
     
