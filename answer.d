@@ -65,17 +65,11 @@ immutable class answer
             return as!string();
         }
 
-        /// Returns value as ubytes array from binary formatted field
-        @property immutable (ubyte[]) bin()
-        {
-            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-            return value;
-        }
-
         /// Returns value as bytes from binary formatted field
         @property T as(T)()
         if( is( T == immutable(ubyte[]) ) )
         {
+            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             return value;
         }
 
@@ -92,6 +86,7 @@ immutable class answer
         @property T as(T)()
         if( isNumeric!(T) )
         {
+            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             assert( value.length == T.sizeof, "Cell size isn't equal to type size" );
             
             ubyte[T.sizeof] s = value[0..T.sizeof];
@@ -171,7 +166,7 @@ immutable class answer
         auto v = PQgetvalue(res, c.Row, c.Col);
         auto s = size( c );
 
-        version(Debug)
+        debug
             auto r = new Cell( v, s, columnFormat( c.Col ) );
         else
             auto r = new Cell( v, s );
@@ -307,7 +302,6 @@ void _unittest( string connParam )
     auto r = conn.exec( p );
 
     assert( r[0,0].as!PGsmallint == -32761 );
-
     assert( r[0,1].as!PGinteger == -2147483646 );
     assert( r[0,2].as!PGbigint == -9223372036854775806 );
     assert( r[0,3].as!PGreal == -12.3456f );
