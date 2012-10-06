@@ -27,8 +27,10 @@ alias immutable (ubyte[]) PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
-class answer
-{  
+final immutable class answer
+{      
+    private PGresult* res;
+    
     /// Result table's cell coordinates 
     struct Coords
     {
@@ -99,9 +101,7 @@ class answer
 
     }
     
-    private immutable PGresult* res;
-    
-    package this(immutable PGresult* r)
+    package this(immutable PGresult* r) immutable
     {
         res = r;
         enforceEx!OutOfMemoryError(r, "Can't write query result");
@@ -196,11 +196,12 @@ class answer
     }
     
     /// Exception
-    class exception : Exception
+    final immutable class exception : Exception
     {       
         /// Exception types
         enum exceptionTypes
         {
+            UNDEFINED, /// Undefined
             COLUMN_NOT_FOUND /// Column not found
         }
         
@@ -212,14 +213,15 @@ class answer
             return to!string( PQresultErrorMessage(res) );
         }
         
-        this( exceptionTypes t, string msg )
+        this( exceptionTypes t, string msg ) immutable
         {
             type = t;
             super( msg, null, null );
         }
         
-        this()
+        this() immutable
         {
+            type = exceptionTypes.UNDEFINED;
             super( resultErrorMessage~" ("~to!string(status)~")", null, null );
         }           
     }
@@ -265,17 +267,17 @@ void _unittest( string connParam )
 
     "select NULL,           'ijk'::text,                 789,  12345.115345";
 
-    auto r = conn.exec( sql_query );
+    auto e = conn.exec( sql_query );
     
     alias answer.Coords Coords;
 
-    assert( r.rowCount == 3 );
-    assert( r.columnCount == 4);
-    assert( r.columnFormat(2) == valueFormat.TEXT );
-    assert( r[1,2].str == "456" );
-    assert( !r.isNULL( Coords(0,0) ) );
-    assert( r.isNULL( Coords(0,2) ) );
-    assert( r.columnNum( "field_name" ) == 1 );
+    assert( e.rowCount == 3 );
+    assert( e.columnCount == 4);
+    assert( e.columnFormat(2) == valueFormat.TEXT );
+    assert( e[1,2].str == "456" );
+    assert( !e.isNULL( Coords(0,0) ) );
+    assert( e.isNULL( Coords(0,2) ) );
+    assert( e.columnNum( "field_name" ) == 1 );
 
 
     // Cell properties test
@@ -295,7 +297,7 @@ void _unittest( string connParam )
         "'first line\nsecond line'::text, "
         r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea"; // "D rules\x00!" (ASCII)
 
-    r = conn.exec( p );
+    auto r = conn.exec( p );
 
     assert( r[0,0].as!PGsmallint == -32761 );
 
@@ -313,6 +315,6 @@ void _unittest( string connParam )
     assert( r[0,10].as!PGbytea == [ 0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
 
     // Notifies test
-    r = conn.exec( "listen test_notify; notify test_notify" );
+    auto n = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
 }

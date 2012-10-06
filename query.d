@@ -32,7 +32,7 @@ struct queryArg
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    answer exec(string SQLcmd )
+    immutable (answer) exec(string SQLcmd )
     {
         return new answer(
             PQexec(conn, toStringz( SQLcmd ))
@@ -40,7 +40,7 @@ final class Connection: BaseConnection
     }
 
     /// Perform SQL query to DB
-    answer exec(ref const queryParams p)
+    immutable (answer) exec(ref const queryParams p)
     {
         // code above just preparing args for PQexecParams
         Oid[] types = new Oid[p.args.length];
@@ -118,5 +118,5 @@ void _unittest( string connParam )
     p.sqlCommand = sql_query2;
     p.args = args;
 
-    r = conn.exec( p );
+    auto r2 = conn.exec( p );
 }
