@@ -101,14 +101,19 @@ immutable class answer
             // UTC because server always sends binary timestamps in UTC, not in TZ
             return new SysTime( pre_time * 10, UTC() );
         }
-    }
-    
-    struct Array
-    {
-        int vl_len_; // standard varlena header word
-        size_t ndim; // number of dimensions of the array
-        int dataoffset; // offset to stored data, or 0 if no nulls bitmap
-        Oid elemtype; // element type OID
+        
+        struct Array
+        {
+            int vl_len_; // standard varlena header word
+            size_t ndim; // number of dimensions of the array
+            int dataoffset; // offset to stored data, or 0 if no nulls bitmap
+            Oid elemtype; // element type OID
+        }
+        
+        immutable ubyte array_cell( size_t x )
+        {
+            return value[Array.sizeof + x];
+        }
     }
     
     package this(immutable PGresult* r) immutable
@@ -320,7 +325,7 @@ void _unittest( string connParam )
     assert( r[0,8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
-    assert( r[0,10].as!PGbytea == [ 0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
+    assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
 
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
