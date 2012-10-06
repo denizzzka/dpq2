@@ -113,7 +113,10 @@ immutable class answer
         enforceEx!OutOfMemoryError(r, "Can't write query result");
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
-            throw new exception();
+        {
+            throw new exception( exception.exceptionTypes.UNDEFINED_FIX_IT,
+                resultErrorMessage~" ("~to!string(status)~")" );
+        }
     }
     
     ~this() {
@@ -153,9 +156,10 @@ immutable class answer
     size_t columnNum( string column_name )
     {    
         size_t n = PQfnumber(res, toStringz(column_name));
-        if( n == -1 ) {}
+        if( n == -1 )
             throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
                                 "Column '"~column_name~"' is not found");
+        return n;
     }
 
     private const (Cell)* getValue( const Coords c )
@@ -193,43 +197,17 @@ immutable class answer
         assertCoords(c);
         return PQgetisnull(res, c.Col, c.Row) != 0;
     }
-
+    
+    private string resultErrorMessage()
+    {
+        return to!string( PQresultErrorMessage(res) );
+    }
+    
     private void assertCoords( const Coords c )
     {
         assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
         assert( c.Col < columnCount, to!string(c.Col)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
-    }
-    
-    /// Exception
-    immutable class exception : Exception
-    {       
-        /// Exception types
-        enum exceptionTypes
-        {
-            UNDEFINED_FIX_IT, /// Undefined
-            COLUMN_NOT_FOUND /// Column not found
-        }
-        
-        exceptionTypes type; /// Exception type
-        
-        /// Returns the error message associated with the command
-        string resultErrorMessage()
-        {
-            return to!string( PQresultErrorMessage(res) );
-        }
-        
-        this( exceptionTypes t, string msg )
-        {
-            type = t;
-            super( msg, null, null );
-        }
-        
-        this()
-        {
-            type = exceptionTypes.UNDEFINED_FIX_IT;
-            super( resultErrorMessage~" ("~to!string(answer.status)~")", null, null );
-        }           
-    }
+    }    
 }
 
 /// Notify
@@ -255,6 +233,26 @@ class notify
         assert( n != null );
     }
 }
+
+/// Exception
+immutable class exception : Exception
+{    
+    /// Exception types
+    enum exceptionTypes
+    {
+        COLUMN_NOT_FOUND, /// Column not found
+        UNDEFINED_FIX_IT /// Undefined, need to find and fix it
+    }
+    
+    exceptionTypes type; /// Exception type
+    
+    this( exceptionTypes t, string msg )
+    {
+        type = t;
+        super( msg, null, null );
+    }
+}
+
 
 void _unittest( string connParam )
 {
