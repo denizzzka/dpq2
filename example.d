@@ -25,8 +25,8 @@ void main()
         "-1234.56789012345::double precision, "
         "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
         "'first line\nsecond line'::text, "
-        r"array[ [ [E'\\x44', E'\\x44' ], [E'\\x44', E'\\x44' ] ], "
-        r"[ [E'\\x44', E'\\x44' ], [E'\\x44', E'\\x44' ] ] ]::bytea[]";
+        r"array[ [ [E'\\x00', E'\\x44' ], [E'\\x44', E'\\x44' ] , [E'\\x44', E'\\x44' ] ], "
+        r"[ [E'\\x44', E'\\x44' ], [E'\\x44', E'\\x44' ], [E'\\x44', E'\\x44' ]  ] ]::bytea[]";
 
     auto r = conn.exec( p );    
  

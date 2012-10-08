@@ -70,7 +70,7 @@ immutable class answer
         @property T as(T)()
         if( isSomeString!(T) )
         {
-            return to!T( cast(immutable(char)*) value );
+            return to!T( cast(immutable(char)*) value.ptr );
         }
         
         /// Returns cell value as native integer or decimal values
@@ -102,29 +102,31 @@ immutable class answer
             ubyte ndim[4]; // number of dimensions of the array
             ubyte dataoffset_ign[4]; // offset for data, removed by libpq
             ubyte element_OID[4]; // element type OID
+            ubyte elemnum[4]; // Number of elements
+            ubyte index_first[4]; // Index of first element
+            ubyte first_value[4]; // Beginning of integer data
             
             @property int dimensions() { return bigEndianToNative!int(ndim); }
-            @property int OID() { return bigEndianToNative!int(element_OID); }
-            
-            struct Dimension
-            {
-              ubyte elemnum[4]; // Number of elements
-              ubyte index_first[4]; // Index of first element
-              ubyte first_value[4]; // Beginning of integer data
-              
-              @property int size() { return bigEndianToNative!int(elemnum); }
-              @property int index() { return bigEndianToNative!int(index_first); }
-              @property int first() { return bigEndianToNative!int(first_value); }
-            }
+            @property Oid OID() { return bigEndianToNative!int(element_OID); }
+            @property int dim_size() { return bigEndianToNative!int(elemnum); }
+            @property int index() { return bigEndianToNative!int(index_first); }
+            @property int elements() { return bigEndianToNative!int(first_value); }
         }
-                    
+        
         auto array_cell( size_t x )
         {
             import std.stdio;
-            auto r = cast(Array*) value;
+            Array* r = cast(Array*) value.ptr;
+            //auto d = cast(Dimension*) (r + 1);
 
             writeln( "Dimensions: ", r.dimensions );
             writeln( "OID: ", r.OID );
+            writeln( "size of dimension: ", r.dim_size );
+
+            writeln( "index: ", r.index );
+            writeln( "elements in demensions: ", r.elements );
+            
+            writeln( "bytea content: ", value);
             
             return 1;
         }
