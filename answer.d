@@ -229,13 +229,19 @@ immutable class answer
 
 
 /// Notify
-class notify
+immutable struct notify
 {
     private PGnotify* n;
 
-    this(){}
-    this( PGnotify* n ) { this.n = n; }
-    ~this() { PQfreemem(n); }
+    this( immutable PGnotify* n ) immutable
+    {
+        this.n = n;
+    }
+        
+    ~this()
+    {
+        PQfreemem( cast(void*) n );
+    }
 
     /// Returns notification condition name
     @property string name() { return to!string( n.relname ); }

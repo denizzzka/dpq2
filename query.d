@@ -81,13 +81,12 @@ final class Connection: BaseConnection
     }
 
     /// Returns null if no notifies was received
-    notify getNextNotify()
+    immutable (notify*) getNextNotify()
     {
         consumeInput();
         auto n = PQnotifies(conn);
         return n is null ? null : new notify(n);
     }
-
 }
 
 void _unittest( string connParam )
