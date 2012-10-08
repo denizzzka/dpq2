@@ -128,7 +128,7 @@ immutable class answer
     package this(immutable PGresult* r) immutable
     {
         res = r;
-        enforceEx!OutOfMemoryError(r, "Can't write query result");
+        enforceEx!OutOfMemoryError(res, "Can't write query result");
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
@@ -225,17 +225,23 @@ immutable class answer
         assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
         assert( c.Col < columnCount, to!string(c.Col)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
     }    
+
+    invariant()
+    {
+        assert( res != null );
+    }
 }
 
 
 /// Notify
-immutable struct notify
+immutable class notify
 {
     private PGnotify* n;
 
-    this( immutable PGnotify* n ) immutable
+    this( immutable (PGnotify*) pgn ) immutable
     {
-        //this.n = n;
+        n = pgn;
+        enforceEx!OutOfMemoryError(n, "Can't write notify");
     }
         
     ~this()

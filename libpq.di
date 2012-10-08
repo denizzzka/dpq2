@@ -167,7 +167,7 @@ PQERRORS_VERBOSE,
     PGresult* PQgetResult(PGconn* conn);
     int PQisBusy(PGconn* conn);
     int PQconsumeInput(PGconn* conn);
-    immutable (PGnotify*) PQnotifies(PGconn* conn);
+    immutable (PGnotify)* PQnotifies(PGconn* conn);
     int PQputCopyData(PGconn* conn, char* buffer, int nbytes);
     int PQputCopyEnd(PGconn* conn, char* errormsg);
     int PQgetCopyData(PGconn* conn, char** buffer, int async);

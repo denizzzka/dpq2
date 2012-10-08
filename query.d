@@ -81,11 +81,11 @@ final class Connection: BaseConnection
     }
 
     /// Returns null if no notifies was received
-    immutable (notify*) getNextNotify()
+    immutable (notify) getNextNotify()
     {
         consumeInput();
         auto n = PQnotifies(conn);
-        return n is null ? null : new notify(n);
+        return n is null ? null : new notify( n );
     }
 }
 
