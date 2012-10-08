@@ -116,7 +116,7 @@ PQERRORS_VERBOSE,
 }
     PGconn* PQconnectStart(char* connInfo);
     PostgresPollingStatusType PQconnectPoll(PGconn* conn);
-    PGconn* PQconnectdb(immutable char* connInfo);
+    PGconn* PQconnectdb(immutable char* connInfo); // used!
     PGconn* PQsetdbLogin(char* pghost, char* pgport, char* pgoptions, char* pgtty, char* dbName, char* login, char* pwd);
     void PQfinish(PGconn* conn);
     PQconninfoOption* PQconndefaults();
@@ -167,7 +167,7 @@ PQERRORS_VERBOSE,
     PGresult* PQgetResult(PGconn* conn);
     int PQisBusy(PGconn* conn);
     int PQconsumeInput(PGconn* conn);
-    immutable (PGnotify)* PQnotifies(PGconn* conn);
+    immutable (PGnotify)* PQnotifies(PGconn* conn); // used!
     int PQputCopyData(PGconn* conn, char* buffer, int nbytes);
     int PQputCopyEnd(PGconn* conn, char* errormsg);
     int PQgetCopyData(PGconn* conn, char** buffer, int async);
@@ -183,10 +183,10 @@ PQERRORS_VERBOSE,
     PGresult* PQfn(PGconn* conn, int fnid, int* result_buf, int* result_len, int result_is_int, PQArgBlock* args, int nargs);
     ExecStatusType PQresultStatus( immutable PGresult* res ); // used!
     char* PQresStatus(ExecStatusType status);
-    char* PQresultErrorMessage(immutable PGresult* res);
+    char* PQresultErrorMessage(immutable PGresult* res); // used!
     char* PQresultErrorField(PGresult* res, int fieldcode);
     size_t PQntuples(immutable PGresult* res); // used!
-    size_t PQnfields(immutable PGresult* res);
+    size_t PQnfields(immutable PGresult* res); // used!
     int PQbinaryTuples(PGresult* res);
     char* PQfname(PGresult* res, int field_num);
     size_t PQfnumber(immutable PGresult* res, immutable char* field_name); // used!
