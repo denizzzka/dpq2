@@ -95,33 +95,38 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
-        immutable struct Array
-        {
-            int ndim; // number of dimensions of the array
-            int dataoffset_ign; // offset for data, removed by libpq
-            Oid elemtype; // element type OID
-        }
         
-        immutable struct Dimension
+        struct Array
         {
-          int size; // Number of elements
-          int index; // Index of first element
-          int first_value; // Beginning of integer data
+            // (network order)
+            ubyte ndim[4]; // number of dimensions of the array
+            ubyte dataoffset_ign[4]; // offset for data, removed by libpq
+            ubyte element_OID[4]; // element type OID
+            
+            @property int dimensions() { return bigEndianToNative!int(ndim); }
+            @property int OID() { return bigEndianToNative!int(element_OID); }
+            
+            struct Dimension
+            {
+              ubyte elemnum[4]; // Number of elements
+              ubyte index_first[4]; // Index of first element
+              ubyte first_value[4]; // Beginning of integer data
+              
+              @property int size() { return bigEndianToNative!int(elemnum); }
+              @property int index() { return bigEndianToNative!int(index_first); }
+              @property int first() { return bigEndianToNative!int(first_value); }
+            }
         }
-        
+                    
         auto array_cell( size_t x )
         {
-            //immutable Oid INT4OID = 23;
-            
             import std.stdio;
-            Array* r = cast(Array*) value + 3;
-            auto d = cast(immutable Dimension*) r + Dimension.sizeof;
+            auto r = cast(Array*) value;
+
+            writeln( "Dimensions: ", r.dimensions );
+            writeln( "OID: ", r.OID );
             
-            writeln( "Array sizeof: ", Array.sizeof );
-            writeln( "Dimensions: ", r.ndim );
-            
-            //return value[ Array.sizeof + Dimension.sizeof ];
-            return d.first_value;
+            return 1;
         }
     }
     
