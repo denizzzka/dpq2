@@ -235,7 +235,7 @@ immutable struct notify
 
     this( immutable PGnotify* n ) immutable
     {
-        this.n = n;
+        //this.n = n;
     }
         
     ~this()
