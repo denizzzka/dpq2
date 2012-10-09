@@ -449,7 +449,7 @@ void _unittest( string connParam )
         "'first line\nsecond line'::text, "
         r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, " // "D rules\x00!" (ASCII)
         r"array[[1, 2], "
-              r"[3, 4]]::integer[] ";
+              r"[3, 7]]::integer[] ";
 
 
     auto r = conn.exec( p );
@@ -469,7 +469,7 @@ void _unittest( string connParam )
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
     immutable(int) i = 0;
-    auto v = r[0,11].asArray.getCell( 2, 1 ).as!PGbytea.length;
+    auto v = r[0,11].asArray.getCell( 1, 1 ).as!PGinteger;
     //assert( v.size == 4 );
     
     writeln( "5: (unused) ", v );
