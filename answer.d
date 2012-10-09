@@ -140,7 +140,16 @@ immutable class answer
                 n_elems *= d.dim_size;
             }
             
-            writeln ( "content: ", value[12 + 8*3+4]);
+            auto offset = Array.sizeof + ds.sizeof + 4;
+            auto content = value[ offset..offset + 4 ];
+            
+            ubyte elem_size[4];
+
+            writeln( "content: ", content );
+            
+            writeln( "content addr: ", &content, " value addr: ", &value );
+            
+            //writeln ( "content: ", bigEndianToNative!int(content) );
             writeln( "total elements: ", n_elems );
             
             writeln( "bytea content: ", value);
