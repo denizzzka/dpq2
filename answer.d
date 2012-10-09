@@ -188,7 +188,7 @@ immutable class answer
             debug this.n_elems = n_elems;
             this.ds = ds.idup;
             
-            elements = new immutable(element)[ n_elems ];
+            auto elements = new element[ n_elems ];
             
             // Looping through all elements and fill out index of them
             writeln(Array.sizeof, " + ", Dim.sizeof, " * ", ndims);
@@ -201,9 +201,10 @@ immutable class answer
                 auto size = bigEndianToNative!int( size_net );
                 curr_offset += size_net.sizeof;
                 elements[i](size, cell.value.ptr + curr_offset );
-                writeln("size: ", size );
+                writeln("size: ", elements[i].size );
                 curr_offset += size;
             }
+            this.elements = elements.idup;
         }
         
         immutable (Cell)* getCell( ... )
@@ -233,6 +234,7 @@ immutable class answer
             }
             
             assert( element_num <= n_elems );
+            writeln("elements[element_num].size = ", elements[element_num].size );
             
             debug
                 auto r = new Cell( elements[element_num].value, elements[element_num].size, valueFormat.BINARY );
