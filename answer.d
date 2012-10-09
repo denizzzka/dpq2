@@ -103,93 +103,101 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
-        
-        struct Array
+        immutable struct Array
         {
-            // (network order)
-            ubyte[4] _ndims; // number of dimensions of the array
-            ubyte[4] _dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
-            ubyte[4] _OID; // element type OID
+            private ubyte[][] elements;
+
+            private struct arrayHeader
+            {
+                // (network order)
+                ubyte[4] ndims; // number of dimensions of the array
+                ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
+                ubyte[4] OID; // element type OID
+            }
+
+            private struct Dim_net // Network byte order
+            {
+                ubyte[4] dim_size; // Number of elements in dimension
+                ubyte[4] lbound; // Index of first element
+
+//                @property int dim_size() { return bigEndianToNative!int(_size); }
+//                @property int lbound() { return bigEndianToNative!int(_lbound); }
+            }
+
+            private struct Dim
+            {
+                int dim_size; // Number of elements in dimension
+                int lbound; // Index of first element
+            }
+
+            this( ... ) immutable
+            {
+                assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
+                
+                auto args = new int[ _arguments.length ];
+                for( int i; i < args.length; ++i )
+                {
+                    assert( _arguments[i] == typeid(int) );
+                    args[i] = va_arg!(int)(_argptr);
+                }
+                
+                auto h = cast(immutable(arrayHeader*)) value.ptr;
+                int ndims = bigEndianToNative!int(h.ndims);
+                Oid OID = bigEndianToNative!int(h.OID);
+                
+                // TODO: here is need exception, not enforce
+                enforce( h.ndims > 0, "Dimensions number must be more than 0" );
+                enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
+                
+                size_t n_elems = 1; // Total elements
+                auto ds = new Dim[ h.ndims ]; // Dimensions size info
+                
+                // Recognize dimensions of array
+                for( auto i = 0; i < h.ndims; ++i )
+                {
+                    struct Dim_net // Network byte order
+                    {
+                        ubyte[4] size; // Number of elements in the dimension
+                        ubyte[4] lbound; // Unknown
+                    }                
+                    
+                    Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+                    
+                    int dim_size = bigEndianToNative!int( d.size );
+                    int lbound = bigEndianToNative!int(d.lbound);
+
+                    // FIXIT: What is lbound in postgresql array reply?
+                    enforce( lbound == 1, "Please report if you came across this error." );
+                    assert( dim_size > 0 );
+                    assert( dim_size > args[i] );
+
+                    ds[i].dim_size = dim_size;
+                    ds[i].lbound = lbound;
+                    n_elems *= dim_size;
+
             
-            @property int ndims() { return bigEndianToNative!int(_ndims); }
-            @property Oid OID() { return bigEndianToNative!int(_OID); }
-        }
+                    auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
+                    
+                    // Looping through all elements and fill out index of them
+                    auto curr_offset = Array.sizeof + Dim.sizeof * h.ndims;            
+                    for(int i = 0; i < n_elems; ++i )
+                    {
+                        ubyte[4] size_net;
+                        size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
+                        auto size = bigEndianToNative!int( size_net );
+                        
+                        curr_offset += size_net.sizeof;
+                        elements[i] = value[ curr_offset .. curr_offset + size ];
+                        curr_offset += size;
+                    }
+                }
 
-        struct Dim_net // Network byte order
-        {
-            ubyte[4] _size; // Number of elements in dimension
-            ubyte[4] _lbound; // Index of first element
 
-            @property int dim_size() { return bigEndianToNative!int(_size); }
-            @property int lbound() { return bigEndianToNative!int(_lbound); }
-        }
-
-        struct Dim
-        {
-            int dim_size; // Number of elements in dimension
-            int lbound; // Index of first element
+            }
         }
         
         immutable (Cell)* array_cell( ... )
         {
-            assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
-            
-            // Arguments to array
-            auto args = new int[ _arguments.length ];
-            for( int i; i < args.length; ++i )
-            {
-                assert( _arguments[i] == typeid(int) );
-                args[i] = va_arg!(int)(_argptr);
-            }
-            
-            // Array header
-            Array* h = cast(Array*) value.ptr;
-            
-            // TODO: here is need exception, not enforce
-            enforce( h.ndims > 0, "Dimensions number must be more than 0" );
-            enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
-
-            size_t n_elems = 1; // Total elements
-            auto ds = new Dim[ h.ndims ]; // Dimensions size info
-            
-            // Recognize dimensions
-            for( auto i = 0; i < h.ndims; ++i )
-            {
-                struct Dim_net // Network byte order
-                {
-                    ubyte[4] size; // Number of elements in the dimension
-                    ubyte[4] lbound; // Unknown
-                }                
-                
-                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
-                
-                int dim_size = bigEndianToNative!int( d.size );
-                int lbound = bigEndianToNative!int(d.lbound);
-
-                // FIXIT: What is lbound in postgresql array reply?
-                enforce( lbound == 1, "Please report if you came across this error." );
-                assert( dim_size > 0 );
-                assert( dim_size > args[i] );
-
-                ds[i].dim_size = dim_size;
-                ds[i].lbound = lbound;
-                n_elems *= dim_size;
-            }
-            
-            auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
-            
-            // Looping through all elements and fill out index of them
-            auto curr_offset = Array.sizeof + Dim.sizeof * h.ndims;            
-            for(int i = 0; i < n_elems; ++i )
-            {
-                ubyte[4] size_net;
-                size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
-                auto size = bigEndianToNative!int( size_net );
-                
-                curr_offset += size_net.sizeof;
-                elements[i] = value[ curr_offset .. curr_offset + size ];
-                curr_offset += size;
-            }
 
             
             // Calculates serial number of the element
