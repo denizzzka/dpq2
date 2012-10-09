@@ -154,15 +154,25 @@ immutable class answer
             
             for( auto i = 0; i < h.ndims; ++i )
             {
-                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
-                assert( d.dim_size > 0 );
-                assert( d.dim_size > args[i] );
-                // FIXIT: What is lbound in postgresql array reply?
-                enforce( d.lbound == 1, "Please report if you came across this error." );
+                struct Dim_net // Network byte order
+                {
+                    ubyte[4] size; // Number of elements in dimension
+                    ubyte[4] lbound; // Unknown
+                }                
                 
-                ds[i].dim_size = d.dim_size;
-                ds[i].lbound = d.lbound;
-                n_elems *= d.dim_size;
+                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+                
+                int dim_size = bigEndianToNative!int( d.size );
+                int lbound = bigEndianToNative!int(d.lbound);
+
+                // FIXIT: What is lbound in postgresql array reply?
+                enforce( lbound == 1, "Please report if you came across this error." );
+                assert( dim_size > 0 );
+                assert( dim_size > args[i] );
+
+                ds[i].dim_size = dim_size;
+                ds[i].lbound = lbound;
+                n_elems *= dim_size;
             }
 
             
