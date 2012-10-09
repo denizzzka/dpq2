@@ -124,12 +124,6 @@ immutable class answer
             int lbound; // Index of first element
         }
         
-        struct Elem
-        {
-            int size;
-            ubyte* value;
-        }
-        
         auto array_cell( ... )
         {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
@@ -175,9 +169,11 @@ immutable class answer
                 ds[i].lbound = lbound;
                 n_elems *= dim_size;
             }
-
             
-            Elem[] res = new Elem[ n_elems ];           
+            auto elements = new ubyte*[ n_elems ]; // List of all elements
+            // так считать размер:
+            //res[i].size = bigEndianToNative!int( size_net );
+
             auto data_offset = Array.sizeof + Dim.sizeof * h.ndims;
             
 
@@ -200,13 +196,12 @@ immutable class answer
             {
                 ubyte[4] size_net;
                 size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
-                res[i].size = bigEndianToNative!int( size_net );
-                res[i].value = cast(ubyte*) &value[curr_offset + size_net.sizeof];
-                
-                curr_offset += size_net.sizeof + res[i].size; //TODO: избавиться от лишней итерации этого в конце цикла
+                auto size = bigEndianToNative!int( size_net );
+                elements[i] = cast(ubyte*) &value[curr_offset + size_net.sizeof];
+                curr_offset += size_net.sizeof + size; //TODO: избавиться от лишней итерации этого в конце цикла
             }
             
-            return res[element_num];
+            return elements[element_num];
         }
     }
     
@@ -436,8 +431,8 @@ void _unittest( string connParam )
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
 
     auto v = r[0,11].array_cell(1, 1);
-    assert( v.size == 4 );
-    ubyte[4] v1 = *(cast(ubyte[4]*) v.value);
+    //assert( v.size == 4 );
+    ubyte[4] v1 = *(cast(ubyte[4]*) v);
     PGinteger v2 = bigEndianToNative!PGinteger( v1 );
     
     writeln( "5: (unused) ", v2 );
