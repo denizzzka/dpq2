@@ -216,15 +216,16 @@ immutable class answer
             
             // Variadic args parsing
             auto args = new int[ _arguments.length ];
+            
+            // TODO: here is need exception, not enforce
+            enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
+            
             for( int i; i < args.length; ++i )
             {
                 assert( _arguments[i] == typeid(int) );
                 args[i] = va_arg!(int)(_argptr);
                 assert( ds[i].dim_size > args[i] );
             }
-            
-            // TODO: here is need exception, not enforce
-            enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
             
             // Calculates serial number of the element
             auto inner = args.length - 1; // inner dimension
@@ -468,7 +469,7 @@ void _unittest( string connParam )
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
     immutable(int) i = 0;
-    auto v = r[0,11].asArray.getCell( 1, 1 ).as!PGbytea.length;
+    auto v = r[0,11].asArray.getCell( 0, 1, 1 ).as!PGbytea.length;
     //assert( v.size == 4 );
     
     writeln( "5: (unused) ", v );
