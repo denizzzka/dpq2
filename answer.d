@@ -121,14 +121,14 @@ immutable class answer
             int dim_size; // Number of elements in dimension
             int lbound; // Index of first element
         }
-        
+        /*
         struct Elem
         {
             ubyte[4] _size;
 
             @property int size() { return bigEndianToNative!int(_size); }
         }
-        
+        */
         auto array_cell( size_t y, size_t x )
         {
             import std.stdio;
@@ -157,8 +157,8 @@ immutable class answer
             
             auto data_offset = Array.sizeof + Dim.sizeof * r.ndims;
             
-            auto element_num = y * x + x;
-            
+            auto element_num = ds[1].dim_size * y + x;
+            /*
             ubyte[4] _content_size = value[ data_offset..data_offset+4 ];
             auto content_size = bigEndianToNative!int(_content_size);
             
@@ -166,20 +166,34 @@ immutable class answer
             
             writeln( "content size: ",  content_size );
             writeln( "content value: ", content_value );
+            */
+            writeln( "total elements: ", n_elems );
+            writeln( "bytea content: ", value);
             
             assert( y <= ds[1].dim_size );
             assert( x <= ds[0].dim_size );
             
-            writeln( "number of element (from zero): ", ds[1].dim_size * y + x );
+            writeln( "number of element (from zero): ", element_num );
             
-            //writeln( "content addr: ", &content, " value addr: ", &value );
+            auto curr_offset = data_offset;
+            ubyte[4] size_net; // network ordered
+            int size;
+            size_t val_start;
             
-            //writeln ( "content: ", bigEndianToNative!int(content) );
-            writeln( "total elements: ", n_elems );
+            for(int i = 0; i <= element_num; ++i )
+            {
+                size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
+                val_start = curr_offset + size_net.sizeof;
+                size = bigEndianToNative!int(size_net);
+                writeln("i: ", i, " curr_offset: ", curr_offset, "size: ", size);
+                curr_offset += size_net.sizeof + size;
+            }
             
-            writeln( "bytea content: ", value);
-            
-            return 1;
+            size_t val_end = val_start + size;
+            writeln(val_start, " ", val_end);
+            auto content_value = value[ val_start .. val_end ];
+
+            return content_value;
         }
     }
     
