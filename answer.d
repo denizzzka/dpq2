@@ -106,6 +106,8 @@ immutable class answer
         immutable struct Array
         {
             private ubyte[][] elements;
+            private int ndims; // Number of dimensions
+            Oid OID;
 
             private struct arrayHeader
             {
@@ -141,19 +143,19 @@ immutable class answer
                     args[i] = va_arg!(int)(_argptr);
                 }
                 
-                auto h = cast(immutable(arrayHeader*)) value.ptr;
-                int ndims = bigEndianToNative!int(h.ndims);
-                Oid OID = bigEndianToNative!int(h.OID);
+                arrayHeader* h; // = cast(arrayHeader*) Cell.value.ptr;
+                ndims = bigEndianToNative!int(h.ndims);
+                OID = bigEndianToNative!Oid(h.OID);
                 
                 // TODO: here is need exception, not enforce
-                enforce( h.ndims > 0, "Dimensions number must be more than 0" );
-                enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
+                enforce( ndims > 0, "Dimensions number must be more than 0" );
+                enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
                 
                 size_t n_elems = 1; // Total elements
-                auto ds = new Dim[ h.ndims ]; // Dimensions size info
+                auto ds = new Dim[ ndims ]; // Dimensions size info
                 
                 // Recognize dimensions of array
-                for( auto i = 0; i < h.ndims; ++i )
+                for( auto i = 0; i < ndims; ++i )
                 {
                     struct Dim_net // Network byte order
                     {
@@ -179,7 +181,7 @@ immutable class answer
                     auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
                     
                     // Looping through all elements and fill out index of them
-                    auto curr_offset = Array.sizeof + Dim.sizeof * h.ndims;            
+                    auto curr_offset = Array.sizeof + Dim.sizeof * ndims;            
                     for(int i = 0; i < n_elems; ++i )
                     {
                         ubyte[4] size_net;
@@ -198,7 +200,7 @@ immutable class answer
         
         immutable (Cell)* array_cell( ... )
         {
-
+            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
             
             // Calculates serial number of the element
             auto inner = args.length - 1; // Inner dimension
