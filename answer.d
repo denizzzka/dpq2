@@ -82,7 +82,7 @@ immutable class answer
         if( isNumeric!(T) )
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-            assert( value.length == T.sizeof, "Cell size isn't equal to type size" );
+            assert( value.length == T.sizeof, "Cell value length isn't equal to type size" );
             
             ubyte[T.sizeof] s = value[0..T.sizeof];
             return bigEndianToNative!(T)( s );
@@ -97,7 +97,7 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
-        Array* asArray()
+        immutable (Array*) asArray()
         {
             return new Array( &this );
         }
@@ -139,7 +139,7 @@ immutable class answer
                 int size;
                 ubyte* value;
                 
-                this( int s, immutable ubyte* v ) immutable
+                this( immutable int s, immutable ubyte* v ) immutable
                 {
                     size = s;
                     value = v;
@@ -147,7 +147,7 @@ immutable class answer
             }
         }
         
-        this( immutable(Cell*) c )
+        this( immutable(Cell*) c ) immutable
         {
             cell = c;
             debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
@@ -195,12 +195,13 @@ immutable class answer
             auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * ndims;            
             for(int i = 0; i < n_elems; ++i )
             {
-                ubyte[4] size_net;
+                ubyte[int.sizeof] size_net;
                 writeln( curr_offset, "..", curr_offset + size_net.sizeof );
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
                 curr_offset += size_net.sizeof;
                 elements[i](size, cell.value.ptr + curr_offset );
+                writeln("size: ", size );
                 curr_offset += size;
             }
         }
@@ -448,7 +449,7 @@ void _unittest( string connParam )
         "'first line\nsecond line'::text, "
         r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, " // "D rules\x00!" (ASCII)
         r"array[[1, 2], "
-              r"[3, 4]] ";
+              r"[3, 4]]::integer[] ";
 
 
     auto r = conn.exec( p );
@@ -466,11 +467,12 @@ void _unittest( string connParam )
 
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
-
-    auto v = r[0,11].asArray.getCell(0,0);
+    
+    immutable(int) i = 0;
+    auto v = r[0,11].asArray.getCell( 1, 1 ).as!PGbytea.length;
     //assert( v.size == 4 );
     
-    writeln( "5: (unused) ", v /*.as!PGinteger*/ );
+    writeln( "5: (unused) ", v );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
