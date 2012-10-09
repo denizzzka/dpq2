@@ -134,7 +134,7 @@ immutable class answer
         {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
-            // Arguments array
+            // Arguments to array
             auto args = new int[ _arguments.length ];
             for( int i; i < args.length; ++i )
             {
@@ -195,7 +195,6 @@ immutable class answer
                 curr_offset += size_net.sizeof + res[i].size; //TODO: избавиться от лишней итерации этого в конце цикла
             }
             
-            writeln( res );
             return res[element_num];
         }
     }
