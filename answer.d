@@ -224,7 +224,7 @@ immutable class answer
             {
                 assert( _arguments[i] == typeid(int) );
                 args[i] = va_arg!(int)(_argptr);
-                assert( ds[i].dim_size > args[i] );
+                enforce( ds[i].dim_size > args[i] ); // TODO: here is need exception, not enforce
             }
             
             // Calculates serial number of the element
