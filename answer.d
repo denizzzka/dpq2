@@ -170,13 +170,10 @@ immutable class answer
                 n_elems *= dim_size;
             }
             
-            auto elements = new ubyte*[ n_elems ]; // List of all elements
-            // так считать размер:
-            //res[i].size = bigEndianToNative!int( size_net );
-
+            auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
+            
             auto data_offset = Array.sizeof + Dim.sizeof * h.ndims;
             
-
             // Calculates serial number of the element
             auto inner = args.length - 1; // Inner dimension
             auto element_num = args[inner]; // Serial number of the element
@@ -190,21 +187,16 @@ immutable class answer
             assert( element_num <= n_elems );
             
             // Looping through all elements and fill out index of them
-            auto curr_offset = data_offset;
-            
+            auto curr_offset = data_offset;            
             for(int i = 0; i < n_elems; ++i )
             {
                 ubyte[4] size_net;
                 size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
-
+                
                 curr_offset += size_net.sizeof;
-                
-                elements[i] = cast(ubyte*) &value[curr_offset];
-                
-                auto x = value[ curr_offset .. curr_offset + size ].idup;
-                
-                curr_offset += size; //TODO: можно ли избавиться от лишней итерации этого в конце цикла? :-)
+                elements[i] = value[ curr_offset .. curr_offset + size ];
+                curr_offset += size;
             }
             
             return elements[element_num];
