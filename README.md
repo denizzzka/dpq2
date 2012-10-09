@@ -19,6 +19,7 @@ Features
  * Text types
  * Integer and decimal types (except "numeric")
  * Timestamp type (with and without timezone)
+* Access to PostgreSQL's multidimensional arrays (only in binary mode)
 * LISTEN/NOTIFY support
 
 Building
@@ -130,5 +131,4 @@ TODO
 * Row by row result reading
 * Binary arguments
 * PostGIS binary data support
-* PostgreSQL arrays
 * Make code more transparent, CamelCased and Autodoc

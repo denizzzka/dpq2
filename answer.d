@@ -63,7 +63,7 @@ immutable class answer
         this( immutable (ubyte[]) value ) immutable
         {
             this.value = value;
-            format = valueFormat.BINARY;
+            debug format = valueFormat.BINARY;
         }
 
         /// Returns value as bytes from binary formatted field
@@ -119,7 +119,7 @@ immutable class answer
             ubyte[][] elements;
             int ndims; // number of dimensions
             Dim[] ds; // dimensions sizes info
-            debug size_t n_elems; // Total elements
+            size_t n_elems; // Total elements
             
             struct arrayHeader_net
             {
@@ -168,7 +168,7 @@ immutable class answer
             auto ds = new Dim[ ndims ];
             
             // Recognize dimensions of array
-            debug int n_elems = 1;
+            int n_elems = 1;
             for( auto i = 0; i < ndims; ++i )
             {
                 struct Dim_net // network byte order
@@ -191,7 +191,7 @@ immutable class answer
                 n_elems *= dim_size;
             }
             
-            debug this.n_elems = n_elems;
+            this.n_elems = n_elems;
             this.ds = ds.idup;
             
             auto elements = new immutable (ubyte)[][ n_elems ];
