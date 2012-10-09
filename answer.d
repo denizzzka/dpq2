@@ -100,7 +100,7 @@ immutable class answer
         {
             // (network order)
             ubyte _ndims[4]; // number of dimensions of the array
-            ubyte _dataoffset_ign[4]; // offset for data, removed by libpq
+            ubyte _dataoffset_ign[4]; // offset for data, removed by libpq. may be it is conteins isNULL flag!
             ubyte _OID[4]; // element type OID
             
             @property int ndims() { return bigEndianToNative!int(_ndims); }
