@@ -129,6 +129,7 @@ TODO
 
 * Async queries support
 * Async queries queue (like in node.js)
+* Row by row result reading
 * Binary arguments
 * PostGIS binary data support
 * PostgreSQL arrays
