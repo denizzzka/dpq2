@@ -158,8 +158,10 @@ immutable class answer
             
             auto element_num = y * x + x;
             
-            auto content_size = value[ data_offset..data_offset+4 ];
-            auto content_value = value[ data_offset+4..data_offset+6 ];
+            ubyte[4] _content_size = value[ data_offset..data_offset+4 ];
+            auto content_size = bigEndianToNative!int(_content_size);
+            
+            auto content_value = value[ data_offset+4..data_offset + 4 + content_size ];
             
             writeln( "content size: ",  content_size );
             writeln( "content value: ", content_value );
