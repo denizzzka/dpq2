@@ -137,6 +137,14 @@ immutable class answer
             writeln( _arguments.length );
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
+            // Arguments array
+            auto args = new int[ _arguments.length ];
+            for( int i; i < args.length; ++i )
+            {
+                assert( _arguments[i] == typeid(int) );
+                args[i] = va_arg!(int)(_argptr);
+            }
+            
             // Array header
             Array* h = cast(Array*) value.ptr;
             
@@ -154,8 +162,7 @@ immutable class answer
             {
                 Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
                 assert( d.dim_size > 0 );
-                //assert( isNumeric( _arguments[i] ) );
-                //assert( d.dim_size <= _arguments[i] );
+                assert( d.dim_size > args[i] );
                 // FIXIT: What is lbound in postgresql array reply?
                 enforce( d.lbound == 1, "Please report if you came across this error." );
                 
@@ -170,16 +177,18 @@ immutable class answer
             
 
             // Calculates serial number of the element
-            int element_num;
-            for( int i = 0; i < ds.length; ++i )
-                element_num += ds[i].dim_size * va_arg!(int)(_argptr);
-            element_num += va_arg!(long)(_argptr); // need to add last variadic argument
+            auto inner = args.length - 1; // Inner dimension
+            auto element_num = args[inner]; // Serial number of the element
+            int s = 1; // Perpendicular to vector which size is calculated currently
+            for( auto i = inner; i > 0; --i )
+            {
+                writeln("i: ", i );
+                s *= ds[i].dim_size;
+                element_num += s * args[i-1];
+            }
             
             writeln("element_num: ", element_num, " n_elems: ", n_elems);
-            //assert( element_num <= n_elems );
-            
-            
-            writeln( "total elements: ", n_elems );
+            assert( element_num <= n_elems );
             writeln( "bytea content: ", value);
             
             
@@ -188,17 +197,16 @@ immutable class answer
             
             for(int i = 0; i < n_elems; ++i )
             {
-                writeln(curr_offset, " ", i);
                 ubyte[4] size_net;
                 size_net = value[ curr_offset .. curr_offset + 4 ];
-                writeln( size_net );
                 res[i].size = bigEndianToNative!int( size_net );
                 res[i].value = cast(ubyte*) &value[curr_offset + size_net.sizeof];
                 
                 curr_offset += size_net.sizeof + res[i].size; //TODO: избавиться от лишней итерации этого в конце цикла
             }
-
-            return res[1]; // content_value;
+            
+            writeln( res );
+            return res[element_num]; // content_value;
         }
     }
     
@@ -407,8 +415,8 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
         "'first line\nsecond line'::text, "
         r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, " // "D rules\x00!" (ASCII)
-        r"array[['\x0607'::bytea, '\x080910'::bytea], "
-             r"['\x1112'::bytea, '\x00000000FF'::bytea]] ";
+        r"array[[1, 2], "
+              r"[3, 4]] ";
 
 
     auto r = conn.exec( p );
@@ -426,7 +434,13 @@ void _unittest( string connParam )
 
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
-    writeln( "5: (unused) ", r[0,11].array_cell(1,2) );
+
+    auto v = r[0,11].array_cell(1, 1);
+    assert( v.size == 4 );
+    ubyte[4] v1 = *(cast(ubyte[4]*) v.value);
+    PGinteger v2 = bigEndianToNative!PGinteger( v1 );
+    
+    writeln( "5: (unused) ", v2 );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
