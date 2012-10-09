@@ -59,6 +59,12 @@ immutable class answer
             this.value = value[0..valueSize];
             format = f;
         }
+        
+        this( immutable (ubyte[]) value ) immutable
+        {
+            this.value = value;
+            format = valueFormat.BINARY;
+        }
 
         /// Returns value as bytes from binary formatted field
         @property T as(T)()
@@ -110,7 +116,7 @@ immutable class answer
         private
         {
             Cell* cell;
-            element[] elements;
+            ubyte[][] elements;
             int ndims; // number of dimensions
             Dim[] ds; // dimensions sizes info
             debug size_t n_elems; // Total elements
@@ -134,7 +140,7 @@ immutable class answer
                 int lbound; // index of first element
             }
 
-            struct element
+            struct element_
             {
                 int size;
                 ubyte* value;
@@ -188,7 +194,7 @@ immutable class answer
             debug this.n_elems = n_elems;
             this.ds = ds.idup;
             
-            auto elements = new element[ n_elems ];
+            auto elements = new immutable (ubyte)[][ n_elems ];
             
             // Looping through all elements and fill out index of them
             writeln(Array.sizeof, " + ", Dim.sizeof, " * ", ndims);
@@ -200,8 +206,8 @@ immutable class answer
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
                 curr_offset += size_net.sizeof;
-                elements[i](size, cell.value.ptr + curr_offset );
-                writeln("size: ", elements[i].size );
+                elements[i] = cell.value[curr_offset .. curr_offset + size];
+                writeln("size: ", elements[][i].length );
                 curr_offset += size;
             }
             this.elements = elements.idup;
@@ -234,12 +240,9 @@ immutable class answer
             }
             
             assert( element_num <= n_elems );
-            writeln("elements[element_num].size = ", elements[element_num].size );
+            writeln("elements[element_num].size = ", elements[element_num].length );
             
-            debug
-                auto r = new Cell( elements[element_num].value, elements[element_num].size, valueFormat.BINARY );
-            else
-                auto r = new Cell( elements[element_num].value, elements[element_num].size );
+            auto r = new Cell( elements[element_num] );
             
             return r;
         }
