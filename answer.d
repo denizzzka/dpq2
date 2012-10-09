@@ -27,6 +27,7 @@ alias string  PGtext; /// text
 alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
+debug import std.stdio;
 
 /// Answer
 immutable class answer
@@ -100,9 +101,9 @@ immutable class answer
         struct Array
         {
             // (network order)
-            ubyte _ndims[4]; // number of dimensions of the array
-            ubyte _dataoffset_ign[4]; // offset for data, removed by libpq. may be it is conteins isNULL flag!
-            ubyte _OID[4]; // element type OID
+            ubyte[4] _ndims; // number of dimensions of the array
+            ubyte[4] _dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
+            ubyte[4] _OID; // element type OID
             
             @property int ndims() { return bigEndianToNative!int(_ndims); }
             @property Oid OID() { return bigEndianToNative!int(_OID); }
@@ -110,8 +111,8 @@ immutable class answer
 
         struct Dim_net // Network byte order
         {
-            ubyte _size[4]; // Number of elements in dimension
-            ubyte _lbound[4]; // Index of first element
+            ubyte[4] _size; // Number of elements in dimension
+            ubyte[4] _lbound; // Index of first element
 
             @property int dim_size() { return bigEndianToNative!int(_size); }
             @property int lbound() { return bigEndianToNative!int(_lbound); }
@@ -122,23 +123,24 @@ immutable class answer
             int dim_size; // Number of elements in dimension
             int lbound; // Index of first element
         }
-        /*
+        
         struct Elem
         {
-            ubyte[4] _size;
-
-            @property int size() { return bigEndianToNative!int(_size); }
+            int size;
+            ubyte* value;
         }
-        */
+        
         auto array_cell( ... )
         {
             import std.stdio;
             
+            writeln( _arguments.length );
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
             // Array header
             Array* h = cast(Array*) value.ptr;
             
+            // TODO: here is need exception, not enforce
             enforce( h.ndims > 0, "Dimensions number must be more than 0" );
             enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
             
@@ -161,42 +163,42 @@ immutable class answer
                 ds[i].lbound = d.lbound;
                 n_elems *= d.dim_size;
             }
+
             
+            Elem[] res = new Elem[ n_elems ];           
             auto data_offset = Array.sizeof + Dim.sizeof * h.ndims;
             
+
             // Calculates serial number of the element
             int element_num;
             for( int i = 0; i < ds.length; ++i )
-                element_num *= ds[i].dim_size * va_arg!(long)(_argptr);
+                element_num += ds[i].dim_size * va_arg!(int)(_argptr);
             element_num += va_arg!(long)(_argptr); // need to add last variadic argument
             
             writeln("element_num: ", element_num, " n_elems: ", n_elems);
-            assert( element_num <= n_elems );
+            //assert( element_num <= n_elems );
+            
             
             writeln( "total elements: ", n_elems );
-            writeln( "bytea content: ", value);            
-            writeln( "number of element (from zero): ", element_num );
+            writeln( "bytea content: ", value);
             
-            // Looping through all elements and find the what we want
+            
+            // Looping through all elements and fill out index
             auto curr_offset = data_offset;
-            ubyte[4] size_net; // network ordered
-            int size;
-            size_t val_start;
             
-            for(int i = 0; i <= element_num; ++i )
+            for(int i = 0; i < n_elems; ++i )
             {
-                size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
-                val_start = curr_offset + size_net.sizeof;
-                size = bigEndianToNative!int(size_net);
-                writeln("i: ", i, " curr_offset: ", curr_offset, "size: ", size);
-                curr_offset += size_net.sizeof + size;
+                writeln(curr_offset, " ", i);
+                ubyte[4] size_net;
+                size_net = value[ curr_offset .. curr_offset + 4 ];
+                writeln( size_net );
+                res[i].size = bigEndianToNative!int( size_net );
+                res[i].value = cast(ubyte*) &value[curr_offset + size_net.sizeof];
+                
+                curr_offset += size_net.sizeof + res[i].size; //TODO: избавиться от лишней итерации этого в конце цикла
             }
-            
-            size_t val_end = val_start + size;
-            writeln(val_start, " ", val_end);
-            auto content_value = value[ val_start .. val_end ];
 
-            return content_value;
+            return res[1]; // content_value;
         }
     }
     
@@ -404,7 +406,10 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
         "'first line\nsecond line'::text, "
-        r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea"; // "D rules\x00!" (ASCII)
+        r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, " // "D rules\x00!" (ASCII)
+        r"array[['\x0607'::bytea, '\x080910'::bytea], "
+             r"['\x1112'::bytea, '\x00000000FF'::bytea]] ";
+
 
     auto r = conn.exec( p );
 
@@ -421,7 +426,8 @@ void _unittest( string connParam )
 
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
-
+    writeln( "5: (unused) ", r[0,11].array_cell(1,2) );
+    
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );

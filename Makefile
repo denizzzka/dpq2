@@ -21,5 +21,5 @@ doc:
 
 clean:
 	rm -rf *.o *.a
-	rm -rf headers
+	rm -rf doc
 	rm -f $(ONAME)
