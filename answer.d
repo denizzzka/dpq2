@@ -50,14 +50,20 @@ immutable class answer
         version(Debug){} else
         this( immutable (ubyte)* value, size_t valueSize ) immutable
         {
-            Cell.value = value[0..valueSize];
+            this.value = value[0..valueSize];
         }
         
         debug
         this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f ) immutable
         {
-            Cell.value = value[0..valueSize];
+            this.value = value[0..valueSize];
             format = f;
+        }
+        
+        this( immutable ubyte[] value ) immutable
+        {
+            this.value = value;
+            format = valueFormat.BINARY;
         }
 
         /// Returns value as bytes from binary formatted field
@@ -124,7 +130,7 @@ immutable class answer
             int lbound; // Index of first element
         }
         
-        auto array_cell( ... )
+        immutable (Cell)* array_cell( ... )
         {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
@@ -189,7 +195,7 @@ immutable class answer
             // Calculates serial number of the element
             auto inner = args.length - 1; // Inner dimension
             auto element_num = args[inner]; // Serial number of the element
-            int s = 1; // Perpendicular to vector which size is calculated currently
+            int s = 1; // Perpendicular to a vector which size is calculated currently
             for( auto i = inner; i > 0; --i )
             {
                 s *= ds[i].dim_size;
@@ -198,7 +204,7 @@ immutable class answer
             
             assert( element_num <= n_elems );
             
-            return elements[element_num];
+            return new Cell( elements[element_num] );
         }
     }
     
@@ -429,10 +435,8 @@ void _unittest( string connParam )
 
     auto v = r[0,11].array_cell(1, 1);
     //assert( v.size == 4 );
-    ubyte[4] v1 = *(cast(ubyte[4]*) v);
-    PGinteger v2 = bigEndianToNative!PGinteger( v1 );
     
-    writeln( "5: (unused) ", v2 );
+    writeln( "5: (unused) ", v.as!PGinteger );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
