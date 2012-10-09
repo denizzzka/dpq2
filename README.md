@@ -44,8 +44,6 @@ or
 
     $ make
 
-After build header file libdpq2.di will be created automatically.
-
 Example
 -------
 
@@ -133,5 +131,4 @@ TODO
 * Binary arguments
 * PostGIS binary data support
 * PostgreSQL arrays
-* Thread safe behaviour
 * Make code more transparent, CamelCased and Autodoc
