@@ -182,7 +182,6 @@ immutable class answer
             int s = 1; // Perpendicular to vector which size is calculated currently
             for( auto i = inner; i > 0; --i )
             {
-                writeln("i: ", i );
                 s *= ds[i].dim_size;
                 element_num += s * args[i-1];
             }
