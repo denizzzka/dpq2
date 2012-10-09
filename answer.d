@@ -106,7 +106,7 @@ immutable class answer
             ubyte index_first[4]; // Index of first element
             ubyte first_value[4]; // Beginning of integer data
             
-            @property int dimensions() { return bigEndianToNative!int(ndim); }
+            @property int dim_num() { return bigEndianToNative!int(ndim); }
             @property Oid OID() { return bigEndianToNative!int(element_OID); }
             @property int dim_size() { return bigEndianToNative!int(elemnum); }
             @property int index() { return bigEndianToNative!int(index_first); }
@@ -119,11 +119,19 @@ immutable class answer
             Array* r = cast(Array*) value.ptr;
             //auto d = cast(Dimension*) (r + 1);
 
-            writeln( "Dimensions: ", r.dimensions );
+            writeln( "Dim_num: ", r.dim_num );
             writeln( "OID: ", r.OID );
             writeln( "size of dimension: ", r.dim_size );
-
-            writeln( "index: ", r.index );
+            
+            auto dims = new int[r.dim_num];
+            
+            for (int d = 0; d < r.dim_num; ++d)
+            {
+                int[4] a = value[d*4..d*4+4].dup;
+                dims[d] = bigEndianToNative!int( a );
+            }
+            
+            writeln( "dims[]: ", dims );
             writeln( "elements in demensions: ", r.elements );
             
             writeln( "bytea content: ", value);
