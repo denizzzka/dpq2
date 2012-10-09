@@ -59,12 +59,6 @@ immutable class answer
             this.value = value[0..valueSize];
             format = f;
         }
-        
-        this( immutable ubyte[] value ) immutable
-        {
-            this.value = value;
-            format = valueFormat.BINARY;
-        }
 
         /// Returns value as bytes from binary formatted field
         @property T as(T)()
@@ -193,7 +187,7 @@ immutable class answer
             debug this.n_elems = n_elems;
             this.ds = ds.idup;
             
-            auto elements = new element[ n_elems ];
+            elements = new immutable(element)[ n_elems ];
             
             // Looping through all elements and fill out index of them
             auto curr_offset = Array.sizeof + Dim.sizeof * ndims;            
@@ -202,12 +196,10 @@ immutable class answer
                 ubyte[4] size_net;
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
-                elements[i].size = size;
                 curr_offset += size_net.sizeof;
-                elements[i].value = cast(ubyte*) cell.value.ptr + curr_offset;
+                elements[i](size, cell.value.ptr + curr_offset );
                 curr_offset += size;
             }
-            this.elements = elements;
         }
         
         immutable (Cell)* getCell( ... )
@@ -237,7 +229,12 @@ immutable class answer
             
             assert( element_num <= n_elems );
             
-            return new Cell( elements[element_num] );
+            debug
+                auto r = new Cell( elements[element_num].value, elements[element_num].size, valueFormat.BINARY );
+            else
+                auto r = new Cell( elements[element_num].value, elements[element_num].size );
+            
+            return r;
         }
     }
     
