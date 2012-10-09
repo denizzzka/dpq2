@@ -193,7 +193,7 @@ PQERRORS_VERBOSE,
     Oid PQftable(PGresult* res, int field_num);
     int PQftablecol(PGresult* res, int field_num);
     valueFormat PQfformat(immutable PGresult* res, size_t field_num); // used!
-    Oid PQftype(PGresult* res, int field_num);
+    Oid PQftype(PGresult* res, int field_num); // TODO: use it for assert/exception check cell types
     int PQfsize(PGresult* res, int field_num);
     int PQfmod(PGresult* res, int field_num);
     char* PQcmdStatus( immutable PGresult* res); // used!
