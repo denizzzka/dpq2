@@ -145,6 +145,7 @@ immutable class answer
             for( auto i = 0; i < r.ndims; ++i )
             {
                 Dim_net* d = (cast(Dim_net*) (r + 1)) + i;
+                assert( d.dim_size > 0 );
                 writeln( "Dimension number: ", i );
                 writeln( "size of dimension: ", d.dim_size );
                 writeln( "lbound: ", d.lbound );
@@ -165,6 +166,11 @@ immutable class answer
             
             writeln( "content size: ",  content_size );
             writeln( "content value: ", content_value );
+            
+            assert( y <= ds[1].dim_size );
+            assert( x <= ds[0].dim_size );
+            
+            writeln( "number of element (from zero): ", ds[1].dim_size * y + x );
             
             //writeln( "content addr: ", &content, " value addr: ", &value );
             
