@@ -187,12 +187,9 @@ immutable class answer
                 element_num += s * args[i-1];
             }
             
-            writeln("element_num: ", element_num, " n_elems: ", n_elems);
             assert( element_num <= n_elems );
-            writeln( "bytea content: ", value);
             
-            
-            // Looping through all elements and fill out index
+            // Looping through all elements and fill out index of them
             auto curr_offset = data_offset;
             
             for(int i = 0; i < n_elems; ++i )
