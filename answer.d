@@ -132,9 +132,6 @@ immutable class answer
         
         auto array_cell( ... )
         {
-            import std.stdio;
-            
-            writeln( _arguments.length );
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
             // Arguments array
@@ -151,10 +148,7 @@ immutable class answer
             // TODO: here is need exception, not enforce
             enforce( h.ndims > 0, "Dimensions number must be more than 0" );
             enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
-            
-            writeln( "Dim_num: ", h.ndims );
-            writeln( "OID: ", h.OID );
-            
+
             size_t n_elems = 1;
             auto ds = new Dim[ h.ndims ];
             
