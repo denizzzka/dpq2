@@ -116,7 +116,7 @@ immutable class answer
         private
         {
             Cell* cell;
-            ubyte[][] elements;
+            element[] elements;
             int ndims; // Number of dimensions
             Dim[] ds; // Dimensions sizes info
             debug size_t n_elems; // Total elements
@@ -139,12 +139,24 @@ immutable class answer
                 int dim_size; // Number of elements in dimension
                 int lbound; // Index of first element
             }
+
+            struct element
+            {
+                int size;
+                ubyte* value;
+                
+                this( int s, immutable ubyte* v ) immutable
+                {
+                    size = s;
+                    value = v;
+                }
+            }
         }
         
         this( immutable(Cell*) c )
         {
             debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
-
+            
             arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
             ndims = bigEndianToNative!int(h.ndims);
             OID = bigEndianToNative!Oid(h.OID);
@@ -181,7 +193,7 @@ immutable class answer
             debug this.n_elems = n_elems;
             this.ds = ds.idup;
             
-            auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
+            auto elements = new element[ n_elems ];
             
             // Looping through all elements and fill out index of them
             auto curr_offset = Array.sizeof + Dim.sizeof * ndims;            
@@ -190,10 +202,12 @@ immutable class answer
                 ubyte[4] size_net;
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
+                elements[i].size = size;
                 curr_offset += size_net.sizeof;
-                elements[i] = cell.value[ curr_offset .. curr_offset + size ];
+                elements[i].value = cast(ubyte*) cell.value.ptr + curr_offset;
                 curr_offset += size;
             }
+            this.elements = elements;
         }
         
         immutable (Cell)* getCell( ... )
