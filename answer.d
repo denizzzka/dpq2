@@ -103,104 +103,113 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
-        immutable struct Array
+        Array* asArray()
         {
-            private ubyte[][] elements;
-            private int ndims; // Number of dimensions
-            Oid OID;
-
-            private struct arrayHeader
+            return new Array( &this );
+        }
+    }
+        
+    immutable struct Array
+    {
+        Oid OID;
+        
+        private
+        {
+            Cell* cell;
+            ubyte[][] elements;
+            int ndims; // Number of dimensions
+            Dim[] ds; // Dimensions sizes info
+            debug size_t n_elems; // Total elements
+            
+            struct arrayHeader_net
             {
-                // (network order)
                 ubyte[4] ndims; // number of dimensions of the array
                 ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
                 ubyte[4] OID; // element type OID
             }
 
-            private struct Dim_net // Network byte order
+            struct Dim_net // Network byte order
             {
                 ubyte[4] dim_size; // Number of elements in dimension
                 ubyte[4] lbound; // Index of first element
-
-//                @property int dim_size() { return bigEndianToNative!int(_size); }
-//                @property int lbound() { return bigEndianToNative!int(_lbound); }
             }
 
-            private struct Dim
+            struct Dim
             {
                 int dim_size; // Number of elements in dimension
                 int lbound; // Index of first element
             }
+        }
+        
+        this( immutable(Cell*) c )
+        {
+            debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
 
-            this( ... ) immutable
-            {
-                assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
-                
-                auto args = new int[ _arguments.length ];
-                for( int i; i < args.length; ++i )
-                {
-                    assert( _arguments[i] == typeid(int) );
-                    args[i] = va_arg!(int)(_argptr);
-                }
-                
-                arrayHeader* h; // = cast(arrayHeader*) Cell.value.ptr;
-                ndims = bigEndianToNative!int(h.ndims);
-                OID = bigEndianToNative!Oid(h.OID);
-                
-                // TODO: here is need exception, not enforce
-                enforce( ndims > 0, "Dimensions number must be more than 0" );
-                enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
-                
-                size_t n_elems = 1; // Total elements
-                auto ds = new Dim[ ndims ]; // Dimensions size info
-                
-                // Recognize dimensions of array
-                for( auto i = 0; i < ndims; ++i )
-                {
-                    struct Dim_net // Network byte order
-                    {
-                        ubyte[4] size; // Number of elements in the dimension
-                        ubyte[4] lbound; // Unknown
-                    }                
-                    
-                    Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
-                    
-                    int dim_size = bigEndianToNative!int( d.size );
-                    int lbound = bigEndianToNative!int(d.lbound);
-
-                    // FIXIT: What is lbound in postgresql array reply?
-                    enforce( lbound == 1, "Please report if you came across this error." );
-                    assert( dim_size > 0 );
-                    assert( dim_size > args[i] );
-
-                    ds[i].dim_size = dim_size;
-                    ds[i].lbound = lbound;
-                    n_elems *= dim_size;
-
+            arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
+            ndims = bigEndianToNative!int(h.ndims);
+            OID = bigEndianToNative!Oid(h.OID);
             
-                    auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
-                    
-                    // Looping through all elements and fill out index of them
-                    auto curr_offset = Array.sizeof + Dim.sizeof * ndims;            
-                    for(int i = 0; i < n_elems; ++i )
-                    {
-                        ubyte[4] size_net;
-                        size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
-                        auto size = bigEndianToNative!int( size_net );
-                        
-                        curr_offset += size_net.sizeof;
-                        elements[i] = value[ curr_offset .. curr_offset + size ];
-                        curr_offset += size;
-                    }
-                }
+            // TODO: here is need exception, not enforce
+            enforce( ndims > 0, "Dimensions number must be more than 0" );
+            
+            auto ds = new Dim[ ndims ];
+            
+            // Recognize dimensions of array
+            debug int n_elems = 1;
+            for( auto i = 0; i < ndims; ++i )
+            {
+                struct Dim_net // Network byte order
+                {
+                    ubyte[4] size; // Number of elements in the dimension
+                    ubyte[4] lbound; // Unknown
+                }                
+                
+                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+                
+                int dim_size = bigEndianToNative!int( d.size );
+                int lbound = bigEndianToNative!int(d.lbound);
 
-
+                // FIXIT: What is lbound in postgresql array reply?
+                enforce( lbound == 1, "Please report if you came across this error." );
+                assert( dim_size > 0 );
+                
+                ds[i].dim_size = dim_size;
+                ds[i].lbound = lbound;
+                n_elems *= dim_size;
+            }
+            
+            debug this.n_elems = n_elems;
+            this.ds = ds.idup;
+            
+            auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
+            
+            // Looping through all elements and fill out index of them
+            auto curr_offset = Array.sizeof + Dim.sizeof * ndims;            
+            for(int i = 0; i < n_elems; ++i )
+            {
+                ubyte[4] size_net;
+                size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+                auto size = bigEndianToNative!int( size_net );
+                curr_offset += size_net.sizeof;
+                elements[i] = cell.value[ curr_offset .. curr_offset + size ];
+                curr_offset += size;
             }
         }
         
-        immutable (Cell)* array_cell( ... )
+        immutable (Cell)* getCell( ... )
         {
-            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+            assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
+            
+            auto args = new int[ _arguments.length ];
+            for( int i; i < args.length; ++i )
+            {
+                assert( _arguments[i] == typeid(int) );
+                args[i] = va_arg!(int)(_argptr);
+                assert( ds[i].dim_size > args[i] );
+            }
+            
+            // TODO: here is need exception, not enforce
+            enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
             
             // Calculates serial number of the element
             auto inner = args.length - 1; // Inner dimension
@@ -443,10 +452,10 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
 
-    auto v = r[0,11].array_cell(1, 1);
+    auto v = r[0,11].asArray; //.getCell(0,0);
     //assert( v.size == 4 );
     
-    writeln( "5: (unused) ", v.as!PGinteger );
+    writeln( "5: (unused) ", v /*.as!PGinteger*/ );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
