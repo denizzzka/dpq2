@@ -152,6 +152,7 @@ immutable class answer
             size_t n_elems = 1;
             auto ds = new Dim[ h.ndims ];
             
+            // Recognize dimensions
             for( auto i = 0; i < h.ndims; ++i )
             {
                 struct Dim_net // Network byte order
