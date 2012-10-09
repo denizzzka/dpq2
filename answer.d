@@ -149,6 +149,7 @@ immutable class answer
         
         this( immutable(Cell*) c )
         {
+            cell = c;
             debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
             
             arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
