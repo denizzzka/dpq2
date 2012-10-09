@@ -112,14 +112,14 @@ immutable class answer
     immutable struct Array
     {
         Oid OID;
+        int nDims; /// Number of dimensions
+        int[] dimsSize; /// Dimensions sizes info
+        size_t nElems; /// Total elements
         
         private
         {
             Cell* cell;
             ubyte[][] elements;
-            int ndims; // number of dimensions
-            Dim[] ds; // dimensions sizes info
-            size_t n_elems; // Total elements
             
             struct arrayHeader_net
             {
@@ -133,13 +133,7 @@ immutable class answer
                 ubyte[4] dim_size; // number of elements in dimension
                 ubyte[4] lbound; // index of first element
             }
-
-            struct Dim
-            {
-                int dim_size; // number of elements in dimension
-                int lbound; // index of first element
-            }
-
+            
             struct element_
             {
                 int size;
@@ -159,17 +153,17 @@ immutable class answer
             debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
             
             arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
-            ndims = bigEndianToNative!int(h.ndims);
+            nDims = bigEndianToNative!int(h.ndims);
             OID = bigEndianToNative!Oid(h.OID);
             
             // TODO: here is need exception, not enforce
-            enforce( ndims > 0, "Dimensions number must be more than 0" );
+            enforce( nDims > 0, "Dimensions number must be more than 0" );
             
-            auto ds = new Dim[ ndims ];
+            auto ds = new int[ nDims ];
             
             // Recognize dimensions of array
             int n_elems = 1;
-            for( auto i = 0; i < ndims; ++i )
+            for( auto i = 0; i < nDims; ++i )
             {
                 struct Dim_net // network byte order
                 {
@@ -186,18 +180,17 @@ immutable class answer
                 enforce( lbound == 1, "Please report if you came across this error." );
                 assert( dim_size > 0 );
                 
-                ds[i].dim_size = dim_size;
-                ds[i].lbound = lbound;
+                ds[i] = dim_size;
                 n_elems *= dim_size;
             }
             
-            this.n_elems = n_elems;
-            this.ds = ds.idup;
+            nElems = n_elems;
+            dimsSize = ds.idup;
             
             auto elements = new immutable (ubyte)[][ n_elems ];
             
             // Looping through all elements and fill out index of them
-            auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * ndims;            
+            auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
             for(int i = 0; i < n_elems; ++i )
             {
                 ubyte[int.sizeof] size_net;
@@ -218,13 +211,13 @@ immutable class answer
             auto args = new int[ _arguments.length ];
             
             // TODO: here is need exception, not enforce
-            enforce( ndims == args.length, "Mismatched dimensions number in arguments and server reply" );
+            enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
             
             for( int i; i < args.length; ++i )
             {
                 assert( _arguments[i] == typeid(int) );
                 args[i] = va_arg!(int)(_argptr);
-                enforce( ds[i].dim_size > args[i] ); // TODO: here is need exception, not enforce
+                enforce( dimsSize[i] > args[i] ); // TODO: here is need exception, not enforce
             }
             
             // Calculates serial number of the element
@@ -233,11 +226,11 @@ immutable class answer
             int s = 1; // perpendicular to a vector which size is calculated currently
             for( auto i = inner; i > 0; --i )
             {
-                s *= ds[i].dim_size;
+                s *= dimsSize[i];
                 element_num += s * args[i-1];
             }
             
-            assert( element_num <= n_elems );
+            assert( element_num <= nElems );
             return new Cell( elements[element_num] );
         }
     }
