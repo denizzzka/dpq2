@@ -198,7 +198,7 @@ immutable class answer
             for(int i = 0; i < n_elems; ++i )
             {
                 ubyte[4] size_net;
-                size_net = value[ curr_offset .. curr_offset + 4 ];
+                size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
                 res[i].size = bigEndianToNative!int( size_net );
                 res[i].value = cast(ubyte*) &value[curr_offset + size_net.sizeof];
                 
@@ -206,7 +206,7 @@ immutable class answer
             }
             
             writeln( res );
-            return res[element_num]; // content_value;
+            return res[element_num];
         }
     }
     
