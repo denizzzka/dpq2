@@ -99,40 +99,41 @@ immutable class answer
         struct Array
         {
             // (network order)
-            ubyte ndim[4]; // number of dimensions of the array
-            ubyte dataoffset_ign[4]; // offset for data, removed by libpq
-            ubyte element_OID[4]; // element type OID
-            ubyte elemnum[4]; // Number of elements
-            ubyte index_first[4]; // Index of first element
-            ubyte first_value[4]; // Beginning of integer data
+            ubyte _ndims[4]; // number of dimensions of the array
+            ubyte _dataoffset_ign[4]; // offset for data, removed by libpq
+            ubyte _OID[4]; // element type OID
             
-            @property int dim_num() { return bigEndianToNative!int(ndim); }
-            @property Oid OID() { return bigEndianToNative!int(element_OID); }
-            @property int dim_size() { return bigEndianToNative!int(elemnum); }
-            @property int index() { return bigEndianToNative!int(index_first); }
-            @property int elements() { return bigEndianToNative!int(first_value); }
+            @property int ndims() { return bigEndianToNative!int(_ndims); }
+            @property Oid OID() { return bigEndianToNative!int(_OID); }
+        }
+
+        struct Dim
+        {
+            ubyte _dim_size[4]; // Number of elements in dimension
+            ubyte _lbound[4]; // Index of first element
+
+            @property int dim_size() { return bigEndianToNative!int(_dim_size); }
+            @property int lbound() { return bigEndianToNative!int(_lbound); }
         }
         
         auto array_cell( size_t x )
         {
             import std.stdio;
             Array* r = cast(Array*) value.ptr;
-            //auto d = cast(Dimension*) (r + 1);
 
-            writeln( "Dim_num: ", r.dim_num );
+            assert( r.ndims > 0 );
+
+            writeln( "Dim_num: ", r.ndims );
             writeln( "OID: ", r.OID );
-            writeln( "size of dimension: ", r.dim_size );
             
-            auto dims = new int[r.dim_num];
             
-            for (int d = 0; d < r.dim_num; ++d)
+            for( auto i = 0; i < r.ndims; ++i )
             {
-                int[4] a = value[d*4..d*4+4].dup;
-                dims[d] = bigEndianToNative!int( a );
+                Dim* d = (cast(Dim*) (r + 1)) + i;
+                writeln( "Dimension number: ", i );
+                writeln( "size of dimension: ", d.dim_size );
+                writeln( "lbound: ", d.lbound );
             }
-            
-            writeln( "dims[]: ", dims );
-            writeln( "elements in demensions: ", r.elements );
             
             writeln( "bytea content: ", value);
             
