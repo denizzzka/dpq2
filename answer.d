@@ -197,17 +197,14 @@ immutable class answer
             auto elements = new immutable (ubyte)[][ n_elems ];
             
             // Looping through all elements and fill out index of them
-            writeln(Array.sizeof, " + ", Dim.sizeof, " * ", ndims);
             auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * ndims;            
             for(int i = 0; i < n_elems; ++i )
             {
                 ubyte[int.sizeof] size_net;
-                writeln( curr_offset, "..", curr_offset + size_net.sizeof );
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
                 curr_offset += size_net.sizeof;
                 elements[i] = cell.value[curr_offset .. curr_offset + size];
-                writeln("size: ", elements[][i].length );
                 curr_offset += size;
             }
             this.elements = elements.idup;
@@ -240,11 +237,8 @@ immutable class answer
             }
             
             assert( element_num <= n_elems );
-            writeln("elements[element_num].size = ", elements[element_num].length );
             
-            auto r = new Cell( elements[element_num] );
-            
-            return r;
+            return new Cell( elements[element_num] );
         }
     }
     
