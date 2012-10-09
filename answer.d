@@ -172,18 +172,6 @@ immutable class answer
             
             auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
             
-            // Calculates serial number of the element
-            auto inner = args.length - 1; // Inner dimension
-            auto element_num = args[inner]; // Serial number of the element
-            int s = 1; // Perpendicular to vector which size is calculated currently
-            for( auto i = inner; i > 0; --i )
-            {
-                s *= ds[i].dim_size;
-                element_num += s * args[i-1];
-            }
-            
-            assert( element_num <= n_elems );
-            
             // Looping through all elements and fill out index of them
             auto curr_offset = Array.sizeof + Dim.sizeof * h.ndims;            
             for(int i = 0; i < n_elems; ++i )
@@ -196,6 +184,19 @@ immutable class answer
                 elements[i] = value[ curr_offset .. curr_offset + size ];
                 curr_offset += size;
             }
+
+            
+            // Calculates serial number of the element
+            auto inner = args.length - 1; // Inner dimension
+            auto element_num = args[inner]; // Serial number of the element
+            int s = 1; // Perpendicular to vector which size is calculated currently
+            for( auto i = inner; i > 0; --i )
+            {
+                s *= ds[i].dim_size;
+                element_num += s * args[i-1];
+            }
+            
+            assert( element_num <= n_elems );
             
             return elements[element_num];
         }
