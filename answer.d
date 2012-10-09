@@ -149,15 +149,15 @@ immutable class answer
             enforce( h.ndims > 0, "Dimensions number must be more than 0" );
             enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
 
-            size_t n_elems = 1;
-            auto ds = new Dim[ h.ndims ];
+            size_t n_elems = 1; // Total elements
+            auto ds = new Dim[ h.ndims ]; // Dimensions size info
             
             // Recognize dimensions
             for( auto i = 0; i < h.ndims; ++i )
             {
                 struct Dim_net // Network byte order
                 {
-                    ubyte[4] size; // Number of elements in dimension
+                    ubyte[4] size; // Number of elements in the dimension
                     ubyte[4] lbound; // Unknown
                 }                
                 
