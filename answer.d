@@ -197,8 +197,14 @@ immutable class answer
                 ubyte[4] size_net;
                 size_net = value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
-                elements[i] = cast(ubyte*) &value[curr_offset + size_net.sizeof];
-                curr_offset += size_net.sizeof + size; //TODO: можно ли избавиться от лишней итерации этого в конце цикла? :-)
+
+                curr_offset += size_net.sizeof;
+                
+                elements[i] = cast(ubyte*) &value[curr_offset];
+                
+                auto x = value[ curr_offset .. curr_offset + size ].idup;
+                
+                curr_offset += size; //TODO: можно ли избавиться от лишней итерации этого в конце цикла? :-)
             }
             
             return elements[element_num];
