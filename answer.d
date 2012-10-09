@@ -107,7 +107,7 @@ immutable class answer
             @property Oid OID() { return bigEndianToNative!int(_OID); }
         }
 
-        struct Dim
+        struct Dim_net // Network byte order
         {
             ubyte _size[4]; // Number of elements in dimension
             ubyte _lbound[4]; // Index of first element
@@ -115,16 +115,21 @@ immutable class answer
             @property int dim_size() { return bigEndianToNative!int(_size); }
             @property int lbound() { return bigEndianToNative!int(_lbound); }
         }
+
+        struct Dim
+        {
+            int dim_size; // Number of elements in dimension
+            int lbound; // Index of first element
+        }
         
         struct Elem
         {
             ubyte[4] _size;
-            ubyte* data;
 
             @property int size() { return bigEndianToNative!int(_size); }
         }
         
-        auto array_cell( size_t x )
+        auto array_cell( size_t y, size_t x )
         {
             import std.stdio;
             Array* r = cast(Array*) value.ptr;
@@ -134,21 +139,24 @@ immutable class answer
             writeln( "Dim_num: ", r.ndims );
             writeln( "OID: ", r.OID );
             
-            auto ds = new Dim[ r.ndims ];
-            
             size_t n_elems = 1;
+            auto ds = new Dim[ r.ndims ];
             
             for( auto i = 0; i < r.ndims; ++i )
             {
-                Dim* d = (cast(Dim*) (r + 1)) + i;
+                Dim_net* d = (cast(Dim_net*) (r + 1)) + i;
                 writeln( "Dimension number: ", i );
                 writeln( "size of dimension: ", d.dim_size );
                 writeln( "lbound: ", d.lbound );
-                //writeln( "content: ", *(d + 1) );
                 n_elems *= d.dim_size;
+                
+                ds[i].dim_size = d.dim_size;
+                ds[i].lbound = d.lbound;
             }
             
             auto data_offset = Array.sizeof + Dim.sizeof * r.ndims;
+            
+            auto element_num = y * x + x;
             
             auto content_size = value[ data_offset..data_offset+4 ];
             auto content_value = value[ data_offset+4..data_offset+6 ];
