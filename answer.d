@@ -109,11 +109,19 @@ immutable class answer
 
         struct Dim
         {
-            ubyte _dim_size[4]; // Number of elements in dimension
+            ubyte _size[4]; // Number of elements in dimension
             ubyte _lbound[4]; // Index of first element
 
-            @property int dim_size() { return bigEndianToNative!int(_dim_size); }
+            @property int dim_size() { return bigEndianToNative!int(_size); }
             @property int lbound() { return bigEndianToNative!int(_lbound); }
+        }
+        
+        struct Elem
+        {
+            ubyte[4] _size;
+            ubyte* data;
+
+            @property int size() { return bigEndianToNative!int(_size); }
         }
         
         auto array_cell( size_t x )
@@ -140,14 +148,15 @@ immutable class answer
                 n_elems *= d.dim_size;
             }
             
-            auto offset = Array.sizeof + ds.sizeof + 4;
-            auto content = value[ offset..offset + 4 ];
+            auto data_offset = Array.sizeof + Dim.sizeof * r.ndims;
             
-            ubyte elem_size[4];
-
-            writeln( "content: ", content );
+            auto content_size = value[ data_offset..data_offset+4 ];
+            auto content_value = value[ data_offset+4..data_offset+6 ];
             
-            writeln( "content addr: ", &content, " value addr: ", &value );
+            writeln( "content size: ",  content_size );
+            writeln( "content value: ", content_value );
+            
+            //writeln( "content addr: ", &content, " value addr: ", &value );
             
             //writeln ( "content: ", bigEndianToNative!int(content) );
             writeln( "total elements: ", n_elems );
