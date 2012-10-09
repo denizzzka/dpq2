@@ -172,8 +172,6 @@ immutable class answer
             
             auto elements = new immutable(ubyte)[][ n_elems ]; // List of all elements
             
-            auto data_offset = Array.sizeof + Dim.sizeof * h.ndims;
-            
             // Calculates serial number of the element
             auto inner = args.length - 1; // Inner dimension
             auto element_num = args[inner]; // Serial number of the element
@@ -187,7 +185,7 @@ immutable class answer
             assert( element_num <= n_elems );
             
             // Looping through all elements and fill out index of them
-            auto curr_offset = data_offset;            
+            auto curr_offset = Array.sizeof + Dim.sizeof * h.ndims;            
             for(int i = 0; i < n_elems; ++i )
             {
                 ubyte[4] size_net;
