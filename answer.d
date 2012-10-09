@@ -126,6 +126,9 @@ immutable class answer
             writeln( "Dim_num: ", r.ndims );
             writeln( "OID: ", r.OID );
             
+            auto ds = new Dim[ r.ndims ];
+            
+            size_t n_elems = 1;
             
             for( auto i = 0; i < r.ndims; ++i )
             {
@@ -133,7 +136,12 @@ immutable class answer
                 writeln( "Dimension number: ", i );
                 writeln( "size of dimension: ", d.dim_size );
                 writeln( "lbound: ", d.lbound );
+                //writeln( "content: ", *(d + 1) );
+                n_elems *= d.dim_size;
             }
+            
+            writeln ( "content: ", value[12 + 8*3+4]);
+            writeln( "total elements: ", n_elems );
             
             writeln( "bytea content: ", value);
             
