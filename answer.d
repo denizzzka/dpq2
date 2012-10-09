@@ -218,7 +218,7 @@ immutable class answer
             auto args = new int[ _arguments.length ];
             
             // TODO: here is need exception, not enforce
-            enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
+            enforce( ndims == args.length, "Mismatched dimensions number in arguments and server reply" );
             
             for( int i; i < args.length; ++i )
             {
@@ -448,8 +448,14 @@ void _unittest( string connParam )
         "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
         "'first line\nsecond line'::text, "
         r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, " // "D rules\x00!" (ASCII)
-        r"array[[1, 2], "
-              r"[3, 7]]::integer[] ";
+        "array[[[1,  2, 3], "
+               "[4,  5, 6]], "
+               
+              "[[7,  8, 9], "
+              "[10, 11,12]], "
+              
+              "[[13,14,15], "
+               "[16,17,18]]]::integer[]";
 
 
     auto r = conn.exec( p );
@@ -468,11 +474,7 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
-    immutable(int) i = 0;
-    auto v = r[0,11].asArray.getCell( 1, 1 ).as!PGinteger;
-    //assert( v.size == 4 );
-    
-    writeln( "5: (unused) ", v );
+    assert( r[0,11].asArray.getCell( 2, 1, 2 ).as!PGinteger == 18 );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
