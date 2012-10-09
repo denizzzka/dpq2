@@ -129,7 +129,7 @@ TODO
 * Async queries support
 * Async queries queue (like in node.js)
 * Row by row result reading
-* Binary arguments
+* Binary arguments types
 * PostGIS binary data support
 * Checking types for reading by OID
 * Make code more transparent, CamelCased and Autodoc
