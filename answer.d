@@ -111,8 +111,8 @@ immutable class answer
         {
             Cell* cell;
             element[] elements;
-            int ndims; // Number of dimensions
-            Dim[] ds; // Dimensions sizes info
+            int ndims; // number of dimensions
+            Dim[] ds; // dimensions sizes info
             debug size_t n_elems; // Total elements
             
             struct arrayHeader_net
@@ -122,16 +122,16 @@ immutable class answer
                 ubyte[4] OID; // element type OID
             }
 
-            struct Dim_net // Network byte order
+            struct Dim_net // network byte order
             {
-                ubyte[4] dim_size; // Number of elements in dimension
-                ubyte[4] lbound; // Index of first element
+                ubyte[4] dim_size; // number of elements in dimension
+                ubyte[4] lbound; // index of first element
             }
 
             struct Dim
             {
-                int dim_size; // Number of elements in dimension
-                int lbound; // Index of first element
+                int dim_size; // number of elements in dimension
+                int lbound; // index of first element
             }
 
             struct element
@@ -165,10 +165,10 @@ immutable class answer
             debug int n_elems = 1;
             for( auto i = 0; i < ndims; ++i )
             {
-                struct Dim_net // Network byte order
+                struct Dim_net // network byte order
                 {
-                    ubyte[4] size; // Number of elements in the dimension
-                    ubyte[4] lbound; // Unknown
+                    ubyte[4] size; // number of elements in the dimension
+                    ubyte[4] lbound; // unknown
                 }                
                 
                 Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
@@ -191,10 +191,12 @@ immutable class answer
             elements = new immutable(element)[ n_elems ];
             
             // Looping through all elements and fill out index of them
-            auto curr_offset = Array.sizeof + Dim.sizeof * ndims;            
+            writeln(Array.sizeof, " + ", Dim.sizeof, " * ", ndims);
+            auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * ndims;            
             for(int i = 0; i < n_elems; ++i )
             {
                 ubyte[4] size_net;
+                writeln( curr_offset, "..", curr_offset + size_net.sizeof );
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 auto size = bigEndianToNative!int( size_net );
                 curr_offset += size_net.sizeof;
@@ -207,6 +209,7 @@ immutable class answer
         {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
+            // Variadic args parsing
             auto args = new int[ _arguments.length ];
             for( int i; i < args.length; ++i )
             {
@@ -219,9 +222,9 @@ immutable class answer
             enforce( ndims == args.length, "Mismatched dimensions number in the arguments and server reply" );
             
             // Calculates serial number of the element
-            auto inner = args.length - 1; // Inner dimension
-            auto element_num = args[inner]; // Serial number of the element
-            int s = 1; // Perpendicular to a vector which size is calculated currently
+            auto inner = args.length - 1; // inner dimension
+            auto element_num = args[inner]; // serial number of the element
+            int s = 1; // perpendicular to a vector which size is calculated currently
             for( auto i = inner; i > 0; --i )
             {
                 s *= ds[i].dim_size;
@@ -464,7 +467,7 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
 
-    auto v = r[0,11].asArray; //.getCell(0,0);
+    auto v = r[0,11].asArray.getCell(0,0);
     //assert( v.size == 4 );
     
     writeln( "5: (unused) ", v /*.as!PGinteger*/ );
