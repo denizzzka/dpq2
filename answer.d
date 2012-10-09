@@ -15,6 +15,7 @@ import core.exception;
 import std.traits;
 import std.bitmanip: bigEndianToNative;
 import std.datetime;
+import core.vararg;
 
 // Supported PostgreSQL binary types
 alias short   PGsmallint; /// smallint
@@ -129,52 +130,54 @@ immutable class answer
             @property int size() { return bigEndianToNative!int(_size); }
         }
         */
-        auto array_cell( size_t y, size_t x )
+        auto array_cell( ... )
         {
             import std.stdio;
-            Array* r = cast(Array*) value.ptr;
-
-            assert( r.ndims > 0 );
-
-            writeln( "Dim_num: ", r.ndims );
-            writeln( "OID: ", r.OID );
+            
+            assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
+            
+            // Array header
+            Array* h = cast(Array*) value.ptr;
+            
+            enforce( h.ndims > 0, "Dimensions number must be more than 0" );
+            enforce( h.ndims == _arguments.length, "Mismatched dimensions number in the arguments and server reply" );
+            
+            writeln( "Dim_num: ", h.ndims );
+            writeln( "OID: ", h.OID );
             
             size_t n_elems = 1;
-            auto ds = new Dim[ r.ndims ];
+            auto ds = new Dim[ h.ndims ];
             
-            for( auto i = 0; i < r.ndims; ++i )
+            for( auto i = 0; i < h.ndims; ++i )
             {
-                Dim_net* d = (cast(Dim_net*) (r + 1)) + i;
+                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
                 assert( d.dim_size > 0 );
-                writeln( "Dimension number: ", i );
-                writeln( "size of dimension: ", d.dim_size );
-                writeln( "lbound: ", d.lbound );
-                n_elems *= d.dim_size;
+                //assert( isNumeric( _arguments[i] ) );
+                //assert( d.dim_size <= _arguments[i] );
+                // FIXIT: What is lbound in postgresql array reply?
+                enforce( d.lbound == 1, "Please report if you came across this error." );
                 
                 ds[i].dim_size = d.dim_size;
                 ds[i].lbound = d.lbound;
+                n_elems *= d.dim_size;
             }
             
-            auto data_offset = Array.sizeof + Dim.sizeof * r.ndims;
+            auto data_offset = Array.sizeof + Dim.sizeof * h.ndims;
             
-            auto element_num = ds[1].dim_size * y + x;
-            /*
-            ubyte[4] _content_size = value[ data_offset..data_offset+4 ];
-            auto content_size = bigEndianToNative!int(_content_size);
+            // Calculates serial number of the element
+            int element_num;
+            for( int i = 0; i < ds.length; ++i )
+                element_num *= ds[i].dim_size * va_arg!(long)(_argptr);
+            element_num += va_arg!(long)(_argptr); // need to add last variadic argument
             
-            auto content_value = value[ data_offset+4..data_offset + 4 + content_size ];
+            writeln("element_num: ", element_num, " n_elems: ", n_elems);
+            assert( element_num <= n_elems );
             
-            writeln( "content size: ",  content_size );
-            writeln( "content value: ", content_value );
-            */
             writeln( "total elements: ", n_elems );
-            writeln( "bytea content: ", value);
-            
-            assert( y <= ds[1].dim_size );
-            assert( x <= ds[0].dim_size );
-            
+            writeln( "bytea content: ", value);            
             writeln( "number of element (from zero): ", element_num );
             
+            // Looping through all elements and find the what we want
             auto curr_offset = data_offset;
             ubyte[4] size_net; // network ordered
             int size;
