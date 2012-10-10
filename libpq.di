@@ -164,7 +164,7 @@ PQERRORS_VERBOSE,
     size_t PQsendQueryParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     int PQsendPrepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     int PQsendQueryPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
-    PGresult* PQgetResult(PGconn* conn);
+    immutable (PGresult)* PQgetResult(PGconn* conn); // used!
     int PQisBusy(PGconn* conn);
     int PQconsumeInput(PGconn* conn);
     immutable (PGnotify)* PQnotifies(PGconn* conn); // used!

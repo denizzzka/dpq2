@@ -80,7 +80,12 @@ final class Connection: BaseConnection
         
         if( r ) throw new exception();
     }
-
+    
+    immutable (answer) getResult()
+    {
+        return new answer( PQgetResult( conn ) );
+    }
+    
     /// Returns null if no notifies was received
     immutable (notify) getNextNotify()
     {
