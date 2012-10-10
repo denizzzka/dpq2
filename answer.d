@@ -162,7 +162,7 @@ immutable class answer
                 int dim_size = bigEndianToNative!int( d.size );
                 int lbound = bigEndianToNative!int(d.lbound);
 
-                // FIXIT: What is lbound in postgresql array reply?
+                // FIXME: What is lbound in postgresql array reply?
                 enforce( lbound == 1, "Please report if you came across this error." );
                 assert( dim_size > 0 );
                 
@@ -191,6 +191,13 @@ immutable class answer
         
         immutable (Value)* getValue( ... ) immutable
         {
+            auto n = coords2Serial( _argptr, _arguments );
+            return new Value( elements[n] );
+        }
+        
+        
+        size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
+        {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
             // Variadic args parsing
@@ -198,7 +205,7 @@ immutable class answer
             // TODO: here is need exception, not enforce
             enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
             
-            for( int i; i < args.length; ++i )
+            for( uint i; i < args.length; ++i )
             {
                 assert( _arguments[i] == typeid(int) );
                 args[i] = va_arg!(int)(_argptr);
@@ -208,7 +215,7 @@ immutable class answer
             // Calculates serial number of the element
             auto inner = args.length - 1; // inner dimension
             auto element_num = args[inner]; // serial number of the element
-            int s = 1; // perpendicular to a vector which size is calculated currently
+            uint s = 1; // perpendicular to a vector which size is calculated currently
             for( auto i = inner; i > 0; --i )
             {
                 s *= dimsSize[i];
@@ -216,7 +223,7 @@ immutable class answer
             }
             
             assert( element_num <= nElems );
-            return new Value( elements[element_num] );
+            return element_num;
         }
     }
     
@@ -227,7 +234,7 @@ immutable class answer
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
-            throw new exception( exception.exceptionTypes.UNDEFINED_FIX_IT,
+            throw new exception( exception.exceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
         }
     }
@@ -380,7 +387,7 @@ immutable class exception : Exception
     enum exceptionTypes
     {
         COLUMN_NOT_FOUND, /// Column not found
-        UNDEFINED_FIX_IT /// Undefined, need to find and fix it
+        UNDEFINED_FIXME /// Undefined, need to find and fix it
     }
     
     exceptionTypes type; /// Exception type
