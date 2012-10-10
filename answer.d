@@ -331,10 +331,10 @@ immutable class answer
     }
     
     /// Value NULL checking
-    bool isNULL( const Coords c ) 
+    bool isNULL( size_t Row, size_t Col ) 
     {
-        assertCoords(c);
-        return PQgetisnull(res, c.Row, c.Col) != 0;
+        assertCoords(Coords(Row, Col));
+        return PQgetisnull(res, Row, Col) != 0;
     }
     
     private string resultErrorMessage()
@@ -437,8 +437,8 @@ void _unittest( string connParam )
     assert( e.columnFormat(2) == valueFormat.TEXT );
 
     assert( e[1,2].as!PGtext == "456" );
-    assert( !e.isNULL( Coords(0,0) ) );
-    assert( e.isNULL( Coords(2,0) ) );
+    assert( !e.isNULL(0, 0) );
+    assert( e.isNULL(2, 0) );
     assert( e.columnNum( "field_name" ) == 1 );
 
     // Value properties test
@@ -492,8 +492,8 @@ void _unittest( string connParam )
     assert( a.isNULL(2,0,2) );
     assert( !a.isNULL(2,1,2) );
     
-    assert( r.isNULL( Coords(0,12) ) );
-    assert( !r.isNULL( Coords(0,9) ) );
+    assert( r.isNULL(0, 12) );
+    assert( !r.isNULL(0, 9) );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
