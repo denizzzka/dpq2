@@ -265,12 +265,14 @@ immutable class answer
     /// Returns column format
     dpq2.libpq.valueFormat columnFormat( size_t colNum )
     {
+        assertCol( colNum );
         return PQfformat(res, colNum);
     }
     
     /// Returns column Oid
     @property Oid OID( size_t colNum )
     {
+        assertCol( colNum );
         return PQftype(res, colNum);
     }
     
@@ -324,10 +326,15 @@ immutable class answer
         return to!string( PQresultErrorMessage(res) );
     }
     
+    private void assertCol( size_t c )
+    {
+        assert( c < columnCount, to!string(c)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
+    }
+    
     private void assertCoords( const Coords c )
     {
         assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
-        assert( c.Col < columnCount, to!string(c.Col)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
+        assertCol( c.Col );
     }    
 
     invariant()
