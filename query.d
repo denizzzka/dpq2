@@ -42,39 +42,17 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     immutable (answer) exec(ref const queryParams p)
     {
-        // code above just preparing args for PQexecParams
-        Oid[] types = new Oid[p.args.length];
-        size_t[] formats = new size_t[p.args.length];
-        size_t[] lengths = new size_t[p.args.length];
-        const(ubyte)*[] values = new const(ubyte)*[p.args.length];
-
-        for( int i = 0; i < p.args.length; ++i )
-        {
-            types[i] = p.args[i].type;
-            formats[i] = p.args[i].queryFormat;  
-            values[i] = p.args[i].valueBin.ptr;
-            
-            final switch( p.args[i].queryFormat )
-            {
-                case valueFormat.TEXT:
-                    lengths[i] = p.args[i].valueStr.length;
-                    break;
-                case valueFormat.BINARY:
-                    lengths[i] = p.args[i].valueBin.length;
-                    break;
-            }
-        }
-
+        auto a = prepareArgs( p );
         return new answer
         (
             PQexecParams (
                 conn,
                 toStringz( p.sqlCommand ),
                 p.args.length,
-                types.ptr,
-                values.ptr,
-                lengths.ptr,
-                formats.ptr,
+                a.types.ptr,
+                a.values.ptr,
+                a.lengths.ptr,
+                a.formats.ptr,
                 p.resultFormat
             )
         );
@@ -96,6 +74,7 @@ final class Connection: BaseConnection
         const(ubyte)*[] values;
     }
     
+    // PQxxxParams need especially prepared arguments
     private preparedArgs* prepareArgs(ref const queryParams p)
     {
         preparedArgs* a = new preparedArgs;
