@@ -131,5 +131,5 @@ TODO
 * Row by row result reading
 * Binary arguments types
 * PostGIS binary data support
-* Checking types for reading by OID
+* Checking types by Oid
 * Make code more transparent, CamelCased and Autodoc
