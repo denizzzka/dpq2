@@ -88,7 +88,40 @@ final class Connection: BaseConnection
         return n is null ? null : new notify( n );
     }
     
+    private struct preparedArgs
+    {
+        Oid[] types;
+        size_t[] formats;
+        size_t[] lengths;
+        const(ubyte)*[] values;
+    }
     
+    private preparedArgs* prepareArgs(ref const queryParams p)
+    {
+        preparedArgs* a = new preparedArgs;
+        a.types = new Oid[p.args.length];
+        a.formats = new size_t[p.args.length];
+        a.lengths = new size_t[p.args.length];
+        a.values = new const(ubyte)*[p.args.length];
+        
+        for( int i = 0; i < p.args.length; ++i )
+        {
+            a.types[i] = p.args[i].type;
+            a.formats[i] = p.args[i].queryFormat;  
+            a.values[i] = p.args[i].valueBin.ptr;
+            
+            final switch( p.args[i].queryFormat )
+            {
+                case valueFormat.TEXT:
+                    a.lengths[i] = p.args[i].valueStr.length;
+                    break;
+                case valueFormat.BINARY:
+                    a.lengths[i] = p.args[i].valueBin.length;
+                    break;
+            }
+        }
+        return a;
+    }
 }
 
 void _unittest( string connParam )
