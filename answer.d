@@ -133,18 +133,6 @@ immutable class answer
                 ubyte[4] dim_size; // number of elements in dimension
                 ubyte[4] lbound; // index of first element
             }
-            
-            struct element_
-            {
-                int size;
-                ubyte* value;
-                
-                this( immutable int s, immutable ubyte* v ) immutable
-                {
-                    size = s;
-                    value = v;
-                }
-            }
         }
         
         this( immutable(Value*) c ) immutable
