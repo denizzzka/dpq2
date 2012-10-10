@@ -179,7 +179,7 @@ PQERRORS_VERBOSE,
     int PQsetnonblocking(PGconn* conn, int arg);
     int PQisnonblocking(PGconn* conn);
     int PQisthreadsafe();
-    int PQflush(PGconn* conn);
+    size_t PQflush(PGconn* conn); // used!
     PGresult* PQfn(PGconn* conn, int fnid, int* result_buf, int* result_len, int result_is_int, PQArgBlock* args, int nargs);
     ExecStatusType PQresultStatus( immutable PGresult* res ); // used!
     char* PQresStatus(ExecStatusType status);
