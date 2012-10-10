@@ -460,9 +460,10 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
-    assert( r[0,11].asArray.getValue(2,1,2).as!PGinteger == 18 );
+    auto v = r[0,11];
     assert( r.OID(11) == 1007 ); // int4 array
-    assert( r[0,11].asArray.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
+    assert( v.asArray.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
+    assert( v.asArray.getValue(2,1,2).as!PGinteger == 18 );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
