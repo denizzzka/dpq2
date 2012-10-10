@@ -268,6 +268,12 @@ immutable class answer
         return PQfformat(res, colNum);
     }
     
+    /// Returns column Oid
+    @property Oid OID( size_t colNum )
+    {
+        return PQftype(res, colNum);
+    }
+    
     /// Returns column number by field name
     size_t columnNum( string column_name )
     {    
@@ -455,6 +461,8 @@ void _unittest( string connParam )
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
     assert( r[0,11].asArray.getValue(2,1,2).as!PGinteger == 18 );
+    assert( r.OID(11) == 1007 ); // int4 array
+    assert( r[0,11].asArray.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
