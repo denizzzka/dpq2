@@ -196,12 +196,14 @@ immutable class answer
             this.elementIsNULL = elementIsNULL.idup;
         }
         
+        /// Returns Value struct
         immutable (Value)* getValue( ... ) immutable
         {
             auto n = coords2Serial( _argptr, _arguments );
             return new Value( elements[n] );
         }
         
+        /// Value NULL checking
         bool isNULL( ... ) immutable
         {
             auto n = coords2Serial( _argptr, _arguments );
