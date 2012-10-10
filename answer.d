@@ -118,6 +118,7 @@ immutable class answer
         {
             Value* cell;
             ubyte[][] elements;
+            bool[] elementIsNULL;
             
             struct arrayHeader_net
             {
@@ -167,7 +168,8 @@ immutable class answer
             nElems = n_elems;
             dimsSize = ds.idup;
             
-            auto elements = new immutable (ubyte)[][ n_elems ];
+            auto elements = new immutable (ubyte)[][ nElems ];
+            auto elementIsNULL = new bool[ nElems ];
             
             // Looping through all elements and fill out index of them
             auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
@@ -175,12 +177,23 @@ immutable class answer
             {
                 ubyte[int.sizeof] size_net;
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-                auto size = bigEndianToNative!int( size_net );
+                int size;
+                if( size_net == [ 0xFF, 0xFF, 0xFF, 0xFF ] )
+                {
+                    elementIsNULL[i] = true;
+                    size = 0;
+                }
+                else
+                {
+                    elementIsNULL[i] = false;
+                    size = bigEndianToNative!int( size_net );
+                }
                 curr_offset += size_net.sizeof;
                 elements[i] = cell.value[curr_offset .. curr_offset + size];
                 curr_offset += size;
             }
             this.elements = elements.idup;
+            this.elementIsNULL = elementIsNULL.idup;
         }
         
         immutable (Value)* getValue( ... ) immutable
@@ -192,7 +205,7 @@ immutable class answer
         bool isNULL( ... ) immutable
         {
             auto n = coords2Serial( _argptr, _arguments );
-            return true;
+            return elementIsNULL[n];
         }
         
         size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
