@@ -302,7 +302,7 @@ immutable class answer
         return n;
     }
 
-    private immutable (Value)* getValue( const Coords c )
+    immutable (Value)* getValue( const Coords c )
     {
         assertCoords(c);
         
@@ -334,7 +334,7 @@ immutable class answer
     bool isNULL( const Coords c ) 
     {
         assertCoords(c);
-        return PQgetisnull(res, c.Col, c.Row) != 0;
+        return PQgetisnull(res, c.Row, c.Col) != 0;
     }
     
     private string resultErrorMessage()
@@ -438,7 +438,7 @@ void _unittest( string connParam )
 
     assert( e[1,2].as!PGtext == "456" );
     assert( !e.isNULL( Coords(0,0) ) );
-    assert( e.isNULL( Coords(0,2) ) );
+    assert( e.isNULL( Coords(2,0) ) );
     assert( e.columnNum( "field_name" ) == 1 );
 
     // Value properties test
@@ -464,7 +464,8 @@ void _unittest( string connParam )
               "[10, 11,12]], "
               
               "[[13,14,NULL], "
-               "[16,17,18]]]::integer[]";
+               "[16,17,18]]]::integer[], "
+        "NULL";
 
 
     auto r = conn.exec( p );
@@ -490,6 +491,9 @@ void _unittest( string connParam )
     assert( a.getValue(2,1,2).as!PGinteger == 18 );
     assert( a.isNULL(2,0,2) );
     assert( !a.isNULL(2,1,2) );
+    
+    assert( r.isNULL( Coords(0,12) ) );
+    assert( !r.isNULL( Coords(0,9) ) );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
