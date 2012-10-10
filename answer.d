@@ -195,7 +195,6 @@ immutable class answer
             
             // Variadic args parsing
             auto args = new int[ _arguments.length ];
-            
             // TODO: here is need exception, not enforce
             enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
             
