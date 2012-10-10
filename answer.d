@@ -129,7 +129,7 @@ immutable class answer
             struct Dim_net // network byte order
             {
                 ubyte[4] dim_size; // number of elements in dimension
-                ubyte[4] lbound; // index of first element
+                ubyte[4] lbound; // unknown
             }
         }
         
@@ -151,15 +151,9 @@ immutable class answer
             int n_elems = 1;
             for( auto i = 0; i < nDims; ++i )
             {
-                struct Dim_net // network byte order
-                {
-                    ubyte[4] size; // number of elements in the dimension
-                    ubyte[4] lbound; // unknown
-                }                
-                
                 Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
                 
-                int dim_size = bigEndianToNative!int( d.size );
+                int dim_size = bigEndianToNative!int( d.dim_size );
                 int lbound = bigEndianToNative!int(d.lbound);
 
                 // FIXME: What is lbound in postgresql array reply?
@@ -195,6 +189,11 @@ immutable class answer
             return new Value( elements[n] );
         }
         
+        bool isNULL( ... ) immutable
+        {
+            auto n = coords2Serial( _argptr, _arguments );
+            return true;
+        }
         
         size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
         {
