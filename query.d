@@ -89,6 +89,12 @@ final class Connection: BaseConnection
         return new answer( PQgetResult( conn ) );
     }
     
+    /// getResult would block waiting for input?
+    bool isBusy()
+    {
+        return PQisBusy(conn) == 1;
+    }
+    
     /// Returns null if no notifies was received
     immutable (notify) getNextNotify()
     {
