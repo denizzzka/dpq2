@@ -58,7 +58,20 @@ final class Connection: BaseConnection
         );
     }
     
-    
+    size_t sendQuery( ref const queryParams p )
+    {
+        auto a = prepareArgs( p );
+        return PQsendQueryParams (
+                conn,
+                toStringz( p.sqlCommand ),
+                p.args.length,
+                a.types.ptr,
+                a.values.ptr,
+                a.lengths.ptr,
+                a.formats.ptr,
+                p.resultFormat
+            );
+    }
 
     /// Returns null if no notifies was received
     immutable (notify) getNextNotify()
