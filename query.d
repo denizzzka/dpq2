@@ -57,6 +57,8 @@ final class Connection: BaseConnection
             )
         );
     }
+    
+    
 
     /// Returns null if no notifies was received
     immutable (notify) getNextNotify()
@@ -74,7 +76,7 @@ final class Connection: BaseConnection
         const(ubyte)*[] values;
     }
     
-    // PQxxxParams need especially prepared arguments
+    // For PQxxxParams need especially prepared arguments
     private preparedArgs* prepareArgs(ref const queryParams p)
     {
         preparedArgs* a = new preparedArgs;
