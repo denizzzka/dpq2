@@ -58,24 +58,27 @@ final class Connection: BaseConnection
         );
     }
     
-    size_t sendQuery( string SQLcmd )
+    void sendQuery( string SQLcmd )
     {
-        return PQsendQuery(conn, toStringz( SQLcmd ));
+        size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
+        if( r ) throw new exception();
     }
     
-    size_t sendQuery( ref const queryParams p )
+    void sendQuery( ref const queryParams p )
     {
         auto a = prepareArgs( p );
-        return PQsendQueryParams (
-                conn,
-                toStringz( p.sqlCommand ),
-                p.args.length,
-                a.types.ptr,
-                a.values.ptr,
-                a.lengths.ptr,
-                a.formats.ptr,
-                p.resultFormat
-            );
+        size_t r = PQsendQueryParams (
+                        conn,
+                        toStringz( p.sqlCommand ),
+                        p.args.length,
+                        a.types.ptr,
+                        a.values.ptr,
+                        a.lengths.ptr,
+                        a.formats.ptr,
+                        p.resultFormat                        
+                    );
+        
+        if( r ) throw new exception();
     }
 
     /// Returns null if no notifies was received
