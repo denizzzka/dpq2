@@ -42,7 +42,7 @@ immutable class answer
     }
 
     /// Result table's cell
-    immutable struct Cell
+    immutable struct Value
     {
         private ubyte[] value;
         debug private dpq2.libpq.valueFormat format;
@@ -88,7 +88,7 @@ immutable class answer
         if( isNumeric!(T) )
         {
             debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-            assert( value.length == T.sizeof, "Cell value length isn't equal to type size" );
+            assert( value.length == T.sizeof, "Value value length isn't equal to type size" );
             
             ubyte[T.sizeof] s = value[0..T.sizeof];
             return bigEndianToNative!(T)( s );
@@ -118,7 +118,7 @@ immutable class answer
         
         private
         {
-            Cell* cell;
+            Value* cell;
             ubyte[][] elements;
             
             struct arrayHeader_net
@@ -147,7 +147,7 @@ immutable class answer
             }
         }
         
-        this( immutable(Cell*) c ) immutable
+        this( immutable(Value*) c ) immutable
         {
             cell = c;
             debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
@@ -203,7 +203,7 @@ immutable class answer
             this.elements = elements.idup;
         }
         
-        immutable (Cell)* getCell( ... ) immutable
+        immutable (Value)* getValue( ... ) immutable
         {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
@@ -231,7 +231,7 @@ immutable class answer
             }
             
             assert( element_num <= nElems );
-            return new Cell( elements[element_num] );
+            return new Value( elements[element_num] );
         }
     }
     
@@ -290,7 +290,7 @@ immutable class answer
         return n;
     }
 
-    private immutable (Cell)* getValue( const Coords c )
+    private immutable (Value)* getValue( const Coords c )
     {
         assertCoords(c);
         
@@ -298,15 +298,15 @@ immutable class answer
         auto s = size( c );
 
         debug
-            auto r = new Cell( v, s, columnFormat( c.Col ) );
+            auto r = new Value( v, s, columnFormat( c.Col ) );
         else
-            auto r = new Cell( v, s );
+            auto r = new Value( v, s );
         
         return r;
     }
     
     /// Returns pointer to cell
-    immutable (Cell)* opIndex( size_t Row, size_t Col )
+    immutable (Value)* opIndex( size_t Row, size_t Col )
     {
         return getValue( Coords( Row, Col ) );
     }
@@ -318,7 +318,7 @@ immutable class answer
         return PQgetlength(res, c.Row, c.Col);
     }
     
-    /// Cell NULL checking
+    /// Value NULL checking
     bool isNULL( const Coords c ) 
     {
         assertCoords(c);
@@ -424,7 +424,7 @@ void _unittest( string connParam )
     assert( e.isNULL( Coords(0,2) ) );
     assert( e.columnNum( "field_name" ) == 1 );
 
-    // Cell properties test
+    // Value properties test
     static queryArg arg;
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
@@ -466,7 +466,7 @@ void _unittest( string connParam )
     assert( r[0,9].as!PGtext == "first line\nsecond line" );
     assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
-    assert( r[0,11].asArray.getCell(2,1,2).as!PGinteger == 18 );
+    assert( r[0,11].asArray.getValue(2,1,2).as!PGinteger == 18 );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
