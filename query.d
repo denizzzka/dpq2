@@ -32,7 +32,7 @@ struct queryArg
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    immutable (answer) exec(string SQLcmd )
+    immutable (answer) exec( string SQLcmd )
     {
         return new answer(
             PQexec(conn, toStringz( SQLcmd ))
@@ -56,6 +56,11 @@ final class Connection: BaseConnection
                 p.resultFormat
             )
         );
+    }
+    
+    size_t sendQuery( string SQLcmd )
+    {
+        return PQsendQuery(conn, toStringz( SQLcmd ));
     }
     
     size_t sendQuery( ref const queryParams p )
