@@ -58,12 +58,14 @@ final class Connection: BaseConnection
         );
     }
     
+    /// Submits a command to the server without waiting for the result(s)
     void sendQuery( string SQLcmd )
     {
         size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
         if( r ) throw new exception();
     }
     
+    /// Submits a command and separate parameters to the server without waiting for the result(s)
     void sendQuery( ref const queryParams p )
     {
         auto a = prepareArgs( p );
@@ -81,6 +83,7 @@ final class Connection: BaseConnection
         if( r ) throw new exception();
     }
     
+    /// Waits for the next result from a sendQuery
     immutable (answer) getResult()
     {
         return new answer( PQgetResult( conn ) );
