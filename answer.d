@@ -463,7 +463,7 @@ void _unittest( string connParam )
               "[[7,  8, 9], "
               "[10, 11,12]], "
               
-              "[[13,14,15], "
+              "[[13,14,NULL], "
                "[16,17,18]]]::integer[]";
 
 
@@ -485,8 +485,11 @@ void _unittest( string connParam )
     
     auto v = r[0,11];
     assert( r.OID(11) == 1007 ); // int4 array
-    assert( v.asArray.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
-    assert( v.asArray.getValue(2,1,2).as!PGinteger == 18 );
+    auto a = v.asArray;
+    assert( a.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
+    assert( a.getValue(2,1,2).as!PGinteger == 18 );
+    assert( a.isNULL(2,0,2) );
+    assert( !a.isNULL(2,1,2) );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
