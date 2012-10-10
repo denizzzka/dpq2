@@ -29,7 +29,7 @@ alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
 immutable class answer
-{      
+{
     private PGresult* res;
     
     /// Result table's cell coordinates 
