@@ -27,8 +27,6 @@ alias string  PGtext; /// text
 alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
-debug import std.stdio;
-
 /// Answer
 immutable class answer
 {      
