@@ -87,6 +87,8 @@ final class Connection: BaseConnection
         auto n = PQnotifies(conn);
         return n is null ? null : new notify( n );
     }
+    
+    
 }
 
 void _unittest( string connParam )

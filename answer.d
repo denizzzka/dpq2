@@ -118,6 +118,7 @@ immutable class answer
         {
             Value* cell;
             ubyte[][] elements;
+            bool[] elementIsNULL;
             
             struct arrayHeader_net
             {
@@ -129,7 +130,7 @@ immutable class answer
             struct Dim_net // network byte order
             {
                 ubyte[4] dim_size; // number of elements in dimension
-                ubyte[4] lbound; // index of first element
+                ubyte[4] lbound; // unknown
             }
         }
         
@@ -151,18 +152,12 @@ immutable class answer
             int n_elems = 1;
             for( auto i = 0; i < nDims; ++i )
             {
-                struct Dim_net // network byte order
-                {
-                    ubyte[4] size; // number of elements in the dimension
-                    ubyte[4] lbound; // unknown
-                }                
-                
                 Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
                 
-                int dim_size = bigEndianToNative!int( d.size );
+                int dim_size = bigEndianToNative!int( d.dim_size );
                 int lbound = bigEndianToNative!int(d.lbound);
 
-                // FIXIT: What is lbound in postgresql array reply?
+                // FIXME: What is lbound in postgresql array reply?
                 enforce( lbound == 1, "Please report if you came across this error." );
                 assert( dim_size > 0 );
                 
@@ -173,7 +168,8 @@ immutable class answer
             nElems = n_elems;
             dimsSize = ds.idup;
             
-            auto elements = new immutable (ubyte)[][ n_elems ];
+            auto elements = new immutable (ubyte)[][ nElems ];
+            auto elementIsNULL = new bool[ nElems ];
             
             // Looping through all elements and fill out index of them
             auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
@@ -181,25 +177,47 @@ immutable class answer
             {
                 ubyte[int.sizeof] size_net;
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-                auto size = bigEndianToNative!int( size_net );
+                int size;
+                if( size_net == [ 0xFF, 0xFF, 0xFF, 0xFF ] )
+                {
+                    elementIsNULL[i] = true;
+                    size = 0;
+                }
+                else
+                {
+                    elementIsNULL[i] = false;
+                    size = bigEndianToNative!int( size_net );
+                }
                 curr_offset += size_net.sizeof;
                 elements[i] = cell.value[curr_offset .. curr_offset + size];
                 curr_offset += size;
             }
             this.elements = elements.idup;
+            this.elementIsNULL = elementIsNULL.idup;
         }
         
         immutable (Value)* getValue( ... ) immutable
+        {
+            auto n = coords2Serial( _argptr, _arguments );
+            return new Value( elements[n] );
+        }
+        
+        bool isNULL( ... ) immutable
+        {
+            auto n = coords2Serial( _argptr, _arguments );
+            return elementIsNULL[n];
+        }
+        
+        size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
         {
             assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
             
             // Variadic args parsing
             auto args = new int[ _arguments.length ];
-            
             // TODO: here is need exception, not enforce
             enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
             
-            for( int i; i < args.length; ++i )
+            for( uint i; i < args.length; ++i )
             {
                 assert( _arguments[i] == typeid(int) );
                 args[i] = va_arg!(int)(_argptr);
@@ -209,7 +227,7 @@ immutable class answer
             // Calculates serial number of the element
             auto inner = args.length - 1; // inner dimension
             auto element_num = args[inner]; // serial number of the element
-            int s = 1; // perpendicular to a vector which size is calculated currently
+            uint s = 1; // perpendicular to a vector which size is calculated currently
             for( auto i = inner; i > 0; --i )
             {
                 s *= dimsSize[i];
@@ -217,7 +235,7 @@ immutable class answer
             }
             
             assert( element_num <= nElems );
-            return new Value( elements[element_num] );
+            return element_num;
         }
     }
     
@@ -228,7 +246,7 @@ immutable class answer
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
-            throw new exception( exception.exceptionTypes.UNDEFINED_FIX_IT,
+            throw new exception( exception.exceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
         }
     }
@@ -284,7 +302,7 @@ immutable class answer
         return n;
     }
 
-    private immutable (Value)* getValue( const Coords c )
+    immutable (Value)* getValue( const Coords c )
     {
         assertCoords(c);
         
@@ -313,10 +331,10 @@ immutable class answer
     }
     
     /// Value NULL checking
-    bool isNULL( const Coords c ) 
+    bool isNULL( size_t Row, size_t Col ) 
     {
-        assertCoords(c);
-        return PQgetisnull(res, c.Col, c.Row) != 0;
+        assertCoords(Coords(Row, Col));
+        return PQgetisnull(res, Row, Col) != 0;
     }
     
     private string resultErrorMessage()
@@ -381,7 +399,7 @@ immutable class exception : Exception
     enum exceptionTypes
     {
         COLUMN_NOT_FOUND, /// Column not found
-        UNDEFINED_FIX_IT /// Undefined, need to find and fix it
+        UNDEFINED_FIXME /// Undefined, need to find and fix it
     }
     
     exceptionTypes type; /// Exception type
@@ -419,8 +437,8 @@ void _unittest( string connParam )
     assert( e.columnFormat(2) == valueFormat.TEXT );
 
     assert( e[1,2].as!PGtext == "456" );
-    assert( !e.isNULL( Coords(0,0) ) );
-    assert( e.isNULL( Coords(0,2) ) );
+    assert( !e.isNULL(0, 0) );
+    assert( e.isNULL(2, 0) );
     assert( e.columnNum( "field_name" ) == 1 );
 
     // Value properties test
@@ -445,8 +463,9 @@ void _unittest( string connParam )
               "[[7,  8, 9], "
               "[10, 11,12]], "
               
-              "[[13,14,15], "
-               "[16,17,18]]]::integer[]";
+              "[[13,14,NULL], "
+               "[16,17,18]]]::integer[], "
+        "NULL";
 
 
     auto r = conn.exec( p );
@@ -467,8 +486,14 @@ void _unittest( string connParam )
     
     auto v = r[0,11];
     assert( r.OID(11) == 1007 ); // int4 array
-    assert( v.asArray.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
-    assert( v.asArray.getValue(2,1,2).as!PGinteger == 18 );
+    auto a = v.asArray;
+    assert( a.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
+    assert( a.getValue(2,1,2).as!PGinteger == 18 );
+    assert( a.isNULL(2,0,2) );
+    assert( !a.isNULL(2,1,2) );
+    
+    assert( r.isNULL(0, 12) );
+    assert( !r.isNULL(0, 9) );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
