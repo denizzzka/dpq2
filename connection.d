@@ -45,11 +45,11 @@ class BaseConnection
             PQ_CONSUME_OK
         }
         
-        alias nothrow void delegate( Answer a ) handler;
+        alias nothrow void delegate( immutable Answer a ) answerHandler;
         struct registredHandler
         {
             PGconn* conn;
-            handler dg;
+            answerHandler dg;
         }
         static registredHandler handlers[];
         
@@ -110,10 +110,10 @@ class BaseConnection
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
-            throw new exception( "Error in "~name~" event handler" ); // FIXME: need to get more info from conn
+            throw new exception( "Error in "~name~" event handler: delegate not found" );
     }
     
-    void addHandler( handler h )
+    void addHandler( answerHandler h )
     {
         registredHandler s;
         s.conn = conn;
@@ -123,25 +123,29 @@ class BaseConnection
     
     private static nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
     {
-        // список делегатов для всех коннекций с пометкой к какому PGEventId присоединены
-        
-        
-        //PGEventResultCreate
+        enum { ERROR, OK }
         
         switch( evtId )
         {
             case PGEventId.PGEVT_REGISTER:
                 debug s ~= "PGEVT_REGISTER ";
-                break;
+                return OK;
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
-                auto r = new Answer( info.result );
-                attention( r );
+                auto a = new Answer( info.result );
+                foreach( d; handlers )
+                {
+                    if( d.conn == info.conn )
+                    {
+                        d.dg( a );
+                        return OK;
+                    }
+                }
                 break;
             default:
         }
         
-        return 1; // always OK
+        return ERROR;
     }
     
     ~this()
