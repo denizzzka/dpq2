@@ -100,9 +100,7 @@ class BaseConnection
     
     private static nothrow extern (C) size_t test(PGEventId evtId, void *evtInfo, void *passThrough)
     {
-        //import std.stdio;
-        //writeln( evtId );
-        return 1;
+        return evtId;
     }
     
     private size_t registerEventProc( PGEventProc proc, string name, void *passThrough)
@@ -137,6 +135,7 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.async = true;
-    c.registerEventProc( &BaseConnection.test, "test event", null );
+    import std.stdio;
+    writeln( c.registerEventProc( &BaseConnection.test, "test event", null ) );
     c.disconnect();
 }
