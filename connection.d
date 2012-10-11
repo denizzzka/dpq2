@@ -70,7 +70,7 @@ class BaseConnection
         return asyncFlag;
     }
     
-    void setNonBlocking( bool state )
+    package void setNonBlocking( bool state )
     {
         PQsetnonblocking(conn, state ? 1 : 0 );
     }
@@ -117,7 +117,7 @@ class BaseConnection
             throw new exception( "Error in "~name~" event handler" );
     }
     
-    void addHandler( answerHandler h )
+    package void addHandler( answerHandler h )
     {
         registredHandler s;
         s.conn = conn;

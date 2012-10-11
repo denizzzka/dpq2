@@ -61,7 +61,7 @@ final class Connection: BaseConnection
     }
     
     /// Submits a command to the server without waiting for the result(s)
-    void sendQuery( string SQLcmd )
+    package void sendQuery( string SQLcmd )
     {
         assert( async );
         size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
@@ -69,7 +69,7 @@ final class Connection: BaseConnection
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQuery( ref const queryParams p )
+    package void sendQuery( ref const queryParams p )
     {
         assert( async );
         auto a = prepareArgs( p );
@@ -88,13 +88,13 @@ final class Connection: BaseConnection
     }
     
     /// Waits for the next result from a sendQuery
-    immutable (Answer) getResult()
+    package immutable (Answer) getResult()
     {
         return getAnswer( PQgetResult( conn ) );
     }
     
     /// getResult would block waiting for input?
-    bool isBusy()
+    package bool isBusy()
     {
         return PQisBusy(conn) == 1;
     }
@@ -106,7 +106,7 @@ final class Connection: BaseConnection
      * repeat until it returns false. Once flush() returns false, wait for the socket to
      * be read-ready and then read the response as described above.
      */
-    bool flush()
+    package bool flush()
     {
         auto r = PQflush(conn);
         if( r == -1 ) throw new exception();
