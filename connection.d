@@ -113,6 +113,13 @@ class BaseConnection
             throw new exception( "Error in "~name~" event handler" ); // FIXME: need to get more info from conn
     }
     
+    void addHandler( handler h )
+    {
+        registredHandler s;
+        s.conn = conn;
+        s.dg = h;
+        handlers ~= s;
+    }
     
     private static nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
     {
@@ -135,14 +142,6 @@ class BaseConnection
         }
         
         return 1; // always OK
-    }
-    
-    void addDelegate( handler h )
-    {
-        registredHandler s;
-        s.conn = conn;
-        s.dg = h;
-        handlers ~= s;
     }
     
     ~this()
