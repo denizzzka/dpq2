@@ -103,9 +103,10 @@ class BaseConnection
         return evtId;
     }
     
-    private size_t registerEventProc( PGEventProc proc, string name, void *passThrough )
+    private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
-        return PQregisterEventProc(conn, proc, toStringz(name), passThrough);
+        if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
+            throw new exception( "Can't register "~name~" event handler" );
     }
     
     ~this()
@@ -118,10 +119,14 @@ class BaseConnection
     {
         ConnStatusType statusType; /// libpq connection status
         
+        this( string msg )
+        {
+            super( msg, null, null );
+        }
+        
         this()
         {
-            statusType = PQstatus(conn);
-            super( PQerrorMessage(conn), null, null );
+            this( to!string( PQstatus(conn) ) );
         }
     }
 }
@@ -135,7 +140,6 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.async = true;
-    import std.stdio;
-    writeln( c.registerEventProc( &BaseConnection.test, "test event", null ) );
+    c.registerEventProc( &BaseConnection.test, "test", null );
     c.disconnect();
 }
