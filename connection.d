@@ -45,6 +45,14 @@ class BaseConnection
             PQ_CONSUME_OK
         }
         
+        alias nothrow void delegate( Answer a ) handler;
+        struct registredHandler
+        {
+            PGconn* conn;
+            handler dg;
+        }
+        static registredHandler handlers[];
+        
         version(Release){}else
         {
         }
@@ -110,11 +118,6 @@ class BaseConnection
     {
         // список делегатов для всех коннекций с пометкой к какому PGEventId присоединены
         
-        struct ds
-        {
-            PGconn* conn;
-            nothrow void delegate(string msg) dg;
-        }
         
         //PGEventResultCreate
         
@@ -132,6 +135,14 @@ class BaseConnection
         }
         
         return 1; // always OK
+    }
+    
+    void addDelegate( handler h )
+    {
+        registredHandler s;
+        s.conn = conn;
+        s.dg = h;
+        handlers ~= s;
     }
     
     ~this()
