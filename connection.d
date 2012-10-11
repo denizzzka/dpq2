@@ -54,10 +54,8 @@ class BaseConnection
         assert( !(asyncFlag && !m), "pqlib can't change mode from async to sync" );
         
         if( !asyncFlag && m )
-        {
-            //auto res = PQregisterEventProc(conn, &eventProc,
-                //const char *name, void *passThrough);
-        }
+            registerEventProc( &eventHandler, "default", null ); // FIXME: why name?
+
         asyncFlag = m;
         return asyncFlag;
     }
@@ -98,7 +96,7 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
-    private static nothrow extern (C) size_t test(PGEventId evtId, void* evtInfo, void* passThrough)
+    private static nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
     {
         return 1;
     }
@@ -140,6 +138,5 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.async = true;
-    c.registerEventProc( &BaseConnection.test, "test", null );
     c.disconnect();
 }
