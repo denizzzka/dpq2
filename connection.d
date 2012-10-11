@@ -155,10 +155,6 @@ class BaseConnection
         }
     }
     
-    debug package void trace( FILE* debug_port ){ PQtrace(conn, debug_port); }
-    
-    debug package void untrace(){ PQuntrace(conn); }
-    
     ~this()
     {
         disconnect();
