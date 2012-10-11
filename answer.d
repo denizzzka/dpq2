@@ -40,7 +40,7 @@ class Answer // most members should be a const
     }
 
     /// Result table's cell
-    immutable struct Value // TODO: should be a const class with immutable content
+    immutable struct Value // TODO: should be a const class with const members
     {
         private ubyte[] value;
         debug private dpq2.libpq.valueFormat format;
