@@ -98,9 +98,9 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
-    private static nothrow extern (C) size_t test(PGEventId evtId, void *evtInfo, void *passThrough)
+    private static nothrow extern (C) size_t test(PGEventId evtId, void* evtInfo, void* passThrough)
     {
-        return evtId;
+        return 1;
     }
     
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
