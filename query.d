@@ -32,7 +32,7 @@ struct queryArg
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    immutable (Answer) exec( string SQLcmd )
+    Answer exec( string SQLcmd )
     {
         assert( !async );
         return getAnswer(
@@ -41,7 +41,7 @@ final class Connection: BaseConnection
     }
 
     /// Perform SQL query to DB
-    immutable (Answer) exec(ref const queryParams p)
+    Answer exec(ref const queryParams p)
     {
         assert( !async );
         auto a = prepareArgs( p );
@@ -88,7 +88,7 @@ final class Connection: BaseConnection
     }
     
     /// Waits for the next result from a sendQuery
-    package immutable (Answer) getResult()
+    package Answer getResult()
     {
         return getAnswer( PQgetResult( conn ) );
     }
@@ -158,7 +158,7 @@ final class Connection: BaseConnection
     }
     
     // It is important to do a separate check because of Answer ctor is nothrow
-    private immutable (Answer) getAnswer( immutable PGresult* r )
+    private Answer getAnswer( immutable PGresult* r )
     {
         auto res = new Answer( r );
         res.checkAnswerForErrors();
@@ -202,8 +202,8 @@ void _unittest( string connParam )
     c.connString = connParam;
     c.connect;
     c.async = true;
-    immutable (Answer)* an;
-    c.addHandler( (immutable Answer a){ an = a; } );
+    Answer an;
+    c.addHandler( (Answer a){ an = a; } );
     c.sendQuery( p );
     
     import core.thread: sleep;

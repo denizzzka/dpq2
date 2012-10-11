@@ -43,7 +43,7 @@ class BaseConnection
             PQ_CONSUME_OK
         }
         
-        alias nothrow void delegate( immutable Answer a ) answerHandler;
+        alias nothrow void delegate( Answer a ) answerHandler;
         struct registredHandler
         {
             PGconn* conn;
@@ -64,7 +64,7 @@ class BaseConnection
         assert( !(asyncFlag && !m), "pqlib can't change mode from async to sync" );
         
         if( !asyncFlag && m )
-            registerEventProc( &eventHandler, "default", null ); // FIXME: why name?
+            registerEventProc( &eventsHandler, "default", null ); // FIXME: why name?
 
         asyncFlag = m;
         return asyncFlag;
@@ -126,7 +126,7 @@ class BaseConnection
         handlers ~= s;
     }
     
-    private static nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
+    private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* passThrough)
     {
         enum { ERROR, OK }
         

@@ -28,9 +28,9 @@ alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
-immutable class Answer
+class Answer
 {
-    private PGresult* res;
+    private immutable PGresult* res;
     
     /// Result table's cell coordinates 
     struct Coords
@@ -240,7 +240,7 @@ immutable class Answer
         }
     }
     
-    package this(immutable PGresult* r) immutable nothrow // FIXME: really this() can throw!
+    package this(immutable PGresult* r) nothrow // FIXME: really this() can throw!
     {
         res = r;
     }
@@ -363,7 +363,6 @@ immutable class Answer
         assert( res != null );
     }
 }
-
 
 /// Notify
 immutable class notify
