@@ -173,12 +173,12 @@ immutable class answer
             
             // Looping through all elements and fill out index of them
             auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
-            for(int i = 0; i < n_elems; ++i )
+            for(uint i = 0; i < n_elems; ++i )
             {
                 ubyte[int.sizeof] size_net;
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-                int size;
-                if( size_net == [ 0xFF, 0xFF, 0xFF, 0xFF ] )
+                uint size = bigEndianToNative!uint( size_net );
+                if( size == size.max ) // NULL magic number
                 {
                     elementIsNULL[i] = true;
                     size = 0;
@@ -186,7 +186,6 @@ immutable class answer
                 else
                 {
                     elementIsNULL[i] = false;
-                    size = bigEndianToNative!int( size_net );
                 }
                 curr_offset += size_net.sizeof;
                 elements[i] = cell.value[curr_offset .. curr_offset + size];
