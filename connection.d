@@ -10,6 +10,8 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
+debug static string s;
+
 /*
  * Bugs: On Unix connection is not thread safe.
  * 
@@ -96,11 +98,6 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
-    private static nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
-    {
-        return 1;
-    }
-    
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
@@ -129,6 +126,25 @@ class BaseConnection
     }
 }
 
+private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
+{
+    // список делегатов для всех коннекций с пометкой к какому PGEventId присоединены
+    
+    struct ds
+    {
+        PGconn* conn;
+        void delegate() dg;
+    }
+    
+    attention();
+    
+    return 1;
+}
+
+nothrow void attention()
+{
+    debug s ~= "delegate! ";
+}
 
 void _unittest( string connParam )
 {    
@@ -139,4 +155,7 @@ void _unittest( string connParam )
     c.connect();
     c.async = true;
     c.disconnect();
+    
+    import std.stdio;
+    writeln(s);
 }
