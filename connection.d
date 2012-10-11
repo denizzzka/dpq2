@@ -134,7 +134,7 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
     struct ds
     {
         PGconn* conn;
-        void nothrow delegate(string msg) dg;
+        nothrow void delegate(string msg) dg;
     }
     
     //PGEventResultCreate
