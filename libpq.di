@@ -248,4 +248,10 @@ PQERRORS_VERBOSE,
         PGEVT_RESULTCOPY,
         PGEVT_RESULTDESTROY
     }
+    
+    struct PGEventResultCreate
+    {
+        PGconn *conn;
+        PGresult *result;
+    }
 }

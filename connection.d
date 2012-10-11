@@ -133,17 +133,28 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
     struct ds
     {
         PGconn* conn;
-        void delegate() dg;
+        void delegate(string msg) dg;
     }
     
-    attention();
+    //PGEventResultCreate
+    
+    switch( evtId )
+    {
+        case PGEventId.PGEVT_REGISTER:
+            attention("PGEVT_REGISTER");
+            break;
+        case PGEventId.PGEVT_RESULTCREATE:
+            attention("RESULTCREATE");
+            break;
+        default:
+    }
     
     return 1;
 }
 
-nothrow void attention()
+nothrow void attention(string msg)
 {
-    debug s ~= "delegate! ";
+    debug s ~= msg~" ";
 }
 
 void _unittest( string connParam )
