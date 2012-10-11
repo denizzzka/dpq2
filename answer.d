@@ -40,7 +40,7 @@ class Answer
     }
 
     /// Result table's cell
-    immutable struct Value // TODO: should be a const with immutable content
+    immutable struct Value // TODO: should be a const class with immutable content
     {
         private ubyte[] value;
         debug private dpq2.libpq.valueFormat format;
@@ -107,7 +107,7 @@ class Answer
         }
     }
         
-    immutable struct Array // TODO: should be a const with immutable content
+    immutable struct Array // TODO: should be a const class with immutable content
     {
         Oid OID;
         int nDims; /// Number of dimensions
