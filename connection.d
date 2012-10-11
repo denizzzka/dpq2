@@ -49,7 +49,7 @@ class BaseConnection
             PGconn* conn;
             answerHandler dg;
         }
-        static registredHandler handlers[];
+        static registredHandler handlers[]; // TODO: list would be better
         
         version(Release){}else
         {
