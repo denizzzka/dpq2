@@ -153,7 +153,6 @@ class BaseConnection
                 return ERROR; // handler not found
                 
             default:
-                //debug s ~= "some event ";
                 return OK;
         }
     }
