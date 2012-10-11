@@ -143,7 +143,7 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
 
 nothrow void attention()
 {
-    debug s ~= "delegate! ";
+    debug s ~= "delegate!"~evtId~" ";
 }
 
 void _unittest( string connParam )
