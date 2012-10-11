@@ -126,7 +126,7 @@ class BaseConnection
         
         this()
         {
-            this( to!string( PQstatus(conn) ) );
+            this( to!string( PQstatus(conn) ) ); // FIXME: need text representation of PQstatus
         }
     }
 }
