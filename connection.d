@@ -55,7 +55,7 @@ class BaseConnection
         
         if( !asyncFlag && m )
         {
-            //auto res = PQregisterEventProc(conn, null,
+            //auto res = PQregisterEventProc(conn, &eventProc,
                 //const char *name, void *passThrough);
         }
         asyncFlag = m;
@@ -98,11 +98,16 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
-    private size_t eventProc(PGEventId evtId, void *evtInfo, void *passThrough)
+    private size_t PGEventProc(PGEventId evtId, void *evtInfo, void *passThrough)
     {
         import std.stdio;
         writeln( evtId );
         return 1;
+    }
+    
+    private size_t registerEventProc( string name, void *passThrough)
+    {
+        return PQregisterEventProc(conn, null, toStringz(name), passThrough);
     }
     
     ~this()
@@ -133,6 +138,4 @@ void _unittest( string connParam )
     c.connect();
     c.async = true;
     c.disconnect();
-    
-    
 }

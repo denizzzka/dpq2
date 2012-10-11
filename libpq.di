@@ -237,7 +237,9 @@ PQERRORS_VERBOSE,
     int PQenv2encoding();
     char* PQencryptPassword(char* passwd, char* user);
     
-    enum PGEventId
+    alias size_t (*PGEventProc) (PGEventId evtId, void* evtInfo, void* passThrough); // used!
+    size_t PQregisterEventProc(PGconn *conn, PGEventProc proc, immutable char* name, void *passThrough); // used!
+    enum PGEventId // used
     {
         PGEVT_REGISTER,
         PGEVT_CONNRESET,
