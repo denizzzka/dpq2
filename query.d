@@ -197,7 +197,6 @@ void _unittest( string connParam )
     auto r2 = conn.exec( p );
     
     
-    debug static string s;
     auto c = new Connection;
     c.connString = connParam;
     c.connect;
@@ -211,4 +210,7 @@ void _unittest( string connParam )
     
     import std.stdio;
     writeln(Connection.s);
+    
+    writeln( an );
+    writeln( an[0,2].as!PGinteger );
 }
