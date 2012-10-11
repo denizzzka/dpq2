@@ -148,8 +148,8 @@ PQERRORS_VERBOSE,
     void* PQgetssl(PGconn* conn);
     void PQinitSSL(int do_init);
     PGVerbosity PQsetErrorVerbosity(PGconn* conn, PGVerbosity verbosity);
-    void PQtrace(PGconn* conn, FILE* debug_port);
-    void PQuntrace(PGconn* conn);
+    void PQtrace(PGconn* conn, FILE* debug_port); // used!
+    void PQuntrace(PGconn* conn); // used!
     alias void function(void* arg, PGresult* res) PQnoticeReceiver;
     alias void function(void* arg, char* message) PQnoticeProcessor;
     PQnoticeReceiver PQsetNoticeReceiver(PGconn* conn, PQnoticeReceiver proc, void* arg);

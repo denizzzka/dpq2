@@ -175,7 +175,7 @@ void _unittest( string connParam )
     string sql_query =
     "select now() as time, 'abc'::text as string, 123, 456.78\n"
     "union all\n"
-    "select now(), 'def'::text, 456, 910.11\n"
+    "select now(), 'def'::text, 777, 910.11\n"
     "union all\n"
     "select NULL, 'ijk'::text, 789, 12345.115345";
 
@@ -207,10 +207,12 @@ void _unittest( string connParam )
     
     import core.thread: sleep;
     sleep( 1 );
+    c.flush();
+    sleep( 1 );
     
     import std.stdio;
     writeln(Connection.s);
     
     writeln( an );
-    writeln( an[0,2].as!PGinteger );
+    //writeln( an[0,2].as!PGinteger );
 }
