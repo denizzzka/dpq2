@@ -51,7 +51,7 @@ class BaseConnection
 
     @property bool async( bool m )
     {
-        assert( asyncFlag && !m, "pqlib can't change mode from async to sync" );
+        assert( !(asyncFlag && !m), "pqlib can't change mode from async to sync" );
         
         if( !asyncFlag && m )
         {
@@ -135,7 +135,7 @@ void _unittest( string connParam )
     auto c = new BaseConnection;
 	c.connString = connParam;
     c.connect();
-    c.asyncFlag = true;
+    c.async = true;
     c.disconnect();
     
     
