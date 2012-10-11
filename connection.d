@@ -105,6 +105,35 @@ class BaseConnection
             throw new exception( "Error in "~name~" event handler" ); // FIXME: need to get more info from conn
     }
     
+    
+    private static nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
+    {
+        // список делегатов для всех коннекций с пометкой к какому PGEventId присоединены
+        
+        struct ds
+        {
+            PGconn* conn;
+            nothrow void delegate(string msg) dg;
+        }
+        
+        //PGEventResultCreate
+        
+        switch( evtId )
+        {
+            case PGEventId.PGEVT_REGISTER:
+                debug s ~= "PGEVT_REGISTER ";
+                break;
+            case PGEventId.PGEVT_RESULTCREATE:
+                auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
+                auto r = new Answer( info.result );
+                attention( r );
+                break;
+            default:
+        }
+        
+        return 1; // always OK
+    }
+    
     ~this()
     {
         disconnect();
@@ -125,34 +154,6 @@ class BaseConnection
             this( to!string( PQstatus(conn) ) ); // FIXME: need text representation of PQstatus result
         }
     }
-}
-
-private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, void* passThrough)
-{
-    // список делегатов для всех коннекций с пометкой к какому PGEventId присоединены
-    
-    struct ds
-    {
-        PGconn* conn;
-        nothrow void delegate(string msg) dg;
-    }
-    
-    //PGEventResultCreate
-    
-    switch( evtId )
-    {
-        case PGEventId.PGEVT_REGISTER:
-            debug s ~= "PGEVT_REGISTER ";
-            break;
-        case PGEventId.PGEVT_RESULTCREATE:
-            auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
-            auto r = new Answer( info.result );
-            attention( r );
-            break;
-        default:
-    }
-    
-    return 1; // can drop error in PQresult by returning 0
 }
 
 nothrow void attention( immutable Answer a )
