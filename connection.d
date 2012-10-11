@@ -11,8 +11,6 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
-debug static string s;
-
 /*
  * Bugs: On Unix connection is not thread safe.
  * 
@@ -57,6 +55,7 @@ class BaseConnection
         {
         }
     }
+    debug static string s;
     
     @property bool async(){ return asyncFlag; }
 
@@ -69,6 +68,11 @@ class BaseConnection
 
         asyncFlag = m;
         return asyncFlag;
+    }
+    
+    void setNonBlocking( bool state )
+    {
+        PQsetnonblocking(conn, state ? 1 : 0 );
     }
     
 	/// Connect to DB
@@ -130,7 +134,9 @@ class BaseConnection
             case PGEventId.PGEVT_REGISTER:
                 debug s ~= "PGEVT_REGISTER ";
                 return OK;
+                
             case PGEventId.PGEVT_RESULTCREATE:
+                debug s ~= "PGEVT_RESULTCREATE ";
                 auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
                 auto a = new Answer( info.result );
                 foreach( d; handlers )
@@ -142,6 +148,7 @@ class BaseConnection
                     }
                 }
                 return ERROR; // handler not found
+                
             default:
         }
         
@@ -170,11 +177,6 @@ class BaseConnection
     }
 }
 
-nothrow void attention( immutable Answer a )
-{
-    debug s ~= "answer! ";
-}
-
 void _unittest( string connParam )
 {    
     assert( PQlibVersion() >= 90100 );
@@ -182,10 +184,7 @@ void _unittest( string connParam )
     auto c = new BaseConnection;
 	c.connString = connParam;
     c.connect();
-    c.async = true;
-    c.addHandler( (immutable Answer a){} );
+    //c.async = true;
+    //c.addHandler( (immutable Answer a){} );
     c.disconnect();
-    
-    import std.stdio;
-    writeln(s);
 }

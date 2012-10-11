@@ -84,7 +84,7 @@ final class Connection: BaseConnection
                         p.resultFormat                        
                     );
         
-        if( r ) throw new exception();
+        if( !r ) throw new exception();
     }
     
     /// Waits for the next result from a sendQuery
@@ -196,10 +196,17 @@ void _unittest( string connParam )
 
     auto r2 = conn.exec( p );
     
+    
+    debug static string s;
     auto c = new Connection;
     c.connString = connParam;
     c.connect;
-    //c.async = true;
-    //c.addHandler( (immutable Answer a){} );
+    c.async = true;
+    c.addHandler( (immutable Answer a){} );
     c.sendQuery( p );
+    c.flush();
+    
+    //while( c.isBusy() ){}
+    import std.stdio;
+    writeln(Connection.s);
 }

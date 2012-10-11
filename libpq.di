@@ -176,7 +176,7 @@ PQERRORS_VERBOSE,
     int PQgetlineAsync(PGconn* conn, char* buffer, int bufsize);
     int PQputnbytes(PGconn* conn, char* buffer, int nbytes);
     int PQendcopy(PGconn* conn);
-    int PQsetnonblocking(PGconn* conn, int arg);
+    size_t PQsetnonblocking(PGconn* conn, size_t arg); // used!
     int PQisnonblocking(PGconn* conn);
     size_t PQisthreadsafe(); //
     size_t PQflush(PGconn* conn); // used!
