@@ -144,9 +144,7 @@ class BaseConnection
                 {
                     if( d.conn == info.conn )
                     {
-                        d.dg( a );
-                        
-                        // FIXME: need to return Answer[] and remove handler
+                        d.dg( a ); // FIXME: need to return Answer[] and remove handler
                         return OK; // handler found
                     }
                 }
