@@ -110,7 +110,7 @@ class BaseConnection
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
-            throw new exception( "Error in "~name~" event handler: delegate not found" );
+            throw new exception( "Error in "~name~" event handler" );
     }
     
     void addHandler( answerHandler h )
