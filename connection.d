@@ -101,7 +101,15 @@ class BaseConnection
     {
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
-
+    
+    // PQ callback
+    private size_t eventProc(PGEventId evtId, void *evtInfo, void *passThrough)
+    {
+        import std.stdio;
+        writeln( evtId );
+        return 1;
+    }
+    
     ~this()
     {
         disconnect();
