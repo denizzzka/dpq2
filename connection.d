@@ -72,7 +72,8 @@ class BaseConnection
     
     package void setNonBlocking( bool state )
     {
-        PQsetnonblocking(conn, state ? 1 : 0 );
+        if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
+            throw new exception();
     }
     
 	/// Connect to DB
