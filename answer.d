@@ -30,7 +30,7 @@ alias SysTime PGtime_stamp; /// time stamp with/without timezone
 /// Answer
 class Answer
 {
-    private immutable PGresult* res;
+    private immutable PGresult* res; // TODO: should be mutable
     
     /// Result table's cell coordinates 
     struct Coords
