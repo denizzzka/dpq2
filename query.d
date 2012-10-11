@@ -195,4 +195,11 @@ void _unittest( string connParam )
     p.args = args;
 
     auto r2 = conn.exec( p );
+    
+    auto c = new Connection;
+    c.connString = connParam;
+    c.connect;
+    c.async = true;
+    //c.addHandler( (immutable Answer a){} );
+    c.sendQuery( p );
 }

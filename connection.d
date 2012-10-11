@@ -60,7 +60,7 @@ class BaseConnection
     
     @property bool async(){ return asyncFlag; }
 
-    @property bool async( bool m )
+    @property bool async( bool m ) // FIXME: need to disable after connect or immutable connection params
     {
         assert( !(asyncFlag && !m), "pqlib can't change mode from async to sync" );
         
@@ -183,6 +183,7 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.async = true;
+    c.addHandler( (immutable Answer a){} );
     c.disconnect();
     
     import std.stdio;
