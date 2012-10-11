@@ -32,13 +32,13 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 class BaseConnection
 {
     string connString; /// Database connection parameters
-    connVariant connType = connVariant.SYNC; /// Connection type variant
-
+    
     package PGconn* conn;
     private
     {
         bool connectingInProgress;
         bool readyForQuery;
+        connVariant syncModeFlag = connVariant.SYNC;
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
@@ -47,10 +47,20 @@ class BaseConnection
         
         version(Release){}else
         {
-            bool xxx; // not used
         }
     }
+    
+    @property connVariant syncMode(){ return syncModeFlag; }
 
+    @property connVariant syncMode( connVariant v )
+    {
+        assert( syncModeFlag == connVariant.ASYNC && v == connVariant.SYNC,
+            "pqlib can't change mode from async to sync" );
+
+        syncModeFlag = v;
+        return v;
+    }
+    
 	/// Connect to DB
     void connect()
     {
@@ -60,7 +70,7 @@ class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if(connType == connVariant.SYNC &&
+        if(syncMode == connVariant.SYNC &&
            PQstatus(conn) != ConnStatusType.CONNECTION_OK)
             throw new exception();
         
