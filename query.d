@@ -204,9 +204,10 @@ void _unittest( string connParam )
     c.async = true;
     c.addHandler( (immutable Answer a){} );
     c.sendQuery( p );
-    c.flush();
+    //c.flush();
     
-    //while( c.isBusy() ){}
+    while( c.isBusy() ){ }
+    
     import std.stdio;
     writeln(Connection.s);
 }

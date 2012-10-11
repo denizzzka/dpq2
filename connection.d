@@ -145,12 +145,15 @@ class BaseConnection
                     if( d.conn == info.conn )
                     {
                         d.dg( a );
+                        
+                        // FIXME: need to remove handler if next PQget returns null
                         return OK; // handler found
                     }
                 }
                 return ERROR; // handler not found
                 
             default:
+            debug s ~= "event #"~evtId.stringof;
         }
         
         return ERROR;
