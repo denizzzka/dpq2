@@ -199,7 +199,7 @@ void _unittest( string connParam )
     auto c = new Connection;
     c.connString = connParam;
     c.connect;
-    c.async = true;
+    //c.async = true;
     //c.addHandler( (immutable Answer a){} );
     c.sendQuery( p );
 }
