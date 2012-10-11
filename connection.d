@@ -138,10 +138,10 @@ class BaseConnection
                     if( d.conn == info.conn )
                     {
                         d.dg( a );
-                        return OK;
+                        return OK; // handler found
                     }
                 }
-                break;
+                return ERROR; // handler not found
             default:
         }
         
