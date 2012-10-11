@@ -160,7 +160,7 @@ final class Connection: BaseConnection
     // It is important to do a separate check because of Answer ctor is nothrow
     private Answer getAnswer( immutable PGresult* r )
     {
-        auto res = new Answer( r );
+        auto res = new Answer( cast(PGresult*) r );
         res.checkAnswerForErrors();
         return res;
     }

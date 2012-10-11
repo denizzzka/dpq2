@@ -138,20 +138,24 @@ class BaseConnection
                 
             case PGEventId.PGEVT_RESULTCREATE:
                 debug s ~= "PGEVT_RESULTCREATE ";
-                auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
-                auto a = new Answer( info.result );
+                auto info = cast(PGEventResultCreate*) evtInfo;
                 foreach( d; handlers )
                 {
                     if( d.conn == info.conn )
                     {
-                        d.dg( a ); // FIXME: need to return Answer[] and remove handler
+                        Answer a;
+                        while( a = new Answer( info.result ), a )
+                        {
+                            d.dg( a );
+                        }
+                        // FIXME: here is need to remove handler
                         return OK; // handler found
                     }
                 }
                 return ERROR; // handler not found
                 
             default:
-                return OK;
+                return OK; // other events
         }
     }
     

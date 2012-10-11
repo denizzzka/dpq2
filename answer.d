@@ -240,9 +240,9 @@ class Answer // most members should be a const
         }
     }
     
-    package this(immutable PGresult* r) nothrow
+    package this(PGresult* r) nothrow
     {
-        res = r;
+        res = cast(immutable PGresult*) r;
     }
     
     ~this() {
