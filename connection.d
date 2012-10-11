@@ -4,6 +4,7 @@ module dpq2.connection;
 @trusted:
 
 import dpq2.libpq;
+import dpq2.answer;
 
 import std.conv: to;
 import std.string: toStringz;
@@ -141,13 +142,12 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
     switch( evtId )
     {
         case PGEventId.PGEVT_REGISTER:
-            attention("PGEVT_REGISTER");
+            debug s ~= "PGEVT_REGISTER ";
             break;
         case PGEventId.PGEVT_RESULTCREATE:
             auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
-            import dpq2.answer: answer;
             auto r = new answer( info.result );
-            attention("PGEVT_RESULTCREATE");
+            attention( r );
             break;
         default:
     }
@@ -155,9 +155,9 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
     return 1;
 }
 
-nothrow void attention(string msg)
+nothrow void attention( immutable answer a )
 {
-    debug s ~= msg~" ";
+    debug s ~= "answer! ";
 }
 
 void _unittest( string connParam )
