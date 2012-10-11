@@ -40,7 +40,7 @@ class Answer // most members should be a const
     }
 
     /// Result table's cell
-    immutable struct Value // TODO: should be a const class with const members
+    immutable struct Value // TODO: should be a const struct with const members without copy ability or class
     {
         private ubyte[] value;
         debug private dpq2.libpq.valueFormat format;
@@ -107,7 +107,7 @@ class Answer // most members should be a const
         }
     }
         
-    immutable struct Array // TODO: should be a const class with immutable content
+    immutable struct Array // TODO: should be a const struct with const members without copy ability or class
     {
         Oid OID;
         int nDims; /// Number of dimensions
