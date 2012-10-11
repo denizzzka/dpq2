@@ -240,7 +240,7 @@ class Answer
         }
     }
     
-    package this(immutable PGresult* r) nothrow // FIXME: really this() can throw!
+    package this(immutable PGresult* r) nothrow
     {
         res = r;
     }
