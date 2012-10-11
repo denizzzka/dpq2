@@ -240,7 +240,7 @@ immutable class answer
         }
     }
     
-    package this(immutable PGresult* r) immutable
+    package this(immutable PGresult* r) immutable nothrow
     {
         res = r;
         enforceEx!OutOfMemoryError(res, "Can't write query result");
