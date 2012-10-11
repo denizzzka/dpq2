@@ -98,16 +98,16 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
-    private size_t PGEventProc(PGEventId evtId, void *evtInfo, void *passThrough)
+    private static nothrow extern (C) size_t test(PGEventId evtId, void *evtInfo, void *passThrough)
     {
-        import std.stdio;
-        writeln( evtId );
+        //import std.stdio;
+        //writeln( evtId );
         return 1;
     }
     
-    private size_t registerEventProc( string name, void *passThrough)
+    private size_t registerEventProc( PGEventProc proc, string name, void *passThrough)
     {
-        return PQregisterEventProc(conn, null, toStringz(name), passThrough);
+        return PQregisterEventProc(conn, proc, toStringz(name), passThrough);
     }
     
     ~this()
@@ -137,5 +137,6 @@ void _unittest( string connParam )
 	c.connString = connParam;
     c.connect();
     c.async = true;
+    c.registerEventProc( &BaseConnection.test, "test event", null );
     c.disconnect();
 }
