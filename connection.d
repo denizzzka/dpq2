@@ -85,10 +85,6 @@ class BaseConnection
             readyForQuery = false;
             PQfinish( conn );
         }
-        else
-        {
-            assert("Not connected yet!");
-        }
     }
 
     package void consumeInput()
