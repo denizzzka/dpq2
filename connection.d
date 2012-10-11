@@ -103,7 +103,7 @@ class BaseConnection
         return evtId;
     }
     
-    private size_t registerEventProc( PGEventProc proc, string name, void *passThrough)
+    private size_t registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         return PQregisterEventProc(conn, proc, toStringz(name), passThrough);
     }
