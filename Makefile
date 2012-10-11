@@ -1,7 +1,7 @@
 DFILES = libpq.di connection.d query.d answer.d unittests_main.d
 ONAME = libdpq2
 DC = dmd
-COMMON = $(DC) $(DFILES) -w -d -of$(ONAME)
+COMMON = $(DC) $(DFILES) -w -of$(ONAME)
 
 DEBUG = $(COMMON) -g -debug -lib
 RELEASE = $(COMMON) -release -O -lib
