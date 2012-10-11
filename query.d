@@ -32,20 +32,20 @@ struct queryArg
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    immutable (answer) exec( string SQLcmd )
+    immutable (Answer) exec( string SQLcmd )
     {
         assert( !async );
-        return new answer(
+        return getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
     }
 
     /// Perform SQL query to DB
-    immutable (answer) exec(ref const queryParams p)
+    immutable (Answer) exec(ref const queryParams p)
     {
         assert( !async );
         auto a = prepareArgs( p );
-        return new answer
+        return getAnswer
         (
             PQexecParams (
                 conn,
@@ -88,9 +88,9 @@ final class Connection: BaseConnection
     }
     
     /// Waits for the next result from a sendQuery
-    immutable (answer) getResult()
+    immutable (Answer) getResult()
     {
-        return new answer( PQgetResult( conn ) );
+        return getAnswer( PQgetResult( conn ) );
     }
     
     /// getResult would block waiting for input?
@@ -155,6 +155,14 @@ final class Connection: BaseConnection
             }
         }
         return a;
+    }
+    
+    // It is important to do a separate check because of Answer ctor is nothrow
+    private immutable (Answer) getAnswer( immutable PGresult* r )
+    {
+        auto res = new Answer( r );
+        res.checkAnswerForErrors();
+        return res;
     }
 }
 

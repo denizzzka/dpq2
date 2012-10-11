@@ -146,7 +146,7 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
             break;
         case PGEventId.PGEVT_RESULTCREATE:
             auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
-            auto r = new answer( info.result );
+            auto r = new Answer( info.result );
             attention( r );
             break;
         default:
@@ -155,7 +155,7 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
     return 1; // can drop error in PQresult by returning 0
 }
 
-nothrow void attention( immutable answer a )
+nothrow void attention( immutable Answer a )
 {
     debug s ~= "answer! ";
 }

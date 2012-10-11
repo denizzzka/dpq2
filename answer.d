@@ -28,7 +28,7 @@ alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
-immutable class answer
+immutable class Answer
 {
     private PGresult* res;
     
@@ -243,6 +243,14 @@ immutable class answer
     package this(immutable PGresult* r) immutable nothrow // FIXME: really this() can throw!
     {
         res = r;
+    }
+    
+    ~this() {
+        PQclear(res);
+    }
+    
+    package void checkAnswerForErrors()
+    {
         enforceEx!OutOfMemoryError(res, "Can't write query result");
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
@@ -252,10 +260,6 @@ immutable class answer
         }
     }
     
-    ~this() {
-        PQclear(res);
-    }
-
     ExecStatusType status()
     {
         return PQresultStatus(res);
@@ -431,7 +435,7 @@ void _unittest( string connParam )
 
     auto e = conn.exec( sql_query );
     
-    alias answer.Coords Coords;
+    alias Answer.Coords Coords;
 
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
