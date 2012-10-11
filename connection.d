@@ -102,7 +102,7 @@ class BaseConnection
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
-            throw new exception( "Can't register "~name~" event handler" );
+            throw new exception( "Error in "~name~" event handler" ); // FIXME: need to get more info from conn
     }
     
     ~this()
@@ -152,7 +152,7 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
         default:
     }
     
-    return 1;
+    return 1; // can drop error in PQresult by returning 0
 }
 
 nothrow void attention( immutable answer a )
