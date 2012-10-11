@@ -236,5 +236,14 @@ PQERRORS_VERBOSE,
     int PQdsplen(char* s, int encoding);
     int PQenv2encoding();
     char* PQencryptPassword(char* passwd, char* user);
+    
+    enum PGEventId
+    {
+        PGEVT_REGISTER,
+        PGEVT_CONNRESET,
+        PGEVT_CONNDESTROY,
+        PGEVT_RESULTCREATE,
+        PGEVT_RESULTCOPY,
+        PGEVT_RESULTDESTROY
+    }
 }
-

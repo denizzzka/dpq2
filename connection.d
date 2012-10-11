@@ -31,17 +31,25 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 /// BaseConnection
 class BaseConnection
 {
-    package PGconn* conn;
-    private bool connectingInProgress;
-    private bool readyForQuery;
-    private enum ConsumeResult
-    {
-        PQ_CONSUME_ERROR,
-        PQ_CONSUME_OK
-    }
-    
     string connString; /// Database connection parameters
-	connVariant connType = connVariant.SYNC; /// Connection type variant
+    connVariant connType = connVariant.SYNC; /// Connection type variant
+
+    package PGconn* conn;
+    private
+    {
+        bool connectingInProgress;
+        bool readyForQuery;
+        enum ConsumeResult
+        {
+            PQ_CONSUME_ERROR,
+            PQ_CONSUME_OK
+        }
+        
+        version(Release){}else
+        {
+            bool xxx; // not used
+        }
+    }
 
 	/// Connect to DB
     void connect()
