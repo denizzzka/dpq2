@@ -34,7 +34,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     immutable (answer) exec( string SQLcmd )
     {
-        assert( syncMode == connVariant.SYNC );
+        assert( !asyncMode );
         return new answer(
             PQexec(conn, toStringz( SQLcmd ))
         );
@@ -43,7 +43,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     immutable (answer) exec(ref const queryParams p)
     {
-        assert( syncMode == connVariant.SYNC );
+        assert( !asyncMode );
         auto a = prepareArgs( p );
         return new answer
         (
@@ -63,7 +63,7 @@ final class Connection: BaseConnection
     /// Submits a command to the server without waiting for the result(s)
     void sendQuery( string SQLcmd )
     {
-        assert( syncMode == connVariant.ASYNC );
+        assert( asyncMode );
         size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
         if( r ) throw new exception();
     }
@@ -71,7 +71,7 @@ final class Connection: BaseConnection
     /// Submits a command and separate parameters to the server without waiting for the result(s)
     void sendQuery( ref const queryParams p )
     {
-        assert( syncMode == connVariant.ASYNC );
+        assert( asyncMode );
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
                         conn,

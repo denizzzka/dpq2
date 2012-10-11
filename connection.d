@@ -10,9 +10,6 @@ import std.string: toStringz;
 import std.exception;
 import core.exception;
 
-/// Available connection types
-enum connVariant { SYNC, ASYNC };
-
 /*
  * Bugs: On Unix connection is not thread safe.
  * 
@@ -38,7 +35,7 @@ class BaseConnection
     {
         bool connectingInProgress;
         bool readyForQuery;
-        connVariant syncModeFlag = connVariant.SYNC;
+        bool asyncModeFlag = false;
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
@@ -50,15 +47,19 @@ class BaseConnection
         }
     }
     
-    @property connVariant syncMode(){ return syncModeFlag; }
+    @property bool asyncMode(){ return asyncModeFlag; }
 
-    @property connVariant syncMode( connVariant v )
+    @property bool asyncMode( bool m )
     {
-        assert( syncModeFlag == connVariant.ASYNC && v == connVariant.SYNC,
-            "pqlib can't change mode from async to sync" );
-
-        syncModeFlag = v;
-        return v;
+        assert( asyncModeFlag && !m, "pqlib can't change mode from async to sync" );
+        
+        if( !asyncModeFlag && m )
+        {
+            //auto res = PQregisterEventProc(conn, null,
+                //const char *name, void *passThrough);
+        }
+        asyncModeFlag = m;
+        return asyncModeFlag;
     }
     
 	/// Connect to DB
@@ -70,8 +71,7 @@ class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if(syncMode == connVariant.SYNC &&
-           PQstatus(conn) != ConnStatusType.CONNECTION_OK)
+        if( !asyncMode && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
             throw new exception();
         
         readyForQuery = true;
