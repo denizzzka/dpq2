@@ -146,17 +146,16 @@ class BaseConnection
                     {
                         d.dg( a );
                         
-                        // FIXME: need to remove handler if next PQget returns null
+                        // FIXME: need to return Answer[] and remove handler
                         return OK; // handler found
                     }
                 }
                 return ERROR; // handler not found
                 
             default:
-            debug s ~= "event #"~evtId.stringof;
+                //debug s ~= "some event ";
+                return OK;
         }
-        
-        return ERROR;
     }
     
     ~this()

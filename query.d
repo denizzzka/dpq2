@@ -202,11 +202,12 @@ void _unittest( string connParam )
     c.connString = connParam;
     c.connect;
     c.async = true;
-    c.addHandler( (immutable Answer a){} );
+    immutable (Answer)* an;
+    c.addHandler( (immutable Answer a){ an = a; } );
     c.sendQuery( p );
-    //c.flush();
     
-    while( c.isBusy() ){ }
+    import core.thread: sleep;
+    sleep( 1 );
     
     import std.stdio;
     writeln(Connection.s);

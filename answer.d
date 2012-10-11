@@ -246,7 +246,7 @@ immutable class Answer
     }
     
     ~this() {
-        PQclear(res);
+        if( res ) PQclear(res);
     }
     
     package void checkAnswerForErrors()
