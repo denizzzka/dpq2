@@ -28,7 +28,7 @@ alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
-class Answer
+class Answer // most members should be a const
 {
     private immutable PGresult* res; // TODO: should be mutable
     
