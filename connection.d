@@ -144,7 +144,10 @@ private nothrow extern (C) size_t eventHandler(PGEventId evtId, void* evtInfo, v
             attention("PGEVT_REGISTER");
             break;
         case PGEventId.PGEVT_RESULTCREATE:
-            attention("RESULTCREATE");
+            auto info = cast(immutable(PGEventResultCreate*)) evtInfo;
+            import dpq2.answer: answer;
+            auto r = new answer( info.result );
+            attention("PGEVT_RESULTCREATE");
             break;
         default:
     }
