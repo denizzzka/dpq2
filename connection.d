@@ -35,7 +35,7 @@ class BaseConnection
     {
         bool connectingInProgress;
         bool readyForQuery;
-        bool asyncModeFlag = false;
+        bool asyncFlag = false;
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
@@ -47,19 +47,19 @@ class BaseConnection
         }
     }
     
-    @property bool asyncMode(){ return asyncModeFlag; }
+    @property bool async(){ return asyncFlag; }
 
-    @property bool asyncMode( bool m )
+    @property bool async( bool m )
     {
-        assert( asyncModeFlag && !m, "pqlib can't change mode from async to sync" );
+        assert( asyncFlag && !m, "pqlib can't change mode from async to sync" );
         
-        if( !asyncModeFlag && m )
+        if( !asyncFlag && m )
         {
             //auto res = PQregisterEventProc(conn, null,
                 //const char *name, void *passThrough);
         }
-        asyncModeFlag = m;
-        return asyncModeFlag;
+        asyncFlag = m;
+        return asyncFlag;
     }
     
 	/// Connect to DB
@@ -71,7 +71,7 @@ class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if( !asyncMode && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
+        if( !async && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
             throw new exception();
         
         readyForQuery = true;
@@ -102,7 +102,6 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
-    // PQ callback
     private size_t eventProc(PGEventId evtId, void *evtInfo, void *passThrough)
     {
         import std.stdio;
@@ -136,5 +135,8 @@ void _unittest( string connParam )
     auto c = new BaseConnection;
 	c.connString = connParam;
     c.connect();
+    c.asyncFlag = true;
     c.disconnect();
+    
+    
 }
