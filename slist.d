@@ -2,25 +2,25 @@
 module dpq2.slist;
 @trusted:
 
-import core.atomic;
-
-shared struct Container
-{
-    Container* next;
-    int value;
-    this( int value ) shared
-    {
-        this.value = value;
-    }
-}
+import core.atomic: cas;
 
 shared struct SList
 {
+    shared struct Container
+    {
+        Container* next;
+        int value;
+        this( int value ) shared
+        {
+            this.value = value;
+        }
+    }
+    
     private Container* root;
     
-    void pushBack( int newValue )
+    void pushBack( int newValue ) shared
     {
-        shared Container* n = new Container( newValue );
+        auto n = new Container( newValue );
         
         do {
             n.next = root;
@@ -30,6 +30,6 @@ shared struct SList
 
 unittest
 {
-    SList l;
-    //l.pushBack( 1 );
+    shared SList l;
+    l.pushBack( 1 );
 }
