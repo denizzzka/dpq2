@@ -48,9 +48,9 @@ class BaseConnection
         struct registredHandlers
         {
             PGconn* conn;
-            answerHandler[] connSpecHandlers; // TODO: list would be better?
+            answerHandler[] connSpecHandlers; // TODO: list would be better and thread-safe?
         }
-        static registredHandlers[] handlers; // TODO: list would be better?
+        public static registredHandlers[] handlers; // TODO: list would be better and thread-safe?
         
         version(Release){}else
         {
@@ -122,17 +122,11 @@ class BaseConnection
     
     package void addHandler( answerHandler h )
     {
-        import std.stdio;
-        writeln( handlers );
-        
         registredHandlers s;
         s.conn = conn;
         s.connSpecHandlers ~= h;
         
         handlers ~= s;
-        
-        import std.stdio;
-        writeln( handlers );
     }
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* passThrough)
@@ -149,26 +143,29 @@ class BaseConnection
                 auto info = cast(PGEventResultCreate*) evtInfo;
                 debug s ~= info.conn != null ? "true " : "false ";
                 answerHandler h;
+                size_t i; // current conn index in handlers array
                 
                 // handler search
-                foreach( d; handlers )
+                for( i = 0; i < handlers.length; ++i )
                 {
-                    if( d.conn == info.conn )
+                    if( handlers[i].conn == info.conn )
                     {
-                        h = d.connSpecHandlers[0]; // oldest registred
+                        h = handlers[i].connSpecHandlers[0]; // oldest registred
                         break;
                     }
                 }
                 
+                // call handler for every result
                 PGresult* r;
                 while( r = PQgetResult(info.conn), r )
                 {
                     debug s ~= "result_received ";
-                    if( h!= null) // handler was found previously
+                    if( h != null) // handler was found previously
                         h( new Answer(r) );
                 }
                 
-                // FIXME: here is need to remove handler
+                // need to remove used handler
+                //if( h != null ) handlers[i].connSpecHandlers.popFront;
                 return OK; // all results processed
                 
             default:

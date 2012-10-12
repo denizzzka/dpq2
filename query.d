@@ -196,6 +196,7 @@ void _unittest( string connParam )
 
     auto r2 = conn.exec( p );
     
+    import std.stdio;
     
     auto c = new Connection;
     c.connString = connParam;
@@ -203,7 +204,9 @@ void _unittest( string connParam )
     c.setNonBlocking( true );
     c.async = true;
     Answer[] an;
+    writeln( c.handlers );
     c.addHandler( (Answer a){ an ~= a; } );
+    writeln( c.handlers );
     import core.thread: sleep;
     sleep( 1 );
     c.exec( "select 1; select 2; select 3;" );
@@ -212,7 +215,8 @@ void _unittest( string connParam )
     sleep( 1 );
     //while( c.isBusy() ){}
     
-    import std.stdio;
+    writeln( c.handlers );
+
     writeln(Connection.s);
     writeln( an );
     writeln( an[0][0,0].as!PGtext );
