@@ -140,7 +140,7 @@ class BaseConnection
                 answerHandler h;
                 connSpecHandlers* l = ( info.conn in handlers );
                 if( l !is null )
-                    h = (*l).moveFront(); // oldest registred
+                    h = (*l).moveFront(); // get oldest registred handler
                 
                 // fetch every result
                 PGresult* r;
