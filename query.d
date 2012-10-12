@@ -224,7 +224,7 @@ void _unittest( string connParam )
     writeln( c.handlers );
     
     import std.range: moveFront;
-    //auto h = c.handlers[0].connSpecHandlers;
+    auto h = c.handlers[c.conn];
     //h.moveFront();
-    writeln( c.handlers );
+    writeln( h );
 }
