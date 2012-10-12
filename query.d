@@ -43,7 +43,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec(ref const queryParams p)
     {
-        //assert( !async );
+        assert( !async );
         auto a = prepareArgs( p );
         return getAnswer
         (
@@ -65,7 +65,7 @@ final class Connection: BaseConnection
     {
         assert( async );
         size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
-        if( r ) throw new exception();
+        if( !r ) throw new exception();
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -203,15 +203,13 @@ void _unittest( string connParam )
     c.async = true;
     Answer an;
     c.addHandler( (Answer a){ an = a; } );
-    //import dpq2.libpq: PQsetInstanceData;
     import core.thread: sleep;
     sleep( 1 );
-    c.exec( p );
+    c.sendQuery( p );
     sleep( 1 );
     
     import std.stdio;
     writeln(Connection.s);
-    
     writeln( an );
-    //writeln( an[0,2].as!PGinteger );
+    writeln( an[0,0].as!PGinteger );
 }

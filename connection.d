@@ -137,7 +137,6 @@ class BaseConnection
                 return OK;
                 
             case PGEventId.PGEVT_RESULTCREATE:
-                debug s ~= "PGEVT_RESULTCREATE ";
                 auto info = cast(PGEventResultCreate*) evtInfo;
                 foreach( d; handlers )
                 {
@@ -146,6 +145,7 @@ class BaseConnection
                         PGresult* r;
                         while( r = PQgetResult(info.conn), r )
                         {
+                            debug s ~= "PGEVT_RESULTCREATE ";
                             auto a = new Answer( r );
                             d.dg( a );
                         }
