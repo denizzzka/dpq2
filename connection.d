@@ -9,6 +9,7 @@ import dpq2.answer;
 import std.conv: to;
 import std.string: toStringz;
 import std.exception;
+import std.array;
 import core.exception;
 
 /*
@@ -44,12 +45,12 @@ class BaseConnection
         }
         
         alias nothrow void delegate( Answer a ) answerHandler;
-        struct registredHandler
+        struct registredHandlers
         {
             PGconn* conn;
-            answerHandler dg;
+            answerHandler[] connSpecHandlers;
         }
-        static registredHandler handlers[]; // TODO: list would be better
+        static registredHandlers[] handlers; // TODO: list would be better?
         
         version(Release){}else
         {
@@ -123,10 +124,13 @@ class BaseConnection
     {
         import std.stdio;
         writeln( handlers );
-        registredHandler s;
+        
+        registredHandlers s;
         s.conn = conn;
-        s.dg = h;
+        s.connSpecHandlers ~= h;
+        
         handlers ~= s;
+        
         import std.stdio;
         writeln( handlers );
     }
@@ -151,7 +155,7 @@ class BaseConnection
                 {
                     if( d.conn == info.conn )
                     {
-                        h = d.dg;
+                        h = d.connSpecHandlers[0]; // oldest registred
                         break;
                     }
                 }
