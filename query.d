@@ -200,7 +200,7 @@ void _unittest( string connParam )
     auto c = new Connection;
     c.connString = connParam;
     c.connect;
-    c.setNonBlocking( true );
+    //c.setNonBlocking( true );
     c.async = true;
     Answer an;
     c.addHandler( (Answer a){ an = a; } );
