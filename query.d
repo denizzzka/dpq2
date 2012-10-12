@@ -202,8 +202,8 @@ void _unittest( string connParam )
     c.connect;
     c.setNonBlocking( true );
     c.async = true;
-    Answer an;
-    c.addHandler( (Answer a){ an = a; } );
+    Answer[] an;
+    c.addHandler( (Answer a){ an ~= a; } );
     import core.thread: sleep;
     sleep( 1 );
     c.exec( "select 1; select 2; select 3;" );
@@ -215,5 +215,6 @@ void _unittest( string connParam )
     import std.stdio;
     writeln(Connection.s);
     writeln( an );
-    writeln( an[0,0].as!PGtext );
+    writeln( an[0][0,0].as!PGtext );
+    writeln( an[1][0,0].as!PGtext );
 }
