@@ -9,7 +9,7 @@ import dpq2.answer;
 import std.conv: to;
 import std.string: toStringz;
 import std.exception;
-import std.array;
+import std.range;
 import core.exception;
 
 /*
@@ -143,30 +143,27 @@ class BaseConnection
                 auto info = cast(PGEventResultCreate*) evtInfo;
                 debug s ~= info.conn != null ? "true " : "false ";
                 answerHandler h;
-                size_t i; // current conn index in handlers array
                 
                 // handler search
-                for( i = 0; i < handlers.length; ++i )
+                foreach( d; handlers )
                 {
-                    if( handlers[i].conn == info.conn )
+                    if( d.conn == info.conn )
                     {
-                        h = handlers[i].connSpecHandlers[0]; // oldest registred
+                        h = d.connSpecHandlers.moveFront(); // oldest registred
                         break;
                     }
                 }
                 
-                // call handler for every result
+                // fetch every result
                 PGresult* r;
                 while( r = PQgetResult(info.conn), r )
                 {
                     debug s ~= "result_received ";
-                    if( h != null) // handler was found previously
+                    if( h != null) // handler was found previously?
                         h( new Answer(r) );
                 }
-                
-                // need to remove used handler
-                //if( h != null ) handlers[i].connSpecHandlers.popFront;
-                return OK; // all results processed
+
+                return OK; // all results are processed
                 
             default:
                 return OK; // other events

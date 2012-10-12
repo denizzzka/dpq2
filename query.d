@@ -204,6 +204,7 @@ void _unittest( string connParam )
     c.setNonBlocking( true );
     c.async = true;
     Answer[] an;
+    Answer[] an2;
     writeln( c.handlers );
     c.addHandler( (Answer a){ an ~= a; } );
     writeln( c.handlers );
@@ -214,11 +215,11 @@ void _unittest( string connParam )
     c.consumeInput();
     sleep( 1 );
     //while( c.isBusy() ){}
-    
-    writeln( c.handlers );
 
     writeln(Connection.s);
     writeln( an );
     writeln( an[0][0,0].as!PGtext );
     writeln( an[1][0,0].as!PGtext );
+    
+    writeln( c.handlers );
 }
