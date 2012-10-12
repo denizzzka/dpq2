@@ -150,10 +150,10 @@ class BaseConnection
                             d.dg( a );
                         }
                         // FIXME: here is need to remove handler
-                        return OK; // handler found
+                        return OK; // handler was found
                     }
                 }
-                return ERROR; // handler not found
+                return ERROR; // handler was not found
                 
             default:
                 return OK; // other events
