@@ -120,10 +120,14 @@ class BaseConnection
     
     package void addHandler( answerHandler h )
     {
+        import std.stdio;
+        writeln( handlers );
         registredHandler s;
         s.conn = conn;
         s.dg = h;
         handlers ~= s;
+        import std.stdio;
+        writeln( handlers );
     }
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* passThrough)
@@ -138,17 +142,20 @@ class BaseConnection
                 
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(PGEventResultCreate*) evtInfo;
+                debug s ~= info.conn ? "true" : "false";
                 foreach( d; handlers )
                 {
                     if( d.conn == info.conn )
                     {
                         PGresult* r;
+                        /*
                         while( r = PQgetResult(info.conn), r )
                         {
                             debug s ~= "PGEVT_RESULTCREATE ";
                             auto a = new Answer( r );
                             d.dg( a );
                         }
+                        */
                         // FIXME: here is need to remove handler
                         return OK; // handler was found
                     }

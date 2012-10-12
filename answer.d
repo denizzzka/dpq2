@@ -246,7 +246,13 @@ class Answer // most members should be a const
     }
     
     ~this() {
-        if( res ) PQclear(res);
+        if( res )
+        {
+            PQclear(res);
+            //res = null; // FIXME: this is really need!
+        }
+        else
+            assert( true, "double free!" );
     }
     
     package void checkAnswerForErrors()

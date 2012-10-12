@@ -205,8 +205,10 @@ void _unittest( string connParam )
     c.addHandler( (Answer a){ an = a; } );
     import core.thread: sleep;
     sleep( 1 );
-    c.sendQuery( p );
+    c.sendQuery( "select 1; select 2;" );
+    c.flush();
     sleep( 1 );
+    //while( c.isBusy() ){}
     
     import std.stdio;
     writeln(Connection.s);
