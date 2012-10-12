@@ -53,6 +53,15 @@ class BaseConnection
         {
         }
     }
+    
+    enum handlerStatuses
+    {
+        HANDLER_STATUS_OK,
+        HANDLER_NOT_FOUND /// No delegate for query processing has been found
+    }
+    
+    auto handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
+    
     debug static string s;
     
     @property bool async(){ return asyncFlag; }
@@ -62,7 +71,7 @@ class BaseConnection
         assert( !(asyncFlag && !m), "pqlib can't change mode from async to sync" );
         
         if( !asyncFlag && m )
-            registerEventProc( &eventsHandler, "default", null ); // FIXME: why name?
+            registerEventProc( &eventsHandler, "PGRESULT_HANDLER", &handlerStatus );
             // TODO: event handler can be registred only after connect!
 
         asyncFlag = m;
@@ -122,8 +131,9 @@ class BaseConnection
         handlers[ conn ] ~= h;
     }
     
-    private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* passThrough)
+    private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* hStatus)
     {
+        auto handlerStatus = cast(handlerStatuses*) hStatus;
         enum { ERROR = 0, OK }
         
         switch( evtId )
@@ -140,14 +150,22 @@ class BaseConnection
                 answerHandler h;
                 connSpecHandlers* l = ( info.conn in handlers );
                 if( l !is null )
-                    h = (*l).moveFront(); // get oldest registred handler
+                {
+                    h = (*l)[0]; //.moveFront(); // get oldest registred handler
+                    //l.popFront();
+                }
                 
                 // fetch every result
                 PGresult* r;
                 while( r = PQgetResult(info.conn), r )
                 {
                     debug s ~= "result_received ";
-                    if( h !is null) // handler was found previously?
+                    if( h is null) // handler was found previously?
+                    {
+                        *handlerStatus = handlerStatuses.HANDLER_NOT_FOUND;
+                        return ERROR;
+                    }
+                    else
                         h( new Answer(r) );
                 }
 

@@ -207,12 +207,15 @@ void _unittest( string connParam )
     Answer[] an2;
     writeln( c.handlers );
     c.addHandler( (Answer a){ an ~= a; } );
+    //c.addHandler( (Answer a){ an2 ~= a; } );
     writeln( c.handlers );
     import core.thread: sleep;
     sleep( 1 );
     c.exec( "select 1; select 2; select 3;" );
-    c.flush();
-    c.consumeInput();
+    sleep( 1 );
+    c.exec( "select 1; select 2; select 3;" );
+    //c.flush();
+    //c.consumeInput();
     sleep( 1 );
     //while( c.isBusy() ){}
 
