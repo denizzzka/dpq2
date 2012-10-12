@@ -143,7 +143,7 @@ class BaseConnection
                 
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(PGEventResultCreate*) evtInfo;
-                debug s ~= info.conn != null ? "true" : "false";
+                debug s ~= info.conn != null ? "true " : "false ";
                 answerHandler h;
                 
                 // handler search
@@ -159,7 +159,7 @@ class BaseConnection
                 PGresult* r;
                 while( r = PQgetResult(info.conn), r )
                 {
-                    debug s ~= "PGEVT_RESULTCREATE ";
+                    debug s ~= "result_received ";
                     if( h!= null) // handler was found previously
                         h( new Answer(r) );
                 }

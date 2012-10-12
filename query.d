@@ -34,7 +34,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
-        assert( !async );
+        //assert( !async );
         return getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
@@ -200,13 +200,13 @@ void _unittest( string connParam )
     auto c = new Connection;
     c.connString = connParam;
     c.connect;
-    //c.setNonBlocking( true );
+    c.setNonBlocking( true );
     c.async = true;
     Answer an;
     c.addHandler( (Answer a){ an = a; } );
     import core.thread: sleep;
     sleep( 1 );
-    c.sendQuery( "select 1; select 2;" );
+    c.exec( "select 1; select 2; select 3;" );
     c.flush();
     c.consumeInput();
     sleep( 1 );
@@ -215,5 +215,5 @@ void _unittest( string connParam )
     import std.stdio;
     writeln(Connection.s);
     writeln( an );
-    writeln( an[0,0].as!PGinteger );
+    writeln( an[0,0].as!PGtext );
 }
