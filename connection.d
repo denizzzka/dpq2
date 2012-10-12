@@ -147,7 +147,7 @@ class BaseConnection
                 while( r = PQgetResult(info.conn), r )
                 {
                     debug s ~= "result_received ";
-                    if( h != null) // handler was found previously?
+                    if( h !is null) // handler was found previously?
                         h( new Answer(r) );
                 }
 
