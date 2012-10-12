@@ -160,9 +160,10 @@ class BaseConnection
                 while( r = PQgetResult(info.conn), r )
                 {
                     debug s ~= "PGEVT_RESULTCREATE ";
-                    auto a = new Answer( r );
-                    if(h) h(a); // call only if handler was found
+                    if( h!= null) // handler was found previously
+                        h( new Answer(r) );
                 }
+                
                 // FIXME: here is need to remove handler
                 return OK; // all results processed
                 
