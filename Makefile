@@ -1,4 +1,4 @@
-DFILES = libpq.di connection.d query.d answer.d unittests_main.d
+DFILES = libpq.di connection.d query.d answer.d slist.d unittests_main.d
 ONAME = libdpq2
 DC = dmd
 COMMON = $(DC) $(DFILES) -w -of$(ONAME)
