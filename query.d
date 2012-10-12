@@ -212,8 +212,6 @@ void _unittest( string connParam )
     import core.thread: sleep;
     sleep( 1 );
     c.exec( "select 1; select 2; select 3;" );
-    sleep( 1 );
-    c.exec( "select 1; select 2; select 3;" );
     //c.flush();
     //c.consumeInput();
     sleep( 1 );
@@ -228,6 +226,7 @@ void _unittest( string connParam )
     
     import std.range: moveFront;
     auto h = c.handlers[c.conn];
+    writeln( typeid( h ) );
     //h.moveFront();
-    writeln( h );
+    //writeln( h );
 }

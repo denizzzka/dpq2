@@ -134,6 +134,8 @@ class BaseConnection
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* hStatus)
     {
         auto handlerStatus = cast(handlerStatuses*) hStatus;
+        *handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
+        
         enum { ERROR = 0, OK }
         
         switch( evtId )
