@@ -130,10 +130,12 @@ class BaseConnection
     {
         enum { ERROR, OK }
         
+        //debug s ~= "asd";
+        
         switch( evtId )
         {
             case PGEventId.PGEVT_REGISTER:
-                debug s ~= "PGEVT_REGISTER ";
+                //debug s ~= "PGEVT_REGISTER ";
                 return OK;
                 
             case PGEventId.PGEVT_RESULTCREATE:
@@ -143,9 +145,10 @@ class BaseConnection
                 {
                     if( d.conn == info.conn )
                     {
-                        Answer a;
-                        while( a = new Answer( info.result ), a )
+                        PGresult* r;
+                        while( r = PQgetResult(info.conn), r )
                         {
+                            auto a = new Answer( r );
                             d.dg( a );
                         }
                         // FIXME: here is need to remove handler

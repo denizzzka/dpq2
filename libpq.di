@@ -156,15 +156,15 @@ PQERRORS_VERBOSE,
     PQnoticeProcessor PQsetNoticeProcessor(PGconn* conn, PQnoticeProcessor proc, void* arg);
     alias void function(int acquire) pgthreadlock_t;
     pgthreadlock_t PQregisterThreadLock(pgthreadlock_t newhandler);
-    immutable (PGresult)* PQexec(PGconn* conn, const char* query); // used!
-    immutable (PGresult)* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
+    PGresult* PQexec(PGconn* conn, const char* query); // used!
+    PGresult* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     PGresult* PQprepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     PGresult* PQexecPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
     size_t PQsendQuery(PGconn* conn, const char* query); // used!
     size_t PQsendQueryParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     int PQsendPrepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     int PQsendQueryPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
-    immutable (PGresult)* PQgetResult(PGconn* conn); // used!
+    PGresult* PQgetResult(PGconn* conn); // used!
     int PQisBusy(PGconn* conn); // used!
     int PQconsumeInput(PGconn* conn);
     immutable (PGnotify)* PQnotifies(PGconn* conn); // used!
@@ -239,6 +239,7 @@ PQERRORS_VERBOSE,
     
     alias size_t function (PGEventId evtId, void* evtInfo, void* passThrough) PGEventProc; // used!
     size_t PQregisterEventProc(PGconn *conn, PGEventProc proc, immutable char* name, void *passThrough); // used!
+    size_t PQsetInstanceData(PGconn *conn, PGEventProc proc, void *data);
     enum PGEventId // used
     {
         PGEVT_REGISTER,

@@ -43,7 +43,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec(ref const queryParams p)
     {
-        assert( !async );
+        //assert( !async );
         auto a = prepareArgs( p );
         return getAnswer
         (
@@ -158,9 +158,9 @@ final class Connection: BaseConnection
     }
     
     // It is important to do a separate check because of Answer ctor is nothrow
-    private Answer getAnswer( immutable PGresult* r )
+    private Answer getAnswer( PGresult* r )
     {
-        auto res = new Answer( cast(PGresult*) r );
+        auto res = new Answer( r );
         res.checkAnswerForErrors();
         return res;
     }
@@ -203,11 +203,10 @@ void _unittest( string connParam )
     c.async = true;
     Answer an;
     c.addHandler( (Answer a){ an = a; } );
-    c.sendQuery( p );
-    
+    //import dpq2.libpq: PQsetInstanceData;
     import core.thread: sleep;
     sleep( 1 );
-    c.flush();
+    c.exec( p );
     sleep( 1 );
     
     import std.stdio;
