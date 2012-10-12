@@ -46,8 +46,8 @@ class BaseConnection
         
         alias nothrow void delegate( Answer a ) answerHandler;
         
-        alias answerHandler[] connSpecHandler; // TODO: list would be better and thread-safe?
-        public static connSpecHandler[PGconn*] handlers; // TODO: list would be better and thread-safe?
+        alias answerHandler[] connSpecHandlers; // TODO: list would be better and thread-safe?
+        public static connSpecHandlers[PGconn*] handlers; // TODO: list would be better and thread-safe?
         
         version(Release){}else
         {
@@ -137,7 +137,10 @@ class BaseConnection
                 debug s ~= info.conn != null ? "true " : "false ";
                 
                 // handler search
-                answerHandler h = handlers[ info.conn ].moveFront(); // oldest registred
+                answerHandler h;
+                connSpecHandlers* l = ( info.conn in handlers );
+                if( l !is null )
+                    h = (*l).moveFront(); // oldest registred
                 
                 // fetch every result
                 PGresult* r;

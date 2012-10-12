@@ -252,7 +252,7 @@ PQERRORS_VERBOSE,
     
     struct PGEventResultCreate
     {
-        PGconn *conn;
-        PGresult *result;
+        PGconn* conn;
+        PGresult* result;
     }
 }
