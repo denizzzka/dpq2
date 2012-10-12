@@ -48,7 +48,7 @@ class BaseConnection
         struct registredHandlers
         {
             PGconn* conn;
-            answerHandler[] connSpecHandlers;
+            answerHandler[] connSpecHandlers; // TODO: list would be better?
         }
         static registredHandlers[] handlers; // TODO: list would be better?
         
