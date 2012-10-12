@@ -45,12 +45,9 @@ class BaseConnection
         }
         
         alias nothrow void delegate( Answer a ) answerHandler;
-        struct registredHandlers
-        {
-            PGconn* conn;
-            answerHandler[] connSpecHandlers; // TODO: list would be better and thread-safe?
-        }
-        public static registredHandlers[] handlers; // TODO: list would be better and thread-safe?
+        
+        alias answerHandler[] connSpecHandler; // TODO: list would be better and thread-safe?
+        public static connSpecHandler[PGconn*] handlers; // TODO: list would be better and thread-safe?
         
         version(Release){}else
         {
@@ -122,11 +119,7 @@ class BaseConnection
     
     package void addHandler( answerHandler h )
     {
-        registredHandlers s;
-        s.conn = conn;
-        s.connSpecHandlers ~= h;
-        
-        handlers ~= s;
+        handlers[ conn ] ~= h;
     }
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* passThrough)
@@ -142,17 +135,9 @@ class BaseConnection
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(PGEventResultCreate*) evtInfo;
                 debug s ~= info.conn != null ? "true " : "false ";
-                answerHandler h;
                 
                 // handler search
-                foreach( d; handlers )
-                {
-                    if( d.conn == info.conn )
-                    {
-                        h = d.connSpecHandlers.moveFront(); // oldest registred
-                        break;
-                    }
-                }
+                answerHandler h = handlers[ info.conn ].moveFront(); // oldest registred
                 
                 // fetch every result
                 PGresult* r;

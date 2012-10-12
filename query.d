@@ -222,4 +222,9 @@ void _unittest( string connParam )
     writeln( an[1][0,0].as!PGtext );
     
     writeln( c.handlers );
+    
+    import std.range: moveFront;
+    //auto h = c.handlers[0].connSpecHandlers;
+    //h.moveFront();
+    writeln( c.handlers );
 }
