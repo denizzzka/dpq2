@@ -1,35 +1,49 @@
-/// Thread safe non blocking singly linked list
+/// Thread safe non blocking singly linked FIFO list
 module dpq2.slist;
 @trusted:
 
 import core.atomic: cas;
 
-shared struct SList
+shared class SList
 {
     shared struct Container
     {
         Container* next;
         int value;
-        this( int value ) shared
-        {
-            this.value = value;
-        }
     }
     
-    private Container* root;
+    private Container* head;
+    private Container* tail;
+    private size_t icount;
+    private size_t ocount;
+    
+    shared this()
+    {
+        auto n = new shared(Container);
+        head = n;
+        tail = n;
+    }
     
     void pushBack( int newValue ) shared
     {
-        auto n = new Container( newValue );
+        auto n = new shared(Container);
+        n.value = newValue;
+        n.next = tail;
         
         do {
-            n.next = root;
-        } while( !cas( &root, n.next, n ) );
+            auto _icount = icount;
+            auto _tail = tail;
+            
+            if( cas( &tail.next, tail, n ) )
+                break;
+            //else
+                //cas( &tail, _tail, _icount, _tail.next, _icount + 1 );
+        } while( false ); // FIXME: to true
     }
 }
 
 unittest
 {
-    shared SList l;
+    auto l = new shared(SList);
     l.pushBack( 1 );
 }
