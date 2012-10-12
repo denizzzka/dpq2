@@ -65,6 +65,7 @@ class BaseConnection
         
         if( !asyncFlag && m )
             registerEventProc( &eventsHandler, "default", null ); // FIXME: why name?
+            // TODO: event handler can be registred only after connect!
 
         asyncFlag = m;
         return asyncFlag;
@@ -115,7 +116,7 @@ class BaseConnection
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
-            throw new exception( "Error in "~name~" event handler" );
+            throw new exception( "Could not register "~name~" event handler" );
     }
     
     package void addHandler( answerHandler h )
@@ -132,7 +133,7 @@ class BaseConnection
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* passThrough)
     {
-        enum { ERROR, OK }
+        enum { ERROR = 0, OK }
         
         switch( evtId )
         {
@@ -142,25 +143,28 @@ class BaseConnection
                 
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(PGEventResultCreate*) evtInfo;
-                debug s ~= info.conn ? "true" : "false";
+                debug s ~= info.conn != null ? "true" : "false";
+                answerHandler h;
+                
+                // handler search
                 foreach( d; handlers )
                 {
                     if( d.conn == info.conn )
                     {
-                        PGresult* r;
-                        /*
-                        while( r = PQgetResult(info.conn), r )
-                        {
-                            debug s ~= "PGEVT_RESULTCREATE ";
-                            auto a = new Answer( r );
-                            d.dg( a );
-                        }
-                        */
-                        // FIXME: here is need to remove handler
-                        return OK; // handler was found
+                        h = d.dg;
+                        break;
                     }
                 }
-                return ERROR; // handler was not found
+                
+                PGresult* r;
+                while( r = PQgetResult(info.conn), r )
+                {
+                    debug s ~= "PGEVT_RESULTCREATE ";
+                    auto a = new Answer( r );
+                    if(h) h(a); // call only if handler was found
+                }
+                // FIXME: here is need to remove handler
+                return OK; // all results processed
                 
             default:
                 return OK; // other events

@@ -199,16 +199,16 @@ void _unittest( string connParam )
     
     auto c = new Connection;
     c.connString = connParam;
-    c.async = true;
-    c.setNonBlocking( true );
+    //c.setNonBlocking( true );
     c.connect;
+    c.async = true;
     Answer an;
-    c.addHandler( (Answer a){ an = a; } );
+    //c.addHandler( (Answer a){ an = a; } );
     import core.thread: sleep;
     sleep( 1 );
     c.sendQuery( "select 1; select 2;" );
-    c.flush();
-    c.consumeInput();
+    //c.flush();
+    //c.consumeInput();
     sleep( 1 );
     //while( c.isBusy() ){}
     
