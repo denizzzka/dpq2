@@ -3,15 +3,15 @@ module dpq2.casn;
 
 import core.atomic: cas;
 
-alias shared int T;
+alias shared Val T;
 
 struct Val
 {
     bool isDescriptor;
-    T val;
+    size_t val;
 }
 
-struct RDCSSDESCRI
+shared struct RDCSSDESCRI
 {
     bool isDescriptor;
 
@@ -22,8 +22,7 @@ struct RDCSSDESCRI
     T newval2;
 }
 
-bool isDescriptor( Val d ){ return d.isDescriptor; }
-bool isDescriptor( RDCSSDESCRI d ){ return d.isDescriptor; }
+bool IsDescriptor( T d ){ return d.isDescriptor; }
 
 T CAS1( T* ptr, T oldval, T newval )
 {
@@ -53,15 +52,14 @@ int RDCSS(int *addr1, int oldval1, int *addr2, int oldval2, int newval2) {
   return res;
 }
 */
-/*
-int RDCSS( RDCSSDESCRI *d ) {
-    int* d_int = cast(int*) d;
-    bool res;
-    do {
-        res = cas(d.addr2, d.oldval2, d_int);
-        if( res ) Complete(d);
-    } while (!res);
-    if (res == d.oldval2) Complete(d);
-    return r;
+RDCSSDESCRI* RDCSS( RDCSSDESCRI* d ) {
+  RDCSSDESCRI* res;
+  do {
+    res = cast(RDCSSDESCRI*) CAS1( d.addr2, d.oldval2, *cast(T*) d );  // STEP1
+    if (IsDescriptor(cast(T)res)) Complete(res); // STEP2
+  } while (IsDescriptor(cast(T)res));             // STEP3
+  if (res == cast(RDCSSDESCRI*) d.oldval2) Complete(d);     // STEP4
+  return res;
 }
-*/
+
+
