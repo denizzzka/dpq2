@@ -60,35 +60,13 @@ bool IsDescriptor(V)( V val )
 }
 
 
+/// Restricted Double-Compare Single-Swap
 T RDCSS( RDCSSDESCRI* d ) {
     T res;
     do {
-        res = CAS1(d.addr2, d.oldval2, cast(T) d);  // STEP1
-        if (IsDescriptor(res)) Complete(res); // STEP2
-  } while (IsDescriptor(res));             // STEP3
-  //if (res == d.oldval2) Complete(d);     // STEP4
-  return res;
+        res = CAS1(d.addr2, d.oldval2, cast(T) d);
+        if (IsDescriptor(res)) Complete(res);
+    } while (IsDescriptor(res));
+    if (res == d.oldval2) Complete(d);
+    return res;
 }
-
-/*
- * Restricted Double-Compare Single-Swap
-
-Semantic:
-
-int RDCSS(int *addr1, int oldval1, int *addr2, int oldval2, int newval2) {
-  int res = *addr;
-  if (res == oldval2 && *addr1 == oldval1) *addr2 = newval2;
-  return res;
-}
-*/
-/*
-RDCSSDESCRI* RDCSS( RDCSSDESCRI* d ) {
-  RDCSSDESCRI* res;
-  do {
-    res = cast(RDCSSDESCRI*) CAS1( d.addr2, d.oldval2, *cast(T*) d );  // STEP1
-    if (IsDescriptor(cast(T)res)) Complete(res); // STEP2
-  } while (IsDescriptor(cast(T)res));             // STEP3
-  if (res == cast(RDCSSDESCRI*) d.oldval2) Complete(d);     // STEP4
-  return res;
-}
-*/
