@@ -3,44 +3,43 @@ module dpq2.casn;
 
 import core.atomic: cas;
 
-alias shared Val T;
-
-struct Val
-{
-    bool isDescriptor;
-    size_t val;
-}
+alias shared size_t T;
 
 shared struct RDCSSDESCRI
 {
-    bool isDescriptor;
-
-    T *addr1;
+    T* addr1;
     T oldval1;
-    T *addr2;
+    T* addr2;
     T oldval2;
     T newval2;
 }
 
-bool IsDescriptor( T d ){ return d.isDescriptor; }
-
-T CAS1( T* ptr, T oldval, T newval )
+T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval ) nothrow
 {
     auto ret = *ptr;
     cas( ptr, oldval, newval );
     return ret;
 }
 
+
 void Complete( RDCSSDESCRI* d )
 {
-    T val = *d.addr1;
+    auto val = *d.addr1;
     if (val == d.oldval1)
-        CAS1(d.addr2, cast(T) d, d.newval2);
+        CAS1(d.addr2, d, d.newval2);
     else
-        CAS1(d.addr2, cast(T) d, d.oldval2);  
+        CAS1(d.addr2, d, d.oldval2);  
 }
-
-
+/*
+size_t RDCSS( RDCSSDESCRI *d ) {
+  do {
+    res = CAS1(d.addr2, d.oldval2, d);  // STEP1
+    if (IsDescriptor(res)) Complete(res); // STEP2
+  } while (IsDescriptor(res));             // STEP3
+  if (res == d.oldval2) Complete(d);     // STEP4
+  return res;
+}
+*/
 /*
  * Restricted Double-Compare Single-Swap
 
@@ -52,6 +51,7 @@ int RDCSS(int *addr1, int oldval1, int *addr2, int oldval2, int newval2) {
   return res;
 }
 */
+/*
 RDCSSDESCRI* RDCSS( RDCSSDESCRI* d ) {
   RDCSSDESCRI* res;
   do {
@@ -61,5 +61,4 @@ RDCSSDESCRI* RDCSS( RDCSSDESCRI* d ) {
   if (res == cast(RDCSSDESCRI*) d.oldval2) Complete(d);     // STEP4
   return res;
 }
-
-
+*/
