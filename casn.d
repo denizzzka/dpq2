@@ -30,15 +30,8 @@ shared struct RDCSSDESCRI
     T oldval2;
     T newval2;
 }
-/*
-T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
-{
-    auto ret = *ptr;
-    cas( ptr, oldval, newval );
-    return ret;
-}
-*/
-void Complete(V)( V v ) // changes only content under v ptr
+
+void Complete(V)( V v )
 {
     auto d = cast( RDCSSDESCRI* ) v;
     
@@ -55,7 +48,7 @@ bool IsDescriptor(V)( V val )
     return hasLSB( v );
 }
 
-/// Restricted Double-Compare Single-Swap
+// Restricted Double-Compare Single-Swap
 T RDCSS( RDCSSDESCRI* d )
 {
     T r = *d.addr2;
@@ -87,7 +80,7 @@ struct ent
     T old;
 }
 
-struct CASNDescriptor
+shared struct CASNDescriptor
 {
     CASNDStatus status;
     int n;
@@ -104,6 +97,7 @@ bool CASN( CASNDescriptor* cd )
 {
     if( cd.status == CASNDStatus.UNDECIDED ) // R4
     {
+        // phase 1:
         auto status = CASNDStatus.SUCCEEDED;
         for( int i = 0; i < cd.n && (status == CASNDStatus.SUCCEEDED); i++ ) // L1
         {
@@ -130,19 +124,20 @@ bool CASN( CASNDescriptor* cd )
         cas( cast(T*) &(cd.status), cast(T) CASNDStatus.UNDECIDED, cast(T) status ); // C4
     }
     
+    // phase 2:
     bool succeeded = ( cd.status == CASNDStatus.SUCCEEDED );
     for( int i = 0; i < cd.n; i++ )
         cas( cd.entry[i].addr, cd,
             succeeded ? (cd.entry[i]._new) : (cd.entry[i].old) ); // C5
     return succeeded;
 }    
-/*
+
 T CASNRead( T* addr )
 {
+    T r;
     do {
         r = RDCSSRead( addr ); // R5
-        if( IsCASNDescriptor( r ) ) CASN( r ); // H4
+        if( IsCASNDescriptor( r ) ) CASN( cast(CASNDescriptor*) r ); // H4
     } while( IsCASNDescriptor( r ) ); // B3
     return r;
 }
-*/
