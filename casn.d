@@ -31,13 +31,12 @@ shared struct RDCSSDESCRI
     T newval2;
 }
 
-T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval ) nothrow
+T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
 {
     auto ret = *ptr;
     cas( ptr, oldval, newval );
     return ret;
 }
-
 
 void Complete( RDCSSDESCRI* d )
 {
