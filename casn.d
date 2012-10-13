@@ -38,15 +38,15 @@ T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
     return ret;
 }
 
-void Complete(V)( V v ) // makes changes only in v
+void Complete(V)( V v ) // changes only content under pointer v
 {
     auto d = cast( RDCSSDESCRI* ) v;
     
     T val = *d.addr1;
     if (val == d.oldval1)
-        cas(d.addr2, d, d.newval2);
+        cas(d.addr2, d, d.newval2); // C2
     else
-        cas(d.addr2, d, d.oldval2);  
+        cas(d.addr2, d, d.oldval2); // C3
 }
 
 bool IsDescriptor(V)( V val )
@@ -56,14 +56,10 @@ bool IsDescriptor(V)( V val )
 }
 
 /// Restricted Double-Compare Single-Swap
-T RDCSS( RDCSSDESCRI* d ) {
-    T res;
-    do {
-        res = CAS1( d.addr2, d.oldval2, cast(T) d );
-        if ( IsDescriptor(res) ) Complete ( res );
-    } while ( IsDescriptor( res ) );
-    if( res == d.oldval2 ) Complete( d );
-    return res;
+void RDCSS( RDCSSDESCRI* d )
+{
+    while( !cas( d.addr2, d.oldval2, cast(T) d ) ){} // C1
+    Complete ( d ); // H1
 }
 /*
 T RDCSSRead( T* addr )
