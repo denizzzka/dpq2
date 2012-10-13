@@ -38,7 +38,7 @@ T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
     return ret;
 }
 
-void Complete(V)( V v ) // changes only content under pointer v
+void Complete(V)( V v ) // changes only content under v ptr
 {
     auto d = cast( RDCSSDESCRI* ) v;
     
@@ -78,3 +78,17 @@ T RDCSSRead( T* addr )
     return r;
 }
 
+enum CASNDStatus { UNDECIDED, FAILED, SUCCEEDED };
+
+struct CASNDescriptor
+{
+    CASNDStatus status;
+    
+    T* ref1;
+    T o1;
+    T* ref2;
+    T o2;
+    T n2;
+    
+    RDCSSDESCRI RDCSSDescriptor;
+}
