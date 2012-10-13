@@ -78,11 +78,12 @@ T RDCSSRead( T* addr )
     return r;
 }
 
-enum CASNDStatus { UNDECIDED, FAILED, SUCCEEDED };
+enum CASNDStatus : T { UNDECIDED, FAILED, SUCCEEDED };
 
 struct ent
 {
     T* addr;
+    T _new;
     T old;
 }
 
@@ -93,6 +94,12 @@ struct CASNDescriptor
     ent[] entry;
 }
 
+bool IsCASNDescriptor(V)( V val )
+{
+    auto v = cast(T) val;
+    return hasLSB( v );
+}
+
 bool CASN( CASNDescriptor* cd )
 {
     if( cd.status == CASNDStatus.UNDECIDED ) // R4
@@ -100,6 +107,7 @@ bool CASN( CASNDescriptor* cd )
         auto status = CASNDStatus.SUCCEEDED;
         for( int i = 0; i < cd.n && (status == CASNDStatus.SUCCEEDED); i++ ) // L1
         {
+            retry_entry:
             auto entry = cd.entry[i];
             
             auto d = new RDCSSDESCRI;
@@ -112,17 +120,17 @@ bool CASN( CASNDescriptor* cd )
             auto val = RDCSS( d ); // X1
             if( IsCASNDescriptor( val ) )
             {
-                if( val != cd )
+                if( val != cast(T) cd )
                 {
-                    CASN( val ); // H3
+                    CASN( cast(CASNDescriptor*) val ); // H3
                     goto retry_entry;
                 }
             } else if( val != entry.old ) status = CASNDStatus.FAILED;
         }
-        cas( &(cd.status), CASNDStatus.UNDECIDED, status ); // C4
+        cas( cast(T*) &(cd.status), cast(T) CASNDStatus.UNDECIDED, cast(T) status ); // C4
     }
     
-    succeeded = ( cd.status == CASNDStatus.SUCCEEDED );
+    bool succeeded = ( cd.status == CASNDStatus.SUCCEEDED );
     for( int i = 0; i < cd.n; i++ )
         cas( cd.entry[i].addr, cd,
             succeeded ? (cd.entry[i]._new) : (cd.entry[i].old) ); // C5
