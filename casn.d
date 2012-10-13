@@ -4,20 +4,20 @@ nothrow:
 
 import core.atomic: cas;
 
-T* setLSB(T)( T* ptr )
+V* setLSB(V)( V* ptr )
 {
     return cast(T*) (cast(size_t) ptr | 1);
 }
 
-T* clearLSB(T)( T* ptr )
+V* clearLSB(V)( V* ptr )
 {
-    return cast(T*) (cast(size_t) ptr | 0);
+    return cast(V*) (cast(size_t) ptr | 0);
 }
 
-bool hasLSB(T)( T* ptr )
+bool hasLSB(V)( V v )
 {
-    size_t mask = 0 | 1;
-    return (ptr & mask) == 1;
+    V mask = 0 | 1;
+    return (v & mask) == 1;
 }
 
 alias shared size_t T;
@@ -53,16 +53,17 @@ bool IsDescriptor(T)( T val )
     return hasLSB( val );
 }
 
-/*
-size_t RDCSS( RDCSSDESCRI *d ) {
-  do {
-    res = CAS1(d.addr2, d.oldval2, d);  // STEP1
+
+T RDCSS( RDCSSDESCRI* d ) {
+    T res;
+    do {
+        res = CAS1(d.addr2, d.oldval2, cast(T) d);  // STEP1
     //if (IsDescriptor(res)) Complete(res); // STEP2
   } while (IsDescriptor(res));             // STEP3
   //if (res == d.oldval2) Complete(d);     // STEP4
   return res;
 }
-*/
+
 /*
  * Restricted Double-Compare Single-Swap
 
