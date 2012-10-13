@@ -38,15 +38,15 @@ T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
     return ret;
 }
 
-void Complete(V)( V v )
+void Complete(V)( V v ) // makes changes only in v
 {
     auto d = cast( RDCSSDESCRI* ) v;
     
     T val = *d.addr1;
     if (val == d.oldval1)
-        CAS1(d.addr2, d, d.newval2);
+        cas(d.addr2, d, d.newval2);
     else
-        CAS1(d.addr2, d, d.oldval2);  
+        cas(d.addr2, d, d.oldval2);  
 }
 
 bool IsDescriptor(V)( V val )
@@ -59,10 +59,20 @@ bool IsDescriptor(V)( V val )
 T RDCSS( RDCSSDESCRI* d ) {
     T res;
     do {
-        res = CAS1(d.addr2, d.oldval2, cast(T) d);
-        if (IsDescriptor(res)) Complete(res);
-    } while (IsDescriptor(res));
-    if (res == d.oldval2) Complete(d);
+        res = CAS1( d.addr2, d.oldval2, cast(T) d );
+        if ( IsDescriptor(res) ) Complete ( res );
+    } while ( IsDescriptor( res ) );
+    if( res == d.oldval2 ) Complete( d );
     return res;
 }
-
+/*
+T RDCSSRead( T* addr )
+{
+    T* r;
+    do {
+        r = *addr;
+        if( IsDescriptor(r) ) Complete( r );
+    } while( IsDescriptor( r ) );
+    return r;
+}
+*/
