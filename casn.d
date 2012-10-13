@@ -38,8 +38,10 @@ T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
     return ret;
 }
 
-void Complete( RDCSSDESCRI* d )
+void Complete(V)( V v )
 {
+    auto d = cast( RDCSSDESCRI* ) v;
+    
     T val = *d.addr1;
     if (val == d.oldval1)
         CAS1(d.addr2, d, d.newval2);
@@ -47,17 +49,11 @@ void Complete( RDCSSDESCRI* d )
         CAS1(d.addr2, d, d.oldval2);  
 }
 
-void Complete( T d )
-{
-    Complete( cast( RDCSSDESCRI* ) d );
-}
-
 bool IsDescriptor(V)( V val )
 {
     auto v = cast(T) val;
     return hasLSB( v );
 }
-
 
 /// Restricted Double-Compare Single-Swap
 T RDCSS( RDCSSDESCRI* d ) {
@@ -69,3 +65,4 @@ T RDCSS( RDCSSDESCRI* d ) {
     if (res == d.oldval2) Complete(d);
     return res;
 }
+
