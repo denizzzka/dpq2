@@ -47,6 +47,12 @@ void Complete( RDCSSDESCRI* d )
     else
         CAS1(d.addr2, d, d.oldval2);  
 }
+
+bool IsDescriptor(T)( T val )
+{
+    return hasLSB( val );
+}
+
 /*
 size_t RDCSS( RDCSSDESCRI *d ) {
   do {
