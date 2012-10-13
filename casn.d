@@ -39,14 +39,18 @@ T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval ) nothrow
 }
 
 
-void Complete(V)( V v )
+void Complete( RDCSSDESCRI* d )
 {
-    auto d = cast( RDCSSDESCRI* ) v;
     T val = *d.addr1;
     if (val == d.oldval1)
         CAS1(d.addr2, d, d.newval2);
     else
         CAS1(d.addr2, d, d.oldval2);  
+}
+
+void Complete( T d )
+{
+    Complete( cast( RDCSSDESCRI* ) d );
 }
 
 bool IsDescriptor(V)( V val )
