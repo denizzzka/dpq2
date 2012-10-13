@@ -103,11 +103,11 @@ bool CASN( CASNDescriptor* cd )
             auto entry = cd.entry[i];
             
             auto d = new RDCSSDESCRI;
-            d.addr1 = &(cd.status);
+            d.addr1 = cast(T*) &(cd.status);
             T oldval1 = CASNDStatus.UNDECIDED;
             T* addr2 = entry.addr;
             T oldval2 = entry.old;
-            T newval2 = cd;
+            T newval2 = cast(T) cd;
             
             auto val = RDCSS( d ); // X1
             if( IsCASNDescriptor( val ) )
