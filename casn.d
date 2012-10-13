@@ -56,14 +56,14 @@ bool IsDescriptor(V)( V val )
 }
 
 /// Restricted Double-Compare Single-Swap
-T* RDCSS( RDCSSDESCRI* d )
+T RDCSS( RDCSSDESCRI* d )
 {
-    auto r = d.addr2;
+    T r = *d.addr2;
     
     while( !cas( d.addr2, d.oldval2, cast(T) d ) ){} // C1
     Complete ( r ); // H1
     
-    if( cast(T) r == d.oldval2 ) Complete( d );
+    if( r == d.oldval2 ) Complete( d );
     
     return r;
 }
