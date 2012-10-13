@@ -30,23 +30,23 @@ shared struct RDCSSDESCRI
     T oldval2;
     T newval2;
 }
-
+/*
 T CAS1(T,V1,V2)( T* ptr, V1 oldval, V2 newval )
 {
     auto ret = *ptr;
     cas( ptr, oldval, newval );
     return ret;
 }
-
+*/
 void Complete(V)( V v ) // changes only content under v ptr
 {
     auto d = cast( RDCSSDESCRI* ) v;
     
     T val = *d.addr1;
     if (val == d.oldval1)
-        cas(d.addr2, d, d.newval2); // C2
+        cas(d.addr2, d, d.newval2); // C2, make descriptor inactive
     else
-        cas(d.addr2, d, d.oldval2); // C3
+        cas(d.addr2, d, d.oldval2); // C3, make descriptor inactive
 }
 
 bool IsDescriptor(V)( V val )
@@ -60,7 +60,7 @@ T RDCSS( RDCSSDESCRI* d )
 {
     T r = *d.addr2;
     
-    while( !cas( d.addr2, d.oldval2, cast(T) d ) ){} // C1
+    while( !cas( d.addr2, d.oldval2, cast(T) d ) ){} // C1 + B1
     Complete ( r ); // H1
     
     if( r == d.oldval2 ) Complete( d );
@@ -74,7 +74,7 @@ T RDCSSRead( T* addr )
     do {
         r = *addr; // R1
         if( IsDescriptor(r) ) Complete( r ); // H2
-    } while( IsDescriptor( r ) ); // B2
+    } while( IsDescriptor(r) ); // B2
     return r;
 }
 
@@ -82,13 +82,32 @@ enum CASNDStatus { UNDECIDED, FAILED, SUCCEEDED };
 
 struct CASNDescriptor
 {
-    CASNDStatus status;
-    
-    T* ref1;
-    T o1;
-    T* ref2;
-    T o2;
-    T n2;
-    
-    RDCSSDESCRI RDCSSDescriptor;
+    CASNDStatus status;    
 }
+
+bool CASN( CASNDescriptor* cd )
+{
+    if( cd.status == UNDECIDED ) // R4
+    {
+        status = SUCCEEDED;
+        for( int t = 0; i < cd.n && (status == SUCCEEDED); i++ ) // L1
+        {
+            entry = cd.entry[i];
+            val = RDCSS( new RDCSSDESCRI (&(cd.status), UNDECIDED, entry.addr, entry.old, cd )); // X1
+            if( IsCASNDescriptor( val ) )
+            {
+                if( val != cd )
+                {
+                    CASN( val; // H3
+                    goto retry_entry;
+                }
+            } else if( val != entry.old ) status = FAILED;
+        }
+        cas( &(cd.status), UNDECIDED, status ); // C4
+    }
+    
+    succeeded = ( cd.status == SUCCEEDED );
+    for( int i = 0; i < cd.n; i++ )
+        cas( cd.entry[i].addr, cd, succeeded ? (cd.entry[i].new) : (cd.entry[i].old); // C5
+    return succeeded;
+}    
