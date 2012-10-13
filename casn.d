@@ -111,3 +111,13 @@ bool CASN( CASNDescriptor* cd )
         cas( cd.entry[i].addr, cd, succeeded ? (cd.entry[i].new) : (cd.entry[i].old); // C5
     return succeeded;
 }    
+/*
+T CASNRead( T* addr )
+{
+    do {
+        r = RDCSSRead( addr ); // R5
+        if( IsCASNDescriptor( r ) ) CASN( r ); // H4
+    } while( IsCASNDescriptor( r ) ); // B3
+    return r;
+}
+*/
