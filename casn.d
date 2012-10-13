@@ -3,6 +3,24 @@ module dpq2.casn;
 
 import core.atomic: cas;
 
+nothrow {
+
+T* setLSB(T)( T* ptr )
+{
+    return cast(T*) (cast(size_t) ptr | 1);
+}
+
+T* clearLSB(T)( T* ptr )
+{
+    return cast(T*) (cast(size_t) ptr | 0);
+}
+
+bool hasLSB(T)( T* ptr )
+{
+    size_t mask = 0 | 1;
+    return (ptr & mask) == 1;
+}
+
 alias shared size_t T;
 
 shared struct RDCSSDESCRI
@@ -34,9 +52,9 @@ void Complete( RDCSSDESCRI* d )
 size_t RDCSS( RDCSSDESCRI *d ) {
   do {
     res = CAS1(d.addr2, d.oldval2, d);  // STEP1
-    if (IsDescriptor(res)) Complete(res); // STEP2
+    //if (IsDescriptor(res)) Complete(res); // STEP2
   } while (IsDescriptor(res));             // STEP3
-  if (res == d.oldval2) Complete(d);     // STEP4
+  //if (res == d.oldval2) Complete(d);     // STEP4
   return res;
 }
 */
@@ -62,3 +80,5 @@ RDCSSDESCRI* RDCSS( RDCSSDESCRI* d ) {
   return res;
 }
 */
+
+}
