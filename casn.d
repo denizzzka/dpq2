@@ -67,14 +67,14 @@ T RDCSS( RDCSSDESCRI* d )
     
     return r;
 }
-/*
+
 T RDCSSRead( T* addr )
 {
-    T* r;
+    T r;
     do {
-        r = *addr;
-        if( IsDescriptor(r) ) Complete( r );
-    } while( IsDescriptor( r ) );
+        r = *addr; // R1
+        if( IsDescriptor(r) ) Complete( r ); // H2
+    } while( IsDescriptor( r ) ); // B2
     return r;
 }
-*/
+
