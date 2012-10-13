@@ -1,9 +1,8 @@
 module dpq2.casn;
 @trusted:
+nothrow:
 
 import core.atomic: cas;
-
-nothrow {
 
 T* setLSB(T)( T* ptr )
 {
@@ -80,5 +79,3 @@ RDCSSDESCRI* RDCSS( RDCSSDESCRI* d ) {
   return res;
 }
 */
-
-}
