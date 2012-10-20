@@ -39,7 +39,6 @@ class BaseConnection
     {
         bool connectingInProgress;
         bool readyForQuery;
-        bool asyncFlag = false;
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
@@ -61,18 +60,17 @@ class BaseConnection
     
     auto handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
     
-    @property bool async(){ return asyncFlag; }
+    @property bool async(){ return PQisnonblocking(conn) == 1; }
 
     @property bool async( bool m ) // FIXME: need to disable after connect or immutable connection params
     {
-        assert( !(asyncFlag && !m), "pqlib can't change mode from async to sync" );
+        //assert( !(async && !m), "pqlib can't change mode from async to sync" );
         
-        if( !asyncFlag && m )
+        if( !async && m )
             registerEventProc( &eventsHandler, "PGRESULT_HANDLER", &handlerStatus );
             // TODO: event handler can be registred only after connect!
-
-        asyncFlag = m;
-        return asyncFlag;
+        
+        return m;
     }
     
     package void setNonBlocking( bool state )
