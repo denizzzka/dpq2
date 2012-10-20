@@ -73,7 +73,7 @@ class BaseConnection
         return m;
     }
     
-    package void setNonBlocking( bool state )
+    private void setNonBlocking( bool state )
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
             throw new exception();
