@@ -65,7 +65,7 @@ final class Connection: BaseConnection
     {
         //assert( async );
         addHandler( handler );
-        size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
+        size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
     }
     
