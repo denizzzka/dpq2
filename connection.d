@@ -45,7 +45,7 @@ class BaseConnection
             PQ_CONSUME_OK
         }
         
-        public shared static answerHandler[PGconn*] handlers; // TODO: list would be better and thread-safe?
+        shared static answerHandler[PGconn*] handlers; // TODO: list would be better and thread-safe?
         
         version(Release){}else
         {
