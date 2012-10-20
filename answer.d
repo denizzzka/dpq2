@@ -101,6 +101,7 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
+        @property
         immutable (Array*) asArray()
         {
             return new Array( &this );
@@ -196,12 +197,14 @@ immutable class answer
             this.elementIsNULL = elementIsNULL.idup;
         }
         
+        /// Returns Value struct
         immutable (Value)* getValue( ... ) immutable
         {
             auto n = coords2Serial( _argptr, _arguments );
             return new Value( elements[n] );
         }
         
+        /// Value NULL checking
         bool isNULL( ... ) immutable
         {
             auto n = coords2Serial( _argptr, _arguments );
@@ -255,6 +258,7 @@ immutable class answer
         PQclear(res);
     }
 
+    @property
     ExecStatusType status()
     {
         return PQresultStatus(res);
@@ -337,6 +341,7 @@ immutable class answer
         return PQgetisnull(res, Row, Col) != 0;
     }
     
+    @property
     private string resultErrorMessage()
     {
         return to!string( PQresultErrorMessage(res) );

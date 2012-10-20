@@ -81,6 +81,7 @@ final class Connection: BaseConnection
     }
 
     /// Returns null if no notifies was received
+    @property
     immutable (notify) getNextNotify()
     {
         consumeInput();
