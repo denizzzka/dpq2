@@ -217,7 +217,6 @@ void _unittest( string connParam )
     sleep( 1 );
     //while( c.isBusy() ){}
 
-    writeln(Connection.s);
     writeln( an );
     writeln( an[0][0,0].as!PGtext );
     writeln( an[1][0,0].as!PGtext );

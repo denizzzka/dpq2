@@ -10,7 +10,6 @@ import std.conv: to;
 import std.string: toStringz;
 import std.exception;
 import std.range;
-import std.array;
 import core.exception;
 
 /*
@@ -62,8 +61,6 @@ class BaseConnection
     }
     
     auto handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
-    
-    debug static string s;
     
     @property bool async(){ return asyncFlag; }
 
@@ -142,12 +139,10 @@ class BaseConnection
         switch( evtId )
         {
             case PGEventId.PGEVT_REGISTER:
-                debug s ~= "PGEVT_REGISTER ";
                 return OK;
                 
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(PGEventResultCreate*) evtInfo;
-                debug s ~= info.conn != null ? "true " : "false ";
                 
                 // handler search
                 answerHandler h;
@@ -168,7 +163,6 @@ class BaseConnection
                 PGresult* r;
                 while( r = PQgetResult(info.conn), r )
                 {
-                    debug s ~= "result_received ";
                     h( new Answer(r) );
                 }
 
