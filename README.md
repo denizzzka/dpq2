@@ -14,6 +14,7 @@ Features
 
 * Arguments list support
 * Binary and text data queries
+* Async queries support
 * Reading of the text query results to native D text types
 * Representation of the binary query results to native D types
  * Text types
@@ -126,8 +127,6 @@ $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=1
 TODO
 ----
 
-* Async queries support
-* Async queries queue (like in node.js)
 * Row by row result reading
 * Binary arguments types
 * PostGIS binary data support
