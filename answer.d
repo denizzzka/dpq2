@@ -505,6 +505,9 @@ void _unittest( string connParam )
     assert( r.isNULL(0, 12) );
     assert( !r.isNULL(0, 9) );
     
+    Answer g;
+    conn.sendQuery( sql_query, (Answer a){ g = a; } );
+    
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );

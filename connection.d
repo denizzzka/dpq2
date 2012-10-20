@@ -32,6 +32,8 @@ class BaseConnection
 {
     string connString; /// Database connection parameters
     
+    alias nothrow void delegate( Answer a ) answerHandler;
+    
     package PGconn* conn;
     private
     {
@@ -43,8 +45,6 @@ class BaseConnection
             PQ_CONSUME_ERROR,
             PQ_CONSUME_OK
         }
-        
-        alias nothrow void delegate( Answer a ) answerHandler;
         
         alias answerHandler[] connSpecHandlers; // TODO: list would be better and thread-safe?
         public static connSpecHandlers[PGconn*] handlers; // TODO: list would be better and thread-safe?
