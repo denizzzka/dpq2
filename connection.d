@@ -126,7 +126,7 @@ class BaseConnection
     
     package void addHandler( answerHandler h )
     {
-        handlers[ conn ] ~= h; // TODO: need synchronization
+        handlers[ conn ] ~= h; // FIXME: need synchronization
     }
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* hStatus)
@@ -154,7 +154,7 @@ class BaseConnection
                 }
                 else
                 {
-                    // TODO: need sychronization
+                    // FIXME: need sychronization
                     h = (*chs)[0];
                     (*chs).popFront();
                 }

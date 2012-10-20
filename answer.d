@@ -508,7 +508,7 @@ void _unittest( string connParam )
     shared Answer gs;
     shared bool answerReceived = false;
     conn.sendQuery( sql_query,
-        (Answer a){ @system gs = cast(shared Answer) a; answerReceived = true; }
+        (Answer a){ gs = cast(shared Answer) a; answerReceived = true; }
     );
     
     while( !answerReceived ){}
