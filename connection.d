@@ -69,7 +69,8 @@ class BaseConnection
         if( !async && m )
             registerEventProc( &eventsHandler, "PGRESULT_HANDLER", &handlerStatus );
             // TODO: event handler can be registred only after connect!
-        
+            
+        setNonBlocking( m );
         return m;
     }
     
@@ -201,7 +202,6 @@ void _unittest( string connParam )
     auto c = new BaseConnection;
 	c.connString = connParam;
     c.connect();
-    //c.async = true;
-    //c.addHandler( (immutable Answer a){} );
+    c.async = true;
     c.disconnect();
 }

@@ -34,7 +34,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
-        //assert( !async );
+        assert( !async );
         return getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
@@ -63,7 +63,7 @@ final class Connection: BaseConnection
     /// Submits a command to the server without waiting for the result(s)
     package void sendQuery( string SQLcmd, answerHandler handler )
     {
-        //assert( async );
+        assert( async );
         addHandler( handler );
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();

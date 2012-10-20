@@ -504,7 +504,12 @@ void _unittest( string connParam )
     
     assert( r.isNULL(0, 12) );
     assert( !r.isNULL(0, 9) );
+        
+    // Notifies test
+    auto n = conn.exec( "listen test_notify; notify test_notify" );
+    assert( conn.getNextNotify.name == "test_notify" );
     
+    // Async query test
     shared Answer gs;
     shared bool answerReceived = false;
     conn.async = true;
@@ -516,8 +521,4 @@ void _unittest( string connParam )
     import std.stdio;
     auto g = cast(Answer) gs;
     writeln( g[1,2].as!PGtext );
-    
-    // Notifies test
-    auto n = conn.exec( "listen test_notify; notify test_notify" );
-    assert( conn.getNextNotify.name == "test_notify" );
 }
