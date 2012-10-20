@@ -101,6 +101,7 @@ immutable class answer
             return new SysTime( pre_time * 10, UTC() );
         }
         
+        @property
         immutable (Array*) asArray()
         {
             return new Array( &this );
@@ -257,6 +258,7 @@ immutable class answer
         PQclear(res);
     }
 
+    @property
     ExecStatusType status()
     {
         return PQresultStatus(res);
@@ -339,6 +341,7 @@ immutable class answer
         return PQgetisnull(res, Row, Col) != 0;
     }
     
+    @property
     private string resultErrorMessage()
     {
         return to!string( PQresultErrorMessage(res) );
