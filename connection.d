@@ -46,8 +46,7 @@ class BaseConnection
             PQ_CONSUME_OK
         }
         
-        alias answerHandler[] connSpecHandlers; // TODO: list would be better and thread-safe?
-        public static connSpecHandlers[PGconn*] handlers; // TODO: list would be better and thread-safe?
+        public shared static answerHandler[PGconn*] handlers; // TODO: list would be better and thread-safe?
         
         version(Release){}else
         {
@@ -125,8 +124,10 @@ class BaseConnection
     }
     
     package void addHandler( answerHandler h )
-    {
-        handlers[ conn ] ~= h; // FIXME: need synchronization
+    {   // FIXME: need synchronization
+        assert( !( conn in handlers ),
+            "Can't make a query while hasn't been completed previous one." );
+        handlers[ conn ] = h;
     }
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* hStatus)
@@ -143,29 +144,15 @@ class BaseConnection
                 
             case PGEventId.PGEVT_RESULTCREATE:
                 auto info = cast(PGEventResultCreate*) evtInfo;
+                assert( handlers[ info.conn ] != null );
                 
-                // handler search
-                answerHandler h;
-                connSpecHandlers* chs = ( info.conn in handlers );
-                if( chs is null || chs.length == 0 )
-                {
-                    *handlerStatus = handlerStatuses.HANDLER_NOT_FOUND;
-                    return ERROR;
-                }
-                else
-                {
-                    // FIXME: need sychronization
-                    h = (*chs)[0];
-                    (*chs).popFront();
-                }
-                
-                // fetch every result
                 PGresult* r;
                 while( r = PQgetResult(info.conn), r )
                 {
-                    h( new Answer(r) );
+                    handlers[ info.conn ]( new Answer(r) );
                 }
-
+                
+                handlers.remove( info.conn );
                 return OK; // all results are processed
                 
             default:
