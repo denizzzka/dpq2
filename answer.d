@@ -506,8 +506,12 @@ void _unittest( string connParam )
     assert( !r.isNULL(0, 9) );
     
     Answer g;
-    conn.async;
-    conn.sendQuery( sql_query, (Answer a){ g = a; } );
+    bool answerReceived = false;
+    conn.sendQuery( sql_query, (Answer a){ g = a; answerReceived = true; } );
+    
+    while( !answerReceived ){}
+    import std.stdio;
+    writeln( g[1,2].as!PGtext );
     
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
