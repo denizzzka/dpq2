@@ -100,20 +100,6 @@ final class Connection: BaseConnection
         return PQisBusy(conn) == 1;
     }
     
-    /// Attempts to flush any queued output data to the server
-    /**
-     * After sending any command or data on a nonblocking connection, call flush().
-     * If it returns true, wait for the socket to be write-ready and call it again;
-     * repeat until it returns false. Once flush() returns false, wait for the socket to
-     * be read-ready and then read the response as described above.
-     */
-    package bool flush()
-    {
-        auto r = PQflush(conn);
-        if( r == -1 ) throw new exception();
-        return !r;
-    }
-    
     /// Returns null if no notifies was received
     immutable (notify) getNextNotify()
     {

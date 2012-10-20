@@ -109,7 +109,14 @@ class BaseConnection
         int r = PQconsumeInput( conn );
         if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
     }
-
+    
+    package bool flush()
+    {
+        auto r = PQflush(conn);
+        if( r == -1 ) throw new exception();
+        return r == 0;
+    }
+    
     private static string PQerrorMessage(PGconn* conn)
     {
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
