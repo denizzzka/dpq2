@@ -66,7 +66,7 @@ final class Connection: BaseConnection
         //assert( async );
         addHandler( handler );
         size_t r = PQsendQuery(conn, toStringz( SQLcmd ));
-        if( !r ) throw new exception();
+        if( r != 1 ) throw new exception();
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -196,37 +196,4 @@ void _unittest( string connParam )
     p.args = args;
 
     auto r2 = conn.exec( p );
-    
-    import std.stdio;
-    
-    auto c = new Connection;
-    c.connString = connParam;
-    c.connect;
-    c.setNonBlocking( true );
-    c.async = true;
-    Answer[] an;
-    Answer[] an2;
-    writeln( c.handlers );
-    c.addHandler( (Answer a){ an ~= a; } );
-    //c.addHandler( (Answer a){ an2 ~= a; } );
-    writeln( c.handlers );
-    import core.thread: sleep;
-    sleep( 1 );
-    c.exec( "select 1; select 2; select 3;" );
-    //c.flush();
-    //c.consumeInput();
-    sleep( 1 );
-    //while( c.isBusy() ){}
-
-    writeln( an );
-    writeln( an[0][0,0].as!PGtext );
-    writeln( an[1][0,0].as!PGtext );
-    
-    writeln( c.handlers );
-    
-    import std.range: moveFront;
-    auto h = c.handlers[c.conn];
-    writeln( typeid( h ) );
-    //h.moveFront();
-    //writeln( h );
 }

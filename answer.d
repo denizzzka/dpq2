@@ -507,6 +507,7 @@ void _unittest( string connParam )
     
     shared Answer gs;
     shared bool answerReceived = false;
+    conn.setNonBlocking( true );
     conn.sendQuery( sql_query,
         (Answer a){ gs = cast(shared Answer) a; answerReceived = true; }
     );
