@@ -506,7 +506,7 @@ void _unittest( string connParam )
     assert( !r.isNULL(0, 9) );
     
     Answer g;
-    bool answerReceived = false;
+    shared bool answerReceived = false;
     conn.sendQuery( sql_query, (Answer a){ g = a; answerReceived = true; } );
     
     while( !answerReceived ){}
