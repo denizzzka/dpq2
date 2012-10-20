@@ -32,7 +32,7 @@ class BaseConnection
 {
     string connString; /// Database connection parameters
     
-    alias nothrow void delegate( Answer a ) answerHandler;
+    @system alias nothrow void delegate( Answer a ) answerHandler;
     
     package PGconn* conn;
     private

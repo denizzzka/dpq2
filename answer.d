@@ -505,12 +505,15 @@ void _unittest( string connParam )
     assert( r.isNULL(0, 12) );
     assert( !r.isNULL(0, 9) );
     
-    Answer g;
+    shared Answer gs;
     shared bool answerReceived = false;
-    conn.sendQuery( sql_query, (Answer a){ g = a; answerReceived = true; } );
+    conn.sendQuery( sql_query,
+        (Answer a){ @system gs = cast(shared Answer) a; answerReceived = true; }
+    );
     
     while( !answerReceived ){}
     import std.stdio;
+    auto g = cast(Answer) gs;
     writeln( g[1,2].as!PGtext );
     
     // Notifies test
