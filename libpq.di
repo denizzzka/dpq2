@@ -141,7 +141,7 @@ PQERRORS_VERBOSE,
     int PQprotocolVersion(PGconn* conn);
     int PQserverVersion(PGconn* conn);
     char* PQerrorMessage(PGconn* conn);
-    int PQsocket(PGconn* conn);
+    size_t PQsocket(PGconn* conn); // used!
     int PQbackendPID(PGconn* conn);
     int PQclientEncoding(PGconn* conn);
     int PQsetClientEncoding(PGconn* conn, char* encoding);

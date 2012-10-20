@@ -117,6 +117,13 @@ class BaseConnection
         return r == 0;
     }
     
+    package size_t socket()
+    {
+        auto r = PQsocket( conn );
+        assert( r >= 0 );
+        return r;
+    }
+    
     private static string PQerrorMessage(PGconn* conn)
     {
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );

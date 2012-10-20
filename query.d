@@ -67,6 +67,9 @@ final class Connection: BaseConnection
         addHandler( handler );
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
+        
+        auto f = flush();
+        while( f ){}
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
