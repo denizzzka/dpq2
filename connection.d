@@ -10,6 +10,7 @@ import std.conv: to;
 import std.string: toStringz;
 import std.exception;
 import std.range;
+import std.array;
 import core.exception;
 
 /*
@@ -128,7 +129,7 @@ class BaseConnection
     
     package void addHandler( answerHandler h )
     {
-        handlers[ conn ] ~= h;
+        handlers[ conn ] ~= h; // TODO: need synchronization
     }
     
     private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* hStatus)
@@ -150,11 +151,17 @@ class BaseConnection
                 
                 // handler search
                 answerHandler h;
-                connSpecHandlers* l = ( info.conn in handlers );
-                if( l !is null )
+                connSpecHandlers* chs = ( info.conn in handlers );
+                if( chs is null || chs.length == 0 )
                 {
-                    h = (*l)[0]; //.moveFront(); // get oldest registred handler
-                    //l.popFront();
+                    *handlerStatus = handlerStatuses.HANDLER_NOT_FOUND;
+                    return ERROR;
+                }
+                else
+                {
+                    // TODO: need sychronization
+                    h = (*chs)[0];
+                    (*chs).popFront();
                 }
                 
                 // fetch every result
@@ -162,13 +169,7 @@ class BaseConnection
                 while( r = PQgetResult(info.conn), r )
                 {
                     debug s ~= "result_received ";
-                    if( h is null) // handler was found previously?
-                    {
-                        *handlerStatus = handlerStatuses.HANDLER_NOT_FOUND;
-                        return ERROR;
-                    }
-                    else
-                        h( new Answer(r) );
+                    h( new Answer(r) );
                 }
 
                 return OK; // all results are processed
