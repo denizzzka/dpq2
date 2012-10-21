@@ -77,12 +77,24 @@ final class Connection: BaseConnection
         if( r != 1 ) throw new exception();
         
         auto socket = cast (shared size_t) socket();
-        return spawn( &expectAnswer, socket, cast (shared answerHandler) handler );
+        return spawn( &expectAnswer, cast(shared Connection) conn, cast (shared answerHandler) handler );
     }
     
-    static void expectAnswer( shared size_t socket, shared answerHandler handler )
+    static private void expectAnswer( shared Connection conn, shared answerHandler handler )
     {
+        auto c = cast(Connection) conn;
+        import std.socket;
+        auto s = new Socket( cast(socket_t) c.socket(), AddressFamily.UNSPEC );
+        auto ss = new SocketSet;
+        ss.add( s );
         
+        import std.stdio;
+        writeln("s1");
+        
+        Socket.select( ss, null, null );
+        c.consumeInput();
+            
+        writeln("s2 ");
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
