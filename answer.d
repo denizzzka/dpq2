@@ -28,9 +28,9 @@ alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
 /// Answer
-immutable class answer
+class Answer // most members should be a const
 {
-    private PGresult* res;
+    private immutable PGresult* res; // TODO: should be mutable
     
     /// Result table's cell coordinates 
     struct Coords
@@ -40,7 +40,7 @@ immutable class answer
     }
 
     /// Result table's cell
-    immutable struct Value
+    immutable struct Value // TODO: should be a const struct with const members without copy ability or class
     {
         private ubyte[] value;
         debug private dpq2.libpq.valueFormat format;
@@ -108,7 +108,7 @@ immutable class answer
         }
     }
         
-    immutable struct Array
+    immutable struct Array // TODO: should be a const struct with const members without copy ability or class
     {
         Oid OID;
         int nDims; /// Number of dimensions
@@ -174,12 +174,12 @@ immutable class answer
             
             // Looping through all elements and fill out index of them
             auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
-            for(int i = 0; i < n_elems; ++i )
+            for(uint i = 0; i < n_elems; ++i )
             {
                 ubyte[int.sizeof] size_net;
                 size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-                int size;
-                if( size_net == [ 0xFF, 0xFF, 0xFF, 0xFF ] )
+                uint size = bigEndianToNative!uint( size_net );
+                if( size == size.max ) // NULL magic number
                 {
                     elementIsNULL[i] = true;
                     size = 0;
@@ -187,7 +187,6 @@ immutable class answer
                 else
                 {
                     elementIsNULL[i] = false;
-                    size = bigEndianToNative!int( size_net );
                 }
                 curr_offset += size_net.sizeof;
                 elements[i] = cell.value[curr_offset .. curr_offset + size];
@@ -242,9 +241,24 @@ immutable class answer
         }
     }
     
-    package this(immutable PGresult* r) immutable
+    package this(PGresult* r) nothrow
     {
-        res = r;
+        res = cast(immutable PGresult*) r;
+    }
+    
+    ~this()
+    {
+        if( res )
+        {
+            PQclear(res);
+            //res = null; // FIXME: this is really need!
+        }
+        else
+            assert( true, "double free!" );
+    }
+    
+    package void checkAnswerForErrors()
+    {
         enforceEx!OutOfMemoryError(res, "Can't write query result");
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
@@ -254,10 +268,6 @@ immutable class answer
         }
     }
     
-    ~this() {
-        PQclear(res);
-    }
-
     @property
     ExecStatusType status()
     {
@@ -364,7 +374,6 @@ immutable class answer
     }
 }
 
-
 /// Notify
 immutable class notify
 {
@@ -435,7 +444,7 @@ void _unittest( string connParam )
 
     auto e = conn.exec( sql_query );
     
-    alias answer.Coords Coords;
+    alias Answer.Coords Coords;
 
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
@@ -499,8 +508,22 @@ void _unittest( string connParam )
     
     assert( r.isNULL(0, 12) );
     assert( !r.isNULL(0, 9) );
-    
+        
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
+    
+    // Async query test
+    shared Answer gs;
+    shared bool answerReceived = false;
+    conn.async = true;
+    conn.sendQuery( sql_query,
+        (Answer a){ gs = cast(shared Answer) a; answerReceived = true; }
+    );
+    
+    import std.stdio;
+    //writeln( conn.handlers[ conn.conn ] );
+    while( !answerReceived ){}
+    auto g = cast(Answer) gs;
+    writeln( g[1,2].as!PGtext );
 }

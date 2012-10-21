@@ -141,7 +141,7 @@ PQERRORS_VERBOSE,
     int PQprotocolVersion(PGconn* conn);
     int PQserverVersion(PGconn* conn);
     char* PQerrorMessage(PGconn* conn);
-    int PQsocket(PGconn* conn);
+    size_t PQsocket(PGconn* conn); // used!
     int PQbackendPID(PGconn* conn);
     int PQclientEncoding(PGconn* conn);
     int PQsetClientEncoding(PGconn* conn, char* encoding);
@@ -156,16 +156,16 @@ PQERRORS_VERBOSE,
     PQnoticeProcessor PQsetNoticeProcessor(PGconn* conn, PQnoticeProcessor proc, void* arg);
     alias void function(int acquire) pgthreadlock_t;
     pgthreadlock_t PQregisterThreadLock(pgthreadlock_t newhandler);
-    immutable (PGresult)* PQexec(PGconn* conn, const char* query); // used!
-    immutable (PGresult)* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
+    PGresult* PQexec(PGconn* conn, const char* query); // used!
+    PGresult* PQexecParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     PGresult* PQprepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     PGresult* PQexecPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
-    int PQsendQuery(PGconn* conn, char* query);
-    int PQsendQueryParams(PGconn* conn, char* command, int nParams, Oid* paramTypes, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
+    size_t PQsendQuery(PGconn* conn, const char* query); // used!
+    size_t PQsendQueryParams(PGconn* conn, const char* command, size_t nParams, Oid* paramTypes, const ubyte** paramValues, size_t* paramLengths, size_t* paramFormats, size_t resultFormat); // used!
     int PQsendPrepare(PGconn* conn, char* stmtName, char* query, int nParams, Oid* paramTypes);
     int PQsendQueryPrepared(PGconn* conn, char* stmtName, int nParams, char** paramValues, int* paramLengths, int* paramFormats, int resultFormat);
-    PGresult* PQgetResult(PGconn* conn);
-    int PQisBusy(PGconn* conn);
+    PGresult* PQgetResult(PGconn* conn); // used!
+    int PQisBusy(PGconn* conn); // used!
     int PQconsumeInput(PGconn* conn);
     immutable (PGnotify)* PQnotifies(PGconn* conn); // used!
     int PQputCopyData(PGconn* conn, char* buffer, int nbytes);
@@ -176,10 +176,10 @@ PQERRORS_VERBOSE,
     int PQgetlineAsync(PGconn* conn, char* buffer, int bufsize);
     int PQputnbytes(PGconn* conn, char* buffer, int nbytes);
     int PQendcopy(PGconn* conn);
-    int PQsetnonblocking(PGconn* conn, int arg);
+    size_t PQsetnonblocking(PGconn* conn, size_t arg); // used!
     int PQisnonblocking(PGconn* conn);
-    int PQisthreadsafe();
-    int PQflush(PGconn* conn);
+    size_t PQisthreadsafe(); //
+    size_t PQflush(PGconn* conn); // used!
     PGresult* PQfn(PGconn* conn, int fnid, int* result_buf, int* result_len, int result_is_int, PQArgBlock* args, int nargs);
     ExecStatusType PQresultStatus( immutable PGresult* res ); // used!
     char* PQresStatus(ExecStatusType status);
@@ -236,5 +236,23 @@ PQERRORS_VERBOSE,
     int PQdsplen(char* s, int encoding);
     int PQenv2encoding();
     char* PQencryptPassword(char* passwd, char* user);
+    
+    alias size_t function (PGEventId evtId, void* evtInfo, void* passThrough) PGEventProc; // used!
+    size_t PQregisterEventProc(PGconn *conn, PGEventProc proc, immutable char* name, void *passThrough); // used!
+    size_t PQsetInstanceData(PGconn *conn, PGEventProc proc, void *data);
+    enum PGEventId // used
+    {
+        PGEVT_REGISTER,
+        PGEVT_CONNRESET,
+        PGEVT_CONNDESTROY,
+        PGEVT_RESULTCREATE,
+        PGEVT_RESULTCOPY,
+        PGEVT_RESULTDESTROY
+    }
+    
+    struct PGEventResultCreate
+    {
+        PGconn* conn;
+        PGresult* result;
+    }
 }
-

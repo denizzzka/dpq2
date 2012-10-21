@@ -31,55 +31,91 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
+    debug shared bool inUse;
+    
     /// Perform SQL query to DB
-    immutable (answer) exec(string SQLcmd )
+    Answer exec( string SQLcmd )
     {
-        return new answer(
+        assert( !async );
+        return getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
     }
 
     /// Perform SQL query to DB
-    immutable (answer) exec(ref const queryParams p)
+    Answer exec(ref const queryParams p)
     {
-        // code above just preparing args for PQexecParams
-        Oid[] types = new Oid[p.args.length];
-        size_t[] formats = new size_t[p.args.length];
-        size_t[] lengths = new size_t[p.args.length];
-        const(ubyte)*[] values = new const(ubyte)*[p.args.length];
-
-        for( int i = 0; i < p.args.length; ++i )
-        {
-            types[i] = p.args[i].type;
-            formats[i] = p.args[i].queryFormat;  
-            values[i] = p.args[i].valueBin.ptr;
-            
-            final switch( p.args[i].queryFormat )
-            {
-                case valueFormat.TEXT:
-                    lengths[i] = p.args[i].valueStr.length;
-                    break;
-                case valueFormat.BINARY:
-                    lengths[i] = p.args[i].valueBin.length;
-                    break;
-            }
-        }
-
-        return new answer
+        assert( !async );
+        auto a = prepareArgs( p );
+        return getAnswer
         (
             PQexecParams (
                 conn,
                 toStringz( p.sqlCommand ),
                 p.args.length,
-                types.ptr,
-                values.ptr,
-                lengths.ptr,
-                formats.ptr,
+                a.types.ptr,
+                a.values.ptr,
+                a.lengths.ptr,
+                a.formats.ptr,
                 p.resultFormat
             )
         );
     }
-
+    
+        
+    import std.concurrency;
+    alias Tid Descriptor;
+    
+    /// Submits a command to the server without waiting for the result(s)
+    package Descriptor sendQuery( string SQLcmd, shared answerHandler handler )
+    {
+        assert( async );
+        assert( !inUse );
+        debug inUse = true;
+        
+        size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
+        if( r != 1 ) throw new exception();
+        
+        auto socket = cast (shared size_t) socket();
+        return spawn( &expectAnswer, socket, cast (shared answerHandler) handler );
+    }
+    
+    static void expectAnswer( shared size_t socket, shared answerHandler handler )
+    {
+        
+    }
+    
+    /// Submits a command and separate parameters to the server without waiting for the result(s)
+    package void sendQuery( ref const queryParams p )
+    {
+        assert( async );
+        auto a = prepareArgs( p );
+        size_t r = PQsendQueryParams (
+                        conn,
+                        toStringz( p.sqlCommand ),
+                        p.args.length,
+                        a.types.ptr,
+                        a.values.ptr,
+                        a.lengths.ptr,
+                        a.formats.ptr,
+                        p.resultFormat                        
+                    );
+        
+        if( !r ) throw new exception();
+    }
+    
+    /// Waits for the next result from a sendQuery
+    package Answer getResult()
+    {
+        return getAnswer( PQgetResult( conn ) );
+    }
+    
+    /// getResult would block waiting for input?
+    package bool isBusy()
+    {
+        return PQisBusy(conn) == 1;
+    }
+    
     /// Returns null if no notifies was received
     @property
     immutable (notify) getNextNotify()
@@ -89,7 +125,49 @@ final class Connection: BaseConnection
         return n is null ? null : new notify( n );
     }
     
+    private struct preparedArgs
+    {
+        Oid[] types;
+        size_t[] formats;
+        size_t[] lengths;
+        const(ubyte)*[] values;
+    }
     
+    // For PQxxxParams need especially prepared arguments
+    private preparedArgs* prepareArgs(ref const queryParams p)
+    {
+        preparedArgs* a = new preparedArgs;
+        a.types = new Oid[p.args.length];
+        a.formats = new size_t[p.args.length];
+        a.lengths = new size_t[p.args.length];
+        a.values = new const(ubyte)*[p.args.length];
+        
+        for( int i = 0; i < p.args.length; ++i )
+        {
+            a.types[i] = p.args[i].type;
+            a.formats[i] = p.args[i].queryFormat;  
+            a.values[i] = p.args[i].valueBin.ptr;
+            
+            final switch( p.args[i].queryFormat )
+            {
+                case valueFormat.TEXT:
+                    a.lengths[i] = p.args[i].valueStr.length;
+                    break;
+                case valueFormat.BINARY:
+                    a.lengths[i] = p.args[i].valueBin.length;
+                    break;
+            }
+        }
+        return a;
+    }
+    
+    // It is important to do a separate check because of Answer ctor is nothrow
+    private Answer getAnswer( PGresult* r )
+    {
+        auto res = new Answer( r );
+        res.checkAnswerForErrors();
+        return res;
+    }
 }
 
 void _unittest( string connParam )
@@ -101,7 +179,7 @@ void _unittest( string connParam )
     string sql_query =
     "select now() as time, 'abc'::text as string, 123, 456.78\n"
     "union all\n"
-    "select now(), 'def'::text, 456, 910.11\n"
+    "select now(), 'def'::text, 777, 910.11\n"
     "union all\n"
     "select NULL, 'ijk'::text, 789, 12345.115345";
 
