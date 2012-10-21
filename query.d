@@ -76,11 +76,13 @@ final class Connection: BaseConnection
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
         
-        return spawn( &expectAnswer, handler );
+        auto socket = cast (shared size_t) socket();
+        return spawn( &expectAnswer, socket, cast (shared answerHandler) handler );
     }
     
-    static void expectAnswer( shared answerHandler handler )
+    static void expectAnswer( shared size_t socket, shared answerHandler handler )
     {
+        
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
