@@ -517,8 +517,9 @@ void _unittest( string connParam )
         (Answer a){ gs = cast(shared Answer) a; answerReceived = true; }
     );
     
-    while( !answerReceived ){}
     import std.stdio;
+    //writeln( conn.handlers[ conn.conn ] );
+    while( !answerReceived ){}
     auto g = cast(Answer) gs;
     writeln( g[1,2].as!PGtext );
 }

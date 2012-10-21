@@ -31,6 +31,8 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
+    debug shared bool inUse;
+    
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
@@ -60,16 +62,25 @@ final class Connection: BaseConnection
         );
     }
     
+        
+    import std.concurrency;
+    alias Tid Descriptor;
+    
     /// Submits a command to the server without waiting for the result(s)
-    package void sendQuery( string SQLcmd, answerHandler handler )
+    package Descriptor sendQuery( string SQLcmd, shared answerHandler handler )
     {
         assert( async );
-        addHandler( handler );
+        assert( !inUse );
+        debug inUse = true;
+        
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
         
-        auto f = flush();
-        while( f ){}
+        return spawn( &expectAnswer, handler );
+    }
+    
+    static void expectAnswer( shared answerHandler handler )
+    {
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
