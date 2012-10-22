@@ -101,11 +101,12 @@ final class Connection: BaseConnection
         } while( c.isBusy() );
         
         import std.stdio;
-        writeln("s1");
+        writeln( "s1" );
         
         PGresult* r;
         auto cn = c.conn;
-        while( r = PQgetResult( c.conn ), r )
+        r = PQgetResult( cn );
+        while( r = PQgetResult( cn ), r )
             c.handler( new Answer( r ) );
         
         c.handler = null;
