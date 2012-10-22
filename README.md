@@ -95,12 +95,16 @@ void main()
 Compile and run:
 ```sh
 $ dmd example.d -Ldpq2/libdpq2.a -L-lpq -L-lcom_err
-$ ./example 
+$ ./example
 1: 456.78
 2: -1234.57
 3: 0013-Oct-05 03:00:21.227803Z
 4: first line
 second line
+5: true
+6: 2
+7: false
+8: true
 ```
 
 Unit tests
