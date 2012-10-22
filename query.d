@@ -77,8 +77,10 @@ final class Connection: BaseConnection
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
         
-        auto socket = cast (shared size_t) socket();
-        return spawn( &expectAnswer, cast(shared Connection) this );
+        expectAnswer( cast(shared Connection) this );
+        
+        //return spawn( &expectAnswer, cast(shared Connection) this );
+        return cast(Tid) null;
     }
     
     static private void expectAnswer( shared Connection conn )
@@ -96,7 +98,8 @@ final class Connection: BaseConnection
         c.consumeInput();
         
         PGresult* r;
-        while( r = PQgetResult(c.conn), r )
+        auto cn = c.conn;
+        while( r = PQgetResult(cn), r )
         {
             c.handler( new Answer(r) );
         }
