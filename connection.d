@@ -62,6 +62,7 @@ class BaseConnection
     
     @property bool async(){ return PQisnonblocking(conn) == 1; }
 
+    @disable
     @property bool async( bool m ) // FIXME: need to disable after connect or immutable connection params
     {
         //assert( !(async && !m), "pqlib can't change mode from async to sync" );
@@ -202,6 +203,5 @@ void _unittest( string connParam )
     auto c = new BaseConnection;
 	c.connString = connParam;
     c.connect();
-    c.async = true;
     c.disconnect();
 }

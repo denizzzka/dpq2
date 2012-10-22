@@ -36,7 +36,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
-        assert( !async );
+        assert( !handler );
         return getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
@@ -45,7 +45,7 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec(ref const queryParams p)
     {
-        assert( !async );
+        assert( !handler );
         auto a = prepareArgs( p );
         return getAnswer
         (
@@ -67,19 +67,15 @@ final class Connection: BaseConnection
     alias Tid Descriptor;
     
     /// Submits a command to the server without waiting for the result(s)
-    package void sendQuery( string SQLcmd, shared answerHandler handler )
+    package Descriptor sendQuery( string SQLcmd, shared answerHandler handler )
     {
-        //assert( async );
         assert( !this.handler );
-        
         this.handler = handler;
         
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
         
-        expectAnswer( cast(shared Connection) this );
-        
-        //return spawn( &expectAnswer, cast(shared Connection) this );
+        return spawn( &expectAnswer, cast(shared Connection) this );
     }
     
     static private void expectAnswer( shared Connection connection )
@@ -100,18 +96,11 @@ final class Connection: BaseConnection
             c.consumeInput();
         } while( c.isBusy() );
         
-        import std.stdio;
-        writeln( "s1" );
-        
         PGresult* r;
-        auto cn = c.conn;
-        //r = PQgetResult( cn );
-        while( r = PQgetResult( cn ), r )
+        while( r = PQgetResult( c.conn ), r )
             c.handler( new Answer( r ) );
         
         c.handler = null;
-        
-        writeln("s2 ");
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)

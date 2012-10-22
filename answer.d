@@ -516,8 +516,7 @@ void _unittest( string connParam )
     // Async query test
     shared Answer gs;
     shared bool answerReceived = false;
-    //conn.async = true;
-    conn.sendQuery( sql_query,
+    conn.sendQuery( "select 123; select 456; select 789",
         (Answer a)
         {
             gs = cast(shared Answer) a;
@@ -528,5 +527,5 @@ void _unittest( string connParam )
     import std.stdio;
     while( !answerReceived ){}
     auto g = cast(Answer) gs;
-    writeln( g[1,2].as!PGtext );
+    writeln( g[0,0].as!PGtext );
 }
