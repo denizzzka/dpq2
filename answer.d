@@ -319,12 +319,12 @@ class Answer // most members should be a const
     }
     
     /// Returns column number by field name
-    size_t columnNum( string column_name )
+    size_t columnNum( string columnName ) const
     {    
-        size_t n = PQfnumber(res, toStringz(column_name));
+        size_t n = PQfnumber(res, toStringz(columnName));
         if( n == -1 )
             throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
-                                "Column '"~column_name~"' is not found");
+                                "Column '"~columnName~"' is not found");
         return n;
     }
 
@@ -408,16 +408,23 @@ class Answer // most members should be a const
         
         /// Value NULL checking
         @property
-        bool isNULL( const size_t col ) 
+        bool isNULL( const size_t col ) const
         {
             return answer.isNULL(row, col);
         }
         
-        immutable (Value)* opIndex( size_t col )
+        immutable (Value)* opIndex( size_t col ) const
         {
             answer.assertCol(col);
             return answer.getValue( Coords( row, col ) );
         }
+        
+        /// Returns column number by field name
+        size_t columnNum( string columnName ) const
+        {
+            return answer.columnNum( columnName );
+        }
+
     }
     
     private size_t currRow;
