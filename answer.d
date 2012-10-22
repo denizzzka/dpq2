@@ -344,9 +344,9 @@ class Answer // most members should be a const
     }
     
     /// Returns pointer to Row
-    Row* opIndex( const size_t row ) const
+    Row opIndex( const size_t row ) const
     {
-        return new Row( this, row );
+        return Row( this, row );
     }
     
     /// Returns pointer to cell value
@@ -422,7 +422,7 @@ class Answer // most members should be a const
     
     private size_t currRow;
     
-    @property Row* front(){ return this[currRow]; }
+    @property Row front(){ return this[currRow]; }
     @property void popFront(){ return ++currRow; }
     @property bool empty(){ return currRow >= rowCount; }
 }
@@ -586,6 +586,6 @@ void _unittest( string connParam )
     foreach( elem; r )
     {
         import std.stdio;
-        assert( (*elem)[0].as!PGsmallint == -32761 );
+        assert( elem[0].as!PGsmallint == -32761 );
     }
 }
