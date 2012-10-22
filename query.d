@@ -31,8 +31,6 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
-    answerHandler handler;
-    
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
@@ -62,9 +60,11 @@ final class Connection: BaseConnection
         );
     }
     
-        
     import std.concurrency;
     alias Tid Descriptor;
+    private answerHandler handler;
+    
+    @property bool inUse(){ return handler != null; }    
     
     /// Submits a command to the server without waiting for the result(s)
     package Descriptor sendQuery( string SQLcmd, answerHandler handler )
@@ -122,7 +122,7 @@ final class Connection: BaseConnection
         while( r = PQgetResult( c.conn ), r )
             c.handler( new Answer( r ) );
         
-        c.handler = null;
+        connection.handler = null;
     }
     
     /// Waits for the next result from a sendQuery

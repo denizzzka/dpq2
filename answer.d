@@ -523,8 +523,9 @@ void _unittest( string connParam )
         }
     );
     
-    while( answersCount != 3 ) {}
+    while( conn.inUse() ) {}
     assert( answersCount == 3 );
     
     conn.sendQuery( p, (Answer a){ } );
+    while( conn.inUse() ) {}
 }
