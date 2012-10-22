@@ -37,7 +37,6 @@ class BaseConnection
     package PGconn* conn;
     private
     {
-        //bool connectingInProgress;
         bool readyForQuery;
         enum ConsumeResult
         {
@@ -45,8 +44,6 @@ class BaseConnection
             PQ_CONSUME_OK
         }
     }
-    
-    auto handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
     
     @property bool nonBlocking(){ return PQisnonblocking(conn) == 1; }
 
@@ -66,6 +63,8 @@ class BaseConnection
 	/// Connect to DB
     void connect()
     {
+        assert( !readyForQuery );
+        
 		// TODO: нужны блокировки чтобы нельзя было несколько раз создать
 		// соединение из параллельных потоков или запрос через нерабочее соединение
         conn = PQconnectdb(toStringz(connString));
