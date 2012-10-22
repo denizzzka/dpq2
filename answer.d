@@ -31,12 +31,24 @@ alias SysTime PGtime_stamp; /// time stamp with/without timezone
 class Answer // most members should be a const
 {
     private immutable PGresult* res; // TODO: should be mutable
+
+    invariant()
+    {
+        assert( res != null );
+    }
     
     /// Result table's cell coordinates 
     struct Coords
     {
         size_t Row; /// Row
         size_t Col; /// Column
+        /*
+        this( const size_t row, const size_t col )
+        {
+            Row = row;
+            Col = col;
+        }
+        */
     }
 
     /// Result table's cell
@@ -197,7 +209,7 @@ class Answer // most members should be a const
         }
         
         /// Returns Value struct
-        immutable (Value)* getValue( ... ) immutable
+        immutable (Value)* getValue( ... ) const
         {
             auto n = coords2Serial( _argptr, _arguments );
             return new Value( elements[n] );
@@ -287,20 +299,20 @@ class Answer // most members should be a const
     }
 
     /// Returns row count
-    @property size_t rowCount(){ return PQntuples(res); }
+    @property size_t rowCount() const { return PQntuples(res); }
 
     /// Returns column count
-    @property size_t columnCount(){ return PQnfields(res); }
+    @property size_t columnCount() const { return PQnfields(res); }
 
     /// Returns column format
-    dpq2.libpq.valueFormat columnFormat( size_t colNum )
+    dpq2.libpq.valueFormat columnFormat( const size_t colNum ) const
     {
         assertCol( colNum );
         return PQfformat(res, colNum);
     }
     
     /// Returns column Oid
-    @property Oid OID( size_t colNum )
+    @property Oid OID( size_t colNum ) const
     {
         assertCol( colNum );
         return PQftype(res, colNum);
@@ -316,7 +328,7 @@ class Answer // most members should be a const
         return n;
     }
 
-    immutable (Value)* getValue( const Coords c )
+    immutable (Value)* getValue( const Coords c ) const
     {
         assertCoords(c);
         
@@ -331,24 +343,31 @@ class Answer // most members should be a const
         return r;
     }
     
-    /// Returns pointer to cell
-    immutable (Value)* opIndex( size_t Row, size_t Col )
+    Row* getRow( const size_t row ) const
     {
-        return getValue( Coords( Row, Col ) );
+        return new Row( this, row );
+    }
+    
+    /// Returns pointer to cell
+    immutable (Value)* opIndex( const size_t row, const size_t col ) const
+    {
+        const Coords c = { Row: row, Col: col };
+        return getValue( c );
     }
     
     /// Returns cell size
-    size_t size( const Coords c ) 
+    size_t size( const Coords c ) const
     {
         assertCoords(c);
         return PQgetlength(res, c.Row, c.Col);
     }
     
     /// Value NULL checking
-    bool isNULL( size_t Row, size_t Col ) 
+    bool isNULL( const size_t row, const size_t col ) const
     {
-        assertCoords(Coords(Row, Col));
-        return PQgetisnull(res, Row, Col) != 0;
+        const Coords c = { Row: row, Col: col };
+        assertCoords( c );
+        return PQgetisnull(res, row, col) != 0;
     }
     
     @property
@@ -357,20 +376,49 @@ class Answer // most members should be a const
         return to!string( PQresultErrorMessage(res) );
     }
     
-    private void assertCol( size_t c )
+    private void assertCol( const size_t c ) const
     {
         assert( c < columnCount, to!string(c)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
     }
     
-    private void assertCoords( const Coords c )
+    private void assertCoords( const Coords c ) const
     {
         assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
         assertCol( c.Col );
     }    
-
-    invariant()
+    
+    struct Row
     {
-        assert( res != null );
+        private const Answer answer;
+        private immutable size_t row;
+        
+        this( const Answer answer, const size_t row )
+        {
+            this.answer = answer;
+            this.row = row;
+        }
+        
+        /// Returns cell size
+        @property
+        size_t size( const size_t col ) const
+        {
+            answer.assertCol(col);
+            return PQgetlength(answer.res, row, col);
+        }
+        
+        /// Value NULL checking
+        @property
+        bool isNULL( const size_t col ) 
+        {
+            answer.assertCol(col);
+            return PQgetisnull(answer.res, row, col) != 0;
+        }
+        
+        immutable (Value)* opIndex( size_t col )
+        {
+            answer.assertCol(col);
+            return answer.getValue( Coords( row, col ) );
+        }
     }
 }
 
