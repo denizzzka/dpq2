@@ -37,19 +37,13 @@ class BaseConnection
     package PGconn* conn;
     private
     {
-        bool connectingInProgress;
+        //bool connectingInProgress;
         bool readyForQuery;
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
             PQ_CONSUME_OK
         }
-    }
-    
-    enum handlerStatuses
-    {
-        HANDLER_STATUS_OK,
-        HANDLER_NOT_FOUND /// No delegate for query processing has been found
     }
     
     auto handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
