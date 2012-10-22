@@ -515,14 +515,16 @@ void _unittest( string connParam )
     
     // Async query test
     shared Answer gs;
-    shared bool answerReceived = false;
+    shared auto answersCount = 0; 
     conn.sendQuery( "select 123; select 456; select 789",
         (Answer a)
         {
-            import std.stdio;
-            writeln( a[0,0].as!PGtext );
-            gs = cast(shared Answer) a;
-            answerReceived = true;
+            ++answersCount;
         }
     );
+    
+    while( answersCount != 3 ) {}
+    assert( answersCount == 3 );
+    
+    conn.sendQuery( p, (Answer a){ } );
 }

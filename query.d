@@ -31,7 +31,7 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
-    shared answerHandler handler;
+    answerHandler handler;
     
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
@@ -67,13 +67,35 @@ final class Connection: BaseConnection
     alias Tid Descriptor;
     
     /// Submits a command to the server without waiting for the result(s)
-    package Descriptor sendQuery( string SQLcmd, shared answerHandler handler )
+    package Descriptor sendQuery( string SQLcmd, answerHandler handler )
     {
         assert( !this.handler );
         this.handler = handler;
         
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
+        
+        return spawn( &expectAnswer, cast(shared Connection) this );
+    }
+    
+    /// Submits a command and separate parameters to the server without waiting for the result(s)
+    package Descriptor sendQuery( ref const queryParams p, answerHandler handler )
+    {
+        assert( !this.handler );
+        this.handler = handler;
+        
+        auto a = prepareArgs( p );
+        size_t r = PQsendQueryParams (
+                        conn,
+                        toStringz( p.sqlCommand ),
+                        p.args.length,
+                        a.types.ptr,
+                        a.values.ptr,
+                        a.lengths.ptr,
+                        a.formats.ptr,
+                        p.resultFormat                        
+                    );
+        if( !r ) throw new exception();
         
         return spawn( &expectAnswer, cast(shared Connection) this );
     }
@@ -101,24 +123,6 @@ final class Connection: BaseConnection
             c.handler( new Answer( r ) );
         
         c.handler = null;
-    }
-    
-    /// Submits a command and separate parameters to the server without waiting for the result(s)
-    package void sendQuery( ref const queryParams p )
-    {
-        auto a = prepareArgs( p );
-        size_t r = PQsendQueryParams (
-                        conn,
-                        toStringz( p.sqlCommand ),
-                        p.args.length,
-                        a.types.ptr,
-                        a.values.ptr,
-                        a.lengths.ptr,
-                        a.formats.ptr,
-                        p.resultFormat                        
-                    );
-        
-        if( !r ) throw new exception();
     }
     
     /// Waits for the next result from a sendQuery
