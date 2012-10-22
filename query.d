@@ -67,7 +67,7 @@ final class Connection: BaseConnection
     alias Tid Descriptor;
     
     /// Submits a command to the server without waiting for the result(s)
-    package Descriptor sendQuery( string SQLcmd, shared answerHandler handler )
+    package void sendQuery( string SQLcmd, shared answerHandler handler )
     {
         assert( async );
         assert( !this.handler );
@@ -80,29 +80,33 @@ final class Connection: BaseConnection
         expectAnswer( cast(shared Connection) this );
         
         //return spawn( &expectAnswer, cast(shared Connection) this );
-        return cast(Tid) null;
     }
     
-    static private void expectAnswer( shared Connection conn )
+    static private void expectAnswer( shared Connection connection )
     {
-        auto c = cast(Connection) conn;
         import std.socket;
+        
+        auto c = cast(Connection) connection;
         auto s = new Socket( cast(socket_t) c.socket(), AddressFamily.UNSPEC );
         auto ss = new SocketSet;
         ss.add( s );
         
+        while( !c.flush() )
+            Socket.select( null, ss, null );
+        
+        Socket.select( ss, null, null );
+        
+        do {
+            c.consumeInput();
+        } while( c.isBusy() );
+        
         import std.stdio;
         writeln("s1");
         
-        Socket.select( ss, null, null );
-        c.consumeInput();
-        
         PGresult* r;
         auto cn = c.conn;
-        while( r = PQgetResult(cn), r )
-        {
-            c.handler( new Answer(r) );
-        }
+        while( r = PQgetResult( c.conn ), r )
+            c.handler( new Answer( r ) );
         
         c.handler = null;
         
