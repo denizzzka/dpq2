@@ -516,14 +516,17 @@ void _unittest( string connParam )
     // Async query test
     shared Answer gs;
     shared bool answerReceived = false;
-    conn.async = true;
+    //conn.async = true;
     conn.sendQuery( sql_query,
-        (Answer a){ gs = cast(shared Answer) a; answerReceived = true; }
+        (Answer a)
+        {
+            gs = cast(shared Answer) a;
+            answerReceived = true;
+        }
     );
     
     import std.stdio;
-    //writeln( conn.handlers[ conn.conn ] );
-    //while( !answerReceived ){}
-    //auto g = cast(Answer) gs;
-    //writeln( g[1,2].as!PGtext );
+    while( !answerReceived ){}
+    auto g = cast(Answer) gs;
+    writeln( g[1,2].as!PGtext );
 }

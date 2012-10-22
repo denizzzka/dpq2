@@ -69,7 +69,7 @@ final class Connection: BaseConnection
     /// Submits a command to the server without waiting for the result(s)
     package void sendQuery( string SQLcmd, shared answerHandler handler )
     {
-        assert( async );
+        //assert( async );
         assert( !this.handler );
         
         this.handler = handler;
@@ -105,7 +105,7 @@ final class Connection: BaseConnection
         
         PGresult* r;
         auto cn = c.conn;
-        r = PQgetResult( cn );
+        //r = PQgetResult( cn );
         while( r = PQgetResult( cn ), r )
             c.handler( new Answer( r ) );
         
