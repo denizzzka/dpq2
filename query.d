@@ -62,7 +62,7 @@ final class Connection: BaseConnection
     
     import std.concurrency;
     alias Tid Descriptor;
-    private answerHandler handler;
+    private shared answerHandler handler;
     
     @property bool inUse(){ return handler != null; }    
     
