@@ -519,13 +519,10 @@ void _unittest( string connParam )
     conn.sendQuery( "select 123; select 456; select 789",
         (Answer a)
         {
+            import std.stdio;
+            writeln( a[0,0].as!PGtext );
             gs = cast(shared Answer) a;
             answerReceived = true;
         }
     );
-    
-    import std.stdio;
-    while( !answerReceived ){}
-    auto g = cast(Answer) gs;
-    writeln( g[0,0].as!PGtext );
 }

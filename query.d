@@ -106,7 +106,6 @@ final class Connection: BaseConnection
     /// Submits a command and separate parameters to the server without waiting for the result(s)
     package void sendQuery( ref const queryParams p )
     {
-        assert( async );
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
                         conn,

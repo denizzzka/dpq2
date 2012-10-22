@@ -32,7 +32,7 @@ class BaseConnection
 {
     string connString; /// Database connection parameters
     
-    @system alias nothrow void delegate( Answer a ) answerHandler;
+    @system alias void delegate( Answer a ) answerHandler;
     
     package PGconn* conn;
     private
@@ -44,12 +44,6 @@ class BaseConnection
             PQ_CONSUME_ERROR,
             PQ_CONSUME_OK
         }
-        
-        shared static answerHandler[PGconn*] handlers; // TODO: list would be better and thread-safe?
-        
-        version(Release){}else
-        {
-        }
     }
     
     enum handlerStatuses
@@ -60,17 +54,11 @@ class BaseConnection
     
     auto handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
     
-    @property bool async(){ return PQisnonblocking(conn) == 1; }
+    @property bool nonBlocking(){ return PQisnonblocking(conn) == 1; }
 
     @disable
-    @property bool async( bool m ) // FIXME: need to disable after connect or immutable connection params
+    @property bool nonBlocking( bool m )
     {
-        //assert( !(async && !m), "pqlib can't change mode from async to sync" );
-        
-        if( !async && m )
-            registerEventProc( &eventsHandler, "PGRESULT_HANDLER", &handlerStatus );
-            // TODO: event handler can be registred only after connect!
-            
         setNonBlocking( m );
         return m;
     }
@@ -90,7 +78,7 @@ class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if( !async && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
+        if( !nonBlocking && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
             throw new exception();
         
         readyForQuery = true;
@@ -135,43 +123,6 @@ class BaseConnection
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
             throw new exception( "Could not register "~name~" event handler" );
-    }
-    
-    package void addHandler( answerHandler h )
-    {   // FIXME: need synchronization
-        assert( !( conn in handlers ),
-            "Can't make a query while hasn't been completed previous one." );
-        handlers[ conn ] = h;
-    }
-    
-    private static nothrow extern (C) size_t eventsHandler(PGEventId evtId, void* evtInfo, void* hStatus)
-    {
-        auto handlerStatus = cast(handlerStatuses*) hStatus;
-        *handlerStatus = handlerStatuses.HANDLER_STATUS_OK;
-        
-        enum { ERROR = 0, OK }
-        
-        switch( evtId )
-        {
-            case PGEventId.PGEVT_REGISTER:
-                return OK;
-                
-            case PGEventId.PGEVT_RESULTCREATE:
-                auto info = cast(PGEventResultCreate*) evtInfo;
-                assert( handlers[ info.conn ] != null );
-                
-                PGresult* r;
-                while( r = PQgetResult(info.conn), r )
-                {
-                    handlers[ info.conn ]( new Answer(r) );
-                }
-                
-                handlers.remove( info.conn );
-                return OK; // all results are processed
-                
-            default:
-                return OK; // other events
-        }
     }
     
     ~this()
