@@ -31,7 +31,7 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
-    debug shared bool inUse;
+    shared answerHandler handler;
     
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
@@ -70,8 +70,9 @@ final class Connection: BaseConnection
     package Descriptor sendQuery( string SQLcmd, shared answerHandler handler )
     {
         assert( async );
-        assert( !inUse );
-        debug inUse = true;
+        assert( !this.handler );
+        
+        this.handler = handler;
         
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
@@ -94,7 +95,14 @@ final class Connection: BaseConnection
         Socket.select( ss, null, null );
         c.consumeInput();
         
-            
+        PGresult* r;
+        while( r = PQgetResult(c.conn), r )
+        {
+            c.handler( new Answer(r) );
+        }
+        
+        c.handler = null;
+        
         writeln("s2 ");
     }
     
