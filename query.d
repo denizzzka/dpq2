@@ -77,10 +77,10 @@ final class Connection: BaseConnection
         if( r != 1 ) throw new exception();
         
         auto socket = cast (shared size_t) socket();
-        return spawn( &expectAnswer, cast(shared Connection) conn, cast (shared answerHandler) handler );
+        return spawn( &expectAnswer, cast(shared Connection) this );
     }
     
-    static private void expectAnswer( shared Connection conn, shared answerHandler handler )
+    static private void expectAnswer( shared Connection conn )
     {
         auto c = cast(Connection) conn;
         import std.socket;
@@ -93,6 +93,7 @@ final class Connection: BaseConnection
         
         Socket.select( ss, null, null );
         c.consumeInput();
+        
             
         writeln("s2 ");
     }
