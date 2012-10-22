@@ -401,18 +401,16 @@ class Answer // most members should be a const
         
         /// Returns cell size
         @property
-        size_t size( const size_t col ) const
+        size_t size( const Coords coords ) const
         {
-            answer.assertCol(col);
-            return PQgetlength(answer.res, row, col);
+            return answer.size( coords );
         }
         
         /// Value NULL checking
         @property
         bool isNULL( const size_t col ) 
         {
-            answer.assertCol(col);
-            return PQgetisnull(answer.res, row, col) != 0;
+            return answer.isNULL(row, col);
         }
         
         immutable (Value)* opIndex( size_t col )
@@ -421,6 +419,12 @@ class Answer // most members should be a const
             return answer.getValue( Coords( row, col ) );
         }
     }
+    
+    private size_t currRow;
+    
+    @property Row* front(){ return this[currRow]; }
+    @property void popFront(){ return ++currRow; }
+    @property bool empty(){ return currRow >= rowCount; }
 }
 
 /// Notify
@@ -577,4 +581,11 @@ void _unittest( string connParam )
     
     conn.sendQuery( p, (Answer a){ } );
     while( conn.inUse() ) {}
+    
+    // Range test
+    foreach( elem; r )
+    {
+        import std.stdio;
+        assert( (*elem)[0].as!PGsmallint == -32761 );
+    }
 }
