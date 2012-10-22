@@ -343,19 +343,20 @@ class Answer // most members should be a const
         return r;
     }
     
-    Row* getRow( const size_t row ) const
+    /// Returns pointer to Row
+    Row* opIndex( const size_t row ) const
     {
         return new Row( this, row );
     }
     
-    /// Returns pointer to cell
+    /// Returns pointer to cell value
     immutable (Value)* opIndex( const size_t row, const size_t col ) const
     {
         const Coords c = { Row: row, Col: col };
         return getValue( c );
     }
     
-    /// Returns cell size
+    /// Returns cell value size
     size_t size( const Coords c ) const
     {
         assertCoords(c);
