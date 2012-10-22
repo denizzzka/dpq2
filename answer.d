@@ -27,6 +27,13 @@ alias string  PGtext; /// text
 alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 
+/// Result table's cell coordinates 
+struct Coords
+{
+    size_t Row; /// Row
+    size_t Col; /// Column
+}
+
 /// Answer
 class Answer // most members should be a const
 {
@@ -36,223 +43,7 @@ class Answer // most members should be a const
     {
         assert( res != null );
     }
-    
-    /// Result table's cell coordinates 
-    struct Coords
-    {
-        size_t Row; /// Row
-        size_t Col; /// Column
-        /*
-        this( const size_t row, const size_t col )
-        {
-            Row = row;
-            Col = col;
-        }
-        */
-    }
-
-    /// Result table's cell
-    immutable struct Value // TODO: should be a const struct with const members without copy ability or class
-    {
-        private ubyte[] value;
-        debug private dpq2.libpq.valueFormat format;
         
-        version(Debug){} else
-        this( immutable (ubyte)* value, size_t valueSize ) immutable
-        {
-            this.value = value[0..valueSize];
-        }
-        
-        debug
-        this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f ) immutable
-        {
-            this.value = value[0..valueSize];
-            format = f;
-        }
-        
-        this( immutable (ubyte[]) value ) immutable
-        {
-            this.value = value;
-            debug format = valueFormat.BINARY;
-        }
-
-        /// Returns value as bytes from binary formatted field
-        @property T as(T)()
-        if( is( T == immutable(ubyte[]) ) )
-        {
-            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-            return value;
-        }
-
-        /// Returns cell value as native string type
-        @property T as(T)()
-        if( isSomeString!(T) )
-        {
-            return to!T( cast(immutable(char)*) value.ptr );
-        }
-        
-        /// Returns cell value as native integer or decimal values
-        ///
-        /// Postgres type "numeric" is oversized and not supported by now
-        @property T as(T)()
-        if( isNumeric!(T) )
-        {
-            debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-            assert( value.length == T.sizeof, "Value value length isn't equal to type size" );
-            
-            ubyte[T.sizeof] s = value[0..T.sizeof];
-            return bigEndianToNative!(T)( s );
-        }
-        
-        /// Returns cell value as native date and time
-        @property T* as(T)()
-        if( is( T == SysTime ) )
-        {
-            ulong pre_time = as!(ulong)();
-            // UTC because server always sends binary timestamps in UTC, not in TZ
-            return new SysTime( pre_time * 10, UTC() );
-        }
-        
-        @property
-        immutable (Array*) asArray()
-        {
-            return new Array( &this );
-        }
-    }
-        
-    immutable struct Array // TODO: should be a const struct with const members without copy ability or class
-    {
-        Oid OID;
-        int nDims; /// Number of dimensions
-        int[] dimsSize; /// Dimensions sizes info
-        size_t nElems; /// Total elements
-        
-        private
-        {
-            Value* cell;
-            ubyte[][] elements;
-            bool[] elementIsNULL;
-            
-            struct arrayHeader_net
-            {
-                ubyte[4] ndims; // number of dimensions of the array
-                ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
-                ubyte[4] OID; // element type OID
-            }
-
-            struct Dim_net // network byte order
-            {
-                ubyte[4] dim_size; // number of elements in dimension
-                ubyte[4] lbound; // unknown
-            }
-        }
-        
-        this( immutable(Value*) c ) immutable
-        {
-            cell = c;
-            debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
-            
-            arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
-            nDims = bigEndianToNative!int(h.ndims);
-            OID = bigEndianToNative!Oid(h.OID);
-            
-            // TODO: here is need exception, not enforce
-            enforce( nDims > 0, "Dimensions number must be more than 0" );
-            
-            auto ds = new int[ nDims ];
-            
-            // Recognize dimensions of array
-            int n_elems = 1;
-            for( auto i = 0; i < nDims; ++i )
-            {
-                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
-                
-                int dim_size = bigEndianToNative!int( d.dim_size );
-                int lbound = bigEndianToNative!int(d.lbound);
-
-                // FIXME: What is lbound in postgresql array reply?
-                enforce( lbound == 1, "Please report if you came across this error." );
-                assert( dim_size > 0 );
-                
-                ds[i] = dim_size;
-                n_elems *= dim_size;
-            }
-            
-            nElems = n_elems;
-            dimsSize = ds.idup;
-            
-            auto elements = new immutable (ubyte)[][ nElems ];
-            auto elementIsNULL = new bool[ nElems ];
-            
-            // Looping through all elements and fill out index of them
-            auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
-            for(uint i = 0; i < n_elems; ++i )
-            {
-                ubyte[int.sizeof] size_net;
-                size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-                uint size = bigEndianToNative!uint( size_net );
-                if( size == size.max ) // NULL magic number
-                {
-                    elementIsNULL[i] = true;
-                    size = 0;
-                }
-                else
-                {
-                    elementIsNULL[i] = false;
-                }
-                curr_offset += size_net.sizeof;
-                elements[i] = cell.value[curr_offset .. curr_offset + size];
-                curr_offset += size;
-            }
-            this.elements = elements.idup;
-            this.elementIsNULL = elementIsNULL.idup;
-        }
-        
-        /// Returns Value struct
-        immutable (Value)* getValue( ... ) const
-        {
-            auto n = coords2Serial( _argptr, _arguments );
-            return new Value( elements[n] );
-        }
-        
-        /// Value NULL checking
-        bool isNULL( ... ) immutable
-        {
-            auto n = coords2Serial( _argptr, _arguments );
-            return elementIsNULL[n];
-        }
-        
-        size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
-        {
-            assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
-            
-            // Variadic args parsing
-            auto args = new int[ _arguments.length ];
-            // TODO: here is need exception, not enforce
-            enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
-            
-            for( uint i; i < args.length; ++i )
-            {
-                assert( _arguments[i] == typeid(int) );
-                args[i] = va_arg!(int)(_argptr);
-                enforce( dimsSize[i] > args[i] ); // TODO: here is need exception, not enforce
-            }
-            
-            // Calculates serial number of the element
-            auto inner = args.length - 1; // inner dimension
-            auto element_num = args[inner]; // serial number of the element
-            uint s = 1; // perpendicular to a vector which size is calculated currently
-            for( auto i = inner; i > 0; --i )
-            {
-                s *= dimsSize[i];
-                element_num += s * args[i-1];
-            }
-            
-            assert( element_num <= nElems );
-            return element_num;
-        }
-    }
-    
     package this(PGresult* r) nothrow
     {
         res = cast(immutable PGresult*) r;
@@ -343,13 +134,13 @@ class Answer // most members should be a const
         return r;
     }
     
-    /// Returns pointer to Row
+    /// Returns pointer to row of cells
     Row opIndex( const size_t row ) const
     {
         return Row( this, row );
     }
     
-    /// Returns pointer to cell value
+    /// Returns pointer to cell
     immutable (Value)* opIndex( const size_t row, const size_t col ) const
     {
         const Coords c = { Row: row, Col: col };
@@ -388,50 +179,251 @@ class Answer // most members should be a const
         assertCol( c.Col );
     }    
     
-    struct Row
-    {
-        private const Answer answer;
-        private immutable size_t row;
-        
-        this( const Answer answer, const size_t row )
-        {
-            this.answer = answer;
-            this.row = row;
-        }
-        
-        /// Returns cell size
-        @property
-        size_t size( const Coords coords ) const
-        {
-            return answer.size( coords );
-        }
-        
-        /// Value NULL checking
-        @property
-        bool isNULL( const size_t col ) const
-        {
-            return answer.isNULL(row, col);
-        }
-        
-        immutable (Value)* opIndex( size_t col ) const
-        {
-            answer.assertCol(col);
-            return answer.getValue( Coords( row, col ) );
-        }
-        
-        /// Returns column number by field name
-        size_t columnNum( string columnName ) const
-        {
-            return answer.columnNum( columnName );
-        }
-
-    }
-    
     private size_t currRow;
     
     @property Row front(){ return this[currRow]; }
     @property void popFront(){ return ++currRow; }
     @property bool empty(){ return currRow >= rowCount; }
+}
+
+struct Row
+{
+    private const Answer answer;
+    private immutable size_t row;
+    
+    this( const Answer answer, const size_t row )
+    {
+        this.answer = answer;
+        this.row = row;
+    }
+    
+    /// Returns cell size
+    @property
+    size_t size( const Coords coords ) const
+    {
+        return answer.size( coords );
+    }
+    
+    /// Value NULL checking
+    @property
+    bool isNULL( const size_t col ) const
+    {
+        return answer.isNULL(row, col);
+    }
+    
+    immutable (Value)* opIndex( size_t col ) const
+    {
+        answer.assertCol(col);
+        return answer.getValue( Coords( row, col ) );
+    }
+    
+    /// Returns column number by field name
+    size_t columnNum( string columnName ) const
+    {
+        return answer.columnNum( columnName );
+    }
+}
+
+/// Result table's cell
+immutable struct Value // TODO: should be a const struct with const members without copy ability or class
+{
+    private ubyte[] value;
+    debug private dpq2.libpq.valueFormat format;
+    
+    version(Debug){} else
+    this( immutable (ubyte)* value, size_t valueSize ) immutable
+    {
+        this.value = value[0..valueSize];
+    }
+    
+    debug
+    this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f ) immutable
+    {
+        this.value = value[0..valueSize];
+        format = f;
+    }
+    
+    this( immutable (ubyte[]) value ) immutable
+    {
+        this.value = value;
+        debug format = valueFormat.BINARY;
+    }
+
+    /// Returns value as bytes from binary formatted field
+    @property T as(T)()
+    if( is( T == immutable(ubyte[]) ) )
+    {
+        debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+        return value;
+    }
+
+    /// Returns cell value as native string type
+    @property T as(T)()
+    if( isSomeString!(T) )
+    {
+        return to!T( cast(immutable(char)*) value.ptr );
+    }
+    
+    /// Returns cell value as native integer or decimal values
+    ///
+    /// Postgres type "numeric" is oversized and not supported by now
+    @property T as(T)()
+    if( isNumeric!(T) )
+    {
+        debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+        assert( value.length == T.sizeof, "Value value length isn't equal to type size" );
+        
+        ubyte[T.sizeof] s = value[0..T.sizeof];
+        return bigEndianToNative!(T)( s );
+    }
+    
+    /// Returns cell value as native date and time
+    @property T* as(T)()
+    if( is( T == SysTime ) )
+    {
+        ulong pre_time = as!(ulong)();
+        // UTC because server always sends binary timestamps in UTC, not in TZ
+        return new SysTime( pre_time * 10, UTC() );
+    }
+    
+    @property
+    immutable (Array*) asArray()
+    {
+        return new Array( &this );
+    }
+}
+
+immutable struct Array
+{
+    Oid OID;
+    int nDims; /// Number of dimensions
+    int[] dimsSize; /// Dimensions sizes info
+    size_t nElems; /// Total elements
+    
+    private
+    {
+        Value* cell;
+        ubyte[][] elements;
+        bool[] elementIsNULL;
+        
+        struct arrayHeader_net
+        {
+            ubyte[4] ndims; // number of dimensions of the array
+            ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
+            ubyte[4] OID; // element type OID
+        }
+
+        struct Dim_net // network byte order
+        {
+            ubyte[4] dim_size; // number of elements in dimension
+            ubyte[4] lbound; // unknown
+        }
+    }
+    
+    this( immutable(Value*) c ) immutable
+    {
+        cell = c;
+        debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
+        
+        arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
+        nDims = bigEndianToNative!int(h.ndims);
+        OID = bigEndianToNative!Oid(h.OID);
+        
+        // TODO: here is need exception, not enforce
+        enforce( nDims > 0, "Dimensions number must be more than 0" );
+        
+        auto ds = new int[ nDims ];
+        
+        // Recognize dimensions of array
+        int n_elems = 1;
+        for( auto i = 0; i < nDims; ++i )
+        {
+            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+            
+            int dim_size = bigEndianToNative!int( d.dim_size );
+            int lbound = bigEndianToNative!int(d.lbound);
+
+            // FIXME: What is lbound in postgresql array reply?
+            enforce( lbound == 1, "Please report if you came across this error." );
+            assert( dim_size > 0 );
+            
+            ds[i] = dim_size;
+            n_elems *= dim_size;
+        }
+        
+        nElems = n_elems;
+        dimsSize = ds.idup;
+        
+        auto elements = new immutable (ubyte)[][ nElems ];
+        auto elementIsNULL = new bool[ nElems ];
+        
+        // Looping through all elements and fill out index of them
+        auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
+        for(uint i = 0; i < n_elems; ++i )
+        {
+            ubyte[int.sizeof] size_net;
+            size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+            uint size = bigEndianToNative!uint( size_net );
+            if( size == size.max ) // NULL magic number
+            {
+                elementIsNULL[i] = true;
+                size = 0;
+            }
+            else
+            {
+                elementIsNULL[i] = false;
+            }
+            curr_offset += size_net.sizeof;
+            elements[i] = cell.value[curr_offset .. curr_offset + size];
+            curr_offset += size;
+        }
+        this.elements = elements.idup;
+        this.elementIsNULL = elementIsNULL.idup;
+    }
+    
+    /// Returns Value struct
+    immutable (Value)* getValue( ... ) const
+    {
+        auto n = coords2Serial( _argptr, _arguments );
+        return new Value( elements[n] );
+    }
+    
+    /// Value NULL checking
+    bool isNULL( ... ) immutable
+    {
+        auto n = coords2Serial( _argptr, _arguments );
+        return elementIsNULL[n];
+    }
+    
+    size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
+    {
+        assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
+        
+        // Variadic args parsing
+        auto args = new int[ _arguments.length ];
+        // TODO: here is need exception, not enforce
+        enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
+        
+        for( uint i; i < args.length; ++i )
+        {
+            assert( _arguments[i] == typeid(int) );
+            args[i] = va_arg!(int)(_argptr);
+            enforce( dimsSize[i] > args[i] ); // TODO: here is need exception, not enforce
+        }
+        
+        // Calculates serial number of the element
+        auto inner = args.length - 1; // inner dimension
+        auto element_num = args[inner]; // serial number of the element
+        uint s = 1; // perpendicular to a vector which size is calculated currently
+        for( auto i = inner; i > 0; --i )
+        {
+            s *= dimsSize[i];
+            element_num += s * args[i-1];
+        }
+        
+        assert( element_num <= nElems );
+        return element_num;
+    }
 }
 
 /// Notify
@@ -504,8 +496,6 @@ void _unittest( string connParam )
 
     auto e = conn.exec( sql_query );
     
-    alias Answer.Coords Coords;
-
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
     assert( e.columnFormat(2) == valueFormat.TEXT );
