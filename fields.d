@@ -88,18 +88,18 @@ void _unittest( string connParam )
     conn.connect();
     
     RowFields!(
-        Field!(PGtext, "i", "", "INTEGER_FIELD" ),
-        Field!(PGtext, "t")
+        Field!(PGtext, "t1", "", "TEXT_FIELD" ),
+        Field!(PGtext, "t2")
     ) f;
     
     string q = "select "~to!string(f)~"
-        from (select 123::integer as i, 'qwerty'::text as t) s";
+        from (select '123'::text as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
     foreach( r; res )
     {
         f.row = r;
-        assert( f.INTEGER_FIELD == res[0,0].as!PGtext );
-        assert( f.t == res[0,1].as!PGtext );
+        assert( f.TEXT_FIELD == res[0,0].as!PGtext );
+        assert( f.t2 == res[0,1].as!PGtext );
     }
 }
