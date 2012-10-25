@@ -8,9 +8,8 @@ struct Field( T )
 {
     string sqlPrefix;
     string sqlName;
+    size_t columnNum;
     T value;
-    
-    //alias as!T as;
     
     @property
     string toString() nothrow
@@ -21,6 +20,13 @@ struct Field( T )
 
 struct Fields( TL ... )
 {
+    void static_this()
+    {
+        foreach( i, T; TL )
+            T.columnNum = i;
+    }
+        
+    @property
     string toString()
     {
         string r;
@@ -32,6 +38,9 @@ struct Fields( TL ... )
         
         return r;
     }
+    
+    //@property
+    //size_t columnNum()
 }
 
 void _unittest( string connParam )
@@ -57,4 +66,6 @@ void _unittest( string connParam )
     import std.stdio;
     writeln( f.toString() );
     writeln( r );
+    
+    writeln( r[0,1].as!PGtext );
 }
