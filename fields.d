@@ -58,12 +58,15 @@ void _unittest( string connParam )
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
-    auto r = conn.exec( q );
+    auto res = conn.exec( q );
     
     import std.stdio;
     writeln( f.toString() );
     writeln( f.INT );
-    writeln( r );
+    writeln( res );
     
-    writeln( r[0,1].as!PGtext );
+    writeln( res[0,1].as!PGtext );
+    
+    foreach( r; res )
+        writeln( r );
 }

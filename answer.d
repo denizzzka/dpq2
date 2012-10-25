@@ -228,6 +228,15 @@ struct Row
     {
         return answer.columnNum( columnName );
     }
+    
+    /// Returns column count
+    @property size_t columnCount() const{ return answer.columnCount(); }
+    
+    @property
+    debug string toString() const
+    {
+        return "Columns: "~to!string(columnCount);
+    }
 }
 
 /// Result table's cell
