@@ -59,18 +59,18 @@ struct RowFields( TL ... )
     Fields!(TL) fields;
     alias fields this;
     
-    Row* row;
+    Row* _row;
     
     @property
-    void answer( ref Row r )
+    void row( ref Row r )
     {
-        row = &r;
+        _row = &r;
     }
     
     @property
     auto getVal( size_t n )()
     {
-        return row.opIndex(n).as!( TL[n].type );
+        return _row.opIndex(n).as!( TL[n].type );
     }
     
     private static string GenRowProperties()
@@ -87,24 +87,19 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
-    RowFields!( Field!(PGtext, "i", "", "INT" ), Field!(PGtext, "t") ) f;
+    RowFields!(
+        Field!(PGtext, "i", "", "INTEGER_FIELD" ),
+        Field!(PGtext, "t")
+    ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
     auto res = conn.exec( q );
-    
-    import std.stdio;
-    writeln( f.toString() );
-    writeln( res );
-    
-    writeln( res[0,1].as!PGtext );
-    
-    writeln("properties: ", f.GenRowProperties());
-    
+        
     foreach( r; res )
     {
-        f.answer = r;
-        writeln( f.INT );
-        //writeln( f.getVal!(f.INT) );
+        f.row = r;
+        assert( f.INTEGER_FIELD == res[0,0].as!PGtext );
+        assert( f.t == res[0,1].as!PGtext );
     }
 }
