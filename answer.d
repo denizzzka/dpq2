@@ -487,9 +487,8 @@ immutable class exception : Exception
 }
 
 
-void _unittest( string connParam )
+void _unittest( string connParam ) { with(types)
 {
-with(types) {
     // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -596,5 +595,4 @@ with(types) {
         import std.stdio;
         assert( elem[0].as!PGsmallint == -32761 );
     }
-}
-}
+}}
