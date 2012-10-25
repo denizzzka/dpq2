@@ -4,7 +4,7 @@ import dpq2.answer;
 import dpq2.libpq;
 import std.string;
 
-struct Field( T, string sqlPrefix, string sqlName )
+static struct Field( T, string sqlName, string sqlPrefix = "" )
 {
     @property
     string toString() pure nothrow
@@ -21,23 +21,23 @@ struct Field( T, string sqlPrefix, string sqlName )
 
 struct Fields( TL ... )
 {
-    void static_this()
+    string joinString( string memberName )( string delimiter )
     {
-        foreach( i, T; TL ){}
-            //T.columnNum = i;
+        string r;
+        foreach( i, T; TL )
+        {
+            mixin( "r ~= T." ~ memberName );
+            if( i < TL.length-1 ) r ~= delimiter;
+        }
+        
+        return r;
     }
     
     @property
     string toString() nothrow
     {
-        string r;
-        foreach( i, T; TL )
-        {
-            r ~= T.toString();
-            if( i < TL.length-1 ) r ~= ", ";
-        }
-        
-        return r;
+        return "sd";
+        //return joinString!("toString()")(", ");
     }
     
     struct M(F)
@@ -47,7 +47,19 @@ struct Fields( TL ... )
         size_t columnNum;
     }
     
-    
+    /*
+    private string GenFieldsEnum() nothrow
+    {
+        string r;
+        foreach( i, T; TL )
+        {
+            r ~= T.toDecl();
+            if( i < TL.length-1 ) r ~= ", ";
+        }
+        return r;
+    }    
+    */
+    //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
     
     //@property
     //size_t columnNum()
@@ -59,8 +71,8 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
 
-    Field!(PGtext, "", "i") ft;
-    Field!(PGinteger, "", "t") fs;
+    immutable Field!(PGtext, "i", "") ft;
+    immutable Field!(PGinteger, "t") fs;
     
     Fields!( ft, fs ) f;
     
