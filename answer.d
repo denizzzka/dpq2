@@ -18,6 +18,8 @@ import std.datetime;
 import core.vararg;
 
 // Supported PostgreSQL binary types
+//struct PGtypes
+//{
 alias short   PGsmallint; /// smallint
 alias int     PGinteger; /// integer
 alias long    PGbigint; /// bigint
@@ -26,6 +28,7 @@ alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
 alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
+//}
 
 /// Result table's cell coordinates 
 struct Coords

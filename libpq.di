@@ -217,6 +217,7 @@ PQERRORS_VERBOSE,
     ubyte* PQunescapeBytea(ubyte* strtext, size_t* retbuflen);
     size_t PQescapeString(char* to, char* from, size_t length);
     ubyte* PQescapeBytea(ubyte* from, size_t from_length, size_t* to_length);
+    char* PQescapeIdentifier(PGconn* conn, const char* str, size_t length);
     void PQprint(FILE* fout, PGresult* res, PQprintOpt* ps);
     void PQdisplayTuples(PGresult* res, FILE* fp, int fillAlign, char* fieldSep, int printHeader, int quiet);
     void PQprintTuples(PGresult* res, FILE* fout, int printAttName, int terseOutput, int width);
