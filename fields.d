@@ -4,7 +4,7 @@ import dpq2.answer;
 import dpq2.libpq;
 import std.string;
 
-struct Field( T, string sqlName, string sqlPrefix = "" )
+struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
 {
     @property
     static string toString() pure nothrow
@@ -15,7 +15,7 @@ struct Field( T, string sqlName, string sqlPrefix = "" )
     @property
     static string toDecl() pure nothrow
     {
-        return sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName;
+        return decl.length ? decl : (sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName);
     }
 }
 
@@ -54,7 +54,7 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
-    Fields!( Field!(types.PGtext, "i"), Field!(types.PGinteger, "t") ) f;
+    Fields!( Field!(PGtext, "i", ), Field!(PGinteger, "t") ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
@@ -65,5 +65,5 @@ void _unittest( string connParam )
     writeln( f.i );
     writeln( r );
     
-    writeln( r[0,1].as!(types.PGtext) );
+    writeln( r[0,1].as!PGtext );
 }
