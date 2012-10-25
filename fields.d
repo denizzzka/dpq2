@@ -21,7 +21,7 @@ struct Field( T, string sqlName, string sqlPrefix = "" )
 
 struct Fields( TL ... )
 {
-    private string joinFieldString( string memberName )( string delimiter )
+    private static string joinFieldString( string memberName )( string delimiter )
     {
         string r;
         foreach( i, T; TL )
@@ -34,9 +34,8 @@ struct Fields( TL ... )
     }
     
     @property
-    string toString() nothrow
+    static string toString() nothrow
     {
-        //return "sd";
         return joinFieldString!("toString()")(", ");
     }
     
@@ -47,19 +46,12 @@ struct Fields( TL ... )
         size_t columnNum;
     }
     
-    /*
-    private string GenFieldsEnum() nothrow
+    private static string GenFieldsEnum() nothrow
     {
-        string r;
-        foreach( i, T; TL )
-        {
-            r ~= T.toDecl();
-            if( i < TL.length-1 ) r ~= ", ";
-        }
-        return r;
-    }    
-    */
-    //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
+        return joinFieldString!("toDecl()")(", ");
+    }
+    
+    mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
     
     //@property
     //size_t columnNum()
