@@ -4,11 +4,15 @@ import dpq2.answer;
 import dpq2.libpq;
 import std.string;
 import std.traits;
+import core.vararg;
 
-struct Field
+struct Field( T )
 {
     string sqlPrefix;
     string sqlName;
+    T value;
+    
+    //alias as!T as;
     
     @property
     string toString() nothrow
@@ -17,7 +21,22 @@ struct Field
     }
 }
 
-struct Fields( FieldArray )
+struct Fields( TL ... )
+{
+    string toString()
+    {
+        string r;
+        foreach( i, T; TL )
+        {
+            r ~= T.toString();
+            if( i < TL.length-1 ) r ~= ", ";
+        }
+        
+        return r;
+    }
+}
+
+struct _Fields( FieldArray )
 {
     FieldArray fields;
     
@@ -39,16 +58,16 @@ struct Fields( FieldArray )
 
 unittest
 {
-    Field f;
-    f.sqlPrefix = "pr";
-    f.sqlName = "asd";
+    Field!(PGtext) ft;
+    ft.sqlPrefix = "pr1";
+    ft.sqlName = "asd";
     
-    Fields!( Field[2] ) fields;
+    Field!(PGinteger) fs;
+    fs.sqlPrefix = "pr2";
+    fs.sqlName = "fgh";
     
-    fields.fields[0] = f;
-    fields.fields[1] = f;
+    Fields!( ft, fs ) f;
     
     import std.stdio;
-    
-    writeln( fields );
+    writeln( f.toString() );
 }

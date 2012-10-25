@@ -398,7 +398,7 @@ immutable struct Array
         return elementIsNULL[n];
     }
     
-    size_t coords2Serial( void *_argptr, TypeInfo[] _arguments ) immutable
+    size_t coords2Serial( void* _argptr, TypeInfo[] _arguments ) immutable
     {
         assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
         
