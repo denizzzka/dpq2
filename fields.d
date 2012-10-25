@@ -8,10 +8,12 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
 {
     alias T type;
     
-    static string toString() pure nothrow
+    static string toSQL() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
     }
+    
+    alias toSQL toString;
     
     static string toDecl() pure nothrow
     {
