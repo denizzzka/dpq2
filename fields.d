@@ -10,7 +10,7 @@ struct Field
     string sqlName;
     
     @property
-    string fieldName() nothrow
+    string toString() nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
     }
@@ -22,12 +22,12 @@ struct Fields( FieldArray )
     
     string str()
     {        
-        string r = fields[0].fieldName;
+        string r = fields[0].toString;
         size_t i = 1;
         
         while ( i < fields.length )
         {
-            r ~= ", " ~ fields[i].fieldName;
+            r ~= ", " ~ fields[i].toString;
             i++;
         }
         
