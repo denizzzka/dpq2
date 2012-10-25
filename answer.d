@@ -18,17 +18,17 @@ import std.datetime;
 import core.vararg;
 
 // Supported PostgreSQL binary types
-//struct PGtypes
-//{
-alias short   PGsmallint; /// smallint
-alias int     PGinteger; /// integer
-alias long    PGbigint; /// bigint
-alias float   PGreal; /// real
-alias double  PGdouble_precision; /// double precision
-alias string  PGtext; /// text
-alias immutable ubyte[] PGbytea; /// bytea
-alias SysTime PGtime_stamp; /// time stamp with/without timezone
-//}
+struct types
+{
+    alias short   PGsmallint; /// smallint
+    alias int     PGinteger; /// integer
+    alias long    PGbigint; /// bigint
+    alias float   PGreal; /// real
+    alias double  PGdouble_precision; /// double precision
+    alias string  PGtext; /// text
+    alias immutable ubyte[] PGbytea; /// bytea
+    alias SysTime PGtime_stamp; /// time stamp with/without timezone
+}
 
 /// Result table's cell coordinates 
 struct Coords
@@ -489,6 +489,7 @@ immutable class exception : Exception
 
 void _unittest( string connParam )
 {
+with(types) {
     // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -595,4 +596,5 @@ void _unittest( string connParam )
         import std.stdio;
         assert( elem[0].as!PGsmallint == -32761 );
     }
+}
 }
