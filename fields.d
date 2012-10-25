@@ -3,6 +3,7 @@ module dpq2.fields;
 import dpq2.answer;
 import dpq2.libpq;
 import std.string;
+import std.traits;
 
 struct Field
 {
