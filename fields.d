@@ -6,16 +6,20 @@ import std.string;
 
 struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
 {
-    @property
     static string toString() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
     }
     
-    @property
     static string toDecl() pure nothrow
     {
         return decl.length ? decl : (sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName);
+    }
+    
+    static string toRowProperty(size_t column)
+    {
+        return "@property "~to!string(typeid(T))~" "~toDecl()~"()"
+            "{ return (*row)["~to!string(column)~"].as!("~to!string(typeid(T))~"); }";
     }
 }
 
@@ -45,7 +49,7 @@ struct Fields( TL ... )
     }
     
     mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
-    alias FieldsEnum this;
+    alias FieldsEnum this;    
 }
 
 struct RowFields( TL ... )
@@ -59,6 +63,11 @@ struct RowFields( TL ... )
     void answer( ref Row r )
     {
         row = &r;
+    }
+    
+    @property PGtext FIELD_NAME()
+    {
+        return (*row)[ 0 ].as!(PGtext);
     }
 }
 
