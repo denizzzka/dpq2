@@ -8,6 +8,12 @@ struct Field
 {
     string sqlPrefix;
     string sqlName;
+    
+    @property
+    string fieldName() nothrow
+    {
+        return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
+    }
 }
 
 struct Fields( FieldArray )
@@ -15,21 +21,13 @@ struct Fields( FieldArray )
     FieldArray fields;
     
     string str()
-    {
-        string addQuotes( string s ) pure nothrow { return "\""~s~"\""; }
-        string fieldName( Field f ) pure nothrow
-        {
-            return addQuotes(
-                f.sqlPrefix.length ? f.sqlPrefix~"."~f.sqlName : f.sqlName
-            );
-        }
-        
-        string r = fieldName( fields[0] );
+    {        
+        string r = fields[0].fieldName;
         size_t i = 1;
         
         while ( i < fields.length )
         {
-            r ~= ", " ~ fieldName( fields[i] );
+            r ~= ", " ~ fields[i].fieldName;
             i++;
         }
         
