@@ -6,6 +6,9 @@ import std.string;
 
 struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
 {
+    //static T getFieldType() { return T; };
+    alias T TY;
+    
     static string toString() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
@@ -70,9 +73,10 @@ struct RowFields( TL ... )
         return (*row)[ 0 ].as!(PGtext);
     }
     
-    auto getVal(T)(fields.FieldsEnum e)
+    @property
+    auto getVal(fields.FieldsEnum e)()
     {
-        return row.opIndex(e).as!(T);
+        return row.opIndex(e).as!( TL[e].TY );
     }
     
     /*
@@ -88,7 +92,7 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
-    RowFields!( Field!(PGtext, "i", "", "INT" ), Field!(PGinteger, "t") ) f;
+    RowFields!( Field!(PGtext, "i", "", "INT" ), Field!(PGtext, "t") ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
@@ -105,6 +109,6 @@ void _unittest( string connParam )
     {
         f.answer = r;
         writeln( r[f.INT].as!PGtext );
-        writeln( f.getVal!PGtext(f.t) );
+        writeln( f.getVal!(f.INT) );
     }
 }
