@@ -68,5 +68,5 @@ void _unittest( string connParam )
     writeln( res[0,1].as!PGtext );
     
     foreach( r; res )
-        writeln( r );
+        writeln( r[f.INT].as!PGtext );
 }
