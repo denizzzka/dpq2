@@ -18,21 +18,22 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
         return decl.length ? decl : (sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName);
     }
     
-    static string toRowProperty(size_t column)
+    static string toRowFieldProperty( size_t n )
     {
-        return "@property "~to!string(typeid(T))~" "~toDecl()~"()"
-            "{ return (*row)["~to!string(column)~"].as!("~to!string(typeid(T))~"); }";
+        return "@property auto "~toDecl()~"()"
+            "{return getVal!( "~to!string(n)~" );}";
     }
 }
 
 struct Fields( TL ... )
 {
-    private static string joinFieldString( string memberName )( string delimiter )
+    private static
+    string joinFieldString( string memberName, bool passIter = false )( string delimiter )
     {
         string r;
         foreach( i, T; TL )
         {
-            mixin( "r ~= T." ~ memberName ~ ";" );
+            mixin( "r ~= T." ~ memberName ~ "("~(passIter ? to!string(i) : "")~");" );
             if( i < TL.length-1 ) r ~= delimiter;
         }
         
@@ -42,12 +43,12 @@ struct Fields( TL ... )
     @property
     static string toString() nothrow
     {
-        return joinFieldString!("toString()")(", ");
+        return joinFieldString!("toString")(", ");
     }
     
     private static string GenFieldsEnum() nothrow
     {
-        return joinFieldString!("toDecl()")(", ");
+        return joinFieldString!("toDecl")(", ");
     }
     
     mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
@@ -67,22 +68,20 @@ struct RowFields( TL ... )
         row = &r;
     }
     
-    @property PGtext FIELD_NAME()
-    {
-        return (*row)[ 0 ].as!(PGtext);
-    }
-    
     @property
-    auto getVal(fields.FieldsEnum e)()
+    auto getVal( size_t n )()
     {
-        return row.opIndex(e).as!( TL[e].type );
+        return row.opIndex(n).as!( TL[n].type );
     }
     
-    /*
-    private string GenProperties()
+    private static string GenRowProperties()
     {
-        return joinFieldString!(")
-    */
+        return fields.joinFieldString!("toRowFieldProperty", true)("");
+    }
+    
+    //@property auto INT(){return getVal!( fields.FieldsEnum.INT );}
+
+    mixin( GenRowProperties() );
 }
 
 void _unittest( string connParam )
@@ -99,15 +98,16 @@ void _unittest( string connParam )
     
     import std.stdio;
     writeln( f.toString() );
-    writeln( f.INT );
     writeln( res );
     
     writeln( res[0,1].as!PGtext );
     
+    writeln("properties: ", f.GenRowProperties());
+    
     foreach( r; res )
     {
         f.answer = r;
-        writeln( r[f.INT].as!PGtext );
-        writeln( f.getVal!(f.INT) );
+        writeln( f.INT );
+        //writeln( f.getVal!(f.INT) );
     }
 }
