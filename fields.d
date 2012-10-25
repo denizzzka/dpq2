@@ -28,7 +28,7 @@ struct Fields( TL ... )
     }
     
     @property
-    string toString()
+    string toString() nothrow
     {
         string r;
         foreach( i, T; TL )
