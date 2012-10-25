@@ -20,7 +20,8 @@ struct Fields( FieldArray )
 {
     FieldArray fields;
     
-    string str()
+    @property
+    string toString()
     {        
         string r = fields[0].toString;
         size_t i = 1;
@@ -48,5 +49,5 @@ unittest
     
     import std.stdio;
     
-    writeln( fields.str() );
+    writeln( fields );
 }
