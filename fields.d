@@ -21,7 +21,7 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
     static string toRowFieldProperty( size_t n )
     {
         return "@property auto "~toDecl()~"()"
-            "{return getVal!( "~to!string(n)~" );}";
+            "{return getVal!("~to!string(n)~");}";
     }
 }
 
