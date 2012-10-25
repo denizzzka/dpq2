@@ -52,7 +52,6 @@ struct Fields( TL ... )
     }
     
     mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
-    alias FieldsEnum this;    
 }
 
 struct RowFields( TL ... )
@@ -79,8 +78,6 @@ struct RowFields( TL ... )
         return fields.joinFieldString!("toRowFieldProperty", true)("");
     }
     
-    //@property auto INT(){return getVal!( fields.FieldsEnum.INT );}
-
     mixin( GenRowProperties() );
 }
 
