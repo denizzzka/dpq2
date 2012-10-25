@@ -69,6 +69,17 @@ struct RowFields( TL ... )
     {
         return (*row)[ 0 ].as!(PGtext);
     }
+    
+    auto getVal(T)(fields.FieldsEnum e)
+    {
+        return row.opIndex(e).as!(T);
+    }
+    
+    /*
+    private string GenProperties()
+    {
+        return joinFieldString!(")
+    */
 }
 
 void _unittest( string connParam )
@@ -94,6 +105,6 @@ void _unittest( string connParam )
     {
         f.answer = r;
         writeln( r[f.INT].as!PGtext );
-        writeln( f.INT );
+        writeln( f.getVal!PGtext(f.t) );
     }
 }
