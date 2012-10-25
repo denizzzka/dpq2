@@ -8,12 +8,12 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
 {
     alias T type;
     
-    static string toSQL() pure nothrow
+    static string sql() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
     }
     
-    alias toSQL toString;
+    alias sql toString;
     
     static string toDecl() pure nothrow
     {
@@ -43,10 +43,12 @@ struct Fields( TL ... )
     }
     
     @property
-    static string toString() nothrow
+    static string sql() nothrow
     {
-        return joinFieldString!("toString")(", ");
+        return joinFieldString!("sql")(", ");
     }
+    
+    alias sql toString;
     
     private static string GenFieldsEnum() nothrow
     {
