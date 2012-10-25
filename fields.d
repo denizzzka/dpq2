@@ -61,16 +61,17 @@ void _unittest( string connParam )
     conn.connect();
 
     Field!(PGtext) ft;
-    ft.sqlPrefix = "pr1";
-    ft.sqlName = "asd";
+    ft.sqlPrefix = "";
+    ft.sqlName = "i";
     
     Field!(PGinteger) fs;
-    fs.sqlPrefix = "pr2";
-    fs.sqlName = "fgh";
+    fs.sqlPrefix = "";
+    fs.sqlName = "t";
     
     Fields!( ft, fs ) f;
     
-    string q = "select 123::integer as i, 'qwerty'::text as t";
+    string q = "select "~to!string(f)~"
+        from (select 123::integer as i, 'qwerty'::text as t) s";
     auto r = conn.exec( q );
     
     import std.stdio;
