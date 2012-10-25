@@ -96,7 +96,7 @@ void _unittest( string connParam )
         Field!(PGtext, "t2")
     ) f;
     
-    string q = "select "~to!string(f)~"
+    string q = "select "~f.sql~"
         from (select '123'::text as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
