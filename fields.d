@@ -3,8 +3,6 @@ module dpq2.fields;
 import dpq2.answer;
 import dpq2.libpq;
 import std.string;
-import std.traits;
-import core.vararg;
 
 struct Field( T )
 {
@@ -56,8 +54,12 @@ struct _Fields( FieldArray )
     }
 }
 
-unittest
+void _unittest( string connParam )
 {
+    auto conn = new Connection;
+	conn.connString = connParam;
+    conn.connect();
+
     Field!(PGtext) ft;
     ft.sqlPrefix = "pr1";
     ft.sqlName = "asd";
