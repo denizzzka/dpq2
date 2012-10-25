@@ -6,8 +6,7 @@ import std.string;
 
 struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
 {
-    //static T getFieldType() { return T; };
-    alias T TY;
+    alias T type;
     
     static string toString() pure nothrow
     {
@@ -76,7 +75,7 @@ struct RowFields( TL ... )
     @property
     auto getVal(fields.FieldsEnum e)()
     {
-        return row.opIndex(e).as!( TL[e].TY );
+        return row.opIndex(e).as!( TL[e].type );
     }
     
     /*
