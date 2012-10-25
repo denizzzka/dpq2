@@ -4,16 +4,16 @@ import dpq2.answer;
 import dpq2.libpq;
 import std.string;
 
-static struct Field( T, string sqlName, string sqlPrefix = "" )
+struct Field( T, string sqlName, string sqlPrefix = "" )
 {
     @property
-    string toString() pure nothrow
+    static string toString() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
     }
     
     @property
-    string toDecl() pure nothrow
+    static string toDecl() pure nothrow
     {
         return sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName;
     }
@@ -21,12 +21,12 @@ static struct Field( T, string sqlName, string sqlPrefix = "" )
 
 struct Fields( TL ... )
 {
-    string joinString( string memberName )( string delimiter )
+    private string joinFieldString( string memberName )( string delimiter )
     {
         string r;
         foreach( i, T; TL )
         {
-            mixin( "r ~= T." ~ memberName );
+            mixin( "r ~= T." ~ memberName ~ ";" );
             if( i < TL.length-1 ) r ~= delimiter;
         }
         
@@ -36,8 +36,8 @@ struct Fields( TL ... )
     @property
     string toString() nothrow
     {
-        return "sd";
-        //return joinString!("toString()")(", ");
+        //return "sd";
+        return joinFieldString!("toString()")(", ");
     }
     
     struct M(F)
@@ -74,7 +74,7 @@ void _unittest( string connParam )
     immutable Field!(PGtext, "i", "") ft;
     immutable Field!(PGinteger, "t") fs;
     
-    Fields!( ft, fs ) f;
+    Fields!( Field!(PGinteger, "i"), Field!(PGinteger, "t") ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
