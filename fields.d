@@ -54,7 +54,7 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
-    Fields!( Field!(PGtext, "i", ), Field!(PGinteger, "t") ) f;
+    Fields!( Field!(PGtext, "i", "", "INT" ), Field!(PGinteger, "t") ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
@@ -62,7 +62,7 @@ void _unittest( string connParam )
     
     import std.stdio;
     writeln( f.toString() );
-    writeln( f.i );
+    writeln( f.INT );
     writeln( r );
     
     writeln( r[0,1].as!PGtext );
