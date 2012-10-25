@@ -573,11 +573,12 @@ void _unittest( string connParam )
         }
     );
     
-    while( conn.inUse() ) {}
+    conn.waitAnswers();
     assert( answersCount == 3 );
     
     conn.sendQuery( p, (Answer a){ } );
     while( conn.inUse() ) {}
+    conn.waitAnswers();
     
     // Range test
     foreach( elem; r )

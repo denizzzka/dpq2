@@ -31,21 +31,31 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
+    alias @system void delegate( Answer a ) answerHandler;
+    private shared answerHandler handler;
+    private void unusedHandler( Answer a ) { assert(false); }
+    
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
         assert( !handler );
-        return getAnswer(
+        handler = &unusedHandler; // FIXME: dirty blocking
+        auto r = getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
+        
+        handler = null;
+        return r;
     }
-
+    
     /// Perform SQL query to DB
     Answer exec(ref const queryParams p)
     {
         assert( !handler );
+        handler = &unusedHandler; // FIXME: dirty blocking
+        
         auto a = prepareArgs( p );
-        return getAnswer
+        auto r = getAnswer
         (
             PQexecParams (
                 conn,
@@ -58,11 +68,13 @@ final class Connection: BaseConnection
                 p.resultFormat
             )
         );
+        
+        handler = null;
+        return r;
     }
     
     import std.concurrency;
     alias Tid Descriptor;
-    private shared answerHandler handler;
     
     @property bool inUse(){ return handler != null; }    
     
@@ -75,7 +87,7 @@ final class Connection: BaseConnection
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
         
-        return spawn( &expectAnswer, cast(shared Connection) this );
+        return spawnExpectAnswer();
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -97,10 +109,15 @@ final class Connection: BaseConnection
                     );
         if( !r ) throw new exception();
         
-        return spawn( &expectAnswer, cast(shared Connection) this );
+        return spawnExpectAnswer();
     }
     
-    static private void expectAnswer( shared Connection connection )
+    private Tid spawnExpectAnswer()
+    {
+        return spawn( &expectAnswer, thisTid, cast(shared Connection) this );
+    }
+    
+    static private void expectAnswer( Tid tid, shared Connection connection )
     {
         import std.socket;
         
@@ -123,6 +140,12 @@ final class Connection: BaseConnection
             c.handler( new Answer( r ) );
         
         connection.handler = null;
+        tid.send(true);
+    }
+    
+    void waitAnswers()
+    {
+        receiveOnly!bool();
     }
     
     /// Waits for the next result from a sendQuery

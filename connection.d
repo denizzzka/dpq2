@@ -32,8 +32,6 @@ class BaseConnection
 {
     string connString; /// Database connection parameters
     
-    @system alias void delegate( Answer a ) answerHandler;
-    
     package PGconn* conn;
     private
     {
@@ -112,6 +110,7 @@ class BaseConnection
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
     
+    @disable
     private void registerEventProc( PGEventProc proc, string name, void *passThrough )
     {
         if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
