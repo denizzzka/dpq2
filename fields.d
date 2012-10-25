@@ -4,17 +4,18 @@ import dpq2.answer;
 import dpq2.libpq;
 import std.string;
 
-struct Field( T )
+struct Field( T, string sqlPrefix, string sqlName )
 {
-    string sqlPrefix;
-    string sqlName;
-    size_t columnNum;
-    T value;
-    
     @property
-    string toString() nothrow
+    string toString() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
+    }
+    
+    @property
+    string toDecl() pure nothrow
+    {
+        return sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName;
     }
 }
 
@@ -22,10 +23,10 @@ struct Fields( TL ... )
 {
     void static_this()
     {
-        foreach( i, T; TL )
-            T.columnNum = i;
+        foreach( i, T; TL ){}
+            //T.columnNum = i;
     }
-        
+    
     @property
     string toString()
     {
@@ -39,6 +40,15 @@ struct Fields( TL ... )
         return r;
     }
     
+    struct M(F)
+    {
+        Field!(F) field;
+        alias field this;
+        size_t columnNum;
+    }
+    
+    
+    
     //@property
     //size_t columnNum()
 }
@@ -49,13 +59,8 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
 
-    Field!(PGtext) ft;
-    ft.sqlPrefix = "";
-    ft.sqlName = "i";
-    
-    Field!(PGinteger) fs;
-    fs.sqlPrefix = "";
-    fs.sqlName = "t";
+    Field!(PGtext, "", "i") ft;
+    Field!(PGinteger, "", "t") fs;
     
     Fields!( ft, fs ) f;
     
