@@ -34,26 +34,6 @@ struct Fields( TL ... )
     }
 }
 
-struct _Fields( FieldArray )
-{
-    FieldArray fields;
-    
-    @property
-    string toString()
-    {        
-        string r = fields[0].toString;
-        size_t i = 1;
-        
-        while ( i < fields.length )
-        {
-            r ~= ", " ~ fields[i].toString;
-            i++;
-        }
-        
-        return r;
-    }
-}
-
 void _unittest( string connParam )
 {
     auto conn = new Connection;
