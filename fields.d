@@ -39,22 +39,13 @@ struct Fields( TL ... )
         return joinFieldString!("toString()")(", ");
     }
     
-    struct M(F)
-    {
-        Field!(F) field;
-        alias field this;
-        size_t columnNum;
-    }
-    
     private static string GenFieldsEnum() nothrow
     {
         return joinFieldString!("toDecl()")(", ");
     }
     
     mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
-    
-    //@property
-    //size_t columnNum()
+    alias FieldsEnum this;
 }
 
 void _unittest( string connParam )
@@ -62,11 +53,8 @@ void _unittest( string connParam )
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
-
-    immutable Field!(PGtext, "i", "") ft;
-    immutable Field!(PGinteger, "t") fs;
     
-    Fields!( Field!(PGinteger, "i"), Field!(PGinteger, "t") ) f;
+    Fields!( Field!(PGtext, "i"), Field!(PGinteger, "t") ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
@@ -74,6 +62,7 @@ void _unittest( string connParam )
     
     import std.stdio;
     writeln( f.toString() );
+    writeln( f.i );
     writeln( r );
     
     writeln( r[0,1].as!PGtext );
