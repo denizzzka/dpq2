@@ -166,6 +166,12 @@ class Answer // most members should be a const
     }
     
     @property
+    debug override string toString() const
+    {
+        return "Rows: "~to!string(rowCount)~" Columns: "~to!string(columnCount);
+    }
+    
+    @property
     private string resultErrorMessage()
     {
         return to!string( PQresultErrorMessage(res) );

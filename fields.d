@@ -70,6 +70,10 @@ void _unittest( string connParam )
     
     Fields!( ft, fs ) f;
     
+    string q = "select 123::integer as i, 'qwerty'::text as t";
+    auto r = conn.exec( q );
+    
     import std.stdio;
     writeln( f.toString() );
+    writeln( r );
 }
