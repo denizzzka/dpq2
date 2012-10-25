@@ -48,13 +48,25 @@ struct Fields( TL ... )
     alias FieldsEnum this;
 }
 
+struct FieldsRow( TL ... )
+{
+    Fields!(TL) fields;
+    alias fields this;
+    
+    private Answer answer;
+    @property answer( Answer a )
+    {
+        //answer = a;
+    }
+}
+
 void _unittest( string connParam )
 {
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
     
-    Fields!( Field!(PGtext, "i", "", "INT" ), Field!(PGinteger, "t") ) f;
+    FieldsRow!( Field!(PGtext, "i", "", "INT" ), Field!(PGinteger, "t") ) f;
     
     string q = "select "~to!string(f)~"
         from (select 123::integer as i, 'qwerty'::text as t) s";
