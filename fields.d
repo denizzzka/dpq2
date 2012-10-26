@@ -65,9 +65,15 @@ struct RowFields( TL ... )
     }
     
     @property
-    auto getVal( size_t n )()
+    private auto getVal( size_t n )()
     {
         return _row.opIndex(n).as!( TL[n].type );
+    }
+    
+    @property
+    private bool isNULL( size_t n )()
+    {
+        return _row.isNULL(n);
     }
     
     private static string GenRowProperties()
