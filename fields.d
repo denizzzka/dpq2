@@ -1,7 +1,6 @@
 module dpq2.fields;
 
 import dpq2.answer;
-import dpq2.libpq;
 
 struct Field( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
