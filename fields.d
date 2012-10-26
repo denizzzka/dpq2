@@ -53,18 +53,15 @@ struct Fields( TL ... )
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
 }
 
-struct RowFields( A, TL ... )
+struct ResultFields( A, TL ... )
 if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
 {
     Fields!(TL) fields;
     alias fields this;
     
-    const (A) answer;
+    A answer;
     
-    this( A a )
-    {
-        answer = a;
-    }
+    this( A a ) { answer = a; }
     
     invariant()
     {
@@ -111,29 +108,37 @@ void _unittest( string connParam )
     conn.connect();
     
     alias
-    RowFields!( Row,
+    ResultFields!( Row,
         Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         Field!(PGtext, "t2")
     ) f1;
     
     alias
-    RowFields!( Answer,
+    ResultFields!( Row*,
         Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         Field!(PGtext, "t2")
     ) f2;
+
+    alias
+    ResultFields!( Answer,
+        Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
+        Field!(PGtext, "t2")
+    ) f3;
     
     string q = "select "~f1.sql~"
         from (select '123'::integer as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
-    auto fa = f2(res);
+    auto fa = f3(res);
     assert( fa.TEXT_FIELD(0) == res[0,0].as!PGtext );
     assert( !fa.TEXT_FIELD_isNULL(0) );
     assert( fa.t2(0) == res[0,1].as!PGtext );
     
     foreach( r; res )
     {
-        f1 f = f1(r);
+        auto f = f1(r);
+        auto unused = f2(&r);
+        
         assert( f.TEXT_FIELD == res[0,0].as!PGtext );
         assert( !f.TEXT_FIELD_isNULL );
         assert( f.t2 == res[0,1].as!PGtext );
