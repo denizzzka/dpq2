@@ -58,6 +58,9 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     Fields!(TL) fields;
     
     A answer;
+    alias answer this;
+    alias fields.sql sql;
+    alias fields.toString toString;
     
     this( A a ) { answer = a; }
     
@@ -65,8 +68,6 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     {
         assert( answer.columnCount == TL.length );
     }
-    
-    alias fields.sql sql;
     
     static if( !is( A == Answer) )
     {
@@ -87,6 +88,12 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
             return "@property auto "~T.toDecl()~"(size_t row){ return getVal!("~to!string(col)~")(row); }"~
                    "@property auto "~T.toDecl()~"_isNULL(size_t row){ return isNULL!("~to!string(col)~")(row); }";
         }
+        
+        auto opIndex()( size_t rowNum )
+        {
+            alias ResultFields!( Row, TL ) rowFields;
+            return rowFields( answer[rowNum] );
+        }        
     }
     
     private static string GenProperties()
@@ -126,7 +133,9 @@ void _unittest( string connParam )
     ) f3;
     
     string q = "select "~f1.sql~"
-        from (select '123'::integer as t1, 'qwerty'::text as t2) s";
+        from (select '123'::integer as t1, 'qwerty'::text as t2
+              union
+              select '456',                'asdfgh') s";
     auto res = conn.exec( q );
         
     auto fa = f3(res);
@@ -134,13 +143,15 @@ void _unittest( string connParam )
     assert( !fa.TEXT_FIELD_isNULL(0) );
     assert( fa.t2(0) == res[0,1].as!PGtext );
     
-    foreach( r; res )
+    import std.stdio;
+    assert( fa[1].t2 == "asdfgh" );
+    
+    /*
+    foreach( f; fa )
     {
-        auto f = f1(r);
-        auto unused = f2(&r);
-        
-        assert( f.TEXT_FIELD == res[0,0].as!PGtext );
+        assert( f.TEXT_FIELD == r[0,0].as!PGtext );
         assert( !f.TEXT_FIELD_isNULL );
-        assert( f.t2 == res[0,1].as!PGtext );
+        assert( f.t2 == r[1].as!PGtext );
     }
+    */
 }
