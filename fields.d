@@ -54,6 +54,7 @@ struct Fields( TL ... )
 }
 
 struct RowFields( A, TL ... )
+if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
 {
     Fields!(TL) fields;
     alias fields this;
@@ -64,26 +65,34 @@ struct RowFields( A, TL ... )
     
     //@property void answer( A a ) { _answer = a; }
     
-    @property
-    private auto getVal( size_t n )()
+    static if( !is( A == Answer) )
     {
-        return answer.opIndex(n).as!( TL[n].type );
+        @property
+        private auto getVal( size_t c )() { return answer.opIndex(c).as!( TL[c].type ); }    
+        @property
+        private bool isNULL( size_t c )() { return answer.isNULL( c ); }
+        private static string fieldProperties( T, size_t col )()
+        {
+            return "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~"); }"~
+                   "@property auto "~T.toDecl()~"_isNULL(){ return isNULL!("~to!string(col)~"); }";
+        }
     }
-    
-    @property
-    private bool isNULL( size_t n )()
+    else
     {
-        return answer.isNULL( n );
+        private auto getVal( size_t c )( size_t r ) { return answer.opIndex(r,c).as!( TL[c].type ); }
+        private bool isNULL( size_t c )( size_t r ) { return answer.isNULL( r, c ); }
+        private static string fieldProperties( T, size_t col )()
+        {
+            return "@property auto "~T.toDecl()~"(size_t row){ return getVal!("~to!string(col)~")(row); }"~
+                   "@property auto "~T.toDecl()~"_isNULL(size_t row){ return isNULL!("~to!string(col)~")(row); }";
+        }
     }
     
     private static string GenProperties()
     {
         string r;
         foreach( i, T; TL )
-        {
-            r ~= "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(i)~"); }";
-            r ~= "@property auto "~T.toDecl()~"_isNULL(){ return isNULL!("~to!string(i)~"); }";            
-        }
+            r ~= fieldProperties!( T, i )();
         
         return r;
     }
@@ -103,10 +112,18 @@ void _unittest( string connParam )
         Field!(PGtext, "t2")
     ) f1;
     
+    alias
+    RowFields!( Answer,
+        Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
+        Field!(PGtext, "t2")
+    ) f2;
+    
     string q = "select "~f1.sql~"
         from (select '123'::integer as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
+    //auto unused = f2(res);
+    
     foreach( r; res )
     {
         f1 f = f1(&r);
