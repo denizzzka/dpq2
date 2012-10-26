@@ -49,6 +49,7 @@ struct Fields( TL ... )
     }
     
     mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
+    //alias FieldsEnum this;
 }
 
 struct RowFields( TL ... )
@@ -58,11 +59,9 @@ struct RowFields( TL ... )
     
     Row* _row;
     
-    @property
-    void row( ref Row r )
-    {
-        _row = &r;
-    }
+    @property void row( ref Row r ) { _row = &r; }
+    
+    @property Row* row() { return _row; }
     
     @property
     private auto getVal( size_t n )()
@@ -73,19 +72,22 @@ struct RowFields( TL ... )
     @property
     private bool isNULL( size_t n )()
     {
-        return _row.isNULL(n);
+        return _row.isNULL( n );
     }
     
-    private static string GenRowProperties()
+    private static string GenProperties()
     {
         string r;
         foreach( i, T; TL )
-            r ~= "@property auto "~T.toDecl()~"()"
-                "{return getVal!("~to!string(i)~");}";
+        {
+            r ~= "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(i)~"); }";
+            r ~= "@property auto "~T.toDecl()~"_isNULL(){ return isNULL!("~to!string(i)~"); }";            
+        }
+        
         return r;
     }
     
-    mixin( GenRowProperties() );
+    mixin( GenProperties() );
 }
 
 void _unittest( string connParam )
@@ -107,6 +109,7 @@ void _unittest( string connParam )
     {
         f.row = r;
         assert( f.TEXT_FIELD == res[0,0].as!PGtext );
+        assert( !f.TEXT_FIELD_isNULL );
         assert( f.t2 == res[0,1].as!PGtext );
     }
 }
