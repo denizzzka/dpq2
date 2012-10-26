@@ -8,7 +8,7 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "", string
     
     static string sql() pure nothrow
     {
-        return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\""~
+        return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\""~
             ( PGtypeCast.length ? "::"~PGtypeCast : "" );
     }
     
