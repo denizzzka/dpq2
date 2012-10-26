@@ -43,13 +43,13 @@ struct Fields( TL ... )
     
     alias sql toString;
     
+    @disable
     private static string GenFieldsEnum() nothrow
     {
         return joinFieldString!("toDecl")(", ");
     }
     
-    mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
-    //alias FieldsEnum this;
+    //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
 }
 
 struct RowFields( TL ... )
