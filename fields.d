@@ -67,14 +67,12 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     
     static if( !is( A == Answer) )
     {
-        @property
         private auto getVal( size_t c )() { return answer.opIndex(c).as!( TL[c].type ); }    
-        @property
         private bool isNULL( size_t c )() { return answer.isNULL( c ); }
         private static string fieldProperties( T, size_t col )()
         {
-            return "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~"); }"~
-                   "@property auto "~T.toDecl()~"_isNULL(){ return isNULL!("~to!string(col)~"); }";
+            return "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~")(); }"~
+                   "@property auto "~T.toDecl()~"_isNULL(){ return isNULL!("~to!string(col)~")(); }";
         }
     }
     else
