@@ -16,7 +16,8 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "", string
     
     static string toDecl() pure nothrow
     {
-        return decl.length ? decl : (sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName);
+        //return decl.length ? decl : (sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName);
+        return decl.length ? decl : sqlName;
     }
 }
 
