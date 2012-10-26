@@ -89,11 +89,14 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
                    "@property auto "~T.toDecl()~"_isNULL(size_t row){ return isNULL!("~to!string(col)~")(row); }";
         }
         
-        auto opIndex()( size_t rowNum )
+        alias ResultFields!( Row, TL ) RF; // Row Fields
+        
+        RF opIndex( size_t rowNum )
         {
-            alias ResultFields!( Row, TL ) rowFields;
-            return rowFields( answer[rowNum] );
-        }        
+            return RF( answer[rowNum] );
+        }
+        
+        @property RF front(){ return opIndex(answer.currRow); }
     }
     
     private static string GenProperties()
@@ -146,12 +149,8 @@ void _unittest( string connParam )
     import std.stdio;
     assert( fa[1].t2 == "asdfgh" );
     
-    /*
     foreach( f; fa )
     {
-        assert( f.TEXT_FIELD == r[0,0].as!PGtext );
         assert( !f.TEXT_FIELD_isNULL );
-        assert( f.t2 == r[1].as!PGtext );
     }
-    */
 }

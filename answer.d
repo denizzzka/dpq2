@@ -186,7 +186,7 @@ class Answer // most members should be a const
         assertCol( c.Col );
     }    
     
-    private size_t currRow;
+    package size_t currRow;
     
     @property Row front(){ return this[currRow]; }
     @property void popFront(){ return ++currRow; }
