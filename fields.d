@@ -3,13 +3,14 @@ module dpq2.fields;
 import dpq2.answer;
 import dpq2.libpq;
 
-struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
+struct Field( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
     alias T type;
     
     static string sql() pure nothrow
     {
-        return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\"";
+        return "\""~( sqlPrefix.length ? sqlPrefix~"."~sqlName : sqlName )~"\""~
+            ( PGtypeCast.length ? "::"~PGtypeCast : "" );
     }
     
     alias sql toString;
@@ -97,12 +98,12 @@ void _unittest( string connParam )
     conn.connect();
     
     RowFields!(
-        Field!(PGtext, "t1", "", "TEXT_FIELD" ),
+        Field!(PGtext, "t1", "", "TEXT_FIELD", "text" ),
         Field!(PGtext, "t2")
     ) f;
     
     string q = "select "~f.sql~"
-        from (select '123'::text as t1, 'qwerty'::text as t2) s";
+        from (select '123'::integer as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
     foreach( r; res )
