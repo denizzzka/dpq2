@@ -18,23 +18,17 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "" )
     {
         return decl.length ? decl : (sqlPrefix.length ? sqlPrefix~"_"~sqlName : sqlName);
     }
-    
-    static string toRowFieldProperty( size_t n )
-    {
-        return "@property auto "~toDecl()~"()"
-            "{return getVal!("~to!string(n)~");}";
-    }
 }
 
 struct Fields( TL ... )
 {
     private static
-    string joinFieldString( string memberName, bool passIter = false )( string delimiter )
+    string joinFieldString( string memberName )( string delimiter )
     {
         string r;
         foreach( i, T; TL )
         {
-            mixin( "r ~= T." ~ memberName ~ "("~(passIter ? to!string(i) : "")~");" );
+            mixin( "r ~= T." ~ memberName ~ "();" );
             if( i < TL.length-1 ) r ~= delimiter;
         }
         
@@ -78,7 +72,11 @@ struct RowFields( TL ... )
     
     private static string GenRowProperties()
     {
-        return fields.joinFieldString!("toRowFieldProperty", true)("");
+        string r;
+        foreach( i, T; TL )
+            r ~= "@property auto "~T.toDecl()~"()"
+                "{return getVal!("~to!string(i)~");}";
+        return r;
     }
     
     mixin( GenRowProperties() );
