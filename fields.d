@@ -53,27 +53,30 @@ struct Fields( TL ... )
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
 }
 
-struct RowFields( TL ... )
+struct RowFields( A, TL ... )
 {
     Fields!(TL) fields;
     alias fields this;
     
-    Row* _row;
+    const A answer;
     
-    @property void row( ref Row r ) { _row = &r; }
+    this( const A a )
+    {
+        answer = a;
+    }
     
-    @property Row* row() { return _row; }
+    //@property void answer( A a ) { _answer = a; }
     
     @property
     private auto getVal( size_t n )()
     {
-        return _row.opIndex(n).as!( TL[n].type );
+        return answer.opIndex(n).as!( TL[n].type );
     }
     
     @property
     private bool isNULL( size_t n )()
     {
-        return _row.isNULL( n );
+        return answer.isNULL( n );
     }
     
     private static string GenProperties()
@@ -97,7 +100,8 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
-    RowFields!(
+    alias
+    RowFields!( Row*,
         Field!(PGtext, "t1", "", "TEXT_FIELD", "text" ),
         Field!(PGtext, "t2")
     ) f;
@@ -108,7 +112,7 @@ void _unittest( string connParam )
         
     foreach( r; res )
     {
-        f.row = r;
+        //f.row = r;
         assert( f.TEXT_FIELD == res[0,0].as!PGtext );
         assert( !f.TEXT_FIELD_isNULL );
         assert( f.t2 == res[0,1].as!PGtext );
