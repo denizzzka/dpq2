@@ -60,10 +60,7 @@ struct RowFields( A, TL ... )
     
     const A answer;
     
-    this( const A a )
-    {
-        answer = a;
-    }
+    this( const A a ) { answer = a; }
     
     //@property void answer( A a ) { _answer = a; }
     
@@ -102,17 +99,17 @@ void _unittest( string connParam )
     
     alias
     RowFields!( Row*,
-        Field!(PGtext, "t1", "", "TEXT_FIELD", "text" ),
+        Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         Field!(PGtext, "t2")
-    ) f;
+    ) f1;
     
-    string q = "select "~f.sql~"
+    string q = "select "~f1.sql~"
         from (select '123'::integer as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
     foreach( r; res )
     {
-        //f.row = r;
+        f1 f = f1(&r);
         assert( f.TEXT_FIELD == res[0,0].as!PGtext );
         assert( !f.TEXT_FIELD_isNULL );
         assert( f.t2 == res[0,1].as!PGtext );
