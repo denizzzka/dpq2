@@ -59,11 +59,17 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     Fields!(TL) fields;
     alias fields this;
     
-    const A answer;
+    const (A) answer;
     
-    this( const A a ) { answer = a; }
+    this( A a )
+    {
+        answer = a;
+    }
     
-    //@property void answer( A a ) { _answer = a; }
+    invariant()
+    {
+        assert( answer.columnCount == TL.length );
+    }
     
     static if( !is( A == Answer) )
     {
@@ -105,7 +111,7 @@ void _unittest( string connParam )
     conn.connect();
     
     alias
-    RowFields!( Row*,
+    RowFields!( Row,
         Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         Field!(PGtext, "t2")
     ) f1;
@@ -120,11 +126,14 @@ void _unittest( string connParam )
         from (select '123'::integer as t1, 'qwerty'::text as t2) s";
     auto res = conn.exec( q );
         
-    //auto unused = f2(res);
+    auto fa = f2(res);
+    assert( fa.TEXT_FIELD(0) == res[0,0].as!PGtext );
+    assert( !fa.TEXT_FIELD_isNULL(0) );
+    assert( fa.t2(0) == res[0,1].as!PGtext );
     
     foreach( r; res )
     {
-        f1 f = f1(&r);
+        f1 f = f1(r);
         assert( f.TEXT_FIELD == res[0,0].as!PGtext );
         assert( !f.TEXT_FIELD_isNULL );
         assert( f.t2 == res[0,1].as!PGtext );
