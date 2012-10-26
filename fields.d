@@ -28,7 +28,7 @@ struct Fields( TL ... )
         string r;
         foreach( i, T; TL )
         {
-            mixin( "r ~= T." ~ memberName ~ "();" );
+            mixin( "r ~= T." ~ memberName ~ ";" );
             if( i < TL.length-1 ) r ~= delimiter;
         }
         
@@ -38,7 +38,7 @@ struct Fields( TL ... )
     @property
     static string sql() nothrow
     {
-        return joinFieldString!("sql")(", ");
+        return joinFieldString!("sql()")(", ");
     }
     
     alias sql toString;
@@ -46,7 +46,7 @@ struct Fields( TL ... )
     @disable
     private static string GenFieldsEnum() nothrow
     {
-        return joinFieldString!("toDecl")(", ");
+        return joinFieldString!("toDecl()")(", ");
     }
     
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
