@@ -56,7 +56,6 @@ struct ResultFields( A, TL ... )
 if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
 {
     Fields!(TL) fields;
-    alias fields this;
     
     A answer;
     
@@ -66,6 +65,8 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     {
         assert( answer.columnCount == TL.length );
     }
+    
+    alias fields.sql sql;
     
     static if( !is( A == Answer) )
     {
