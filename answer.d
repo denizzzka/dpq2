@@ -119,40 +119,11 @@ class Answer // most members should be a const
                                 "Column '"~columnName~"' is not found");
         return n;
     }
-
-    immutable (Value)* getValue( const Coords c ) const
-    {
-        assertCoords(c);
-        
-        auto v = PQgetvalue(res, c.Row, c.Col);
-        auto s = size( c );
-
-        debug
-            auto r = new Value( v, s, columnFormat( c.Col ) );
-        else
-            auto r = new Value( v, s );
-        
-        return r;
-    }
     
     /// Returns pointer to row of cells
     Row opIndex( const size_t row ) const
     {
         return Row( this, row );
-    }
-    
-    /// Returns pointer to cell
-    immutable (Value)* opIndex( const size_t row, const size_t col ) const
-    {
-        const Coords c = { Row: row, Col: col };
-        return getValue( c );
-    }
-    
-    /// Returns cell value size
-    size_t size( const Coords c ) const
-    {
-        assertCoords(c);
-        return PQgetlength(res, c.Row, c.Col);
     }
     
     @property
@@ -172,9 +143,14 @@ class Answer // most members should be a const
         assert( c < columnCount, to!string(c)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
     }
     
-    private void assertCoords( const Coords c ) const
+    private void assertRow( const size_t r ) const
     {
-        assert( c.Row < rowCount, to!string(c.Row)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
+        assert( r < rowCount, to!string(r)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
+    }
+    
+     private void assertCoords( const Coords c ) const
+    {
+        assertRow( c.Row );
         assertCol( c.Col );
     }    
     
@@ -190,17 +166,24 @@ struct Row
     private const Answer answer;
     private immutable size_t row;
     
+    
     this( const Answer answer, const size_t row )
     {
         this.answer = answer;
         this.row = row;
     }
     
+    invariant()
+    {
+        answer.assertRow( row );
+    }
+    
     /// Returns cell size
     @property
-    size_t size( const Coords coords ) const
+    size_t size( const size_t col ) const
     {
-        return answer.size( coords );
+        answer.assertCol(col);
+        return PQgetlength(answer.res, row, col);
     }
     
     /// Value NULL checking
@@ -212,8 +195,17 @@ struct Row
     
     immutable (Value)* opIndex( size_t col ) const
     {
-        answer.assertCol(col);
-        return answer.getValue( Coords( row, col ) );
+        answer.assertCoords( Coords( row, col ) );
+        
+        auto v = PQgetvalue(answer.res, row, col);
+        auto s = size( col );
+
+        debug
+            auto r = new Value( v, s, answer.columnFormat( col ) );
+        else
+            auto r = new Value( v, s );
+        
+        return r;
     }
     
     /// Returns column number by field name
@@ -508,7 +500,7 @@ void _unittest( string connParam )
     assert( e.columnCount == 4);
     assert( e.columnFormat(2) == valueFormat.TEXT );
 
-    assert( e[1,2].as!PGtext == "456" );
+    assert( e[1][2].as!PGtext == "456" );
     assert( !e[0].isNULL(0) );
     assert( e[2].isNULL(0) );
     assert( e.columnNum( "field_name" ) == 1 );
@@ -542,21 +534,21 @@ void _unittest( string connParam )
 
     auto r = conn.exec( p );
 
-    assert( r[0,0].as!PGsmallint == -32761 );
-    assert( r[0,1].as!PGinteger == -2147483646 );
-    assert( r[0,2].as!PGbigint == -9223372036854775806 );
-    assert( r[0,3].as!PGreal == -12.3456f );
-    assert( r[0,4].as!PGdouble_precision == -1234.56789012345 );
+    assert( r[0][0].as!PGsmallint == -32761 );
+    assert( r[0][1].as!PGinteger == -2147483646 );
+    assert( r[0][2].as!PGbigint == -9223372036854775806 );
+    assert( r[0][3].as!PGreal == -12.3456f );
+    assert( r[0][4].as!PGdouble_precision == -1234.56789012345 );
 
-    assert( r[0,5].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
-    assert( r[0,6].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( r[0,7].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( r[0,8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( r[0][5].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
+    assert( r[0][6].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( r[0][7].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
+    assert( r[0][8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
 
-    assert( r[0,9].as!PGtext == "first line\nsecond line" );
-    assert( r[0,10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
+    assert( r[0][9].as!PGtext == "first line\nsecond line" );
+    assert( r[0][10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
-    auto v = r[0,11];
+    auto v = r[0][11];
     assert( r.OID(11) == 1007 ); // int4 array
     auto a = v.asArray;
     assert( a.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage

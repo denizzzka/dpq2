@@ -142,9 +142,9 @@ void _unittest( string connParam )
     auto res = conn.exec( q );
         
     auto fa = f3(res);
-    assert( fa[0].TEXT_FIELD == res[0,0].as!PGtext );
+    assert( fa[0].TEXT_FIELD == res[0][0].as!PGtext );
     assert( !fa[0].TEXT_FIELD_isNULL );
-    assert( fa[0].t2 == res[0,1].as!PGtext );
+    assert( fa[0].t2 == res[0][1].as!PGtext );
     
     import std.stdio;
     assert( fa[1].t2 == "asdfgh" );
