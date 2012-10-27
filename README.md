@@ -67,7 +67,7 @@ void main()
         "123 as field_3, 456.78 as field_4"
         );
         
-    writeln( "1: ", s[0,3].as!PGtext );
+    writeln( "1: ", s[0][3].as!PGtext );
 
     // Binary query result
     static queryArg arg;
@@ -83,13 +83,13 @@ void main()
     
     auto r = conn.exec( p );    
  
-    writeln( "2: ", r[0,0].as!PGdouble_precision );
-    writeln( "3: ", r[0,1].as!PGtime_stamp.toSimpleString );
-    writeln( "4: ", r[0,2].as!PGtext );
-    writeln( "5: ", r.isNULL(0,3) );
-    writeln( "6: ", r[0,4].asArray.getValue(1).as!PGinteger );
-    writeln( "7: ", r[0,4].asArray.isNULL(0) );
-    writeln( "8: ", r[0,4].asArray.isNULL(2) );
+    writeln( "2: ", r[0][0].as!PGdouble_precision );
+    writeln( "3: ", r[0][1].as!PGtime_stamp.toSimpleString );
+    writeln( "4: ", r[0][2].as!PGtext );
+    writeln( "5: ", r[0].isNULL(3) );
+    writeln( "6: ", r[0][4].asArray.getValue(1).as!PGinteger );
+    writeln( "7: ", r[0][4].asArray.isNULL(0) );
+    writeln( "8: ", r[0][4].asArray.isNULL(2) );
 }
 ```
 Compile and run:
