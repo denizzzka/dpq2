@@ -166,16 +166,12 @@ struct Row
     private const Answer answer;
     private immutable size_t row;
     
-    
     this( const Answer answer, const size_t row )
     {
+        answer.assertRow( row );
+        
         this.answer = answer;
         this.row = row;
-    }
-    
-    invariant()
-    {
-        answer.assertRow( row );
     }
     
     /// Returns cell size
