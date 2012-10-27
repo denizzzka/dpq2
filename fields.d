@@ -79,7 +79,7 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         private auto getVal( size_t c )() { return answer.opIndex(c).as!( TL[c].type ); }    
         private static string fieldProperties( T, size_t col )()
         {
-            return "@property auto getVal(string s)()"
+            return "@property auto getValue(string s)()"
                         "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(); }"
                    "@property bool isNULL(string s)()"
                         "if( s == \""~T.toTemplatedName()~"\" ){ return answer.isNULL("~to!string(col)~"); }"
@@ -92,7 +92,11 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         private auto getVal( size_t c )( size_t r ) { return answer.opIndex(r,c).as!( TL[c].type ); }
         private static string fieldProperties( T, size_t col )()
         {
-            return "@property auto "~T.toDecl()~"(size_t row){ return getVal!("~to!string(col)~")(row); }"~
+            return "@property auto getValue(string s)(size_t row)"
+                        "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(row); }"
+                   "@property bool isNULL(string s)(size_t row)"
+                        "if( s == \""~T.toTemplatedName()~"\" ){ return answer.isNULL(row, "~to!string(col)~"); }"
+                   "@property auto "~T.toDecl()~"(size_t row){ return getVal!("~to!string(col)~")(row); }"~
                    "@property bool "~T.toDecl()~"_isNULL(size_t row){ return answer.isNULL(row, "~to!string(col)~"); }";
         }
         
@@ -149,16 +153,16 @@ void _unittest( string connParam )
     auto res = conn.exec( q );
         
     auto fa = f3(res);
-    assert( fa.TEXT_FIELD(0) == res[0,0].as!PGtext );
+    assert( fa[0].TEXT_FIELD == res[0,0].as!PGtext );
     assert( !fa.TEXT_FIELD_isNULL(0) );
-    assert( fa.t2(0) == res[0,1].as!PGtext );
+    assert( fa[0].t2 == res[0,1].as!PGtext );
     
     import std.stdio;
     assert( fa[1].t2 == "asdfgh" );
     
     foreach( f; fa )
     {
-        f.getVal!"t2";
+        f.getValue!"t2";
         assert( !f.isNULL!"t2" );
         assert( !f.TEXT_FIELD_isNULL );
     }
