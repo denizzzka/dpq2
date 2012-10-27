@@ -74,7 +74,18 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         assert( answer.columnCount == TL.length );
     }
     
-    static if( !is( A == Answer) )
+    static if( is( A == Answer) )
+    {
+        alias ResultFields!( Row, TL ) RF; // Row Fields
+        
+        RF opIndex( size_t rowNum )
+        {
+            return RF( answer[rowNum] );
+        }
+        
+        @property RF front(){ return opIndex(answer.currRow); }
+    }
+    else
     {
         private auto getVal( size_t c )() { return answer.opIndex(c).as!( TL[c].type ); }    
         private static string fieldProperties( T, size_t col )()
@@ -86,40 +97,18 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
                    "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~")(); }"
                    "@property auto "~T.toDecl()~"_isNULL(){ return answer.isNULL("~to!string(col)~"); }";
         }
-    }
-    else
-    {
-        private auto getVal( size_t c )( size_t r ) { return answer.opIndex(r,c).as!( TL[c].type ); }
-        private static string fieldProperties( T, size_t col )()
+        
+        private static string GenProperties()
         {
-            return "@property auto getValue(string s)(size_t row)"
-                        "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(row); }"
-                   "@property bool isNULL(string s)(size_t row)"
-                        "if( s == \""~T.toTemplatedName()~"\" ){ return answer.isNULL(row, "~to!string(col)~"); }"
-                   "@property auto "~T.toDecl()~"(size_t row){ return getVal!("~to!string(col)~")(row); }"~
-                   "@property bool "~T.toDecl()~"_isNULL(size_t row){ return answer.isNULL(row, "~to!string(col)~"); }";
+            string r;
+            foreach( i, T; TL )
+                r ~= fieldProperties!( T, i )();
+            
+            return r;
         }
         
-        alias ResultFields!( Row, TL ) RF; // Row Fields
-        
-        RF opIndex( size_t rowNum )
-        {
-            return RF( answer[rowNum] );
-        }
-        
-        @property RF front(){ return opIndex(answer.currRow); }
+        mixin( GenProperties() );
     }
-    
-    private static string GenProperties()
-    {
-        string r;
-        foreach( i, T; TL )
-            r ~= fieldProperties!( T, i )();
-        
-        return r;
-    }
-    
-    mixin( GenProperties() );
 }
 
 void _unittest( string connParam )
@@ -154,7 +143,7 @@ void _unittest( string connParam )
         
     auto fa = f3(res);
     assert( fa[0].TEXT_FIELD == res[0,0].as!PGtext );
-    assert( !fa.TEXT_FIELD_isNULL(0) );
+    assert( !fa[0].TEXT_FIELD_isNULL );
     assert( fa[0].t2 == res[0,1].as!PGtext );
     
     import std.stdio;
