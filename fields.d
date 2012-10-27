@@ -77,15 +77,14 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     static if( !is( A == Answer) )
     {
         private auto getVal( size_t c )() { return answer.opIndex(c).as!( TL[c].type ); }    
-        private bool _isNULL( size_t c ) { return answer.isNULL( c ); }
         private static string fieldProperties( T, size_t col )()
         {
             return "@property auto getVal(string s)()"
                         "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(); }"
                    "@property bool isNULL(string s)()"
-                        "if( s == \""~T.toTemplatedName()~"\" ){ return _isNULL("~to!string(col)~"); }"
+                        "if( s == \""~T.toTemplatedName()~"\" ){ return answer.isNULL("~to!string(col)~"); }"
                    "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~")(); }"
-                   "@property auto "~T.toDecl()~"_isNULL(){ return _isNULL("~to!string(col)~"); }";
+                   "@property auto "~T.toDecl()~"_isNULL(){ return answer.isNULL("~to!string(col)~"); }";
         }
     }
     else
@@ -94,7 +93,7 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         private static string fieldProperties( T, size_t col )()
         {
             return "@property auto "~T.toDecl()~"(size_t row){ return getVal!("~to!string(col)~")(row); }"~
-                   "@property auto "~T.toDecl()~"_isNULL(size_t row){ return answer.isNULL(row, "~to!string(col)~"); }";
+                   "@property bool "~T.toDecl()~"_isNULL(size_t row){ return answer.isNULL(row, "~to!string(col)~"); }";
         }
         
         alias ResultFields!( Row, TL ) RF; // Row Fields
