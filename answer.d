@@ -155,14 +155,6 @@ class Answer // most members should be a const
         return PQgetlength(res, c.Row, c.Col);
     }
     
-    /// Value NULL checking
-    bool isNULL( const size_t row, const size_t col ) const
-    {
-        const Coords c = { Row: row, Col: col };
-        assertCoords( c );
-        return PQgetisnull(res, row, col) != 0;
-    }
-    
     @property
     debug override string toString() const
     {
@@ -215,7 +207,7 @@ struct Row
     @property
     bool isNULL( const size_t col ) const
     {
-        return answer.isNULL(row, col);
+        return PQgetisnull(answer.res, row, col) != 0;
     }
     
     immutable (Value)* opIndex( size_t col ) const
@@ -517,8 +509,8 @@ void _unittest( string connParam )
     assert( e.columnFormat(2) == valueFormat.TEXT );
 
     assert( e[1,2].as!PGtext == "456" );
-    assert( !e.isNULL(0, 0) );
-    assert( e.isNULL(2, 0) );
+    assert( !e[0].isNULL(0) );
+    assert( e[2].isNULL(0) );
     assert( e.columnNum( "field_name" ) == 1 );
 
     // Value properties test
@@ -572,8 +564,8 @@ void _unittest( string connParam )
     assert( a.isNULL(2,0,2) );
     assert( !a.isNULL(2,1,2) );
     
-    assert( r.isNULL(0, 12) );
-    assert( !r.isNULL(0, 9) );
+    assert( r[0].isNULL(12) );
+    assert( !r[0].isNULL(9) );
         
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
