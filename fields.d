@@ -81,8 +81,10 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         private static string fieldProperties( T, size_t col )()
         {
             return "@property auto getVal(string s)()"
-                        "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(); }"~
-                   "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~")(); }"~
+                        "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(); }"
+                   "@property auto isNULL(string s)()"
+                        "if( s == \""~T.toTemplatedName()~"\" ){ return isNULL!("~to!string(col)~")(); }"
+                   "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~")(); }"
                    "@property auto "~T.toDecl()~"_isNULL(){ return isNULL!("~to!string(col)~")(); }";
         }
     }
@@ -159,6 +161,7 @@ void _unittest( string connParam )
     foreach( f; fa )
     {
         f.getVal!"t2";
+        assert( !f.isNULL!"t2" );
         assert( !f.TEXT_FIELD_isNULL );
     }
 }
