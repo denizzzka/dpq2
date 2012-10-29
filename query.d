@@ -146,9 +146,11 @@ final class Connection: BaseConnection
         tid.send(true);
     }
     
+    
+    //TODO: возвращать количество сработок
     void waitAnswers()
     {
-        receiveOnly!bool();
+        receiveOnly!bool(); // TODO: ждать сообщение только от нашего Tid
     }
     
     /// Waits for the next result from a sendQuery
