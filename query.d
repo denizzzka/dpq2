@@ -20,17 +20,16 @@ struct queryArg
     Oid type = 0;
     valueFormat queryFormat = valueFormat.TEXT; /// Value format
 
-    /// Argument value
-    union
-    {
-        ubyte[] valueBin; /// Binary variant
-        //string valueStr; /// Text variant
-    };
+    immutable ubyte[] valueBin;
     
-    @property void valueStr( string s )
+    this( const ubyte[] value ){ valueBin = value.idup; }
+    
+    this( string s )
     {
-        import std.string;
-        valueBin = toStringz(s);
+        import std.string: toStringz;
+        
+        valueBin.length = s.sizeof + 1;
+        valueBin = cast(immutable(ubyte[])) toStringz(s);
     }
 }
 
@@ -195,16 +194,7 @@ final class Connection: BaseConnection
             a.types[i] = p.args[i].type;
             a.formats[i] = p.args[i].queryFormat;  
             a.values[i] = p.args[i].valueBin.ptr;
-            
-            final switch( p.args[i].queryFormat )
-            {
-                case valueFormat.TEXT:
-                    a.lengths[i] = p.args[i].valueStr.length;
-                    break;
-                case valueFormat.BINARY:
-                    a.lengths[i] = p.args[i].valueBin.length;
-                    break;
-            }
+            a.lengths[i] = p.args[i].valueBin.length;
         }
         return a;
     }
@@ -240,9 +230,9 @@ void _unittest( string connParam )
     ") t\n"
     "where string = $1";
     
-    static queryArg arg = { valueStr: "абвгд" };
-    queryArg[1] args;
-    args[0] = arg;
+    queryArg[1] args = [ queryArg("абвгд") ];
+    //args[0] = ;
+    
     queryParams p;
     p.sqlCommand = sql_query2;
     p.args = args;
