@@ -24,8 +24,14 @@ struct queryArg
     union
     {
         ubyte[] valueBin; /// Binary variant
-        string valueStr; /// Text variant
+        //string valueStr; /// Text variant
     };
+    
+    @property void valueStr( string s )
+    {
+        import std.string;
+        valueBin = toStringz(s);
+    }
 }
 
 /// Connection
