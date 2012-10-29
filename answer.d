@@ -488,15 +488,17 @@ void _unittest( string connParam )
     "select now(),          'def'::text,                 456,  910.11\n"
     "union all\n"
 
-    "select NULL,           'ijk'::text,                 789,  12345.115345";
+    "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
 
     auto e = conn.exec( sql_query );
     
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
+    assert( e.columnFormat(1) == valueFormat.TEXT );
     assert( e.columnFormat(2) == valueFormat.TEXT );
 
     assert( e[1][2].as!PGtext == "456" );
+    assert( e[2][1].as!PGtext == "ijk_АБВГД" );
     assert( !e[0].isNULL(0) );
     assert( e[2].isNULL(0) );
     assert( e.columnNum( "field_name" ) == 1 );

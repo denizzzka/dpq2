@@ -222,7 +222,7 @@ void _unittest( string connParam )
     string sql_query =
     "select now() as time, 'abc'::text as string, 123, 456.78\n"
     "union all\n"
-    "select now(), 'def'::text, 777, 910.11\n"
+    "select now(), 'абвгд'::text, 777, 910.11\n"
     "union all\n"
     "select NULL, 'ijk'::text, 789, 12345.115345";
 
@@ -234,7 +234,7 @@ void _unittest( string connParam )
     ") t\n"
     "where string = $1";
     
-    static queryArg arg = { valueStr: "def" };
+    static queryArg arg = { valueStr: "абвгд" };
     queryArg[1] args;
     args[0] = arg;
     queryParams p;
