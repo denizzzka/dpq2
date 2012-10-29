@@ -44,7 +44,6 @@ final class Connection: BaseConnection
             PQexec(conn, toStringz( SQLcmd ))
         );
         
-        handler = null;
         return r;
     }
     
@@ -69,7 +68,6 @@ final class Connection: BaseConnection
             )
         );
         
-        handler = null;
         return r;
     }
     
@@ -208,6 +206,7 @@ final class Connection: BaseConnection
     // It is important to do a separate check because of Answer ctor is nothrow
     private Answer getAnswer( PGresult* r )
     {
+        handler = null;
         auto res = new Answer( r );
         res.checkAnswerForErrors();
         return res;
