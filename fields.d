@@ -127,13 +127,14 @@ struct QueryFieldsUnity( TL ... )
         assert( false, "Name not found" );
     }
     
-    private static string createDollars( size_t startNum, size_t count )
+    private static string createDollars( size_t start, size_t count )
     {
+        size_t end = start + count;
         string r;
-        foreach( i; startNum .. startNum + count )
+        foreach( i; start .. end )
         {
             r ~= "$"~to!string(i);
-            if( i < TL.length ) r~=", ";
+            if( i < end-1 ) r~=", ";
         }
         return r;
     }
@@ -205,9 +206,16 @@ void _unittest( string connParam )
     
     QueryFieldsUnity!( QF ) qf;
     
-    assert( qf.sql!("QFS1") == `"t1"` );
-    assert( qf.dollars!("QFS1") == "$1" );
-    assert( qf.length == 1 );
+    alias QueryFields!( "QFS2",
+        F!("t1"),
+        F!("t2")
+    ) QF2;
+    
+    QueryFieldsUnity!( QF2 ) qf2;
+    
+    assert( qf2.sql!("QFS2") == `"t1", "t2"` );
+    assert( qf2.dollars!("QFS2") == "$1, $2" );
+    assert( qf2.length == 2 );
     assert( qf.decl[0] == "t1" );
     
     alias
