@@ -76,18 +76,6 @@ struct QueryFields( string _name, TL ... )
     Fields!(TL) fieldsTuples;
     alias fieldsTuples this;
     
-    @property
-    static string dollars()
-    {
-        string r;
-        foreach( i; 1..TL.length+1 )
-        {
-            r ~= "$"~to!string(i);
-            if( i < TL.length ) r~=", ";
-        }
-        return r;
-    }
-    
     package static string genArrayElems() nothrow
     {
         return fieldsTuples.joinFieldString!("T.toArrayElement()")(", ");
