@@ -103,42 +103,32 @@ struct QueryFields( string _name, TL ... )
 
 struct QueryFieldsUnity( TL ... )
 {   
-    /*
     @property
-    private static auto qfByName( string name )
-    {
-        foreach( T; TL )
-            if( T.name == name ) return T;
-        
-        return TL[0];
-        //static assert( false, "Name not found" );
-    }
-    */
-    
-    static string dollars( string name )()
-    {
-        foreach( T; TL )
-            if( T.name == name ) return T.dollars();
-        
-        static assert( false, "Name not found" );
-    }
-    
-    static string sql( string name )()
-    {
-        foreach( T; TL )
-            if( T.name == name ) return T.sql();
-        
-        static assert( false, "Name not found" );
-    }
-    
-    @property
-    static string sql()
+    static string sql()()
     {
         string r;
         foreach( T; TL )
             r ~= T.genArrayElems()~" ";
             
         return r;
+    }
+    
+    @property
+    static string sql( string name )()
+    {
+        foreach( T; TL )
+            if( T.name == name ) return T.sql();
+        
+        assert( false, "Name not found" );
+    }
+    
+    @property
+    static string dollars( string name )()
+    {
+        foreach( T; TL )
+            if( T.name == name ) return T.dollars();
+        
+        assert( false, "Name not found" );
     }
 }
 
@@ -150,7 +140,6 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     A answer;
     alias answer this;
     alias fields.sql sql;
-    alias fields.toString toString;
     
     this( A a ) { answer = a; }
     
@@ -204,13 +193,12 @@ void _unittest( string connParam )
     
     alias QueryField F;    
     alias QueryFields!( "QFS1",
-        F!("t1"),
-        F!("t2")
+        F!("t1")
     ) QF;
     
     QueryFieldsUnity!( QF ) qf;
     
-    assert( qf.sql!("QFS1") == "t1" );
+    assert( qf.sql!("QFS1") == `"t1"` );
     assert( qf.dollars!("QFS1") == "$1" );
     
     alias
@@ -237,7 +225,7 @@ void _unittest( string connParam )
          from (select '123'::integer as t1, 'qwerty'::text as t2
                union
                select '456',                'asdfgh') s
-         where "~qf.sql~" = "~qf.dollars("QF1");
+         where "~qf.sql~" = "~qf.dollars!("QFS1");
          
     queryArg arg;
     arg.valueStr = "456";
