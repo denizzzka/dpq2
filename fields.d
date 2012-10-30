@@ -111,15 +111,25 @@ struct QueryFieldsUnity( TL ... )
     {
         string[] a;
         size_t i = 1;
-        foreach( T; 0..TL.length )
+        foreach( T; TL )
         {
-            foreach( m; 0..T.length )
+            foreach( m; T )
             {
                 a ~= "$"~to!string(i);
                 i++;
             }
         }
         return join( a, ", ");
+    }
+    
+    @property
+    static string sql()
+    {
+        string r;
+        foreach( T; TL )
+            r ~= T.genArrayElems()~" ";
+            
+        return r;
     }
 }
 
