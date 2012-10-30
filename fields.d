@@ -129,14 +129,12 @@ struct QueryFieldsUnity( TL ... )
         foreach( T; TL )
         {
             if( T.name == name )
-                return createDollars( i, T.length );
-            
-            i += T.length;
+                return createDollars( i += T.length, T.length );
         }
         assert( false, "Name not found" );
     }
     
-    private string createDollars( size_t startNum, size_t count )
+    private static string createDollars( size_t startNum, size_t count )
     {
         string r;
         foreach( i; startNum .. startNum + count )
