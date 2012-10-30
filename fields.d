@@ -2,7 +2,7 @@ module dpq2.fields;
 
 import dpq2.answer;
 
-struct Field(string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
+struct Field( string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
     static string sql() pure nothrow
     {
@@ -18,7 +18,16 @@ struct Field(string sqlName, string sqlPrefix = "", string decl = "", string PGt
     }
     
     alias toDecl toTemplatedName;
+    
+    static string toArrayElement() pure nothrow
+    {
+        return addQuotes( toDecl() );
+    }
+    
+    static string addQuotes(string s) pure nothrow { return "\""~s~"\""; }    
 }
+
+alias Field QueryField;
 
 struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
@@ -30,15 +39,14 @@ struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", 
 struct Fields( TL ... )
 {
     @property static size_t length(){ return TL.length; }
-    string opIndex(size_t n)(){ return TL[n].toDecl(); }
     
-    private static
+    package static
     string joinFieldString( string memberName )( string delimiter )
     {
         string r;
         foreach( i, T; TL )
         {
-            mixin( "r ~= T." ~ memberName ~ ";" );
+            mixin( "r ~= " ~ memberName ~ ";" );
             if( i < TL.length-1 ) r ~= delimiter;
         }
         
@@ -48,7 +56,7 @@ struct Fields( TL ... )
     @property
     static string sql() nothrow
     {
-        return joinFieldString!("sql()")(", ");
+        return joinFieldString!("T.sql()")(", ");
     }
     
     @property
@@ -66,12 +74,30 @@ struct Fields( TL ... )
     alias sql toString;
     
     @disable
-    private static string GenFieldsEnum() nothrow
+    package static string GenFieldsEnum() nothrow
     {
-        return joinFieldString!("toDecl()")(", ");
+        return joinFieldString!("T.toDecl()")(", ");
     }
     
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
+}
+
+struct QueryFields( TL ... )
+{
+    Fields!(TL) fieldsTuples;
+    alias fieldsTuples this;
+    
+    private static string genArrayElems() nothrow
+    {
+        return fieldsTuples.joinFieldString!("T.toArrayElement()")(", ");
+    }
+    
+    mixin("auto fields = ["~genArrayElems()~"];");
+    
+    string opIndex( size_t n )
+    {
+        return fields[n];
+    }
 }
 
 struct ResultFields( A, TL ... )
@@ -135,6 +161,13 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
+    alias Field F;    
+    QueryFields!(
+        F!("t1")
+    ) qf;
+    
+    assert( qf[0] == "t1" );
+    
     alias
     ResultFields!( Row,
         ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
@@ -155,23 +188,31 @@ void _unittest( string connParam )
     
     assert( f1.dollars == "$1, $2" );
     
-    string q = "select "~f1.sql~"
-        from (select '123'::integer as t1, 'qwerty'::text as t2
-              union
-              select '456',                'asdfgh') s";
-    auto res = conn.exec( q );
+    queryParams p;
+    p.sqlCommand = 
+        "select "~f1.sql~"
+         from (select '123'::integer as t1, 'qwerty'::text as t2
+               union
+               select '456',                'asdfgh') s
+         where "~qf.sql~" = "~qf.dollars;
+         
+    queryArg arg;
+    arg.valueStr = "456";
+    p.args = [ arg ];
+    
+    auto res = conn.exec( p );
         
     auto fa = f3(res);
     assert( fa[0].TEXT_FIELD == res[0][0].as!PGtext );
     assert( !fa[0].TEXT_FIELD_isNULL );
     assert( fa[0].t2 == res[0][1].as!PGtext );
     
-    import std.stdio;
-    assert( fa[1].t2 == "asdfgh" );
+    assert( fa[0].t2 == "asdfgh" );
     
     foreach( f; fa )
     {
-        f.getValue!"t2";
+        assert( f.getValue!"t2" == "asdfgh" );
+        assert( f.TEXT_FIELD == "456" );
         assert( !f.isNULL!"t2" );
         assert( !f.TEXT_FIELD_isNULL );
     }

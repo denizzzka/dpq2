@@ -140,12 +140,12 @@ class Answer // most members should be a const
     
     private void assertCol( const size_t c ) const
     {
-        assert( c < columnCount, to!string(c)~" col is out of range 0.."~to!string(columnCount-1)~" of result cols" );
+        assert( c < columnCount, to!string(c)~" col is out of range 0.."~to!string(columnCount)~" of result cols" );
     }
     
     private void assertRow( const size_t r ) const
     {
-        assert( r < rowCount, to!string(r)~" row is out of range 0.."~to!string(rowCount-1)~" of result rows" );
+        assert( r < rowCount, to!string(r)~" row is out of range 0.."~to!string(rowCount)~" of result rows" );
     }
     
      private void assertCoords( const Coords c ) const
