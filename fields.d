@@ -129,21 +129,22 @@ struct QueryFieldsUnity( TL ... )
         foreach( T; TL )
         {
             if( T.name == name )
-            {
-                string r;
-                foreach( j; i..i+T.length )
-                {
-                    r ~= "$"~to!string(j);
-                    if( i < TL.length ) r~=", ";
-                }
-                
-                return r;
-            }
+                return createDollars( i, T.length );
             
             i += T.length;
         }
-        
         assert( false, "Name not found" );
+    }
+    
+    private string createDollars( size_t startNum, size_t count )
+    {
+        string r;
+        foreach( i; startNum .. startNum + count )
+        {
+            r ~= "$"~to!string(i);
+            if( i < TL.length ) r~=", ";
+        }
+        return r;
     }
 }
 
