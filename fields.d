@@ -2,6 +2,8 @@ module dpq2.fields;
 
 import dpq2.answer;
 
+string addQuotes(string s) pure nothrow { return "\""~s~"\""; }    
+
 struct Field( string sqlName, string sqlPrefix = "", string decl = "" )
 {
     static string sql() pure nothrow
@@ -20,8 +22,6 @@ struct Field( string sqlName, string sqlPrefix = "", string decl = "" )
     {
         return addQuotes( toDecl() );
     }
-    
-    static string addQuotes(string s) pure nothrow { return "\""~s~"\""; }    
 }
 
 alias Field QueryField;
@@ -48,7 +48,7 @@ struct Fields( TL ... )
         string r;
         foreach( i, T; TL )
         {
-            mixin( "r ~= " ~ memberName ~ ";" );
+            mixin( "r ~= T." ~ memberName ~ ";" );
             if( i < TL.length-1 ) r ~= delimiter;
         }
         
@@ -58,13 +58,13 @@ struct Fields( TL ... )
     @property
     static string sql() nothrow
     {
-        return joinFieldString!("T.sql()")(", ");
+        return joinFieldString!("sql()")(", ");
     }
     
     @disable
     package static string GenFieldsEnum() nothrow
     {
-        return joinFieldString!("T.toDecl()")(", ");
+        return joinFieldString!("toDecl()")(", ");
     }
     
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
@@ -78,14 +78,7 @@ struct QueryFields( string _name, TL ... )
     
     package static string genArrayElems() nothrow
     {
-        return fieldsTuples.joinFieldString!("T.toArrayElement()")(", ");
-    }
-    
-    mixin("auto fields = ["~genArrayElems()~"];");
-    
-    string opIndex( size_t n )
-    {
-        return fields[n];
+        return fieldsTuples.joinFieldString!("toArrayElement()")(", ");
     }
 }
 
