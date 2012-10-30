@@ -26,8 +26,6 @@ struct queryArg
     
     this( string s )
     {
-        import std.string: toStringz;
-        
         valueBin = cast(immutable ubyte[])( s ~ '\0' );
     }
 }
