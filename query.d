@@ -19,13 +19,14 @@ struct queryArg
 {
     Oid type = 0;
     valueFormat queryFormat = valueFormat.TEXT; /// Value format
-    const ubyte[] valueBin;
+    ubyte[] valueBin; // can be null for SQL NULL value
     
-    this( const ubyte[] value ){ valueBin = value; }
-    
-    this( string s )
+    @property void valueStr( string s )
     {
-        valueBin = cast(const ubyte[])( s ~ '\0' );
+        if( s == null )
+            valueBin = null;
+        else
+            valueBin = cast(ubyte[])( s ~ '\0' );
     }
 }
 
@@ -190,10 +191,11 @@ final class Connection: BaseConnection
         for( int i = 0; i < p.args.length; ++i )
         {
             a.types[i] = p.args[i].type;
-            a.formats[i] = p.args[i].queryFormat;  
+            a.formats[i] = p.args[i].queryFormat;
             a.values[i] = p.args[i].valueBin.ptr;
             a.lengths[i] = p.args[i].valueBin.length;
         }
+        
         return a;
     }
     
@@ -228,8 +230,10 @@ void _unittest( string connParam )
     ") t\n"
     "where string = $1";
     
-    queryArg[1] args = [ queryArg("абвгд") ];
-    //args[0] = ;
+    queryArg[1] args;
+    queryArg arg;
+    arg.valueStr = "абвгд";
+    args[0] = arg;
     
     queryParams p;
     p.sqlCommand = sql_query2;
