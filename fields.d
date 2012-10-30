@@ -128,8 +128,10 @@ struct QueryFieldsUnity( TL ... )
         size_t i = 1;
         foreach( T; TL )
         {
-            if( T.name == name )
-                return createDollars( i += T.length, T.length );
+            if( T.name != name )
+                i += T.length;
+            else
+                return createDollars( i, T.length );
         }
         assert( false, "Name not found" );
     }
@@ -213,6 +215,7 @@ void _unittest( string connParam )
     QueryFieldsUnity!( QF ) qf;
     
     assert( qf.sql!("QFS1") == `"t1"` );
+    auto tmp = qf.dollars!("QFS1");
     assert( qf.dollars!("QFS1") == "$1" );
     
     alias
