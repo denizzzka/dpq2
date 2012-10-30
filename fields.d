@@ -100,28 +100,16 @@ struct QueryFieldsUnity( TL ... )
         return l;
     }
     
-    @property
-    static string sql()()
+    private static string genDeclArray()
     {
-        string r;
+        string s;
         foreach( T; TL )
-            r ~= T.genArrayElems()~" ";
-            
-        return r;
+            s ~= T.genArrayElems()~" ";
+        
+        return s;
     }
     
-    @property
-    static string[] declArray()
-    {
-        mixin("auto r = ["~sql~"];");
-        return r;
-    }
-    
-    @property
-    static string decl( size_t n )
-    {
-        return declArray()[n];
-    }
+    mixin("auto declArray = ["~genDeclArray()~"];");
     
     @property
     static string sql( string name )()
@@ -227,7 +215,7 @@ void _unittest( string connParam )
     assert( qf.sql!("QFS1") == `"t1"` );
     assert( qf.dollars!("QFS1") == "$1" );
     assert( qf.length == 1 );
-    assert( qf.decl(0) == "t1" );
+    assert( qf.declArray[0] == "t1" );
     
     alias
     ResultFields!( Row,
@@ -253,7 +241,7 @@ void _unittest( string connParam )
          from (select '123'::integer as t1, 'qwerty'::text as t2
                union
                select '456',                'asdfgh') s
-         where "~qf.sql~" = "~qf.dollars!("QFS1");
+         where "~qf.sql!("QFS1")~" = "~qf.dollars!("QFS1");
          
     queryArg arg;
     arg.valueStr = "456";
