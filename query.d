@@ -20,13 +20,13 @@ struct queryArg
     Oid type = 0;
     valueFormat queryFormat = valueFormat.TEXT; /// Value format
 
-    immutable ubyte[] valueBin;
+    const ubyte[] valueBin;
     
-    this( const ubyte[] value ){ valueBin = value.idup; }
+    this( const ubyte[] value ){ valueBin = value; }
     
     this( string s )
     {
-        valueBin = cast(immutable ubyte[])( s ~ '\0' );
+        valueBin = cast(const ubyte[])( s ~ '\0' );
     }
 }
 
