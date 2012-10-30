@@ -2,10 +2,8 @@ module dpq2.fields;
 
 import dpq2.answer;
 
-struct Field( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
+struct Field(string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
-    alias T type;
-    
     static string sql() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\""~
@@ -19,10 +17,14 @@ struct Field( T, string sqlName, string sqlPrefix = "", string decl = "", string
         return decl.length ? decl : sqlName;
     }
     
-    static string toTemplatedName() pure nothrow
-    {
-        return toDecl();
-    }
+    alias toDecl toTemplatedName;
+}
+
+struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
+{
+    alias T type;
+    Field!(sqlName, sqlPrefix, decl, PGtypeCast) field;
+    alias field this;
 }
 
 struct Fields( TL ... )
@@ -132,20 +134,20 @@ void _unittest( string connParam )
     
     alias
     ResultFields!( Row,
-        Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
-        Field!(PGtext, "t2")
+        ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
+        ResultField!(PGtext, "t2")
     ) f1;
     
     alias
     ResultFields!( Row*,
-        Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
-        Field!(PGtext, "t2")
+        ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
+        ResultField!(PGtext, "t2")
     ) f2;
 
     alias
     ResultFields!( Answer,
-        Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
-        Field!(PGtext, "t2")
+        ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
+        ResultField!(PGtext, "t2")
     ) f3;
     
     assert( f1.dollars == "$1, $2" );
