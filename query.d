@@ -19,7 +19,6 @@ struct queryArg
 {
     Oid type = 0;
     valueFormat queryFormat = valueFormat.TEXT; /// Value format
-
     const ubyte[] valueBin;
     
     this( const ubyte[] value ){ valueBin = value; }
