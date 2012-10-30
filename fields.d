@@ -63,18 +63,6 @@ struct Fields( TL ... )
         return joinFieldString!("T.sql()")(", ");
     }
     
-    @property
-    static string dollars()
-    {
-        string r;
-        foreach( i; 1..TL.length+1 )
-        {
-            r ~= "$"~to!string(i);
-            if( i < TL.length ) r~=", ";
-        }
-        return r;
-    }
-    
     alias sql toString;
     
     @disable
@@ -91,7 +79,19 @@ struct QueryFields( TL ... )
     Fields!(TL) fieldsTuples;
     alias fieldsTuples this;
     
-    private static string genArrayElems() nothrow
+    @property
+    static string dollars()
+    {
+        string r;
+        foreach( i; 1..TL.length+1 )
+        {
+            r ~= "$"~to!string(i);
+            if( i < TL.length ) r~=", ";
+        }
+        return r;
+    }
+    
+    package static string genArrayElems() nothrow
     {
         return fieldsTuples.joinFieldString!("T.toArrayElement()")(", ");
     }
@@ -104,6 +104,25 @@ struct QueryFields( TL ... )
     }
 }
 
+struct QueryFieldsUnity( TL ... )
+{
+    @property
+    static string dollars()
+    {
+        string[] a;
+        size_t i = 1;
+        foreach( T; 0..TL.length )
+        {
+            foreach( m; 0..T.length )
+            {
+                a ~= "$"~to!string(i);
+                i++;
+            }
+        }
+        return join( a, ", ");
+    }
+}
+
 struct ResultFields( A, TL ... )
 if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
 {
@@ -112,7 +131,6 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     A answer;
     alias answer this;
     alias fields.sql sql;
-    alias fields.dollars dollars;
     alias fields.toString toString;
     
     this( A a ) { answer = a; }
@@ -189,8 +207,6 @@ void _unittest( string connParam )
         ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         ResultField!(PGtext, "t2")
     ) f3;
-    
-    assert( f1.dollars == "$1, $2" );
     
     queryParams p;
     p.sqlCommand = 
