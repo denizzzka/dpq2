@@ -46,6 +46,18 @@ struct Fields( TL ... )
         return joinFieldString!("sql()")(", ");
     }
     
+    @property
+    static string dollars()
+    {
+        string r;
+        foreach( i; 1..TL.length+1 )
+        {
+            r ~= "$"~to!string(i);
+            if( i < TL.length ) r~=", ";
+        }
+        return r;
+    }
+    
     alias sql toString;
     
     @disable
@@ -65,6 +77,7 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
     A answer;
     alias answer this;
     alias fields.sql sql;
+    alias fields.dollars dollars;
     alias fields.toString toString;
     
     this( A a ) { answer = a; }
@@ -134,6 +147,8 @@ void _unittest( string connParam )
         Field!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         Field!(PGtext, "t2")
     ) f3;
+    
+    assert( f1.dollars == "$1, $2" );
     
     string q = "select "~f1.sql~"
         from (select '123'::integer as t1, 'qwerty'::text as t2
