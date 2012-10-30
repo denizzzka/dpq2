@@ -90,7 +90,16 @@ struct QueryFields( string _name, TL ... )
 }
 
 struct QueryFieldsUnity( TL ... )
-{   
+{
+    @property static size_t length()
+    {
+        size_t l = 0;
+        foreach( T; TL )
+            l += T.length;
+            
+        return l;
+    }
+    
     @property
     static string sql()()
     {
@@ -203,8 +212,8 @@ void _unittest( string connParam )
     QueryFieldsUnity!( QF ) qf;
     
     assert( qf.sql!("QFS1") == `"t1"` );
-    auto tmp = qf.dollars!("QFS1");
     assert( qf.dollars!("QFS1") == "$1" );
+    assert( qf.length == 1 );
     
     alias
     ResultFields!( Row,
