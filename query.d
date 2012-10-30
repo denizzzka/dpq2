@@ -28,8 +28,7 @@ struct queryArg
     {
         import std.string: toStringz;
         
-        valueBin.length = s.sizeof + 1;
-        valueBin = cast(immutable(ubyte[])) toStringz(s);
+        valueBin = cast(immutable ubyte[])( s ~ '\0' );
     }
 }
 
