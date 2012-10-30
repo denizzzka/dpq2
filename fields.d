@@ -97,7 +97,7 @@ struct QueryFieldsUnity( TL ... )
     {
         string s;
         foreach( T; TL )
-            s ~= T.genArrayElems()~" ";
+            s ~= T.genArrayElems()~", ";
         
         return s;
     }
