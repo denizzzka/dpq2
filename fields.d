@@ -9,8 +9,6 @@ struct Field( string sqlName, string sqlPrefix = "", string decl = "" )
         return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\"";
     }
     
-    alias sql toString;
-    
     static string toDecl() pure nothrow
     {
         return decl.length ? decl : sqlName;
@@ -63,8 +61,6 @@ struct Fields( TL ... )
         return joinFieldString!("T.sql()")(", ");
     }
     
-    alias sql toString;
-    
     @disable
     package static string GenFieldsEnum() nothrow
     {
@@ -74,8 +70,9 @@ struct Fields( TL ... )
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
 }
 
-struct QueryFields( TL ... )
+struct QueryFields( string _name, TL ... )
 {
+    alias _name name; // TODO: how to write alias name this.name; in templates?
     Fields!(TL) fieldsTuples;
     alias fieldsTuples this;
     
@@ -105,21 +102,33 @@ struct QueryFields( TL ... )
 }
 
 struct QueryFieldsUnity( TL ... )
-{
+{   
+    /*
     @property
-    static string dollars()
+    private static auto qfByName( string name )
     {
-        string[] a;
-        size_t i = 1;
         foreach( T; TL )
-        {
-            foreach( m; T )
-            {
-                a ~= "$"~to!string(i);
-                i++;
-            }
-        }
-        return join( a, ", ");
+            if( T.name == name ) return T;
+        
+        return TL[0];
+        //static assert( false, "Name not found" );
+    }
+    */
+    
+    static string dollars( string name )()
+    {
+        foreach( T; TL )
+            if( T.name == name ) return T.dollars();
+        
+        static assert( false, "Name not found" );
+    }
+    
+    static string sql( string name )()
+    {
+        foreach( T; TL )
+            if( T.name == name ) return T.sql();
+        
+        static assert( false, "Name not found" );
     }
     
     @property
@@ -193,12 +202,16 @@ void _unittest( string connParam )
 	conn.connString = connParam;
     conn.connect();
     
-    alias Field F;    
-    QueryFields!(
-        F!("t1")
-    ) qf;
+    alias QueryField F;    
+    alias QueryFields!( "QFS1",
+        F!("t1"),
+        F!("t2")
+    ) QF;
     
-    assert( qf[0] == "t1" );
+    QueryFieldsUnity!( QF ) qf;
+    
+    assert( qf.sql!("QFS1") == "t1" );
+    assert( qf.dollars!("QFS1") == "$1" );
     
     alias
     ResultFields!( Row,
@@ -224,7 +237,7 @@ void _unittest( string connParam )
          from (select '123'::integer as t1, 'qwerty'::text as t2
                union
                select '456',                'asdfgh') s
-         where "~qf.sql~" = "~qf.dollars;
+         where "~qf.sql~" = "~qf.dollars("QF1");
          
     queryArg arg;
     arg.valueStr = "456";
