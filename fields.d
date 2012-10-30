@@ -2,12 +2,11 @@ module dpq2.fields;
 
 import dpq2.answer;
 
-struct Field( string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
+struct Field( string sqlName, string sqlPrefix = "", string decl = "" )
 {
     static string sql() pure nothrow
     {
-        return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\""~
-            ( PGtypeCast.length ? "::"~PGtypeCast : "" );
+        return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\"";
     }
     
     alias sql toString;
@@ -32,8 +31,13 @@ alias Field QueryField;
 struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
     alias T type;
-    Field!(sqlName, sqlPrefix, decl, PGtypeCast) field;
+    Field!(sqlName, sqlPrefix, decl) field;
     alias field this;
+    
+    static string sql() nothrow
+    {
+        return field.sql() ~ ( PGtypeCast.length ? "::"~PGtypeCast : "" );
+    }
 }
 
 struct Fields( TL ... )
