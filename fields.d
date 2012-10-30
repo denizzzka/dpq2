@@ -109,7 +109,7 @@ struct QueryFieldsUnity( TL ... )
         return s;
     }
     
-    mixin("auto declArray = ["~genDeclArray()~"];");
+    mixin("auto decl = ["~genDeclArray()~"];");
     
     @property
     static string sql( string name )()
@@ -215,7 +215,7 @@ void _unittest( string connParam )
     assert( qf.sql!("QFS1") == `"t1"` );
     assert( qf.dollars!("QFS1") == "$1" );
     assert( qf.length == 1 );
-    assert( qf.declArray[0] == "t1" );
+    assert( qf.decl[0] == "t1" );
     
     alias
     ResultFields!( Row,
