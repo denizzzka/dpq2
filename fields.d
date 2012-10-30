@@ -125,8 +125,23 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string dollars( string name )()
     {
+        size_t i = 1;
         foreach( T; TL )
-            if( T.name == name ) return T.dollars();
+        {
+            if( T.name == name )
+            {
+                string r;
+                foreach( j; i..i+T.length )
+                {
+                    r ~= "$"~to!string(j);
+                    if( i < TL.length ) r~=", ";
+                }
+                
+                return r;
+            }
+            
+            i += T.length;
+        }
         
         assert( false, "Name not found" );
     }
