@@ -29,6 +29,9 @@ struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", 
 
 struct Fields( TL ... )
 {
+    @property static size_t length(){ return TL.length; }
+    string opIndex(size_t n)(){ return TL[n].toDecl(); }
+    
     private static
     string joinFieldString( string memberName )( string delimiter )
     {
