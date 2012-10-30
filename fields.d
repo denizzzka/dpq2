@@ -111,6 +111,19 @@ struct QueryFieldsUnity( TL ... )
     }
     
     @property
+    static string[] declArray()
+    {
+        mixin("auto r = ["~sql~"];");
+        return r;
+    }
+    
+    @property
+    static string decl( size_t n )
+    {
+        return declArray()[n];
+    }
+    
+    @property
     static string sql( string name )()
     {
         foreach( T; TL )
@@ -214,6 +227,7 @@ void _unittest( string connParam )
     assert( qf.sql!("QFS1") == `"t1"` );
     assert( qf.dollars!("QFS1") == "$1" );
     assert( qf.length == 1 );
+    assert( qf.decl(0) == "t1" );
     
     alias
     ResultFields!( Row,
