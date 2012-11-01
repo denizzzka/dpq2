@@ -241,8 +241,9 @@ void _unittest( string connParam )
         ResultField!(PGtext, "t2")
     ) f1;
     
-    alias f1.getQueryFields!( "qffru" ) QFFromResultFields;
-    //QueryFieldsUnity!( QFFromResultFields ) qffru;
+    alias f1.getQueryFields!( "qffrf" ) QFFromResultFields;
+    QueryFieldsUnity!( QFFromResultFields ) qffrf;
+    assert( qffrf.sql!"qffrf" == `"t1", "t2"` );
     
     alias
     ResultFields!( Row*,
