@@ -190,10 +190,10 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         mixin( GenProperties() );
     }
     
-    static auto getQueryFields(string name)()
+    template getQueryFields(string name)
     {
         alias QFRepeat!(TL.length) r;
-        return QueryFields!( name, r );
+        alias QueryFields!( name, r ) getQueryFields;
     }
         
     private template QFRepeat( size_t max, size_t n = 0 )
