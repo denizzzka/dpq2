@@ -15,14 +15,18 @@ struct Field( string sqlName, string sqlPrefix = "", string declName = "" )
     {
         return declName.length ? declName : sqlName;
     }
+}
+
+struct QueryField( string sqlName, string sqlPrefix = "", string declName = "" )
+{
+    alias Field!(sqlName, sqlPrefix, declName) field;
+    alias field this;
     
     static string arrayElement() pure nothrow
     {
-        return addQuotes( decl() );
-    }
+        return addQuotes( field.decl() );
+    }    
 }
-
-alias Field QueryField;
 
 struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
@@ -58,25 +62,18 @@ struct Fields( TL ... )
     {
         return joinFieldString!("sql()")(", ");
     }
-    
-    @disable
-    package static string GenFieldsEnum() nothrow
-    {
-        return joinFieldString!("decl()")(", ");
-    }
-    
-    //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
 }
 
 struct QueryFields( string _name, TL ... )
 {
-    alias _name name; // TODO: how to write alias name this.name; in templates?
-    Fields!(TL) fieldsTuples;
-    alias fieldsTuples this;
+    alias _name name; // TODO: how to write "alias name this.name;" in the templates?
+    
+    alias Fields!(TL) fields;
+    alias fields this;
     
     package static string genArrayElems() nothrow
     {
-        return fieldsTuples.joinFieldString!("arrayElement()")(", ");
+        return fields.joinFieldString!("arrayElement()")(", ");
     }
 }
 
