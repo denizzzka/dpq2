@@ -4,23 +4,21 @@ import dpq2.answer;
 
 string addQuotes(string s) pure nothrow { return "\""~s~"\""; }    
 
-struct Field( string sqlName, string sqlPrefix = "", string decl = "" )
+struct Field( string sqlName, string sqlPrefix = "", string declName = "" )
 {
     static string sql() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\"";
     }
     
-    static string toDecl() pure nothrow
+    static string decl() pure nothrow
     {
-        return decl.length ? decl : sqlName;
+        return declName.length ? declName : sqlName;
     }
     
-    alias toDecl toTemplatedName;
-    
-    static string toArrayElement() pure nothrow
+    static string arrayElement() pure nothrow
     {
-        return addQuotes( toDecl() );
+        return addQuotes( decl() );
     }
 }
 
@@ -29,7 +27,7 @@ alias Field QueryField;
 struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
 {
     alias T type;
-    Field!(sqlName, sqlPrefix, decl) field;
+    alias Field!(sqlName, sqlPrefix, decl) field;
     alias field this;
     
     static string sql() nothrow
@@ -64,7 +62,7 @@ struct Fields( TL ... )
     @disable
     package static string GenFieldsEnum() nothrow
     {
-        return joinFieldString!("toDecl()")(", ");
+        return joinFieldString!("decl()")(", ");
     }
     
     //mixin("enum FieldsEnum {"~GenFieldsEnum()~"}");
@@ -78,12 +76,17 @@ struct QueryFields( string _name, TL ... )
     
     package static string genArrayElems() nothrow
     {
-        return fieldsTuples.joinFieldString!("toArrayElement()")(", ");
+        return fieldsTuples.joinFieldString!("arrayElement()")(", ");
     }
 }
 
-struct QueryFieldsUnity( TL ... )
+struct QueryFieldsUnity( _TL ... )
 {
+    static if( __traits(compiles, _TL[0].genArrayElems()) )
+        alias _TL TL;
+    else
+        alias _TL[1..$] TL;
+    
     @property static size_t length()
     {
         size_t l = 0;
@@ -173,11 +176,11 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         private static string fieldProperties( T, size_t col )()
         {
             return "@property auto getValue(string s)()"
-                        "if( s == \""~T.toTemplatedName()~"\" ){ return getVal!("~to!string(col)~")(); }"
+                        "if( s == \""~T.decl()~"\" ){ return getVal!("~to!string(col)~")(); }"
                    "@property bool isNULL(string s)()"
-                        "if( s == \""~T.toTemplatedName()~"\" ){ return answer.isNULL("~to!string(col)~"); }"
-                   "@property auto "~T.toDecl()~"(){ return getVal!("~to!string(col)~")(); }"
-                   "@property auto "~T.toDecl()~"_isNULL(){ return answer.isNULL("~to!string(col)~"); }";
+                        "if( s == \""~T.decl()~"\" ){ return answer.isNULL("~to!string(col)~"); }"
+                   "@property auto "~T.decl()~"(){ return getVal!("~to!string(col)~")(); }"
+                   "@property auto "~T.decl()~"_isNULL(){ return answer.isNULL("~to!string(col)~"); }";
         }
         
         private static string GenProperties()
@@ -229,7 +232,9 @@ void _unittest( string connParam )
         ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
         ResultField!(PGtext, "t2")
     ) f2;
-
+    
+    //alias QueryFieldsUnity!( f1, f2 ) QFU_RF;
+    
     alias
     ResultFields!( Answer,
         ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
