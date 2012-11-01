@@ -265,3 +265,83 @@ void _unittest( string connParam )
         assert( !f.TEXT_FIELD_isNULL );
     }
 }
+
+/*
+ * Query fields can be used in this case:
+ * 
+		alias QueryField F;
+		
+		alias QueryFields!( "buildings",
+			F!("district"),
+			F!("microdistrict"),
+			F!("street"),
+			F!("house_number"),
+			F!("built_at"),
+			F!("floors_total"),
+			F!("walls"),
+			F!("development_address")
+		) buildings;
+
+		alias QueryFields!( "apartments",
+			F!("apartment_type"),
+			F!("floor"),
+			F!("apartment_number"),
+			F!("layout"),
+			F!("windows_type"),
+			F!("windows_orientation"),
+			F!("layout_figure"),
+			F!("stove"),
+			F!("wc"),
+			F!("balcony")
+		) apartments;
+		
+		alias QueryFields!( "ads",
+			F!("user_id"),
+			F!("phone_number"),
+			F!("ip"),
+			F!("comment"),
+			F!("contact_name"),
+			F!("password")
+		) ads;
+		
+		alias QueryFields!( "selling",
+			F!("property_since"),
+			F!("burden"),
+			F!("percentage"),
+			F!("price")
+		) selling;
+		
+		QueryFieldsUnity!( buildings, apartments, ads, selling ) u;
+		
+		alias ResultField RF;
+		alias ResultFields!( Row,
+			RF!(PGtext, "uniq_random_id")
+		) RFS;
+		
+		queryParams p;
+		p.sqlCommand = "
+			with b as (
+				insert into apartments.buildings("~u.sql!("buildings")~")
+				values("~u.dollars!("buildings")~")
+				returning building_id
+			),
+			
+			ap as (
+				insert into apartments.apartments(building_id, "~u.sql!("apartments")~")
+				values((select building_id from b), "~u.dollars!("apartments")~")
+				returning apartment_id
+			),
+			
+			ads as (
+				insert into ads.ads(apartment_id, "~u.sql!("ads")~")
+				values((select apartment_id from ap), "~u.dollars!("ads")~")
+				returning ads_id, uniq_random_id
+			),
+			
+			s as (
+				insert into ads.selling(ads_id, "~u.sql!("selling")~")
+				values((select ads_id from ads), "~u.dollars!("selling")~")
+			)
+			
+			select "~RFS.sql~" from ads"; // (Illegal use of QueryFields)
+*/
