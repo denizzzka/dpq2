@@ -370,5 +370,5 @@ void _unittest( string connParam )
 				values((select ads_id from ads), "~u.dollars!("selling")~")
 			)
 			
-			select "~RFS.sql~" from ads"; // (Illegal use of QueryFields)
+			select "~RFS.sql~" from ads";
 */
