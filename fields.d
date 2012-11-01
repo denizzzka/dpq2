@@ -43,6 +43,12 @@ struct ResultField( T, string _sqlName, string _sqlPrefix = "", string _declName
     }
 }
 
+struct ResultFieldText( string sqlName, string sqlPrefix = "", string declName = "", string PGtypeCast = "" )
+{
+    alias ResultField!( PGtext, sqlName, sqlPrefix, declName, PGtypeCast ) field;
+    alias field this;
+}
+
 struct Fields( TL ... )
 {
     @property static size_t length(){ return TL.length; }
@@ -241,15 +247,15 @@ void _unittest( string connParam )
         ResultField!(PGtext, "t2")
     ) f1;
     
-    alias f1.getQueryFields!( "qffrf" ) QFFromResultFields;
-    QueryFieldsUnity!( QFFromResultFields ) qffrf;
-    assert( qffrf.sql!"qffrf" == `"t1", "t2"` );
-    
     alias
     ResultFields!( Row*,
-        ResultField!(PGtext, "t1", "", "TEXT_FIELD", "text"),
-        ResultField!(PGtext, "t2")
+        ResultFieldText!("t3", "", "TEXT_FIELD", "text"),
+        ResultFieldText!("t4")
     ) f2;
+    
+    alias f2.getQueryFields!( "qffrf" ) QFFromResultFields;
+    QueryFieldsUnity!( QFFromResultFields ) qffrf;
+    assert( qffrf.sql!"qffrf" == `"t3", "t4"` );
     
     alias
     ResultFields!( Answer,
