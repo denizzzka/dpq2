@@ -28,10 +28,13 @@ struct QueryField( string sqlName, string sqlPrefix = "", string declName = "" )
     }    
 }
 
-struct ResultField( T, string sqlName, string sqlPrefix = "", string decl = "", string PGtypeCast = "" )
+struct ResultField( T, string _sqlName, string _sqlPrefix = "", string _declName = "", string PGtypeCast = "" )
 {
     alias T type;
-    alias Field!(sqlName, sqlPrefix, decl) field;
+    alias _sqlName sqlName;
+    alias _sqlPrefix sqlPrefix;
+    alias _declName declName;
+    alias Field!(sqlName, sqlPrefix, declName) field;
     alias field this;
     
     static string sql() nothrow
@@ -185,6 +188,14 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         }
         
         mixin( GenProperties() );
+    }
+    
+    auto getQueryFields()
+    {
+        foreach( T; TL )
+            alias QueryField!( T.sqlName, T.sqlPrefix, T.declName ) a;
+        
+        return 0;
     }
 }
 
