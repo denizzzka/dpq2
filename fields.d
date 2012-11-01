@@ -190,7 +190,7 @@ if( is( A == Answer) || is( A == Row ) || is( A == Row* ) )
         mixin( GenProperties() );
     }
     
-    auto getQueryFields(string name)()
+    static auto getQueryFields(string name)()
     {
         alias QFRepeat!(TL.length) r;
         return QueryFields!( name, r );
