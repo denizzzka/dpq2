@@ -77,13 +77,8 @@ struct QueryFields( string _name, TL ... )
     }
 }
 
-struct QueryFieldsUnity( _TL ... )
+struct QueryFieldsUnity( TL ... )
 {
-    static if( __traits(compiles, _TL[0].genArrayElems()) )
-        alias _TL TL;
-    else
-        alias _TL[1..$] TL;
-    
     @property static size_t length()
     {
         size_t l = 0;
