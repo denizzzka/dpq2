@@ -147,7 +147,7 @@ struct QueryFieldsUnity( TL ... )
     }
     
     @property
-    static string setList( string name )()
+    static string set( string name )()
     {
 	alias FindQFName!( name ) T;
 	return Repeat!( T[1], 0, "", T[0].TL );
@@ -271,7 +271,7 @@ void _unittest( string connParam )
     
     assert( qf2.sql!("QFS2") == `"t1", "t2"` );
     assert( qf2.dollars!("QFS2") == "$1, $2" );
-    assert( qf2.setList!("QFS2") == `"t1" = $1, "t2" = $2` );
+    assert( qf2.set!("QFS2") == `"t1" = $1, "t2" = $2` );
     assert( qf2.length == 2 );
     assert( qf.decl[0] == "t1" );
     
