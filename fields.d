@@ -128,7 +128,8 @@ struct QueryFieldsUnity( TL ... )
             else
                 return createDollars( i, T.length );
         }
-        assert( false, "Name not found" );
+	
+        assert( false, "Name '"~name~"' is not found" );
     }
     
     private static string createDollars( size_t start, size_t count )
