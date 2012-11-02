@@ -149,17 +149,25 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string setList( string name )()
     {
-	//return enumerateValues!( name, "createSetList" )();
-	return "asd";
+        size_t i = 1;
+        foreach( T; TL )
+        {
+            if( T.name != name )
+                i += T.length;
+            else
+                return createSetList!(T)(i);
+        }
+	
+        assert( false, "Name '"~name~"' is not found" );
     }
     
-    private static string createSetList(T, size_t start)()
+    private static string createSetList(T)(size_t start)
     {
 	size_t end = start + T.length;
 	string r;
         foreach( i; start .. end )
         {
-            r ~= T.fields.TL[i].sql~" = $"~to!string(i);
+            r ~= " = $"~to!string(i);
             if( i < end-1 ) r~=", ";
         }
         return r;
