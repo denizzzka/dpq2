@@ -160,17 +160,18 @@ struct QueryFieldsUnity( TL ... )
         }
 	*/
 	
-	return Repeat!( TL[0].fields, 1 );
+	return Repeat!( 1, 0, "", TL[0].TL );
 	
         //assert( false, "Name '"~name~"' is not found" );
     }
     
-    private template Repeat( T, size_t from, size_t i = 0, string result = "" )
+    private template Repeat( size_t from, size_t i = 0, string result = "", TL ... )
     {
-	static if( i < T.length )
+	static if( i < TL.length )
 	{
-	    alias Repeat!(T, from, i+1,
-		result~" = $"~to!string(from+i)~( i==T.length-1 ? "" : ", " )
+	    alias Repeat!( from, i+1,
+		result~TL[i].sql!()()~" = $"~to!string(from+i)~( i==TL.length-1 ? "" : ", " ),
+		TL
 	    ) Repeat;
 	}
 	else
