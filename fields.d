@@ -271,8 +271,7 @@ void _unittest( string connParam )
     
     assert( qf2.sql!("QFS2") == `"t1", "t2"` );
     assert( qf2.dollars!("QFS2") == "$1, $2" );
-    import std.stdio;
-    writeln( qf2.setList!("QFS2") );
+    assert( qf2.setList!("QFS2") == `"t1" = $1, "t2" = $2` );
     assert( qf2.length == 2 );
     assert( qf.decl[0] == "t1" );
     
