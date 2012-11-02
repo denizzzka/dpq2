@@ -149,31 +149,29 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string setList( string name )()
     {
-	/*
-        size_t i = 1;
-        foreach( T; TL )
-        {
-            if( T.name != name )
-                i += T.length;
-            else
-                return createSetList!(T)(i);
-        }
-	*/
-	
-	return Repeat!( 1, 0, "", TL[0].TL );
-	
-        //assert( false, "Name '"~name~"' is not found" );
+	alias FindQFName!( name ) T;
+	return Repeat!( T[1], 0, "", T[0].TL );
     }
     
-    private template Repeat( size_t from, size_t i = 0, string result = "", TL ... )
+    private template FindQFName( string name, size_t num = 0, size_t count = 1 )
     {
-	static if( i < TL.length )
-	{
+	import std.typetuple;
+	
+	static assert( num < TL.length, "Name '"~name~"' is not found");
+	
+	static if( TL[num].name != name )
+	    alias FindQFName!( name, num+1, count+TL[num].length ) FindQFName;
+	else
+	    alias TypeTuple!(TL[num], count) FindQFName;
+    }
+    
+    private template Repeat( size_t from, size_t i = 0, string result = "", T ... )
+    {
+	static if( i < T.length )
 	    alias Repeat!( from, i+1,
-		result~TL[i].sql!()()~" = $"~to!string(from+i)~( i==TL.length-1 ? "" : ", " ),
-		TL
+		result~T[i].sql!()()~" = $"~to!string(from+i)~( i==T.length-1 ? "" : ", " ),
+		T
 	    ) Repeat;
-	}
 	else
 	    alias result Repeat;
     }
