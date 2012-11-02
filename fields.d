@@ -6,12 +6,12 @@ string addQuotes(string s) pure nothrow { return "\""~s~"\""; }
 
 struct Field( string sqlName, string sqlPrefix = "", string declName = "" )
 {
-    static string sql() pure nothrow
+    static string sql()() pure nothrow
     {
         return "\""~( sqlPrefix.length ? sqlPrefix~"\".\""~sqlName : sqlName )~"\"";
     }
     
-    static string decl() pure nothrow
+    static string decl()() pure nothrow
     {
         return declName.length ? declName : sqlName;
     }
@@ -22,7 +22,7 @@ struct QueryField( string sqlName, string sqlPrefix = "", string declName = "" )
     alias Field!(sqlName, sqlPrefix, declName) field;
     alias field this;
     
-    static string arrayElement() pure nothrow
+    static string arrayElement()() pure nothrow
     {
         return addQuotes( field.decl() );
     }    
@@ -37,7 +37,7 @@ struct ResultField( T, string _sqlName, string _sqlPrefix = "", string _declName
     alias Field!(sqlName, sqlPrefix, declName) field;
     alias field this;
     
-    static string sql() nothrow
+    static string sql()() nothrow
     {
         return field.sql() ~ ( PGtypeCast.length ? "::"~PGtypeCast : "" );
     }
@@ -149,6 +149,7 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string setList( string name )()
     {
+	/*
         size_t i = 1;
         foreach( T; TL )
         {
@@ -157,20 +158,23 @@ struct QueryFieldsUnity( TL ... )
             else
                 return createSetList!(T)(i);
         }
+	*/
 	
-        assert( false, "Name '"~name~"' is not found" );
+	return Repeat!( TL[0].fields, 1 );
+	
+        //assert( false, "Name '"~name~"' is not found" );
     }
     
-    private static string createSetList(T)(size_t start)
+    private template Repeat( T, size_t from, size_t i = 0, string result = "" )
     {
-	size_t end = start + T.length;
-	string r;
-        foreach( i; start .. end )
-        {
-            r ~= " = $"~to!string(i);
-            if( i < end-1 ) r~=", ";
-        }
-        return r;
+	static if( i < T.length )
+	{
+	    alias Repeat!(T, from, i+1,
+		result~" = $"~to!string(from+i)~( i==T.length-1 ? "" : ", " )
+	    ) Repeat;
+	}
+	else
+	    alias result Repeat;
     }
 }
 
