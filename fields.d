@@ -132,7 +132,7 @@ struct QueryFieldsUnity( TL ... )
                 i += T.length;
             else
 	    {
-		mixin("auto r = "~func~"( i, T.length );");
+		mixin("auto r = "~func~"!(T)(i);");
                 return r;
 	    }
         }
@@ -140,9 +140,9 @@ struct QueryFieldsUnity( TL ... )
         assert( false, func~": name '"~name~"' is not found" );
     }
     
-    private static string createDollars( size_t start, size_t count )
+    private static string createDollars(T)( size_t start )
     {
-        size_t end = start + count;
+        size_t end = start + T.length;
         string r;
         foreach( i; start .. end )
         {
