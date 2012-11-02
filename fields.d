@@ -120,16 +120,24 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string dollars( string name )()
     {
+	return enumerateValues!( name, "createDollars" )();
+    }
+    
+    private static string enumerateValues( string name, string func )()
+    {
         size_t i = 1;
         foreach( T; TL )
         {
             if( T.name != name )
                 i += T.length;
             else
-                return createDollars( i, T.length );
+	    {
+		mixin("auto r = "~func~"( i, T.length );");
+                return r;
+	    }
         }
 	
-        assert( false, "Name '"~name~"' is not found" );
+        assert( false, func~": name '"~name~"' is not found" );
     }
     
     private static string createDollars( size_t start, size_t count )
@@ -139,6 +147,24 @@ struct QueryFieldsUnity( TL ... )
         foreach( i; start .. end )
         {
             r ~= "$"~to!string(i);
+            if( i < end-1 ) r~=", ";
+        }
+        return r;
+    }
+    
+    @property
+    static string setList( string name )()
+    {
+	return enumerateValues!( name, "createSetList" )();
+    }
+    
+    private static string createSetList( size_t start, size_t count )
+    {
+	size_t end = start + count;
+	string r;
+        foreach( i; start .. end )
+        {
+            //r ~= T.decl[i]~" = $"~to!string(i);
             if( i < end-1 ) r~=", ";
         }
         return r;
