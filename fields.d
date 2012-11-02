@@ -49,8 +49,10 @@ struct ResultFieldText( string sqlName, string sqlPrefix = "", string declName =
     alias field this;
 }
 
-struct Fields( TL ... )
-{
+struct Fields( _TL ... )
+{    
+    alias _TL TL;
+    
     @property static size_t length(){ return TL.length; }
     
     package static
@@ -120,27 +122,19 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string dollars( string name )()
     {
-	return enumerateValues!( name, "createDollars" )();
-    }
-    
-    private static string enumerateValues( string name, string func )()
-    {
         size_t i = 1;
         foreach( T; TL )
         {
             if( T.name != name )
                 i += T.length;
             else
-	    {
-		mixin("auto r = "~func~"!(T)(i);");
-                return r;
-	    }
+                return createDollars!(T)(i);
         }
 	
-        assert( false, func~": name '"~name~"' is not found" );
+        assert( false, "Name '"~name~"' is not found" );
     }
     
-    private static string createDollars(T)( size_t start )
+    private static string createDollars(T)(size_t start)
     {
         size_t end = start + T.length;
         string r;
@@ -155,16 +149,17 @@ struct QueryFieldsUnity( TL ... )
     @property
     static string setList( string name )()
     {
-	return enumerateValues!( name, "createSetList" )();
+	//return enumerateValues!( name, "createSetList" )();
+	return "asd";
     }
     
-    private static string createSetList( size_t start, size_t count )
+    private static string createSetList(T, size_t start)()
     {
-	size_t end = start + count;
+	size_t end = start + T.length;
 	string r;
         foreach( i; start .. end )
         {
-            //r ~= T.decl[i]~" = $"~to!string(i);
+            r ~= T.fields.TL[i].sql~" = $"~to!string(i);
             if( i < end-1 ) r~=", ";
         }
         return r;
@@ -265,6 +260,8 @@ void _unittest( string connParam )
     
     assert( qf2.sql!("QFS2") == `"t1", "t2"` );
     assert( qf2.dollars!("QFS2") == "$1, $2" );
+    import std.stdio;
+    writeln( qf2.setList!("QFS2") );
     assert( qf2.length == 2 );
     assert( qf.decl[0] == "t1" );
     
