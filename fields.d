@@ -155,7 +155,7 @@ struct QueryFieldsUnity( TL ... )
     
     private template FindQFName( string name, size_t num = 0, size_t count = 1 )
     {
-	import std.typetuple;
+	import std.typetuple: TypeTuple;
 	
 	static assert( num < TL.length, "Name '"~name~"' is not found");
 	
