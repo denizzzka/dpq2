@@ -10,13 +10,14 @@ import dpq2.libpq;
 public import dpq2.query;
 public import dpq2.fields;
 
+import core.vararg;
 import std.string: toStringz;
 import std.exception;
 import core.exception;
 import std.traits;
 import std.bitmanip: bigEndianToNative;
 import std.datetime;
-import core.vararg;
+import std.uuid;
 
 // Supported PostgreSQL binary types
 alias short   PGsmallint; /// smallint
@@ -27,6 +28,7 @@ alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
 alias immutable ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
+alias UUID    PGuuid; /// UUID
 
 /// Result table's cell coordinates 
 struct Coords
@@ -267,19 +269,30 @@ immutable struct Value // TODO: should be a const struct with const members with
     if( isNumeric!(T) )
     {
         debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-        assert( value.length == T.sizeof, "Value value length isn't equal to type size" );
+        assert( value.length == T.sizeof, "Value length isn't equal to type size" );
         
         ubyte[T.sizeof] s = value[0..T.sizeof];
         return bigEndianToNative!(T)( s );
     }
     
     /// Returns cell value as native date and time
-    @property T* as(T)()
+    @property T as(T)()
     if( is( T == SysTime ) )
     {
         ulong pre_time = as!(ulong)();
         // UTC because server always sends binary timestamps in UTC, not in TZ
-        return new SysTime( pre_time * 10, UTC() );
+        return SysTime( pre_time * 10, UTC() );
+    }
+    
+    /// Returns UUID as native UUID value
+    @property T as(T)()
+    if( is( T == UUID ) )
+    {
+        assert( value.length == 16, "Value length isn't equal to UUID size" );
+        
+        UUID r;
+        r.data = value;
+        return r;
     }
     
     @property
@@ -527,7 +540,8 @@ void _unittest( string connParam )
               
               "[[13,14,NULL], "
                "[16,17,18]]]::integer[], "
-        "NULL";
+        "NULL, "
+        "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'::uuid";
 
 
     auto r = conn.exec( p );
@@ -556,6 +570,7 @@ void _unittest( string connParam )
     
     assert( r[0].isNULL(12) );
     assert( !r[0].isNULL(9) );
+    assert( r[0][13].as!PGuuid.toString() == "8b9ab33a-96e9-499b-9c36-aad1fe86d640" );
         
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
