@@ -33,7 +33,7 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
-    alias @system void delegate( Answer a ) answerHandler;
+    @system alias void delegate( Answer a ) answerHandler;
     private shared answerHandler handler;
     private void unusedHandler( Answer a ) { assert(false); }
     
@@ -142,7 +142,6 @@ final class Connection: BaseConnection
         connection.handler = null;
         tid.send(true);
     }
-    
     
     //TODO: возвращать количество сработок
     void waitAnswers()

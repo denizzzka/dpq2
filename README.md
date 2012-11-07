@@ -118,7 +118,7 @@ To perform unit test it is required access to any PostgreSQL server with
 permissions to run SELECT statements.
 
 After building dpq2 with the unit tests file libdpq2 can be executed. Option "--conninfo"
-may contains connection string as described in [PostgreSQL documentation]
+may contain connection string as described in [PostgreSQL documentation]
 (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING).
 
 For default connection to DB type:
