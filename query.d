@@ -79,7 +79,7 @@ final class Connection: BaseConnection
     @property bool inUse(){ return handler != null; }    
     
     /// Submits a command to the server without waiting for the result(s)
-    package Descriptor sendQuery( string SQLcmd, answerHandler handler )
+    Descriptor sendQuery( string SQLcmd, answerHandler handler )
     {
         assert( !this.handler );
         this.handler = handler;
@@ -91,7 +91,7 @@ final class Connection: BaseConnection
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    package Descriptor sendQuery( ref const queryParams p, answerHandler handler )
+    Descriptor sendQuery( ref const queryParams p, answerHandler handler )
     {
         assert( !this.handler );
         this.handler = handler;
