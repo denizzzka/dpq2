@@ -159,7 +159,7 @@ class Answer // most members should be a const
     package size_t currRow;
     
     @property Row front(){ return this[currRow]; }
-    @property void popFront(){ return ++currRow; }
+    @property void popFront(){ ++currRow; }
     @property bool empty(){ return currRow >= rowCount; }
 }
 
