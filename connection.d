@@ -63,8 +63,6 @@ class BaseConnection
     {
         assert( !readyForQuery );
         
-		// TODO: нужны блокировки чтобы нельзя было несколько раз создать
-		// соединение из параллельных потоков или запрос через нерабочее соединение
         conn = PQconnectdb(toStringz(connString));
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
@@ -87,7 +85,7 @@ class BaseConnection
 
     package void consumeInput()
     {
-        int r = PQconsumeInput( conn );
+        size_t r = PQconsumeInput( conn );
         if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
     }
     
@@ -108,13 +106,6 @@ class BaseConnection
     private static string PQerrorMessage(PGconn* conn)
     {
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
-    }
-    
-    @disable
-    private void registerEventProc( PGEventProc proc, string name, void *passThrough )
-    {
-        if(!PQregisterEventProc(conn, proc, toStringz(name), passThrough))
-            throw new exception( "Could not register "~name~" event handler" );
     }
     
     ~this()

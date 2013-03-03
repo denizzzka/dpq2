@@ -576,21 +576,14 @@ void _unittest( string connParam )
     assert( conn.getNextNotify.name == "test_notify" );
     
     // Async query test
-    shared Answer gs;
-    shared auto answersCount = 0; 
-    conn.sendQuery( "select 123; select 456; select 789",
-        (Answer a)
-        {
-            ++answersCount;
-        }
-    );
+    conn.sendQuery( "select 123; select 456; select 789" );
     
-    conn.waitAnswers();
-    assert( answersCount == 3 );
+    while( conn.getResult() ){}
+    while( conn.getResult() ){}
+    while( conn.getResult() ){}
     
-    conn.sendQuery( p, (Answer a){ } );
-    while( conn.inUse() ) {}
-    conn.waitAnswers();
+    conn.sendQuery( p );
+    while( conn.getResult() ){}
     
     // Range test
     foreach( elem; r )

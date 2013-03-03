@@ -33,15 +33,15 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
+    /*
     @system alias void delegate( Answer a ) answerHandler;
     private shared answerHandler handler;
     private void unusedHandler( Answer a ) { assert(false); }
+    */
     
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
-        assert( !handler );
-        handler = &unusedHandler; // FIXME: dirty blocking
         auto r = getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
         );
@@ -52,9 +52,6 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     Answer exec(ref const queryParams p)
     {
-        assert( !handler );
-        handler = &unusedHandler; // FIXME: dirty blocking
-        
         auto a = prepareArgs( p );
         auto r = getAnswer
         (
@@ -73,29 +70,16 @@ final class Connection: BaseConnection
         return r;
     }
     
-    import std.concurrency;
-    alias Tid Descriptor;
-    
-    @property bool inUse(){ return handler != null; }    
-    
     /// Submits a command to the server without waiting for the result(s)
-    Descriptor sendQuery( string SQLcmd, answerHandler handler )
+    void sendQuery( string SQLcmd )
     {
-        assert( !this.handler );
-        this.handler = handler;
-        
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new exception();
-        
-        return spawnExpectAnswer();
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    Descriptor sendQuery( ref const queryParams p, answerHandler handler )
+    void sendQuery( ref const queryParams p )
     {
-        assert( !this.handler );
-        this.handler = handler;
-        
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
                         conn,
@@ -107,46 +91,8 @@ final class Connection: BaseConnection
                         a.formats.ptr,
                         p.resultFormat                        
                     );
+                    
         if( !r ) throw new exception();
-        
-        return spawnExpectAnswer();
-    }
-    
-    private Tid spawnExpectAnswer()
-    {
-        return spawn( &expectAnswer, thisTid, cast(shared Connection) this );
-    }
-    
-    static private void expectAnswer( Tid tid, shared Connection connection )
-    {
-        import std.socket;
-        
-        auto c = cast(Connection) connection;
-        auto s = new Socket( cast(socket_t) c.socket(), AddressFamily.UNSPEC );
-        auto ss = new SocketSet;
-        ss.add( s );
-        
-        while( !c.flush() )
-            Socket.select( null, ss, null );
-        
-        Socket.select( ss, null, null );
-        
-        do {
-            c.consumeInput();
-        } while( c.isBusy() );
-        
-        PGresult* r;
-        while( r = PQgetResult( c.conn ), r )
-            c.handler( new Answer( r ) );
-        
-        connection.handler = null;
-        tid.send(true);
-    }
-    
-    //TODO: возвращать количество сработок
-    void waitAnswers()
-    {
-        receiveOnly!bool(); // TODO: ждать сообщение только от нашего Tid
     }
     
     /// Waits for the next result from a sendQuery
@@ -201,7 +147,6 @@ final class Connection: BaseConnection
     // It is important to do a separate check because of Answer ctor is nothrow
     private Answer getAnswer( PGresult* r )
     {
-        handler = null;
         auto res = new Answer( r );
         res.checkAnswerForErrors();
         return res;
