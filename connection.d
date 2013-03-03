@@ -103,7 +103,7 @@ class BaseConnection
         return r;
     }
     
-    private static string PQerrorMessage(PGconn* conn)
+    private string errorMessage()
     {
         return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
     }
@@ -117,6 +117,7 @@ class BaseConnection
     class exception : Exception
     {
         ConnStatusType statusType; /// libpq connection status
+        string message; /// PQerrorMessage
         
         this( string msg )
         {
@@ -125,7 +126,9 @@ class BaseConnection
         
         this()
         {
-            this( to!string( PQstatus(conn) ) ); // FIXME: need text representation of PQstatus result
+            statusType = PQstatus(conn);
+            message = errorMessage();
+            this( to!string( statusType ) ~": "~ message ); // FIXME: need text representation of PQstatus result
         }
     }
 }
