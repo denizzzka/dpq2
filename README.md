@@ -138,7 +138,6 @@ $ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=1
 TODO
 ----
 
-* All high-level request queues support should be removed because postgresql not support it. Application programmer must take care of queues if required.
 * Row by row result reading
 * Binary arguments types
 * PostGIS binary data support
