@@ -117,20 +117,19 @@ class BaseConnection
     class exception : Exception
     {
         /// libpq connection status
-        @property
-        public ConnStatusType statusType(){ return PQstatus(conn); };
+        immutable ConnStatusType statusType;
         
         /// PQerrorMessage
         @property string message(){ return errorMessage(); }
         
-        this( string msg )
-        {
-            super( msg, null, null );
-        }
-        
         this()
         {
-            this( to!string( statusType ) ~": "~ message );
+            statusType = PQstatus(conn);
+            super(
+                to!string( statusType ) ~": "~ message,
+                null,
+                null );
+            
         }
     }
 }

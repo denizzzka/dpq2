@@ -156,7 +156,22 @@ final class Connection: BaseConnection
         }
         return res;
     }
+    
+    /*
+    /// Exception
+    class exception: exception
+    {
+        /// PQerrorMessage
+        @property string message(){ return PQerrorMessage(); }
+        
+        this()
+        {
+            super( message );
+        }
+    }
+    * */
 }
+
 
 void _unittest( string connParam )
 {
