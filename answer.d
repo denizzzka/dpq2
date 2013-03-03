@@ -8,7 +8,6 @@ pragma(lib, "com_err");
 
 import dpq2.libpq;
 public import dpq2.query;
-public import dpq2.fields;
 
 import core.vararg;
 import std.string: toStringz;

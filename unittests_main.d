@@ -7,7 +7,6 @@ version( unittest )
     import conn = dpq2.connection: _unittest;
     import query = dpq2.query: _unittest;
     import answer = dpq2.answer: _unittest;
-    import fields = dpq2.fields: _unittest;
     
     int main(string[] args)
     {
@@ -17,7 +16,6 @@ version( unittest )
         conn._unittest( conninfo );
         query._unittest( conninfo );
         answer._unittest( conninfo );
-        fields._unittest( conninfo );
         
         return 0;
     }
