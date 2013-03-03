@@ -157,19 +157,23 @@ final class Connection: BaseConnection
         return res;
     }
     
-    /*
+    private string errorMessage()
+    {
+        return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
+    }
+    
     /// Exception
-    class exception: exception
+    class exception: Exception
     {
         /// PQerrorMessage
-        @property string message(){ return PQerrorMessage(); }
+        immutable string message;
         
         this()
         {
-            super( message );
+            message = errorMessage();
+            super( message, null, null );
         }
     }
-    * */
 }
 
 

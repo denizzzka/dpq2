@@ -103,11 +103,6 @@ class BaseConnection
         return r;
     }
     
-    private string errorMessage()
-    {
-        return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
-    }
-    
     ~this()
     {
         disconnect();
@@ -119,14 +114,11 @@ class BaseConnection
         /// libpq connection status
         immutable ConnStatusType statusType;
         
-        /// PQerrorMessage
-        @property string message(){ return errorMessage(); }
-        
         this()
         {
             statusType = PQstatus(conn);
             super(
-                to!string( statusType ) ~": "~ message,
+                to!string( statusType ),
                 null,
                 null );
             
