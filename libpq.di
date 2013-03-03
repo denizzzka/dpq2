@@ -180,35 +180,35 @@ PQERRORS_VERBOSE,
     size_t PQisthreadsafe(); //
     size_t PQflush(PGconn* conn); // used!
     PGresult* PQfn(PGconn* conn, int fnid, int* result_buf, int* result_len, int result_is_int, PQArgBlock* args, int nargs);
-    ExecStatusType PQresultStatus( immutable PGresult* res ); // used!
+    ExecStatusType PQresultStatus( const PGresult* res ); // used!
     char* PQresStatus(ExecStatusType status);
-    char* PQresultErrorMessage(immutable PGresult* res); // used!
+    char* PQresultErrorMessage(const PGresult* res); // used!
     char* PQresultErrorField(PGresult* res, int fieldcode);
-    size_t PQntuples(immutable PGresult* res); // used!
-    size_t PQnfields(immutable PGresult* res); // used!
+    size_t PQntuples(const PGresult* res); // used!
+    size_t PQnfields(const PGresult* res); // used!
     int PQbinaryTuples(PGresult* res);
     char* PQfname(PGresult* res, int field_num);
-    size_t PQfnumber(immutable PGresult* res, immutable char* field_name); // used!
+    size_t PQfnumber(const PGresult* res, immutable char* field_name); // used!
     Oid PQftable(PGresult* res, int field_num);
     int PQftablecol(PGresult* res, int field_num);
-    valueFormat PQfformat(immutable PGresult* res, size_t field_num); // used!
-    Oid PQftype(immutable PGresult* res, size_t field_num); // used!
+    valueFormat PQfformat(const PGresult* res, size_t field_num); // used!
+    Oid PQftype(const PGresult* res, size_t field_num); // used!
     int PQfsize(PGresult* res, int field_num);
     int PQfmod(PGresult* res, int field_num);
-    char* PQcmdStatus( immutable PGresult* res); // used!
+    char* PQcmdStatus( PGresult* res); // used!
     char* PQoidStatus(PGresult* res);
     Oid PQoidValue(PGresult* res);
     char* PQcmdTuples(PGresult* res);
-    immutable(ubyte)* PQgetvalue(immutable PGresult* res, size_t tup_num, size_t field_num); // used!
-    size_t PQgetlength(immutable PGresult* res, size_t tup_num, size_t field_num); // used!
-    int PQgetisnull(immutable PGresult* res, size_t tup_num, size_t field_num); // used!
+    immutable(ubyte)* PQgetvalue(const PGresult* res, size_t tup_num, size_t field_num); // used!
+    size_t PQgetlength(const PGresult* res, size_t tup_num, size_t field_num); // used!
+    int PQgetisnull(const PGresult* res, size_t tup_num, size_t field_num); // used!
     int PQnparams(PGresult* res);
     Oid PQparamtype(PGresult* res, int param_num);
     PGresult* PQdescribePrepared(PGconn* conn, char* stmt);
     PGresult* PQdescribePortal(PGconn* conn, char* portal);
     int PQsendDescribePrepared(PGconn* conn, char* stmt);
     int PQsendDescribePortal(PGconn* conn, char* portal);
-    void PQclear(immutable PGresult* res); //used!
+    void PQclear(PGresult* res); //used!
     void PQfreemem(void* ptr);
     PGresult* PQmakeEmptyPGresult(PGconn* conn, ExecStatusType status);
     size_t PQescapeStringConn(PGconn* conn, char* to, char* from, size_t length, int* error);

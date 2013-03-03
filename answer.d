@@ -39,7 +39,7 @@ struct Coords
 /// Answer
 class Answer // most members should be a const
 {
-    private immutable PGresult* res; // TODO: should be mutable
+    private PGresult* res; // TODO: should be mutable
 
     invariant()
     {
@@ -48,7 +48,7 @@ class Answer // most members should be a const
         
     package this(PGresult* r) nothrow
     {
-        res = cast(immutable PGresult*) r;
+        res = r;
     }
     
     ~this()
