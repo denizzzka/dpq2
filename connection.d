@@ -116,8 +116,11 @@ class BaseConnection
     /// Exception
     class exception : Exception
     {
-        ConnStatusType statusType; /// libpq connection status
-        string message; /// PQerrorMessage
+        /// libpq connection status
+        @property ConnStatusType statusType(){ return PQstatus(conn); };
+        
+        /// PQerrorMessage
+        @property string message(){ return errorMessage(); }
         
         this( string msg )
         {
@@ -126,8 +129,6 @@ class BaseConnection
         
         this()
         {
-            statusType = PQstatus(conn);
-            message = errorMessage();
             this( to!string( statusType ) ~": "~ message ); // FIXME: need text representation of PQstatus result
         }
     }
