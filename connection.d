@@ -117,11 +117,7 @@ class BaseConnection
         this()
         {
             statusType = PQstatus(conn);
-            super(
-                to!string( statusType ),
-                null,
-                null );
-            
+            super( to!string( statusType ), null, null );
         }
     }
 }
