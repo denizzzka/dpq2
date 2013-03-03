@@ -575,14 +575,16 @@ void _unittest( string connParam )
     auto n = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
     
-    // Async query test
+    // Async query test 1
     conn.sendQuery( "select 123; select 456; select 789" );
-    
     for( size_t i = 0; i <= 2; i++ )
         while( conn.getResult() is null ){}
+    assert( !conn.getResult() ); // removes null answer at the end
     
+    // Async query test 2
     conn.sendQuery( p );
     while( conn.getResult() is null ){}
+    assert( !conn.getResult() ); // removes null answer at the end
     
     // Range test
     foreach( elem; r )
