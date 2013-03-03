@@ -578,12 +578,11 @@ void _unittest( string connParam )
     // Async query test
     conn.sendQuery( "select 123; select 456; select 789" );
     
-    while( conn.getResult() ){}
-    while( conn.getResult() ){}
-    while( conn.getResult() ){}
+    for( size_t i = 0; i <= 2; i++ )
+        while( conn.getResult() is null ){}
     
     conn.sendQuery( p );
-    while( conn.getResult() ){}
+    while( conn.getResult() is null ){}
     
     // Range test
     foreach( elem; r )

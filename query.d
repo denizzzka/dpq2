@@ -147,8 +147,13 @@ final class Connection: BaseConnection
     // It is important to do a separate check because of Answer ctor is nothrow
     private Answer getAnswer( PGresult* r )
     {
-        auto res = new Answer( r );
-        res.checkAnswerForErrors();
+        Answer res;
+        
+        if( r )
+        {
+            res = new Answer( r );
+            res.checkAnswerForErrors();
+        }
         return res;
     }
 }
