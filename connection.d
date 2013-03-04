@@ -1,5 +1,3 @@
-///TODO: защита класса BaseConnection на тему мультитредности
-
 module dpq2.connection;
 @trusted:
 
