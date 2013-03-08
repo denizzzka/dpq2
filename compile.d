@@ -11,10 +11,10 @@ string cleanupCommands()
 {
 	version(Windows)
 	{
-		return "del *.obj *.lib && del doc && del "~EXAMPLE_ONAME~".exe";
+		return "del *.obj *.lib && del doc && del "~EXAMPLE_ONAME~".exe "~UNITTEST_ONAME~".exe";
 	} else
 	{
-		return "rm -rf *.o *.a && rm -rf doc && rm -rf "~EXAMPLE_ONAME;
+		return "rm -rf *.o *.a && rm -rf doc && rm -rf "~EXAMPLE_ONAME~" "~UNITTEST_ONAME;
 	}
 }
 
@@ -43,7 +43,7 @@ static this()
 	addCompTarget("example-static", "./", EXAMPLE_ONAME, BUILD.APP);
 	addDependTarget("static");
 	addSingleFile("./src/example.d");
-	addCustomFlags("-version=BINDINGS_STATIC");
+	addCustomFlags("-version=BINDINGS_STATIC -L-lpq -L-lcom_err");
 
 	// Unittesting
 	addCompTarget("unittest-dynamic", "./", UNITTEST_ONAME, BUILD.APP);
@@ -54,7 +54,7 @@ static this()
 	addCompTarget("unittest-static", "./", UNITTEST_ONAME, BUILD.APP);
 	addDependTarget("static");
 	addSingleFile("./src/unittests_main.d");
-	addCustomFlags("-version=BINDINGS_STATIC -unittest");
+	addCustomFlags("-version=BINDINGS_STATIC -unittest -L-lpq -L-lcom_err");
 
 	// Docs
 	addCompTarget("docs", "./", DPQ_ONAME, BUILD.LIB);
