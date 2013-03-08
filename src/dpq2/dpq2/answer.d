@@ -39,7 +39,7 @@ struct Coords
 /// Answer
 class Answer // most members should be a const
 {
-    private immutable PGresult* res; // TODO: should be mutable
+    private PGresult* res; // TODO: should be mutable
 
     invariant()
     {
@@ -48,7 +48,7 @@ class Answer // most members should be a const
         
     package this(PGresult* r) nothrow
     {
-        res = cast(immutable)r;
+        res = r;
     }
     
     ~this()
@@ -76,7 +76,7 @@ class Answer // most members should be a const
     @property
     ExecStatusType status()
     {
-        return PQresultStatus(cast(immutable)res);
+        return PQresultStatus(res);
     }
 
     /// Returns the command status tag from the SQL command that generated the PGresult

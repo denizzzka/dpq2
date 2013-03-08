@@ -143,7 +143,7 @@ extern (C) nothrow
     int PQsetnonblocking(PGconn* conn, int arg); // used!
     int PQisthreadsafe(); //   
     int PQflush(PGconn* conn); // used!
-    ExecStatusType PQresultStatus(immutable PGresult* res);
+    ExecStatusType PQresultStatus(const PGresult* res);
     int PQconsumeInput(PGconn* conn);
     char* PQresultErrorMessage(const PGresult* res); // used!
     int PQntuples(const PGresult* res); // used!
