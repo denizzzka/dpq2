@@ -154,8 +154,8 @@ extern (C) nothrow
     immutable(ubyte)* PQgetvalue(const PGresult* res, int tup_num, int field_num); // used!
     int PQgetlength(const PGresult* res, int tup_num, int field_num); // used!
     int PQgetisnull(const PGresult* res, int tup_num, int field_num); // used!
-    char* PQcmdStatus( PGresult* res); // used!
-    void PQclear(PGresult* res); //used!
+    char* PQcmdStatus( const PGresult* res); // used!
+    void PQclear(const PGresult* res); //used!
     alias int function (PGEventId evtId, void* evtInfo, void* passThrough) PGEventProc; // used!
     int PQregisterEventProc(PGconn *conn, PGEventProc proc, immutable char* name, void *passThrough); // used!
     int PQlibVersion();

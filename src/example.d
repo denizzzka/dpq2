@@ -6,7 +6,7 @@ import std.stdio: writeln;
 void main()
 {
     Connection conn = new Connection;
-    conn.connString = "host=localhost port=5432 dbname=postgres user=postgres password=*****";
+    conn.connString = "host=localhost port=5432 dbname=postgres user=postgres password=150561";
     conn.connect();
 
     // Text query result

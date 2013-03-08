@@ -101,14 +101,14 @@ class Answer // most members should be a const
     valueFormat columnFormat( const size_t colNum ) const
     {
         assertCol( colNum );
-        return PQfformat(res, colNum);
+        return PQfformat(res, cast(int)colNum);
     }
     
     /// Returns column Oid
     @property Oid OID( size_t colNum ) const
     {
         assertCol( colNum );
-        return PQftype(res, colNum);
+        return PQftype(res, cast(int)colNum);
     }
     
     /// Returns column number by field name
@@ -180,21 +180,21 @@ struct Row
     size_t size( const size_t col ) const
     {
         answer.assertCol(col);
-        return PQgetlength(answer.res, row, col);
+        return PQgetlength(answer.res, cast(int)row, cast(int)col);
     }
     
     /// Value NULL checking
     @property
     bool isNULL( const size_t col ) const
     {
-        return PQgetisnull(answer.res, row, col) != 0;
+        return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
     immutable (Value)* opIndex( size_t col ) const
     {
         answer.assertCoords( Coords( row, col ) );
         
-        auto v = PQgetvalue(answer.res, row, col);
+        auto v = PQgetvalue(answer.res, cast(int)row, cast(int)col);
         auto s = size( col );
 
         debug
