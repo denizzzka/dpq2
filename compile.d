@@ -11,10 +11,10 @@ string cleanupCommands()
 {
 	version(Windows)
 	{
-		return "del *.obj *.lib && del doc && del "~EXAMPLE_ONAME~".exe "~UNITTEST_ONAME~".exe";
+		return "del *.obj *.lib && del docs && del "~EXAMPLE_ONAME~".exe "~UNITTEST_ONAME~".exe";
 	} else
 	{
-		return "rm -rf *.o *.a && rm -rf doc && rm -rf "~EXAMPLE_ONAME~" "~UNITTEST_ONAME;
+		return "rm -rf *.o *.a && rm -rf docs && rm -rf "~EXAMPLE_ONAME~" "~UNITTEST_ONAME;
 	}
 }
 
