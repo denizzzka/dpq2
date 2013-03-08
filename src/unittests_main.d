@@ -4,6 +4,7 @@ version( unittest )
 {
     import std.getopt;
     
+    import dpq2.all;
     import conn = dpq2.connection: _unittest;
     import query = dpq2.query: _unittest;
     import answer = dpq2.answer: _unittest;

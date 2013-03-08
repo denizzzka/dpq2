@@ -1,12 +1,12 @@
 #!/usr/bin/env rdmd
 
-import dpq2.answer;
+import dpq2.all;
 import std.stdio: writeln;
 
 void main()
 {
     Connection conn = new Connection;
-    conn.connString = "dbname=postgres";
+    conn.connString = "host=localhost port=5432 dbname=postgres user=postgres password=*****";
     conn.connect();
 
     // Text query result
@@ -20,7 +20,7 @@ void main()
     // Binary query result
     static queryArg arg;
     queryParams p;
-    p.resultFormat = dpq2.answer.valueFormat.BINARY;
+    p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
         "-1234.56789012345::double precision, "
         "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "

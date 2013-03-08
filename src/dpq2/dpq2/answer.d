@@ -1,12 +1,12 @@
 module dpq2.answer;
 
-// for rdmd
-pragma(lib, "pq");
-pragma(lib, "com_err");
-
 @trusted:
 
-import dpq2.libpq;
+version(BINDINGS_STATIC)
+    import dpq2.libpq;
+version(BINDINGS_DYNAMIC)    
+    import derelict.pq.pq;
+
 public import dpq2.query;
 
 import core.vararg;
@@ -39,7 +39,7 @@ struct Coords
 /// Answer
 class Answer // most members should be a const
 {
-    private PGresult* res; // TODO: should be mutable
+    private immutable PGresult* res; // TODO: should be mutable
 
     invariant()
     {
@@ -48,7 +48,7 @@ class Answer // most members should be a const
         
     package this(PGresult* r) nothrow
     {
-        res = r;
+        res = cast(immutable)r;
     }
     
     ~this()
@@ -76,7 +76,7 @@ class Answer // most members should be a const
     @property
     ExecStatusType status()
     {
-        return PQresultStatus(res);
+        return PQresultStatus(cast(immutable)res);
     }
 
     /// Returns the command status tag from the SQL command that generated the PGresult
@@ -98,7 +98,7 @@ class Answer // most members should be a const
     @property size_t columnCount() const { return PQnfields(res); }
 
     /// Returns column format
-    dpq2.libpq.valueFormat columnFormat( const size_t colNum ) const
+    valueFormat columnFormat( const size_t colNum ) const
     {
         assertCol( colNum );
         return PQfformat(res, colNum);
@@ -225,7 +225,7 @@ struct Row
 immutable struct Value // TODO: should be a const struct with const members without copy ability or class
 {
     private ubyte[] value;
-    debug private dpq2.libpq.valueFormat format;
+    debug private dpq2.pq.valueFormat format;
     
     version(Debug){} else
     this( immutable (ubyte)* value, size_t valueSize ) immutable
@@ -234,7 +234,7 @@ immutable struct Value // TODO: should be a const struct with const members with
     }
     
     debug
-    this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f ) immutable
+    this( immutable (ubyte)* value, size_t valueSize, dpq2.pq.valueFormat f ) immutable
     {
         this.value = value[0..valueSize];
         format = f;
@@ -488,6 +488,8 @@ immutable class exception : Exception
 
 void _unittest( string connParam )
 {
+    import std.stdio;
+
     // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -503,7 +505,7 @@ void _unittest( string connParam )
     "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
 
     auto e = conn.exec( sql_query );
-    
+
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
     assert( e.columnFormat(1) == valueFormat.TEXT );
@@ -544,7 +546,7 @@ void _unittest( string connParam )
 
 
     auto r = conn.exec( p );
-
+        
     assert( r[0][0].as!PGsmallint == -32761 );
     assert( r[0][1].as!PGinteger == -2147483646 );
     assert( r[0][2].as!PGbigint == -9223372036854775806 );
@@ -577,14 +579,13 @@ void _unittest( string connParam )
     
     // Async query test 1
     conn.sendQuery( "select 123; select 456; select 789" );
-    for( size_t i = 0; i <= 2; i++ )
-        while( conn.getResult() is null ){}
-    assert( !conn.getResult() ); // removes null answer at the end
-    
+    while( conn.getResult() !is null ){}
+    assert( conn.getResult() is null ); // removes null answer at the end
+
     // Async query test 2
     conn.sendQuery( p );
-    while( conn.getResult() is null ){}
-    assert( !conn.getResult() ); // removes null answer at the end
+    while( conn.getResult() !is null ){}
+    assert( conn.getResult() is null ); // removes null answer at the end
     
     // Range test
     foreach( elem; r )

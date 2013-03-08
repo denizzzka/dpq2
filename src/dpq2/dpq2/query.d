@@ -1,10 +1,13 @@
 module dpq2.query;
 @trusted:
 
-import dpq2.libpq;
+version(BINDINGS_STATIC)
+    import dpq2.libpq;
+version(BINDINGS_DYNAMIC)    
+    import derelict.pq.pq;
+
 import dpq2.answer;
 public import dpq2.connection;
-public import dpq2.libpq: valueFormat;
 
 /// Query parameters
 struct queryParams
@@ -57,13 +60,13 @@ final class Connection: BaseConnection
         (
             PQexecParams (
                 conn,
-                toStringz( p.sqlCommand ),
-                p.args.length,
+                cast(const char*)toStringz( p.sqlCommand ),
+                cast(int)p.args.length,
                 a.types.ptr,
                 a.values.ptr,
-                a.lengths.ptr,
-                a.formats.ptr,
-                p.resultFormat
+                cast(int*)a.lengths.ptr,
+                cast(int*)a.formats.ptr,
+                cast(int)p.resultFormat
             )
         );
         
@@ -82,14 +85,14 @@ final class Connection: BaseConnection
     {
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
-                        conn,
-                        toStringz( p.sqlCommand ),
-                        p.args.length,
-                        a.types.ptr,
-                        a.values.ptr,
-                        a.lengths.ptr,
-                        a.formats.ptr,
-                        p.resultFormat                        
+                    conn,
+                    cast(const char*)toStringz( p.sqlCommand ),
+                    cast(int)p.args.length,
+                    a.types.ptr,
+                    a.values.ptr,
+                    cast(int*)a.lengths.ptr,
+                    cast(int*)a.formats.ptr,
+                    cast(int)p.resultFormat                    
                     );
                     
         if( !r ) throw new exception();
@@ -159,7 +162,7 @@ final class Connection: BaseConnection
     
     private string errorMessage()
     {
-        return to!(string)( dpq2.libpq.PQerrorMessage(conn) );
+        return to!(string)( PQerrorMessage(conn) );
     }
     
     /// Exception
@@ -208,4 +211,6 @@ void _unittest( string connParam )
     p.args = args;
 
     auto r2 = conn.exec( p );
+
+    conn.disconnect();
 }
