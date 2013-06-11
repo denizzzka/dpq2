@@ -1,7 +1,12 @@
+
 module dpq2.connection;
 @trusted:
 
-import dpq2.libpq;
+version(BINDINGS_STATIC)
+    import dpq2.libpq;
+version(BINDINGS_DYNAMIC)    
+    import derelict.pq.pq;
+    
 import dpq2.answer;
 
 import std.conv: to;

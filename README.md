@@ -27,24 +27,25 @@ Building
 --------
 
 ####Requirements:
-Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.060 and GNU make.
+Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.062.
+Bindings for libpq can be static or dynamic, compilation described below.
 ```sh
 git clone https://github.com/denizzzka/dpq2.git
 cd dpq2
 ```
+####Static bindings
+    $ rdmd compile.d static [release|debug]
 
-####Debug version (with debugging symbols and asserts)
-    $ make debug
+####Dynamic bindings
+    $ rdmd compile.d dynamic [release|debug]
 
 ####Unittest version (see below)
-    $ make unittest
+    $ rdmd compile.d unittest-static [release|debug]
+    $ rdmd compile.d unittest-dynamic [release|debug]
 
-####Release version
-    $ make release
-
-or
-
-    $ make
+####Example compilation
+    $ rdmd compile.d example-static [release|debug]
+    $ rdmd compile.d example-dynamic [release|debug]
 
 Example
 -------
@@ -52,13 +53,13 @@ Example
 ```D
 #!/usr/bin/env rdmd
 
-import dpq2.answer;
+import dpq2.all;
 import std.stdio: writeln;
 
 void main()
 {
     Connection conn = new Connection;
-    conn.connString = "dbname=postgres";
+    conn.connString = "host=localhost port=5432 dbname=postgres user=postgres password=******";
     conn.connect();
 
     // Text query result
@@ -72,7 +73,7 @@ void main()
     // Binary query result
     static queryArg arg;
     queryParams p;
-    p.resultFormat = dpq2.answer.valueFormat.BINARY;
+    p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
         "-1234.56789012345::double precision, "
         "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
@@ -91,10 +92,26 @@ void main()
     writeln( "7: ", r[0][4].asArray.isNULL(0) );
     writeln( "8: ", r[0][4].asArray.isNULL(2) );
 }
+
 ```
-Compile and run:
+##Compile and run
+Static bindings (requires libpq.a libcomm_err.a):
 ```sh
-$ dmd example.d -Ldpq2/libdpq2.a -L-lpq -L-lcom_err
+$ rdmd compile.d example-static
+$ ./example
+1: 456.78
+2: -1234.57
+3: 0013-Oct-05 03:00:21.227803Z
+4: first line
+second line
+5: true
+6: 2
+7: false
+8: true
+```
+Dynamic bindings (requires libpq.so libssl.so libcrypto.so for linux, libpq.dll libeay32.dll ssleay32.dll for win):
+```sh
+$ rdmd compile.d example-dynamic
 $ ./example
 1: 456.78
 2: -1234.57

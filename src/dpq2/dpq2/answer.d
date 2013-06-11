@@ -1,12 +1,12 @@
 module dpq2.answer;
 
-// for rdmd
-pragma(lib, "pq");
-pragma(lib, "com_err");
-
 @trusted:
 
-import dpq2.libpq;
+version(BINDINGS_STATIC)
+    import dpq2.libpq;
+version(BINDINGS_DYNAMIC)    
+    import derelict.pq.pq;
+
 public import dpq2.query;
 
 import core.vararg;
@@ -41,7 +41,7 @@ class Answer // most members should be a const
 {
     private PGresult* res; // TODO: should be mutable
 
-    invariant()
+    nothrow invariant()
     {
         assert( res != null );
     }
@@ -68,7 +68,7 @@ class Answer // most members should be a const
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
-            throw new exception( exception.exceptionTypes.UNDEFINED_FIXME,
+            throw new immutable exception( exception.exceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
         }
     }
@@ -98,17 +98,17 @@ class Answer // most members should be a const
     @property size_t columnCount() const { return PQnfields(res); }
 
     /// Returns column format
-    dpq2.libpq.valueFormat columnFormat( const size_t colNum ) const
+    valueFormat columnFormat( const size_t colNum ) const
     {
         assertCol( colNum );
-        return PQfformat(res, colNum);
+        return PQfformat(res, cast(int)colNum);
     }
     
     /// Returns column Oid
     @property Oid OID( size_t colNum ) const
     {
         assertCol( colNum );
-        return PQftype(res, colNum);
+        return PQftype(res, cast(int)colNum);
     }
     
     /// Returns column number by field name
@@ -116,7 +116,7 @@ class Answer // most members should be a const
     {    
         size_t n = PQfnumber(res, toStringz(columnName));
         if( n == -1 )
-            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
+            throw new immutable exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
                                 "Column '"~columnName~"' is not found");
         return n;
     }
@@ -180,27 +180,27 @@ struct Row
     size_t size( const size_t col ) const
     {
         answer.assertCol(col);
-        return PQgetlength(answer.res, row, col);
+        return PQgetlength(answer.res, cast(int)row, cast(int)col);
     }
     
     /// Value NULL checking
     @property
     bool isNULL( const size_t col ) const
     {
-        return PQgetisnull(answer.res, row, col) != 0;
+        return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
     immutable (Value)* opIndex( size_t col ) const
     {
         answer.assertCoords( Coords( row, col ) );
         
-        auto v = PQgetvalue(answer.res, row, col);
+        auto v = PQgetvalue(answer.res, cast(int)row, cast(int)col);
         auto s = size( col );
 
         debug
-            auto r = new Value( v, s, answer.columnFormat( col ) );
+            auto r = new immutable Value( v, s, answer.columnFormat( col ) );
         else
-            auto r = new Value( v, s );
+            auto r = new immutable Value( v, s );
         
         return r;
     }
@@ -225,7 +225,7 @@ struct Row
 immutable struct Value // TODO: should be a const struct with const members without copy ability or class
 {
     private ubyte[] value;
-    debug private dpq2.libpq.valueFormat format;
+    debug private valueFormat format;
     
     version(Debug){} else
     this( immutable (ubyte)* value, size_t valueSize ) immutable
@@ -234,7 +234,7 @@ immutable struct Value // TODO: should be a const struct with const members with
     }
     
     debug
-    this( immutable (ubyte)* value, size_t valueSize, dpq2.libpq.valueFormat f ) immutable
+    this( immutable (ubyte)* value, size_t valueSize, valueFormat f ) immutable
     {
         this.value = value[0..valueSize];
         format = f;
@@ -297,7 +297,7 @@ immutable struct Value // TODO: should be a const struct with const members with
     @property
     immutable (Array*) asArray()
     {
-        return new Array( &this );
+        return new immutable Array( &this );
     }
 }
 
@@ -393,7 +393,7 @@ immutable struct Array
     immutable (Value)* getValue( ... ) const
     {
         auto n = coords2Serial( _argptr, _arguments );
-        return new Value( elements[n] );
+        return new immutable Value( elements[n] );
     }
     
     /// Value NULL checking
@@ -459,7 +459,7 @@ immutable class notify
     /// Returns process ID of notifying server process
     @property size_t pid() { return n.be_pid; }
 
-    invariant()
+    nothrow invariant() 
     {
         assert( n != null );
     }
@@ -488,6 +488,8 @@ immutable class exception : Exception
 
 void _unittest( string connParam )
 {
+    import std.stdio;
+
     // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -503,7 +505,7 @@ void _unittest( string connParam )
     "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
 
     auto e = conn.exec( sql_query );
-    
+
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
     assert( e.columnFormat(1) == valueFormat.TEXT );
@@ -544,7 +546,7 @@ void _unittest( string connParam )
 
 
     auto r = conn.exec( p );
-
+        
     assert( r[0][0].as!PGsmallint == -32761 );
     assert( r[0][1].as!PGinteger == -2147483646 );
     assert( r[0][2].as!PGbigint == -9223372036854775806 );
@@ -577,14 +579,13 @@ void _unittest( string connParam )
     
     // Async query test 1
     conn.sendQuery( "select 123; select 456; select 789" );
-    for( size_t i = 0; i <= 2; i++ )
-        while( conn.getResult() is null ){}
-    assert( !conn.getResult() ); // removes null answer at the end
-    
+    while( conn.getResult() !is null ){}
+    assert( conn.getResult() is null ); // removes null answer at the end
+
     // Async query test 2
     conn.sendQuery( p );
-    while( conn.getResult() is null ){}
-    assert( !conn.getResult() ); // removes null answer at the end
+    while( conn.getResult() !is null ){}
+    assert( conn.getResult() is null ); // removes null answer at the end
     
     // Range test
     foreach( elem; r )
