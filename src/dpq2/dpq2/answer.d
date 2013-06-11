@@ -41,7 +41,7 @@ class Answer // most members should be a const
 {
     private PGresult* res; // TODO: should be mutable
 
-    invariant()
+    nothrow invariant()
     {
         assert( res != null );
     }
@@ -68,7 +68,7 @@ class Answer // most members should be a const
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
-            throw new exception( exception.exceptionTypes.UNDEFINED_FIXME,
+            throw new immutable exception( exception.exceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
         }
     }
@@ -116,7 +116,7 @@ class Answer // most members should be a const
     {    
         size_t n = PQfnumber(res, toStringz(columnName));
         if( n == -1 )
-            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
+            throw new immutable exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
                                 "Column '"~columnName~"' is not found");
         return n;
     }
@@ -198,9 +198,9 @@ struct Row
         auto s = size( col );
 
         debug
-            auto r = new Value( v, s, answer.columnFormat( col ) );
+            auto r = new immutable Value( v, s, answer.columnFormat( col ) );
         else
-            auto r = new Value( v, s );
+            auto r = new immutable Value( v, s );
         
         return r;
     }
@@ -225,7 +225,7 @@ struct Row
 immutable struct Value // TODO: should be a const struct with const members without copy ability or class
 {
     private ubyte[] value;
-    debug private dpq2.pq.valueFormat format;
+    debug private valueFormat format;
     
     version(Debug){} else
     this( immutable (ubyte)* value, size_t valueSize ) immutable
@@ -234,7 +234,7 @@ immutable struct Value // TODO: should be a const struct with const members with
     }
     
     debug
-    this( immutable (ubyte)* value, size_t valueSize, dpq2.pq.valueFormat f ) immutable
+    this( immutable (ubyte)* value, size_t valueSize, valueFormat f ) immutable
     {
         this.value = value[0..valueSize];
         format = f;
@@ -297,7 +297,7 @@ immutable struct Value // TODO: should be a const struct with const members with
     @property
     immutable (Array*) asArray()
     {
-        return new Array( &this );
+        return new immutable Array( &this );
     }
 }
 
@@ -393,7 +393,7 @@ immutable struct Array
     immutable (Value)* getValue( ... ) const
     {
         auto n = coords2Serial( _argptr, _arguments );
-        return new Value( elements[n] );
+        return new immutable Value( elements[n] );
     }
     
     /// Value NULL checking
@@ -459,7 +459,7 @@ immutable class notify
     /// Returns process ID of notifying server process
     @property size_t pid() { return n.be_pid; }
 
-    invariant()
+    nothrow invariant() 
     {
         assert( n != null );
     }

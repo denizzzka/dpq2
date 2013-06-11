@@ -116,7 +116,7 @@ final class Connection: BaseConnection
     {
         consumeInput();
         auto n = PQnotifies(conn);
-        return n is null ? null : new notify( n );
+        return n is null ? null : new immutable notify( n );
     }
     
     private struct preparedArgs
