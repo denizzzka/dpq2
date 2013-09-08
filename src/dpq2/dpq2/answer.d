@@ -370,7 +370,7 @@ immutable struct Array
         for(uint i = 0; i < n_elems; ++i )
         {
             ubyte[int.sizeof] size_net;
-            size_net = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+            size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
             uint size = bigEndianToNative!uint( size_net );
             if( size == size.max ) // NULL magic number
             {
