@@ -208,7 +208,7 @@ void _unittest( string connParam )
     
     queryParams p;
     p.sqlCommand = sql_query2;
-    p.args = args;
+    p.args = args[];
 
     auto r2 = conn.exec( p );
 
