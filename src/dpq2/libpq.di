@@ -1,8 +1,5 @@
 module dpq2.libpq;
 
-pragma(lib, "pq");
-pragma(lib, "com_err");
-
 @safe:
 
 import std.c.stdio : FILE;
