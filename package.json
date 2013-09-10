@@ -1,0 +1,24 @@
+{
+	"name": "dpq2",
+	"description": "High-level binding to the PostgreSQL database",
+	"homepage": "https://github.com/denizzzka/dpq2",
+	"license": "",
+	"authors": [
+		"denizzzka", "Anton Gushcha"
+	],
+	"targetPath": "bin",
+	"dependencies": {
+	},
+	"configurations": [
+		{
+			"name": "static",
+			"versions": ["BINDINGS_STATIC"],
+			"libs": ["pq"]
+		},
+		{
+			"name": "dynamic",
+			"dependencies": {"derelict-pq": {"version": "~master", "path": "DerelictPQ"}},
+			"versions": ["BINDINGS_DYNAMIC"]
+		}
+	]
+}
