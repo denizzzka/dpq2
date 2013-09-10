@@ -27,25 +27,59 @@ Building
 --------
 
 ####Requirements:
-Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.062.
+Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.062 and higher.
 Bindings for libpq can be static or dynamic, compilation described below.
+
+Instead of explicitly installing dpq2, it is now recommended to use 
+[DUB](https://github.com/rejectedsoftware/dub) for building dpq2 based
+applications. Once DUB is installed, you can create a new project by running
+`dub init <name>` and enable the use of dpq2 by adding the following
+dependency to the `package.json` file in your project's directory:
+
+    {
+        "name": "your-project-identifier",
+        "dependencies": {
+            "dpq2": "~master"
+        }
+    }
+
+Invoking `dub` will then automatically download the latest dpq2 and compile
+and run the project.
+
+Similarly, you can run an example by invoking `dub` from any of the
+example project directories.
+
+If you want to install dpq2 explicitly, you can use:
+
 ```sh
 git clone https://github.com/denizzzka/dpq2.git
 cd dpq2
 ```
-####Static bindings
-    $ rdmd compile.d static [release|debug]
+####Static bindings - debug version
+    $ dub build
 
-####Dynamic bindings
-    $ rdmd compile.d dynamic [release|debug]
+####Static bindings - release version
+    $ dub --build=release build
+
+####Dynamic bindings - debug version
+    $ dub --config=dynamic build
+
+####Dynamic bindings - release version
+    $ dub --config=dynamic --build=release build
 
 ####Unittest version (see below)
-    $ rdmd compile.d unittest-static [release|debug]
-    $ rdmd compile.d unittest-dynamic [release|debug]
+    $ cd unittests
+    $ dub build
+    $ dub --build=release build
+    $ dub --config=dynamic build
+    $ dub --config=dynamic --build=release build
 
 ####Example compilation
-    $ rdmd compile.d example-static [release|debug]
-    $ rdmd compile.d example-dynamic [release|debug]
+    $ cd example
+    $ dub build
+    $ dub --build=release build
+    $ dub --config=dynamic build
+    $ dub --config=dynamic --build=release build
 
 Example
 -------
@@ -95,10 +129,10 @@ void main()
 
 ```
 ##Compile and run
-Static bindings (requires libpq.a libcomm_err.a):
+Static bindings (requires libpq.a libcom_err.a):
 ```sh
-$ rdmd compile.d example-static
-$ ./example
+$ cd example
+$ dub
 1: 456.78
 2: -1234.57
 3: 0013-Oct-05 03:00:21.227803Z
@@ -111,8 +145,8 @@ second line
 ```
 Dynamic bindings (requires libpq.so libssl.so libcrypto.so for linux, libpq.dll libeay32.dll ssleay32.dll for win):
 ```sh
-$ rdmd compile.d example-dynamic
-$ ./example
+$ cd example
+$ dub --config=dynamic
 1: 456.78
 2: -1234.57
 3: 0013-Oct-05 03:00:21.227803Z
@@ -141,15 +175,18 @@ may contain connection string as described in [PostgreSQL documentation]
 For default connection to DB type:
 
 ```sh
-$ ./libdpq2 
+$ cd unittests
+$ dub
 ```
 Connection to usually available database "postgres":
 ```sh
-$ ./libdpq2 --conninfo "dbname=postgres"
+$ cd unittests
+$ dub -- --conninfo "dbname=postgres"
 ```
 Network connection:
 ```sh
-$ ./libdpq2 --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
+$ cd unittests
+$ dub -- --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
 ```
 
 TODO
