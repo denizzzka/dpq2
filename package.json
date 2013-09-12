@@ -16,7 +16,7 @@
 		},
 		{
 			"name": "dynamic",
-			"dependencies": {"derelict-pq": {"version": "~master", "path": "DerelictPQ"}},
+			"dependencies": {"derelict:pq": "~master"},
 			"versions": ["BINDINGS_DYNAMIC"]
 		}
 	]
