@@ -4,7 +4,7 @@
 	"homepage": "https://github.com/denizzzka/dpq2",
 	"license": "",
 	"authors": [
-		"denizzzka", "Anton Gushcha"
+		"Denis Feklushkin", "Anton Gushcha"
 	],
 	"targetPath": "bin",
 	"dependencies": {
