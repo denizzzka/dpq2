@@ -2,7 +2,7 @@
 	"name": "dpq2",
 	"description": "High-level binding to the PostgreSQL database",
 	"homepage": "https://github.com/denizzzka/dpq2",
-	"license": "",
+	"license": "Boost",
 	"authors": [
 		"Denis Feklushkin", "Anton Gushcha"
 	],
