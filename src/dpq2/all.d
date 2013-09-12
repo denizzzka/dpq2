@@ -25,7 +25,7 @@ version(BINDINGS_DYNAMIC)
         writeln("finished.");
     }
 }
-version(BINDINGS_STATIC)
+else
 {
     public 
     {

@@ -12,7 +12,6 @@
 	"configurations": [
 		{
 			"name": "static",
-			"versions": ["BINDINGS_STATIC"],
 			"libs": ["pq"]
 		},
 		{
