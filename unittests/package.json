@@ -2,9 +2,9 @@
 	"name": "dpq2-unittests",
 	"description": "Unit tests for usage high-level binding to the PostgreSQL database",
 	"homepage": "https://github.com/denizzzka/dpq2",
-	"license": "",
+	"license": "Boost",
 	"authors": [
-		"denizzzka", "Anton Gushcha"
+		"Denis Feklushkin", "Anton Gushcha"
 	],
 	"targetPath": "bin",
 	"dependencies": {

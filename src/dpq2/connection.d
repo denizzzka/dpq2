@@ -2,10 +2,14 @@
 module dpq2.connection;
 @trusted:
 
-version(BINDINGS_STATIC)
-    import dpq2.libpq;
-version(BINDINGS_DYNAMIC)    
+version(BINDINGS_DYNAMIC)
+{
     import derelict.pq.pq;
+}
+else
+{
+    import dpq2.libpq;
+}
     
 import dpq2.answer;
 
