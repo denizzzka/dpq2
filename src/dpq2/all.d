@@ -17,15 +17,23 @@ version(BINDINGS_DYNAMIC)
 
     shared static ~this()
     {
-        import std.stdio;
-        write("DerelictPQ is unloading... ");
+        debug
+        {
+            import std.stdio;
+            write("DerelictPQ is unloading... ");
+        }
+        
         import core.memory;
         GC.collect();
         DerelictPQ.unload();
-        writeln("finished.");
+        
+        debug
+        {
+            writeln("finished.");
+        }
     }
 }
-version(BINDINGS_STATIC)
+else
 {
     public 
     {
