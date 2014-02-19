@@ -38,4 +38,6 @@ void main()
     writeln( "6: ", r[0][4].asArray.getValue(1).as!PGinteger );
     writeln( "7: ", r[0][4].asArray.isNULL(0) );
     writeln( "8: ", r[0][4].asArray.isNULL(2) );
+    
+    delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
 }
