@@ -88,7 +88,7 @@ to the `dub` parameters to generate release version.
 
 Example
 -------
-
+####Source
 ```D
 #!/usr/bin/env rdmd
 
@@ -133,7 +133,7 @@ void main()
 }
 
 ```
-##Compile and run
+####Compile and run
 Static bindings (requires libpq.a libcom_err.a):
 ```sh
 $ cd example
