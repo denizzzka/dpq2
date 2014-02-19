@@ -3,18 +3,18 @@
 import std.getopt;
 
 import dpq2.all;
-import conn = dpq2.connection: _unittest;
-import query = dpq2.query: _unittest;
-import answer = dpq2.answer: _unittest;
+import conn = dpq2.connection: integration_test;
+import query = dpq2.query: integration_test;
+import answer = dpq2.answer: integration_test;
 
 int main(string[] args)
 {
     string conninfo;
     getopt( args, "conninfo", &conninfo );
 
-    conn._unittest( conninfo );
-    query._unittest( conninfo );
-    answer._unittest( conninfo );
+    conn.integration_test( conninfo );
+    query.integration_test( conninfo );
+    answer.integration_test( conninfo );
     
     return 0;
 }

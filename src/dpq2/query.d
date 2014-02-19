@@ -179,7 +179,7 @@ final class Connection: BaseConnection
 }
 
 
-void _unittest( string connParam )
+void integration_test( string connParam )
 {
     auto conn = new Connection;
 	conn.connString = connParam;
