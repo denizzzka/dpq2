@@ -155,6 +155,7 @@ final class Connection: BaseConnection
             res = new Answer( r );
             res.checkAnswerForErrors();
         }
+        
         return res;
     }
     

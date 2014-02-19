@@ -43,7 +43,7 @@ struct Coords
 /// Answer
 class Answer // most members should be a const
 {
-    private PGresult* res; // TODO: should be mutable
+    private PGresult* res;
 
     nothrow invariant()
     {
