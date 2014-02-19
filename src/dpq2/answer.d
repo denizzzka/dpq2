@@ -43,7 +43,7 @@ struct Coords
 /// Answer
 class Answer // most members should be a const
 {
-    private PGresult* res; // TODO: should be mutable
+    private PGresult* res;
 
     nothrow invariant()
     {
@@ -60,7 +60,6 @@ class Answer // most members should be a const
         if( res )
         {
             PQclear(res);
-            //res = null; // FIXME: this is really need!
         }
         else
             assert( true, "double free!" );
@@ -490,7 +489,7 @@ immutable class exception : Exception
 }
 
 
-void _unittest( string connParam )
+void integration_test( string connParam )
 {
     import std.stdio;
 

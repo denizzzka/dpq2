@@ -1,8 +1,5 @@
 dpq2
 ====
-
-(Under development - undocumented functions should be used with care.)
-
 This is yet another attempt to create a good interface to PostgreSQL from the 
 D programming language.
 
@@ -75,8 +72,8 @@ to the `dub` parameters to generate release version.
 ####Dynamic bindings - release version
     $ dub --config=dynamic --build=release build
 
-####Unittest version (see below)
-    $ cd unittests
+####Integration testing (see below)
+    $ cd integration_tests
     $ dub
     $ dub --build=release
     $ dub --config=dynamic
@@ -166,34 +163,32 @@ second line
 8: true
 ```
 
-Unit tests
+Integration testing
 ----------
 
-Code contains embedded unit tests using a regular functions calls, not using
-standard D unit tests. It is because unit tests need to receive parameters of
-connection to the database in runtime.
+Code contains integration tests
 
-To perform unit test it is required access to any PostgreSQL server with
+Integration testing is required access to any PostgreSQL server with
 permissions to run SELECT statements.
 
-After building dpq2 with the unit tests file libdpq2 can be executed. Option "--conninfo"
-may contain connection string as described in [PostgreSQL documentation]
+After building dpq2-integration_tests file integration_tests/bin/dpq2-integration_tests can be executed.
+Option "--conninfo" may contain connection string as described in [PostgreSQL documentation]
 (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING).
 
 For default connection to DB type:
 
 ```sh
-$ cd unittests
+$ cd integration_tests
 $ dub
 ```
 Connection to usually available database "postgres":
 ```sh
-$ cd unittests
+$ cd integration_tests
 $ dub -- --conninfo "dbname=postgres"
 ```
 Network connection:
 ```sh
-$ cd unittests
+$ cd integration_tests
 $ dub -- --conninfo "host=123.45.67.89 dbname=testdb user=testuser password=123123"
 ```
 

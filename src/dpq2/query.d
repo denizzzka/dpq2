@@ -40,12 +40,6 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
-    /*
-    @system alias void delegate( Answer a ) answerHandler;
-    private shared answerHandler handler;
-    private void unusedHandler( Answer a ) { assert(false); }
-    */
-    
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
@@ -161,6 +155,7 @@ final class Connection: BaseConnection
             res = new Answer( r );
             res.checkAnswerForErrors();
         }
+        
         return res;
     }
     
@@ -184,7 +179,7 @@ final class Connection: BaseConnection
 }
 
 
-void _unittest( string connParam )
+void integration_test( string connParam )
 {
     auto conn = new Connection;
 	conn.connString = connParam;

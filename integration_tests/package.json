@@ -1,6 +1,6 @@
 {
-	"name": "dpq2-unittests",
-	"description": "Unit tests for usage high-level binding to the PostgreSQL database",
+	"name": "dpq2-integration_tests",
+	"description": "Integration testing of dpq2",
 	"homepage": "https://github.com/denizzzka/dpq2",
 	"license": "Boost",
 	"authors": [
@@ -8,7 +8,7 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"dpq2": {"version": "~master", "path": "../"}
+		"dpq2": {"version": "0.0.0", "path": "../"}
 	},
 	"configurations": [
 		{
