@@ -8,7 +8,7 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"dpq2": {"version": "~master", "path": "../"}
+		"dpq2": {"version": "0.0.0", "path": "../"}
 	},
 	"configurations": [
 		{
