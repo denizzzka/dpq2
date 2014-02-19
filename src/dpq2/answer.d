@@ -489,7 +489,7 @@ immutable class exception : Exception
 }
 
 
-void integration_test( string connParam )
+void _integration_test( string connParam )
 {
     import std.stdio;
 

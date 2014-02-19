@@ -129,7 +129,7 @@ class BaseConnection
     }
 }
 
-void integration_test( string connParam )
+void _integration_test( string connParam )
 {    
     assert( PQlibVersion() >= 90100 );
     
