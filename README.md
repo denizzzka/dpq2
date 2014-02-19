@@ -1,8 +1,5 @@
 dpq2
 ====
-
-(Under development - undocumented functions should be used with care.)
-
 This is yet another attempt to create a good interface to PostgreSQL from the 
 D programming language.
 
