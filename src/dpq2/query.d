@@ -40,12 +40,6 @@ struct queryArg
 /// Connection
 final class Connection: BaseConnection
 {
-    /*
-    @system alias void delegate( Answer a ) answerHandler;
-    private shared answerHandler handler;
-    private void unusedHandler( Answer a ) { assert(false); }
-    */
-    
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
