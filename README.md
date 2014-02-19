@@ -166,9 +166,7 @@ second line
 Integration testing
 ----------
 
-Code contains integration tests
-
-Integration testing is required access to any PostgreSQL server with
+Code contains integration tests. Integration testing requires access to any PostgreSQL server with
 permissions to run SELECT statements.
 
 After building dpq2-integration_tests file integration_tests/bin/dpq2-integration_tests can be executed.
