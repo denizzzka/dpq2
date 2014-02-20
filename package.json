@@ -1,6 +1,6 @@
 {
 	"name": "dpq2",
-	"description": "Middle-level binding to the PostgreSQL database",
+	"description": "Medium-level binding to the PostgreSQL database",
 	"homepage": "https://github.com/denizzzka/dpq2",
 	"license": "Boost",
 	"authors": [
