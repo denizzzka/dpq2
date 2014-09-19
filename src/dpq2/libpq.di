@@ -136,7 +136,7 @@ extern (C) nothrow
     PGresult* PQexecParams(PGconn* conn, const char* command, int nParams, Oid* paramTypes, const ubyte** paramValues, int* paramLengths, int* paramFormats, int resultFormat); // used!
     PGresult* PQgetResult(PGconn* conn); // used!
     int PQisBusy(PGconn* conn); // used!
-    immutable (PGnotify)* PQnotifies(PGconn* conn); // used!
+    PGnotify* PQnotifies(PGconn* conn); // used!
     int PQsetnonblocking(PGconn* conn, int arg); // used!
     int PQisthreadsafe(); //   
     int PQflush(PGconn* conn); // used!

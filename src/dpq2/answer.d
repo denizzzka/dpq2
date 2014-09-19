@@ -406,7 +406,7 @@ immutable struct Array
         return elementIsNULL[n];
     }
     
-    size_t coords2Serial( void* _argptr, TypeInfo[] _arguments ) immutable
+    size_t coords2Serial( va_list _argptr, TypeInfo[] _arguments ) immutable
     {
         assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
         
@@ -438,11 +438,11 @@ immutable struct Array
 }
 
 /// Notify
-immutable class notify
+class notify
 {
     private PGnotify* n;
 
-    this( immutable (PGnotify*) pgn ) immutable
+    this( PGnotify* pgn )
     {
         n = pgn;
         enforceEx!OutOfMemoryError(n, "Can't write notify");
