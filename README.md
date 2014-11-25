@@ -6,6 +6,9 @@ D programming language.
 It is doesn't add overhead to the original low level library libpq but
 make convenient use PostgreSQL from D.
 
+_upd: I slightly abandoned dpq2 because https://github.com/DSoftOut/pgator-backend was written. It contains better PG types support with many bug fixes (code rewritten from zero)._
+
+
 Features
 --------
 
