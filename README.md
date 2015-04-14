@@ -1,5 +1,7 @@
 dpq2
 ====
+[![Build Status](https://travis-ci.org/denizzzka/dpq2.svg?branch=master)](https://travis-ci.org/denizzzka/dpq2)
+
 This is yet another attempt to create a good interface to PostgreSQL from the 
 D programming language.
 
