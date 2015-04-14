@@ -6,7 +6,7 @@
 	"authors": [
 		"Denis Feklushkin", "Anton Gushcha"
 	],
-	"targetPath": "bin",
+	"sourcePath": ".",
 	"dependencies": {
 		"dpq2": {"version": "~master", "path": "../"}
 	},
