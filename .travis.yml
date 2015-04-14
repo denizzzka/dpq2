@@ -12,6 +12,6 @@ before_script:
 
 script:
   - dub test
-  - cd integration_tests && dub -- --conninfo "dbname=postgres"
+  - cd integration_tests && dub -- --conninfo "dbname=postgres" && cd -
   - dub build --build=release
-  - cd _example && dub
+  - cd example && dub && cd -
