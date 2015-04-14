@@ -17,7 +17,7 @@
 		{
 			"name": "dynamic",
 			"dependencies": {
-				"derelict-pq": "~master"
+				"derelict-pq": "~>1.0.1"
 			},
 			"versions": ["BINDINGS_DYNAMIC"]
 		}
