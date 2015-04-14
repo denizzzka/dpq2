@@ -1,0 +1,17 @@
+language: d
+
+d: dmd-2.066.1
+
+addons:
+  postgresql: 9.4
+
+services: postgresql
+
+before_script:
+  - psql -c 'create database "dpq2-test";' -U postgres
+
+script:
+  # compilation test for production
+  - dub test
+  - cd integration_tests && dub -- --conninfo "dbname=postgres"
+  - dub build --build=release
