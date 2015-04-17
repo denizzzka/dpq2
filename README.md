@@ -29,7 +29,7 @@ Building
 --------
 
 ####Requirements:
-Currently code builds with libpq 9.1.0 and higher, compiler dmd 2.062 and higher.
+Currently code builds with libpq 9.1.0 and higher.
 Bindings for libpq can be static or dynamic, compilation described below.
 
 Instead of explicitly installing dpq2, it is now recommended to use 
