@@ -443,11 +443,11 @@ const struct Array
 /// Notify
 class notify
 {
-    private immutable(PGnotify)* n;
+    private const (PGnotify)* n;
 
     this( immutable(PGnotify)* pgn )
     {
-        n = pgn;
+        n = cast(const (PGnotify)*) pgn;
         cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
     }
         
