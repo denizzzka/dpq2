@@ -313,6 +313,7 @@ struct Value
     }
 }
 
+/// Link to the cell of the answer table
 const struct Array
 {
     Oid OID;
