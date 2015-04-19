@@ -23,8 +23,9 @@ void main()
         "$1::double precision as double_field, "
         "$2::timestamp with time zone as time_field, "
         "$3::text, "
-        "$4::text, "
-        "$5::integer[] as array_field";
+        "$4::text as null_field, "
+        "array['first', 'second', 'NULL']::text[] as array_field, "
+        "$5::integer[] as multi_array";
     
     p.args.length = 5;
     
@@ -32,7 +33,7 @@ void main()
     p.args[1].value = "2012-10-04 11:00:21.227803+08";
     p.args[2].value = "first line\nsecond line";
     p.args[3].value = null;
-    p.args[4].value = "{1, 2, NULL}";
+    p.args[4].value = "{{1, 2, 3}, {4, 5, 6}}";
     
     auto r = conn.exec(p);
     
@@ -41,10 +42,11 @@ void main()
     writeln( "2: ", r[0][2].as!PGtext );
     writeln( "3.1 isNull: ", r[0][3].isNull );
     writeln( "3.2 isNULL: ", r[0].isNULL(3) );
-    writeln( "4.1: ", r[0][4].asArray[1].as!PGinteger );
-    writeln( "4.2: ", r[0][4].asArray.getValue(1).as!PGinteger );
+    writeln( "4.1: ", r[0][4].asArray[0].as!PGtext );
+    writeln( "4.2: ", r[0][4].asArray[1].as!PGtext );
     writeln( "4.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "4.4: ", r[0]["array_field"].asArray.isNULL(2) );
+    writeln( "5: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
     
     version(LDC) delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
 }
