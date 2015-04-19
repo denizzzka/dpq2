@@ -148,7 +148,7 @@ extern (C) nothrow
     int PQfnumber(const PGresult* res, immutable char* field_name); // used!
     valueFormat PQfformat(const PGresult* res, int field_num); // used!
     Oid PQftype(const PGresult* res, int field_num); // used!
-    immutable(ubyte)* PQgetvalue(const PGresult* res, int tup_num, int field_num); // used!
+    const (ubyte)* PQgetvalue(const PGresult* res, int tup_num, int field_num); // used!
     int PQgetlength(const PGresult* res, int tup_num, int field_num); // used!
     int PQgetisnull(const PGresult* res, int tup_num, int field_num); // used!
     char* PQcmdStatus( const PGresult* res); // used!

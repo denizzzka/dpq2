@@ -193,17 +193,17 @@ const struct Row
         return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
-    const (Value)* opIndex( size_t col ) const
+    Value opIndex( size_t col ) const
     {
         answer.assertCoords( Coords( row, col ) );
         
         auto v = PQgetvalue(answer.res, cast(int)row, cast(int)col);
         auto s = size( col );
-
+        
         debug
-            auto r = new const Value( v, s, answer.columnFormat( col ) );
+            auto r = const Value( v, s, answer.columnFormat( col ) );
         else
-            auto r = new const Value( v, s );
+            auto r = const Value( v, s );
         
         return r;
     }
@@ -232,7 +232,7 @@ const struct Value
     
     debug
     {
-        this( const ubyte* value, size_t valueSize, valueFormat f )
+        this( const (ubyte)* value, size_t valueSize, valueFormat f )
         {
             this.value = value[0..valueSize];
             format = f;
@@ -240,7 +240,7 @@ const struct Value
     }
     else
     {
-        this( const ubyte* value, size_t valueSize )
+        this( const (ubyte)* value, size_t valueSize )
         {
             this.value = value[0..valueSize];
         }
