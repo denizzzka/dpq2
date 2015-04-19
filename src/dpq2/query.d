@@ -20,7 +20,6 @@ struct queryParams
 struct queryArg
 {
     Oid type = 0;
-    valueFormat queryFormat = valueFormat.TEXT; /// Value format
     private ubyte[] valueBin;
     
     /// s can be null for SQL NULL value
@@ -132,7 +131,7 @@ final class Connection: BaseConnection
         for( int i = 0; i < p.args.length; ++i )
         {
             a.types[i] = p.args[i].type;
-            a.formats[i] = p.args[i].queryFormat;
+            a.formats[i] = valueFormat.TEXT;
             a.values[i] = p.args[i].valueBin.ptr;
             a.lengths[i] = p.args[i].valueBin.length;
         }
