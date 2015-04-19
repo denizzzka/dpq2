@@ -127,7 +127,7 @@ class Answer // most members should be a const
     /// Returns pointer to row of cells
     Row opIndex( const size_t row ) const
     {
-        return Row( this, row );
+        return const Row( this, row );
     }
     
     @property
@@ -165,12 +165,12 @@ class Answer // most members should be a const
     @property bool empty(){ return currRow >= rowCount; }
 }
 
-struct Row
+const struct Row
 {
     private const Answer answer;
     private immutable size_t row;
     
-    this( const Answer answer, const size_t row )
+    this( const Answer answer, size_t row )
     {
         answer.assertRow( row );
         
