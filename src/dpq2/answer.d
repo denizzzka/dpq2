@@ -385,7 +385,14 @@ const struct Array
         this.elementIsNULL = elementIsNULL.idup;
     }
     
+    /// Returns Value struct by index
+    Value opIndex(int n) const
+    {
+        return getValue(n);
+    }
+    
     /// Returns Value struct
+    /// Useful for multidimensional arrays
     const Value getValue( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
