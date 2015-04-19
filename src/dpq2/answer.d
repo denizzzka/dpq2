@@ -558,18 +558,18 @@ void _integration_test( string connParam )
 
 
     auto r = conn.exec( p );
-        
+    
     assert( r[0][0].as!PGsmallint == -32761 );
     assert( r[0][1].as!PGinteger == -2147483646 );
     assert( r[0][2].as!PGbigint == -9223372036854775806 );
     assert( r[0][3].as!PGreal == -12.3456f );
     assert( r[0][4].as!PGdouble_precision == -1234.56789012345 );
-
+    
     assert( r[0][5].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
     assert( r[0][6].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( r[0][7].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
     assert( r[0][8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-
+    
     assert( r[0][9].as!PGtext == "first line\nsecond line" );
     assert( r[0][10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
@@ -582,10 +582,18 @@ void _integration_test( string connParam )
     assert( !a.isNULL(2,1,2) );
     
     assert( r[0].isNULL(12) );
-    assert( r[0][12].as!PGsmallint );
+    
+    bool isNullFlag = false;
+    try
+        r[0][12].as!PGsmallint;
+    catch(AssertError)
+        isNullFlag = true;
+    finally
+        assert(isNullFlag);
+    
     assert( !r[0].isNULL(9) );
     assert( r[0][13].as!PGuuid.toString() == "8b9ab33a-96e9-499b-9c36-aad1fe86d640" );
-        
+    
     // Notifies test
     auto n = conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
