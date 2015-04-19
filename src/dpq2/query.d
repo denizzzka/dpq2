@@ -21,9 +21,9 @@ struct queryArg
 {
     Oid type = 0;
     valueFormat queryFormat = valueFormat.TEXT; /// Value format
-    ubyte[] valueBin; // can be null for SQL NULL value
+    private ubyte[] valueBin; // can be null for SQL NULL value
     
-    @property void valueStr( string s )
+    @property void value( string s )
     {
         if( s == null )
             valueBin = null;
@@ -196,7 +196,7 @@ void _integration_test( string connParam )
     
     queryArg[1] args;
     queryArg arg;
-    arg.valueStr = "абвгд";
+    arg.value = "абвгд";
     args[0] = arg;
     
     queryParams p;

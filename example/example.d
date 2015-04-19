@@ -15,29 +15,36 @@ void main()
         "123 as field_3, 456.78 as field_4"
         );
         
-    writeln( "1: ", s[0][3].as!PGtext );
+    writeln( "Text query result: ", s[0][3].as!PGtext );
 
-    // Binary query result
-    static queryArg arg;
+    // Query with separate arguments
     queryParams p;
-    p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "
-        "-1234.56789012345::double precision, "
-        "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
-        "'first line\nsecond line'::text, "
-        "NULL, "
-        "array[1, 2, NULL]::integer[]";
+        "$1::double precision, "
+        "$2::timestamp with time zone, "
+        "$3::text, "
+        "$4::smallint, "
+        "$5::integer[]";
     
+    p.args.length = 5;
     
-    auto r = conn.exec( p );    
- 
-    writeln( "2: ", r[0][0].as!PGdouble_precision );
-    writeln( "3: ", r[0][1].as!PGtime_stamp.toSimpleString );
-    writeln( "4: ", r[0][2].as!PGtext );
-    writeln( "5: ", r[0].isNULL(3) );
-    writeln( "6: ", r[0][4].asArray.getValue(1).as!PGinteger );
-    writeln( "7: ", r[0][4].asArray.isNULL(0) );
-    writeln( "8: ", r[0][4].asArray.isNULL(2) );
+    p.args[0].value = "-1234.56789012345";
+    p.args[1].value = "2012-10-04 11:00:21.227803+08";
+    p.args[2].value = "first line\nsecond line";
+    p.args[3].value = "213"; // should be null
+    p.args[4].value = "{1, 2, NULL}";
+    
+    p.resultFormat = valueFormat.BINARY;
+    
+    auto r = conn.exec(p);
+    
+    writeln( "0: ", r[0][0].as!PGdouble_precision );
+    writeln( "1: ", r[0][1].as!PGtime_stamp.toSimpleString );
+    writeln( "2: ", r[0][2].as!PGtext );
+    writeln( "3: ", r[0].isNULL(3) );
+    writeln( "4.1: ", r[0][4].asArray.getValue(1).as!PGinteger );
+    writeln( "4.2: ", r[0][4].asArray.isNULL(0) );
+    writeln( "4.3: ", r[0][4].asArray.isNULL(2) );
     
     delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
 }
