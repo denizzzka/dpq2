@@ -225,7 +225,7 @@ const struct Row
 }
 
 /// Result table's cell
-const struct Value // TODO: should be a const struct with const members without copy ability or class
+const struct Value
 {
     private const ubyte[] value;
     debug private const valueFormat format;
