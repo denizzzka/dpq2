@@ -23,7 +23,7 @@ void main()
         "$1::double precision, "
         "$2::timestamp with time zone, "
         "$3::text, "
-        "$4::smallint, "
+        "$4::text, "
         "$5::integer[]";
     
     p.args.length = 5;
@@ -31,7 +31,7 @@ void main()
     p.args[0].value = "-1234.56789012345";
     p.args[1].value = "2012-10-04 11:00:21.227803+08";
     p.args[2].value = "first line\nsecond line";
-    p.args[3].value = "213"; // should be null
+    p.args[3].value = null;
     p.args[4].value = "{1, 2, NULL}";
     
     p.resultFormat = valueFormat.BINARY;
