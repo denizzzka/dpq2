@@ -251,9 +251,11 @@ struct Value
 
     /// Returns cell value as native string type
     @property T as(T)() const
-    if( isSomeString!(T) )
+    if(is(T == string))
     {
-        return to!T( cast(immutable(char)*) value.ptr );
+        import std.utf: toUTF8;
+        
+        return toUTF8(cast(const(char[])) value);
     }
     
     /// Returns cell value as native integer or decimal values
@@ -425,7 +427,7 @@ const struct Array
         {
             assert( _arguments[i] == typeid(int) );
             args[i] = va_arg!(int)(_argptr);
-            enforce( dimsSize[i] > args[i] ); // TODO: here is need exception, not enforce
+            enforce(dimsSize[i] > args[i], "Out of range"); // TODO: here is need exception, not enforce
         }
         
         // Calculates serial number of the element

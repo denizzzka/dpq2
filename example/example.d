@@ -24,7 +24,7 @@ void main()
         "$2::timestamp with time zone as time_field, "
         "$3::text, "
         "$4::text as null_field, "
-        "array['first', 'second', 'NULL']::text[] as array_field, "
+        "array['first', 'second', NULL]::text[] as array_field, "
         "$5::integer[] as multi_array";
     
     p.args.length = 5;
