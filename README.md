@@ -84,7 +84,8 @@ void main()
 ####Compile and run:
 ```
 $ cd example
-$ dub
+$ dub build --build=release
+$ sudo -u postgres ./dpq2-example
 Text query result: 456.78
 0: -1234.57
 1: 0013-Oct-05 03:00:21.227803Z
@@ -94,7 +95,6 @@ second line
 4.1: 2
 4.2: false
 4.3: true
-DerelictPQ is unloading... finished.
 ```
 
 TODO
