@@ -32,7 +32,7 @@ to the `dub` parameters to generate dynamic bindings.
 
 Example
 -------
-####Source
+####Source:
 ```D
 #!/usr/bin/env rdmd
 
