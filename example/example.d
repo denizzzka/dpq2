@@ -39,11 +39,11 @@ void main()
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
     writeln( "1: ", r[0]["time_field"].as!PGtime_stamp.toSimpleString );
     writeln( "2: ", r[0][2].as!PGtext );
-    writeln( "3.1 isNULL: ", r[0].isNULL(3) );
-    writeln( "3.2 isNull: ", r[0][3].isNull );
+    writeln( "3.1 isNull: ", r[0][3].isNull );
+    writeln( "3.2 isNULL: ", r[0].isNULL(3) );
     writeln( "4.1: ", r[0][4].asArray[1].as!PGinteger );
     writeln( "4.2: ", r[0][4].asArray.getValue(1).as!PGinteger );
-    writeln( "4.3: ", r[0]["array_field"].asArray.isNULL(0) );
+    writeln( "4.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "4.4: ", r[0]["array_field"].asArray.isNULL(2) );
     
     version(LDC) delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
