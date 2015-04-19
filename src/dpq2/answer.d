@@ -21,6 +21,7 @@ import std.traits;
 import std.bitmanip: bigEndianToNative;
 import std.datetime;
 import std.uuid;
+import std.typecons: Nullable;
 
 // Supported PostgreSQL binary types
 alias short   PGsmallint; /// smallint
@@ -71,7 +72,7 @@ class Answer // most members should be a const
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
-            throw new immutable exception( exception.exceptionTypes.UNDEFINED_FIXME,
+            throw new exception( exception.exceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
         }
     }
@@ -119,7 +120,7 @@ class Answer // most members should be a const
     {    
         size_t n = PQfnumber(res, toStringz(columnName));
         if( n == -1 )
-            throw new immutable exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
+            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
                                 "Column '"~columnName~"' is not found");
         return n;
     }
@@ -193,17 +194,19 @@ const struct Row
         return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
-    Value opIndex( size_t col ) const
+    Nullable!Value opIndex( size_t col ) const
     {
         answer.assertCoords( Coords( row, col ) );
         
         auto v = PQgetvalue(answer.res, cast(int)row, cast(int)col);
         auto s = size( col );
         
+        Nullable!Value r;
+        
         debug
-            auto r = const Value( v, s, answer.columnFormat( col ) );
+            r = Value( v, s, answer.columnFormat( col ) );
         else
-            auto r = const Value( v, s );
+            r = Value( v, s );
         
         return r;
     }
@@ -225,16 +228,16 @@ const struct Row
 }
 
 /// Link to the cell of the answer table
-const struct Value
+struct Value
 {
-    private const ubyte[] value;
-    debug private const valueFormat format;
+    private ubyte[] value;
+    debug private valueFormat format;
     
     debug
     {
         this( const (ubyte)* value, size_t valueSize, valueFormat f )
         {
-            this.value = value[0..valueSize];
+            this.value = cast(ubyte[]) value[0..valueSize];
             format = f;
         }
     }
@@ -242,18 +245,18 @@ const struct Value
     {
         this( const (ubyte)* value, size_t valueSize )
         {
-            this.value = value[0..valueSize];
+            this.value = cast(ubyte[]) value[0..valueSize];
         }
     }
     
     this( const ubyte[] value )
     {
-        this.value = value;
+        this.value = cast(ubyte[]) value;
         debug format = valueFormat.BINARY;
     }
 
     /// Returns value as bytes from binary formatted field
-    @property T as(T)()
+    @property T as(T)() const
     if( is( T == const(ubyte[]) ) )
     {
         debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
@@ -261,7 +264,7 @@ const struct Value
     }
 
     /// Returns cell value as native string type
-    @property T as(T)()
+    @property T as(T)() const
     if( isSomeString!(T) )
     {
         return to!T( cast(immutable(char)*) value.ptr );
@@ -270,7 +273,7 @@ const struct Value
     /// Returns cell value as native integer or decimal values
     ///
     /// Postgres type "numeric" is oversized and not supported by now
-    @property T as(T)()
+    @property T as(T)() const
     if( isNumeric!(T) )
     {
         debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
@@ -281,7 +284,7 @@ const struct Value
     }
     
     /// Returns cell value as native date and time
-    @property T as(T)()
+    @property T as(T)() const
     if( is( T == SysTime ) )
     {
         ulong pre_time = as!(ulong)();
@@ -290,7 +293,7 @@ const struct Value
     }
     
     /// Returns UUID as native UUID value
-    @property T as(T)()
+    @property T as(T)() const
     if( is( T == UUID ) )
     {
         assert( value.length == 16, "Value length isn't equal to UUID size" );
@@ -303,7 +306,7 @@ const struct Value
     @property
     Array asArray() const
     {
-        return const Array( &this );
+        return const Array(this);
     }
 }
 
@@ -316,7 +319,7 @@ const struct Array
     
     private
     {
-        Value* cell;
+        Value cell;
         ubyte[][] elements;
         bool[] elementIsNULL;
         
@@ -334,7 +337,7 @@ const struct Array
         }
     }
     
-    this( const(Value)* c )
+    this(in Value c)
     {
         cell = c;
         debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
@@ -399,7 +402,7 @@ const struct Array
     const Value getValue( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
-        return const Value( elements[n] );
+        return Value( elements[n] );
     }
     
     /// Value NULL checking
@@ -473,7 +476,7 @@ class notify
 
 
 /// Exception
-immutable class exception : Exception
+class exception : Exception
 {    
     /// Exception types
     enum exceptionTypes
