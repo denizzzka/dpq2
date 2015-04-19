@@ -224,7 +224,7 @@ const struct Row
     }
 }
 
-/// Result table's cell
+/// Link to the cell of the answer table
 const struct Value
 {
     private const ubyte[] value;
@@ -301,9 +301,9 @@ const struct Value
     }
     
     @property
-    const (Array*) asArray()
+    Array asArray() const
     {
-        return new const Array( &this );
+        return const Array( &this );
     }
 }
 
@@ -334,7 +334,7 @@ const struct Array
         }
     }
     
-    this( const(Value*) c )
+    this( const(Value)* c )
     {
         cell = c;
         debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
