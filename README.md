@@ -79,6 +79,8 @@ void main()
     writeln( "4.1: ", r[0][4].asArray.getValue(1).as!PGinteger );
     writeln( "4.2: ", r[0][4].asArray.isNULL(0) );
     writeln( "4.3: ", r[0][4].asArray.isNULL(2) );
+    
+    version(LDC) delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
 }
 ```
 ####Compile and run:
