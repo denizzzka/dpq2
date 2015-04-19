@@ -19,3 +19,4 @@ script:
   - cd integration_tests && dub -- --conninfo "dbname=postgres" && cd -
   - dub build --build=release
   - cd example && dub && cd -
+  - cd example && dub --build=release && cd -
