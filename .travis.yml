@@ -14,6 +14,7 @@ before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script:
+  - dub build
   - dub test
   - cd integration_tests && dub -- --conninfo "dbname=postgres" && cd -
   - dub build --build=release

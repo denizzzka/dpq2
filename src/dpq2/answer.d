@@ -230,17 +230,20 @@ immutable struct Value // TODO: should be a const struct with const members with
     private ubyte[] value;
     debug private valueFormat format;
     
-    version(Debug){} else
-    this( immutable (ubyte)* value, size_t valueSize ) immutable
-    {
-        this.value = value[0..valueSize];
-    }
-    
     debug
-    this( immutable (ubyte)* value, size_t valueSize, valueFormat f ) immutable
     {
-        this.value = value[0..valueSize];
-        format = f;
+        this( immutable (ubyte)* value, size_t valueSize, valueFormat f ) immutable
+        {
+            this.value = value[0..valueSize];
+            format = f;
+        }
+    }
+    else
+    {
+        this( immutable (ubyte)* value, size_t valueSize ) immutable
+        {
+            this.value = value[0..valueSize];
+        }
     }
     
     this( immutable (ubyte[]) value ) immutable
