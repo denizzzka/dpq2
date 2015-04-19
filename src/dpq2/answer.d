@@ -197,12 +197,7 @@ const struct Row
         Nullable!Value r;
         
         if(!isNULL(col))
-        {
-            debug
-                r = Value( v, s, answer.columnFormat( col ) );
-            else
-                r = Value( v, s );
-        }
+            r = Value( v, s, answer.columnFormat( col ) );
         
         return r;
     }
@@ -229,20 +224,10 @@ struct Value
     private ubyte[] value;
     private valueFormat format;
     
-    debug
+    this( const (ubyte)* value, size_t valueSize, valueFormat f )
     {
-        this( const (ubyte)* value, size_t valueSize, valueFormat f )
-        {
-            this.value = cast(ubyte[]) value[0..valueSize];
-            format = f;
-        }
-    }
-    else
-    {
-        this( const (ubyte)* value, size_t valueSize )
-        {
-            this.value = cast(ubyte[]) value[0..valueSize];
-        }
+        this.value = cast(ubyte[]) value[0..valueSize];
+        format = f;
     }
     
     this( const ubyte[] value )
