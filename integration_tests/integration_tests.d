@@ -11,9 +11,13 @@ int main(string[] args)
 {
     string conninfo;
     getopt( args, "conninfo", &conninfo );
-
+    
+    import std.stdio;
+    writeln("conn");
     conn._integration_test( conninfo );
+    writeln("query");
     query._integration_test( conninfo );
+    writeln("answer");
     answer._integration_test( conninfo );
     
     return 0;

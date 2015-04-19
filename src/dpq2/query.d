@@ -107,7 +107,7 @@ final class Connection: BaseConnection
     notify getNextNotify()
     {
         consumeInput();
-        auto n = cast(const(PGnotify)*) PQnotifies(conn);
+        auto n = PQnotifies(conn);
         return n is null ? null : new notify( n );
     }
     

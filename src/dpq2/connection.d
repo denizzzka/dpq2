@@ -123,11 +123,16 @@ class BaseConnection
 }
 
 void _integration_test( string connParam )
-{    
-    assert( PQlibVersion() >= 90100 );
+{
+    import std.stdio;
+    writeln("conn =====");
     
+    assert( PQlibVersion() >= 90100 );
+    writeln("conn.new base");
     auto c = new BaseConnection;
 	c.connString = connParam;
+    writeln("conn.begin");
     c.connect();
+    writeln("conn.disconnect");
     c.disconnect();
 }

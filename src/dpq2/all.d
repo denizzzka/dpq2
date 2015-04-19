@@ -1,28 +1,25 @@
 module dpq2.all;
 
-version(BINDINGS_DYNAMIC)
+shared static this()
 {
-    shared static this()
-    {
-        DerelictPQ.load();
-    }
+    DerelictPQ.load();
+}
 
-    shared static ~this()
+shared static ~this()
+{
+    debug
     {
-        debug
-        {
-            import std.stdio;
-            write("DerelictPQ is unloading... ");
-        }
-        
-        import core.memory;
-        GC.collect();
-        DerelictPQ.unload();
-        
-        debug
-        {
-            writeln("finished.");
-        }
+        import std.stdio;
+        write("DerelictPQ is unloading... ");
+    }
+    
+    import core.memory;
+    GC.collect();
+    DerelictPQ.unload();
+    
+    debug
+    {
+        writeln("finished.");
     }
 }
 

@@ -16,8 +16,7 @@
 			"libs": ["pq"]
 		},
 		{
-			"name": "dynamic",
-			"versions": ["BINDINGS_DYNAMIC"]
+			"name": "dynamic"
 		}
 	]
 }
