@@ -9,15 +9,15 @@ void main()
     conn.connString = "dbname=postgres";
     conn.connect();
 
-    // Text query result
+    // Only text query result can be obtained by this call:
     auto s = conn.exec(
         "SELECT now() as current_time, 'abc'::text as field_name, "
         "123 as field_3, 456.78 as field_4"
         );
-        
+    
     writeln( "Text query result: ", s[0][3].as!PGtext );
-
-    // Query with separate arguments
+    
+    // Separated arguments query with binary result:
     queryParams p;
     p.sqlCommand = "SELECT "
         "$1::double precision, "
@@ -34,17 +34,13 @@ void main()
     p.args[3].value = null;
     p.args[4].value = "{1, 2, NULL}";
     
-    p.resultFormat = valueFormat.BINARY;
-    
     auto r = conn.exec(p);
     
     writeln( "0: ", r[0][0].as!PGdouble_precision );
     writeln( "1: ", r[0][1].as!PGtime_stamp.toSimpleString );
     writeln( "2: ", r[0][2].as!PGtext );
-    writeln( "3: ", r[0].isNULL(3) );
+    writeln( "3 isNULL: ", r[0].isNULL(3) );
     writeln( "4.1: ", r[0][4].asArray.getValue(1).as!PGinteger );
     writeln( "4.2: ", r[0][4].asArray.isNULL(0) );
     writeln( "4.3: ", r[0][4].asArray.isNULL(2) );
-    
-    delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
 }

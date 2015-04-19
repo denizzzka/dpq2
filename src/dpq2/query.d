@@ -13,7 +13,7 @@ struct queryParams
 {
     string sqlCommand; /// SQL command
     queryArg[] args; /// SQL command arguments
-    valueFormat resultFormat = valueFormat.TEXT; /// Result value format
+    valueFormat resultFormat = valueFormat.BINARY; /// Result value format
 }
 
 /// Query argument
@@ -21,8 +21,9 @@ struct queryArg
 {
     Oid type = 0;
     valueFormat queryFormat = valueFormat.TEXT; /// Value format
-    private ubyte[] valueBin; // can be null for SQL NULL value
+    private ubyte[] valueBin;
     
+    /// s can be null for SQL NULL value
     @property void value( string s )
     {
         if( s == null )

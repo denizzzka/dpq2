@@ -227,7 +227,7 @@ const struct Row
 struct Value
 {
     private ubyte[] value;
-    debug private valueFormat format;
+    private valueFormat format;
     
     debug
     {
@@ -248,14 +248,14 @@ struct Value
     this( const ubyte[] value )
     {
         this.value = cast(ubyte[]) value;
-        debug format = valueFormat.BINARY;
+        format = valueFormat.BINARY;
     }
 
     /// Returns value as bytes from binary formatted field
     @property T as(T)() const
     if( is( T == const(ubyte[]) ) )
     {
-        debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+        enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
         return value;
     }
 
@@ -272,8 +272,8 @@ struct Value
     @property T as(T)() const
     if( isNumeric!(T) )
     {
-        debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
-        assert( value.length == T.sizeof, "Value length isn't equal to type size" );
+        enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+        enforce( value.length == T.sizeof, "Value length isn't equal to type size" );
         
         ubyte[T.sizeof] s = value[0..T.sizeof];
         return bigEndianToNative!(T)( s );
@@ -337,7 +337,7 @@ const struct Array
     this(in Value c)
     {
         cell = c;
-        debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
+        enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
         
         arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
