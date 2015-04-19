@@ -35,7 +35,7 @@ struct Coords
 }
 
 /// Answer
-class Answer // most members should be a const
+class Answer
 {
     private const (PGresult*) res;
 
@@ -83,7 +83,7 @@ class Answer // most members should be a const
      * not free the result directly. It will be freed when the associated 
      * PGresult handle is passed to PQclear.
      */
-    @property string cmdStatus()
+    @property string cmdStatus() const
     {
         return to!string( PQcmdStatus(res) );
     }
