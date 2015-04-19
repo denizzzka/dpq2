@@ -37,7 +37,7 @@ else
 {
     public 
     {
-        import dpq2.libpq;
+        import derelict.pq.pq;
         import dpq2.answer;
         import dpq2.connection;
         import dpq2.query;

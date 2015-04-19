@@ -7,7 +7,7 @@ version(BINDINGS_DYNAMIC)
 }
 else
 {
-    import dpq2.libpq;
+    import derelict.pq.pq;
 }
 
 import dpq2.answer;

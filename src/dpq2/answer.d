@@ -2,16 +2,9 @@ module dpq2.answer;
 
 @trusted:
 
-version(BINDINGS_DYNAMIC)
-{
-    import derelict.pq.pq;
-}
-else
-{
-    import dpq2.libpq;
-}
-
 public import dpq2.query;
+
+import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
@@ -450,12 +443,12 @@ const struct Array
 /// Notify
 class notify
 {
-    private PGnotify* n;
+    private immutable(PGnotify)* n;
 
-    this( PGnotify* pgn )
+    this( immutable(PGnotify)* pgn )
     {
         n = pgn;
-        enforceEx!OutOfMemoryError(n, "Can't write notify");
+        cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
     }
         
     ~this()
