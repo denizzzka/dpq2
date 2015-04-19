@@ -119,7 +119,7 @@ class Answer
     }
     
     /// Returns pointer to row of cells
-    Row opIndex( const size_t row ) const
+    Row opIndex(in size_t row) const
     {
         return const Row( this, row );
     }
@@ -187,7 +187,7 @@ const struct Row
         return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
-    Nullable!Value opIndex( size_t col ) const
+    Nullable!Value opIndex(in size_t col) const
     {
         answer.assertCoords( Coords( row, col ) );
         
@@ -200,6 +200,11 @@ const struct Row
             r = Value( v, s, answer.columnFormat( col ) );
         
         return r;
+    }
+    
+    Nullable!Value opIndex(in string column) const
+    {
+        return opIndex(columnNum(column));
     }
     
     /// Returns column number by field name
@@ -507,6 +512,7 @@ void _integration_test( string connParam )
     assert( !e[0].isNULL(0) );
     assert( e[2].isNULL(0) );
     assert( e.columnNum( "field_name" ) == 1 );
+    assert( e[1]["field_name"].as!PGtext == "def" );
 
     // Value properties test
     static queryArg arg;
