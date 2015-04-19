@@ -1,17 +1,12 @@
 module dpq2.query;
-@trusted:
 
-version(BINDINGS_DYNAMIC)
-{
-    import derelict.pq.pq;
-}
-else
-{
-    import derelict.pq.pq;
-}
+@trusted:
 
 import dpq2.answer;
 public import dpq2.connection;
+
+import derelict.pq.pq;
+
 
 /// Query parameters
 struct queryParams

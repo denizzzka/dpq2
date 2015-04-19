@@ -2,14 +2,6 @@ module dpq2.all;
 
 version(BINDINGS_DYNAMIC)
 {
-    public 
-    {
-        import derelict.pq.pq;
-        import dpq2.answer;
-        import dpq2.connection;
-        import dpq2.query;
-    }
-
     shared static this()
     {
         DerelictPQ.load();
@@ -33,13 +25,12 @@ version(BINDINGS_DYNAMIC)
         }
     }
 }
-else
+
+public
 {
-    public 
-    {
-        import derelict.pq.pq;
-        import dpq2.answer;
-        import dpq2.connection;
-        import dpq2.query;
-    }
+    import derelict.pq.pq;
+    
+    import dpq2.answer;
+    import dpq2.connection;
+    import dpq2.query;
 }

@@ -1,17 +1,10 @@
-
 module dpq2.connection;
+
 @trusted:
 
-version(BINDINGS_DYNAMIC)
-{
-    import derelict.pq.pq;
-}
-else
-{
-    import derelict.pq.pq;
-}
-    
 import dpq2.answer;
+
+import derelict.pq.pq;
 
 import std.conv: to;
 import std.string: toStringz;
