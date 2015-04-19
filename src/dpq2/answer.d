@@ -253,9 +253,7 @@ struct Value
     @property T as(T)() const
     if(is(T == string))
     {
-        import std.utf: toUTF8;
-        
-        return toUTF8(cast(const(char[])) value);
+        return cast(const(char[])) value;
     }
     
     /// Returns cell value as native integer or decimal values
