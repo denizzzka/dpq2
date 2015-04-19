@@ -203,10 +203,13 @@ const struct Row
         
         Nullable!Value r;
         
-        debug
-            r = Value( v, s, answer.columnFormat( col ) );
-        else
-            r = Value( v, s );
+        if(!isNULL(col))
+        {
+            debug
+                r = Value( v, s, answer.columnFormat( col ) );
+            else
+                r = Value( v, s );
+        }
         
         return r;
     }
