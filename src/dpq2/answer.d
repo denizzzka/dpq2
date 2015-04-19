@@ -386,17 +386,23 @@ const struct Array
     }
     
     /// Returns Value struct by index
-    Value opIndex(int n) const
+    Nullable!Value opIndex(int n) const
     {
         return getValue(n);
     }
     
     /// Returns Value struct
     /// Useful for multidimensional arrays
-    const Value getValue( ... )
+    Nullable!Value getValue( ... ) const
     {
         auto n = coords2Serial( _argptr, _arguments );
-        return Value( elements[n] );
+        
+        Nullable!Value r;
+        
+        if(!elementIsNULL[n])
+            r = Value( elements[n] );
+        
+        return r;
     }
     
     /// Value NULL checking
