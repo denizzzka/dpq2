@@ -29,7 +29,7 @@ alias long    PGbigint; /// bigint
 alias float   PGreal; /// real
 alias double  PGdouble_precision; /// double precision
 alias string  PGtext; /// text
-alias immutable ubyte[] PGbytea; /// bytea
+alias const ubyte[] PGbytea; /// bytea
 alias SysTime PGtime_stamp; /// time stamp with/without timezone
 alias UUID    PGuuid; /// UUID
 
@@ -193,7 +193,7 @@ const struct Row
         return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
-    immutable (Value)* opIndex( size_t col ) const
+    const (Value)* opIndex( size_t col ) const
     {
         answer.assertCoords( Coords( row, col ) );
         
@@ -201,9 +201,9 @@ const struct Row
         auto s = size( col );
 
         debug
-            auto r = new immutable Value( v, s, answer.columnFormat( col ) );
+            auto r = new const Value( v, s, answer.columnFormat( col ) );
         else
-            auto r = new immutable Value( v, s );
+            auto r = new const Value( v, s );
         
         return r;
     }
@@ -225,14 +225,14 @@ const struct Row
 }
 
 /// Result table's cell
-immutable struct Value // TODO: should be a const struct with const members without copy ability or class
+const struct Value // TODO: should be a const struct with const members without copy ability or class
 {
-    private ubyte[] value;
-    debug private valueFormat format;
+    private const ubyte[] value;
+    debug private const valueFormat format;
     
     debug
     {
-        this( immutable (ubyte)* value, size_t valueSize, valueFormat f ) immutable
+        this( const ubyte* value, size_t valueSize, valueFormat f )
         {
             this.value = value[0..valueSize];
             format = f;
@@ -240,13 +240,13 @@ immutable struct Value // TODO: should be a const struct with const members with
     }
     else
     {
-        this( immutable (ubyte)* value, size_t valueSize ) immutable
+        this( const ubyte* value, size_t valueSize )
         {
             this.value = value[0..valueSize];
         }
     }
     
-    this( immutable (ubyte[]) value ) immutable
+    this( const ubyte[] value )
     {
         this.value = value;
         debug format = valueFormat.BINARY;
@@ -254,7 +254,7 @@ immutable struct Value // TODO: should be a const struct with const members with
 
     /// Returns value as bytes from binary formatted field
     @property T as(T)()
-    if( is( T == immutable(ubyte[]) ) )
+    if( is( T == const(ubyte[]) ) )
     {
         debug enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
         return value;
@@ -301,13 +301,13 @@ immutable struct Value // TODO: should be a const struct with const members with
     }
     
     @property
-    immutable (Array*) asArray()
+    const (Array*) asArray()
     {
-        return new immutable Array( &this );
+        return new const Array( &this );
     }
 }
 
-immutable struct Array
+const struct Array
 {
     Oid OID;
     int nDims; /// Number of dimensions
@@ -334,7 +334,7 @@ immutable struct Array
         }
     }
     
-    this( immutable(Value*) c ) immutable
+    this( const(Value*) c )
     {
         cell = c;
         debug enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
@@ -368,7 +368,7 @@ immutable struct Array
         nElems = n_elems;
         dimsSize = ds.idup;
         
-        auto elements = new immutable (ubyte)[][ nElems ];
+        auto elements = new const (ubyte)[][ nElems ];
         auto elementIsNULL = new bool[ nElems ];
         
         // Looping through all elements and fill out index of them
@@ -391,19 +391,19 @@ immutable struct Array
             elements[i] = cell.value[curr_offset .. curr_offset + size];
             curr_offset += size;
         }
-        this.elements = elements.idup;
+        this.elements = elements.dup;
         this.elementIsNULL = elementIsNULL.idup;
     }
     
     /// Returns Value struct
-    immutable (Value)* getValue( ... ) const
+    const Value getValue( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
-        return new immutable Value( elements[n] );
+        return const Value( elements[n] );
     }
     
     /// Value NULL checking
-    bool isNULL( ... ) immutable
+    bool isNULL( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
         return elementIsNULL[n];
