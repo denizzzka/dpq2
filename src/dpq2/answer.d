@@ -586,7 +586,7 @@ void _integration_test( string connParam )
     
     bool isNullFlag = false;
     try
-        r[0][12].as!PGsmallint;
+        cast(void) r[0][12].as!PGsmallint;
     catch(AssertError)
         isNullFlag = true;
     finally
