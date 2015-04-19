@@ -65,9 +65,9 @@ class Answer // most members should be a const
             assert( true, "double free!" );
     }
     
-    package void checkAnswerForErrors()
+    package void checkAnswerForErrors() const
     {
-        enforceEx!OutOfMemoryError(res, "Can't write query result");
+        cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
@@ -77,7 +77,7 @@ class Answer // most members should be a const
     }
     
     @property
-    ExecStatusType status()
+    ExecStatusType status() const
     {
         return PQresultStatus(res);
     }
@@ -137,7 +137,7 @@ class Answer // most members should be a const
     }
     
     @property
-    private string resultErrorMessage()
+    private string resultErrorMessage() const
     {
         return to!string( PQresultErrorMessage(res) );
     }
