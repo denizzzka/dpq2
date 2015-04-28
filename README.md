@@ -2,7 +2,7 @@ dpq2
 ====
 [![Build Status](https://travis-ci.org/denizzzka/dpq2.svg?branch=master)](https://travis-ci.org/denizzzka/dpq2)
 
-This is yet another attempt to create a good interface to PostgreSQL from the 
+This is yet another attempt to create a good interface to PostgreSQL for the 
 D programming language.
 
 It adds only tiny overhead to the original low level library libpq but
