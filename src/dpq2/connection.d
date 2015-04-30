@@ -55,7 +55,7 @@ class BaseConnection
     private void setNonBlocking( bool state )
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
-            throw new exception();
+            throw new ConnException();
     }
     
 	/// Connect to DB
@@ -68,7 +68,7 @@ class BaseConnection
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
         if( !nonBlocking && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
-            throw new exception();
+            throw new ConnException();
         
         readyForQuery = true;
     }
@@ -86,13 +86,13 @@ class BaseConnection
     package void consumeInput()
     {
         const size_t r = PQconsumeInput( conn );
-        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
+        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnException();
     }
     
     package bool flush()
     {
         auto r = PQflush(conn);
-        if( r == -1 ) throw new exception();
+        if( r == -1 ) throw new ConnException();
         return r == 0;
     }
     
@@ -109,7 +109,7 @@ class BaseConnection
     }
     
     /// Exception
-    class exception : Exception
+    class ConnException : Exception
     {
         /// libpq connection status
         immutable ConnStatusType statusType;
