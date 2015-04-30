@@ -65,7 +65,7 @@ class Answer
         if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
              status == ExecStatusType.PGRES_TUPLES_OK))
         {
-            throw new exception( exception.exceptionTypes.UNDEFINED_FIXME,
+            throw new AnswerException( AnswerException.exceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
         }
     }
@@ -113,7 +113,7 @@ class Answer
     {    
         size_t n = PQfnumber(res, toStringz(columnName));
         if( n == -1 )
-            throw new exception(exception.exceptionTypes.COLUMN_NOT_FOUND,
+            throw new AnswerException(AnswerException.exceptionTypes.COLUMN_NOT_FOUND,
                                 "Column '"~columnName~"' is not found");
         return n;
     }
@@ -476,7 +476,7 @@ class Notify
 
 
 /// Exception
-class exception : Exception
+class AnswerException : Exception
 {    
     /// Exception types
     enum exceptionTypes
