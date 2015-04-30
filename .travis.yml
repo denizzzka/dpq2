@@ -23,8 +23,8 @@ script:
   - dub build
   - dub test
   - cd integration_tests && dub -- --conninfo "dbname=postgres" && cd -
-  - ~/Dscanner/bin/dscanner -s
-  - ~/Dscanner/bin/dscanner -S
+  - if [[ -x "~/Dscanner/bin/dscanner" ]]; then ~/Dscanner/bin/dscanner -s; fi
+  - if [[ -x "~/Dscanner/bin/dscanner" ]]; then ~/Dscanner/bin/dscanner -S; fi
   - dub build --build=release
   - cd example && dub && cd -
   - cd example && dub --build=release && cd -
