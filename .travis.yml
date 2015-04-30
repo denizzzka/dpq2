@@ -10,6 +10,12 @@ addons:
 
 services: postgresql
 
+before_install:
+  - git clone --depth=1 --recursive git@github.com:Hackerpilot/Dscanner.git ~/Dscanner
+
+install:
+  - make -C ~/Dscanner
+
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
@@ -17,6 +23,8 @@ script:
   - dub build
   - dub test
   - cd integration_tests && dub -- --conninfo "dbname=postgres" && cd -
+  - ~/Dscanner/bin/dscanner -s
+  - ~/Dscanner/bin/dscanner -S
   - dub build --build=release
   - cd example && dub && cd -
   - cd example && dub --build=release && cd -
