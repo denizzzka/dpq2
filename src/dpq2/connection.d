@@ -85,7 +85,7 @@ class BaseConnection
 
     package void consumeInput()
     {
-        size_t r = PQconsumeInput( conn );
+        const size_t r = PQconsumeInput( conn );
         if( r != ConsumeResult.PQ_CONSUME_OK ) throw new exception();
     }
     
