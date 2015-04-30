@@ -611,8 +611,5 @@ void _integration_test( string connParam )
     
     // Range test
     foreach( elem; r )
-    {
-        import std.stdio;
         assert( elem[0].as!PGsmallint == -32761 );
-    }
 }
