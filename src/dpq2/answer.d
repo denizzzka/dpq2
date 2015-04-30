@@ -557,9 +557,9 @@ void _integration_test( string connParam )
 
     auto r = conn.exec( p );
     
-    assert( r[0][0].as!PGsmallint == -32761 );
-    assert( r[0][1].as!PGinteger == -2147483646 );
-    assert( r[0][2].as!PGbigint == -9223372036854775806 );
+    assert( r[0][0].as!PGsmallint == -32_761 );
+    assert( r[0][1].as!PGinteger == -2_147_483_646 );
+    assert( r[0][2].as!PGbigint == -9_223_372_036_854_775_806 );
     assert( r[0][3].as!PGreal == -12.3456f );
     assert( r[0][4].as!PGdouble_precision == -1234.56789012345 );
     
