@@ -14,6 +14,7 @@ before_install:
   - git clone --depth=1 --recursive https://github.com/Hackerpilot/Dscanner.git ~/Dscanner
 
 install:
+  - echo ${DC}
   - if [ ${DC}="dmd" ]; then make -C ~/Dscanner; fi
 
 before_script:
