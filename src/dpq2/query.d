@@ -178,14 +178,14 @@ void _integration_test( string connParam )
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
-
+    
     string sql_query =
     "select now() as time, 'abc'::text as string, 123, 456.78\n"
     "union all\n"
     "select now(), 'абвгд'::text, 777, 910.11\n"
     "union all\n"
     "select NULL, 'ijk'::text, 789, 12345.115345";
-
+    
     auto r = conn.exec( sql_query );
     
     string sql_query2 =
@@ -202,8 +202,8 @@ void _integration_test( string connParam )
     queryParams p;
     p.sqlCommand = sql_query2;
     p.args = args[];
-
-    auto r2 = conn.exec( p );
-
+    
+    conn.exec( p );
+    
     conn.disconnect();
 }
