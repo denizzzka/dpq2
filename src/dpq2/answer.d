@@ -30,8 +30,8 @@ alias PGuuid =          UUID; /// UUID
 /// Result table's cell coordinates 
 struct Coords
 {
-    size_t Row; /// Row
-    size_t Col; /// Column
+    size_t row; /// Row
+    size_t col; /// Column
 }
 
 /// Answer
@@ -148,8 +148,8 @@ class Answer
     
      private void assertCoords( const Coords c ) const
     {
-        assertRow( c.Row );
-        assertCol( c.Col );
+        assertRow( c.row );
+        assertCol( c.col );
     }    
     
     package size_t currRow;
@@ -310,7 +310,7 @@ const struct Array
         ubyte[][] elements;
         bool[] elementIsNULL;
         
-        struct arrayHeader_net
+        struct ArrayHeader_net
         {
             ubyte[4] ndims; // number of dimensions of the array
             ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
@@ -329,7 +329,7 @@ const struct Array
         cell = c;
         enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
         
-        arrayHeader_net* h = cast(arrayHeader_net*) cell.value.ptr;
+        ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
         OID = bigEndianToNative!Oid(h.OID);
         
@@ -362,7 +362,7 @@ const struct Array
         auto elementIsNULL = new bool[ nElems ];
         
         // Looping through all elements and fill out index of them
-        auto curr_offset = arrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
+        auto curr_offset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
         for(uint i = 0; i < n_elems; ++i )
         {
             ubyte[int.sizeof] size_net;

@@ -124,7 +124,7 @@ class BaseConnection
 
 void _integration_test( string connParam )
 {
-    assert( PQlibVersion() >= 90100 );
+    assert( PQlibVersion() >= 9_0100 );
     
     auto c = new BaseConnection;
 	c.connString = connParam;
