@@ -69,7 +69,7 @@ final class Connection: BaseConnection
     /// Submits a command to the server without waiting for the result(s)
     void sendQuery( string SQLcmd )
     {
-        size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
+        const size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if( r != 1 ) throw new QueryException();
     }
     
