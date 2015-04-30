@@ -186,9 +186,9 @@ void _integration_test( string connParam )
     "union all\n"
     "select NULL, 'ijk'::text, 789, 12345.115345";
     
-    auto r = conn.exec( sql_query );
+    conn.exec( sql_query );
     
-    string sql_query2 =
+    const string sql_query2 =
     "select * from (\n"
     ~ sql_query ~
     ") t\n"
