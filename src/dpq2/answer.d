@@ -497,8 +497,6 @@ class AnswerException : Exception
 
 void _integration_test( string connParam )
 {
-    import std.stdio;
-
     // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -528,7 +526,6 @@ void _integration_test( string connParam )
     assert( e[1]["field_name"].as!PGtext == "def" );
 
     // Value properties test
-    static queryArg arg;
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "~
@@ -596,7 +593,7 @@ void _integration_test( string connParam )
     assert( r[0][13].as!PGuuid.toString() == "8b9ab33a-96e9-499b-9c36-aad1fe86d640" );
     
     // Notifies test
-    auto n = conn.exec( "listen test_notify; notify test_notify" );
+    conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
     
     // Async query test 1
@@ -611,5 +608,5 @@ void _integration_test( string connParam )
     
     // Range test
     foreach( elem; r )
-        assert( elem[0].as!PGsmallint == -32761 );
+        assert( elem[0].as!PGsmallint == -32_761 );
 }
