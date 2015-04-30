@@ -13,7 +13,7 @@ shared static ~this()
         write("DerelictPQ is unloading... ");
     }
     
-    import core.memory;
+    import core.memory: GC;
     GC.collect();
     DerelictPQ.unload();
     
