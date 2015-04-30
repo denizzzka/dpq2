@@ -104,11 +104,11 @@ final class Connection: BaseConnection
     }
     
     /// Returns null if no notifies was received
-    notify getNextNotify()
+    Notify getNextNotify()
     {
         consumeInput();
         auto n = PQnotifies(conn);
-        return n is null ? null : new notify( n );
+        return n is null ? null : new Notify( n );
     }
     
     private struct preparedArgs

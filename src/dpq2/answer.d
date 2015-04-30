@@ -444,7 +444,7 @@ const struct Array
 }
 
 /// Notify
-class notify
+class Notify
 {
     private immutable PGnotify* n;
 
