@@ -531,27 +531,27 @@ void _integration_test( string connParam )
     static queryArg arg;
     queryParams p;
     p.resultFormat = valueFormat.BINARY;
-    p.sqlCommand = "SELECT "
-        "-32761::smallint, "
-        "-2147483646::integer, "
-        "-9223372036854775806::bigint, "
-        "-12.3456::real, "
-        "-1234.56789012345::double precision, "
-        "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "
-        "'2012-10-04 11:00:21.227803+08'::timestamp without time zone, "
-        "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "
-        "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "
-        "'first line\nsecond line'::text, "
-        r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, " // "D rules\x00!" (ASCII)
-        "array[[[1,  2, 3], "
-               "[4,  5, 6]], "
+    p.sqlCommand = "SELECT "~
+        "-32761::smallint, "~
+        "-2147483646::integer, "~
+        "-9223372036854775806::bigint, "~
+        "-12.3456::real, "~
+        "-1234.56789012345::double precision, "~
+        "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "~
+        "'2012-10-04 11:00:21.227803+08'::timestamp without time zone, "~
+        "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "~
+        "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "~
+        "'first line\nsecond line'::text, "~
+        r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, "~ // "D rules\x00!" (ASCII)
+        "array[[[1,  2, 3], "~
+               "[4,  5, 6]], "~
                
-              "[[7,  8, 9], "
-              "[10, 11,12]], "
+              "[[7,  8, 9], "~
+              "[10, 11,12]], "~
               
-              "[[13,14,NULL], "
-               "[16,17,18]]]::integer[], "
-        "NULL, "
+              "[[13,14,NULL], "~
+               "[16,17,18]]]::integer[], "~
+        "NULL, "~
         "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'::uuid";
 
 
