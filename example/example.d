@@ -21,28 +21,26 @@ void main()
     QueryParams p;
     p.sqlCommand = "SELECT "~
         "$1::double precision as double_field, "~
-        "$2::timestamp with time zone as time_field, "~
-        "$3::text, "~
-        "$4::text as null_field, "~
+        "$2::text, "~
+        "$3::text as null_field, "~
         "array['first', 'second', NULL]::text[] as array_field, "~
-        "$5::integer[] as multi_array";
+        "$4::integer[] as multi_array";
     
-    p.args.length = 5;
+    p.args.length = 4;
     
     p.args[0].value = "-1234.56789012345";
-    p.args[1].value = "2012-10-04 11:00:21.227803+08";
-    p.args[2].value = "first line\nsecond line";
-    p.args[3].value = null;
-    p.args[4].value = "{{1, 2, 3}, {4, 5, 6}}";
+    p.args[1].value = "first line\nsecond line";
+    p.args[2].value = null;
+    p.args[3].value = "{{1, 2, 3}, {4, 5, 6}}";
     
     auto r = conn.exec(p);
     
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
-    writeln( "1: ", r[0][2].as!PGtext );
-    writeln( "2.1 isNull: ", r[0][3].isNull );
-    writeln( "2.2 isNULL: ", r[0].isNULL(3) );
-    writeln( "3.1: ", r[0][4].asArray[0].as!PGtext );
-    writeln( "3.2: ", r[0][4].asArray[1].as!PGtext );
+    writeln( "1: ", r[0][1].as!PGtext );
+    writeln( "2.1 isNull: ", r[0][2].isNull );
+    writeln( "2.2 isNULL: ", r[0].isNULL(2) );
+    writeln( "3.1: ", r[0][3].asArray[0].as!PGtext );
+    writeln( "3.2: ", r[0][3].asArray[1].as!PGtext );
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
     writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
