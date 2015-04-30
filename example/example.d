@@ -19,12 +19,12 @@ void main()
     
     // Separated arguments query with binary result:
     queryParams p;
-    p.sqlCommand = "SELECT "
-        "$1::double precision as double_field, "
-        "$2::timestamp with time zone as time_field, "
-        "$3::text, "
-        "$4::text as null_field, "
-        "array['first', 'second', NULL]::text[] as array_field, "
+    p.sqlCommand = "SELECT "~
+        "$1::double precision as double_field, "~
+        "$2::timestamp with time zone as time_field, "~
+        "$3::text, "~
+        "$4::text as null_field, "~
+        "array['first', 'second', NULL]::text[] as array_field, "~
         "$5::integer[] as multi_array";
     
     p.args.length = 5;
