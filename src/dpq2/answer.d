@@ -159,6 +159,7 @@ class Answer
     @property bool empty(){ return currRow >= rowCount; }
 }
 
+/// Represents one row from the answer table
 const struct Row
 {
     private const Answer answer;
