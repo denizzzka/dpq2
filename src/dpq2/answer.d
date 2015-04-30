@@ -17,15 +17,15 @@ import std.uuid;
 import std.typecons: Nullable;
 
 // Supported PostgreSQL binary types
-alias short   PGsmallint; /// smallint
-alias int     PGinteger; /// integer
-alias long    PGbigint; /// bigint
-alias float   PGreal; /// real
-alias double  PGdouble_precision; /// double precision
-alias string  PGtext; /// text
-alias const ubyte[] PGbytea; /// bytea
-alias SysTime PGtime_stamp; /// time stamp with/without timezone
-alias UUID    PGuuid; /// UUID
+alias PGsmallint =      short; /// smallint
+alias PGinteger =       int; /// integer
+alias PGbigint =        long; /// bigint
+alias PGreal =          float; /// real
+alias PGdouble_precision = double; /// double precision
+alias PGtext =          string; /// text
+alias PGbytea =         const ubyte[]; /// bytea
+alias PGtime_stamp =    SysTime; /// time stamp with/without timezone
+alias PGuuid =          UUID; /// UUID
 
 /// Result table's cell coordinates 
 struct Coords
