@@ -10,8 +10,10 @@ addons:
 
 services: postgresql
 
+before_install:
+  - git clone --depth=1 --recursive https://github.com/Hackerpilot/Dscanner.git ~/Dscanner
+
 install:
-  - git clone --depth=1 --recursive git@github.com:Hackerpilot/Dscanner.git ~/Dscanner
   - make -C ~/Dscanner
 
 before_script:
