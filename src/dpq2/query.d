@@ -12,12 +12,12 @@ import derelict.pq.pq;
 struct QueryParams
 {
     string sqlCommand; /// SQL command
-    queryArg[] args; /// SQL command arguments
+    QueryArg[] args; /// SQL command arguments
     valueFormat resultFormat = valueFormat.BINARY; /// Result value format
 }
 
 /// Query argument
-struct queryArg
+struct QueryArg
 {
     Oid type = 0;
     private ubyte[] valueBin;
@@ -194,8 +194,8 @@ void _integration_test( string connParam )
     ") t\n"
     "where string = $1";
     
-    queryArg[1] args;
-    queryArg arg;
+    QueryArg[1] args;
+    QueryArg arg;
     arg.value = "абвгд";
     args[0] = arg;
     
