@@ -70,7 +70,7 @@ final class Connection: BaseConnection
     void sendQuery( string SQLcmd )
     {
         size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
-        if( r != 1 ) throw new exception();
+        if( r != 1 ) throw new QueryException();
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -88,7 +88,7 @@ final class Connection: BaseConnection
                     cast(int)p.resultFormat                    
                     );
                     
-        if( !r ) throw new exception();
+        if( !r ) throw new QueryException();
     }
     
     /// Waits for the next result from a sendQuery
@@ -159,7 +159,7 @@ final class Connection: BaseConnection
     }
     
     /// Exception
-    class exception: Exception
+    class QueryException: Exception
     {
         /// PQerrorMessage
         immutable string message;
