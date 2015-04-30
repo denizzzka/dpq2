@@ -111,7 +111,7 @@ final class Connection: BaseConnection
         return n is null ? null : new Notify( n );
     }
     
-    private struct preparedArgs
+    private struct PreparedArgs
     {
         Oid[] types;
         size_t[] formats;
@@ -120,9 +120,9 @@ final class Connection: BaseConnection
     }
     
     // For PQxxxParams need especially prepared arguments
-    private preparedArgs* prepareArgs(ref const QueryParams p)
+    private PreparedArgs* prepareArgs(ref const QueryParams p)
     {
-        preparedArgs* a = new preparedArgs;
+        PreparedArgs* a = new PreparedArgs;
         a.types = new Oid[p.args.length];
         a.formats = new size_t[p.args.length];
         a.lengths = new size_t[p.args.length];
