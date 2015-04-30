@@ -9,7 +9,7 @@ shared static ~this()
 {
     debug
     {
-        import std.stdio;
+        import std.stdio: write, writeln;
         write("DerelictPQ is unloading... ");
     }
     
