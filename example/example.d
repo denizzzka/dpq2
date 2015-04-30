@@ -18,7 +18,7 @@ void main()
     writeln( "Text query result: ", s[0][3].as!PGtext );
     
     // Separated arguments query with binary result:
-    queryParams p;
+    QueryParams p;
     p.sqlCommand = "SELECT "~
         "$1::double precision as double_field, "~
         "$2::timestamp with time zone as time_field, "~
