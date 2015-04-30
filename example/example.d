@@ -48,5 +48,5 @@ void main()
     writeln( "4.4: ", r[0]["array_field"].asArray.isNULL(2) );
     writeln( "5: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
     
-    version(LDC) delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
+    version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
