@@ -53,13 +53,13 @@ void main()
     writeln( "Text query result: ", s[0][3].as!PGtext );
     
     // Separated arguments query with binary result:
-    queryParams p;
-    p.sqlCommand = "SELECT "
-        "$1::double precision as double_field, "
-        "$2::timestamp with time zone as time_field, "
-        "$3::text, "
-        "$4::text as null_field, "
-        "array['first', 'second', NULL]::text[] as array_field, "
+    QueryParams p;
+    p.sqlCommand = "SELECT "~
+        "$1::double precision as double_field, "~
+        "$2::timestamp with time zone as time_field, "~
+        "$3::text, "~
+        "$4::text as null_field, "~
+        "array['first', 'second', NULL]::text[] as array_field, "~
         "$5::integer[] as multi_array";
     
     p.args.length = 5;
@@ -83,7 +83,7 @@ void main()
     writeln( "4.4: ", r[0]["array_field"].asArray.isNULL(2) );
     writeln( "5: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
     
-    version(LDC) delete r; // before Derelict unloads its bindings (prevents SIGSEGV)
+    version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
 ```
 ####Compile and run:
