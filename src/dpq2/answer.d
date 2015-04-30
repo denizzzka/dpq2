@@ -526,7 +526,7 @@ void _integration_test( string connParam )
     assert( e[1]["field_name"].as!PGtext == "def" );
 
     // Value properties test
-    queryParams p;
+    QueryParams p;
     p.resultFormat = valueFormat.BINARY;
     p.sqlCommand = "SELECT "~
         "-32761::smallint, "~

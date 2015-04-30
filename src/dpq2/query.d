@@ -9,7 +9,7 @@ import derelict.pq.pq;
 
 
 /// Query parameters
-struct queryParams
+struct QueryParams
 {
     string sqlCommand; /// SQL command
     queryArg[] args; /// SQL command arguments
@@ -46,7 +46,7 @@ final class Connection: BaseConnection
     }
     
     /// Perform SQL query to DB
-    Answer exec(ref const queryParams p)
+    Answer exec(ref const QueryParams p)
     {
         auto a = prepareArgs( p );
         auto r = getAnswer
@@ -74,7 +74,7 @@ final class Connection: BaseConnection
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQuery( ref const queryParams p )
+    void sendQuery( ref const QueryParams p )
     {
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
@@ -120,7 +120,7 @@ final class Connection: BaseConnection
     }
     
     // For PQxxxParams need especially prepared arguments
-    private preparedArgs* prepareArgs(ref const queryParams p)
+    private preparedArgs* prepareArgs(ref const QueryParams p)
     {
         preparedArgs* a = new preparedArgs;
         a.types = new Oid[p.args.length];
@@ -199,7 +199,7 @@ void _integration_test( string connParam )
     arg.value = "абвгд";
     args[0] = arg;
     
-    queryParams p;
+    QueryParams p;
     p.sqlCommand = sql_query2;
     p.args = args[];
     
