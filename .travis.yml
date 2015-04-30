@@ -14,8 +14,7 @@ before_install:
   - git clone --depth=1 --recursive https://github.com/Hackerpilot/Dscanner.git ~/Dscanner
 
 install:
-  - echo ${DC}
-  - if [ ${DC}="dmd" ]; then make -C ~/Dscanner; fi
+  - if [ ${DC} = "dmd" ]; then make -C ~/Dscanner; fi
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
