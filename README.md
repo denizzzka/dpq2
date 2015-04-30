@@ -73,15 +73,14 @@ void main()
     auto r = conn.exec(p);
     
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
-    writeln( "1: ", r[0]["time_field"].as!PGtime_stamp.toSimpleString );
-    writeln( "2: ", r[0][2].as!PGtext );
-    writeln( "3.1 isNull: ", r[0][3].isNull );
-    writeln( "3.2 isNULL: ", r[0].isNULL(3) );
-    writeln( "4.1: ", r[0][4].asArray[0].as!PGtext );
-    writeln( "4.2: ", r[0][4].asArray[1].as!PGtext );
-    writeln( "4.3: ", r[0]["array_field"].asArray[2].isNull );
-    writeln( "4.4: ", r[0]["array_field"].asArray.isNULL(2) );
-    writeln( "5: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "1: ", r[0][2].as!PGtext );
+    writeln( "2.1 isNull: ", r[0][3].isNull );
+    writeln( "2.2 isNULL: ", r[0].isNULL(3) );
+    writeln( "3.1: ", r[0][4].asArray[0].as!PGtext );
+    writeln( "3.2: ", r[0][4].asArray[1].as!PGtext );
+    writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
+    writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
+    writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
     
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
@@ -93,16 +92,15 @@ $ dub build --build=release
 $ sudo -u postgres ./dpq2-example
 Text query result: 456.78
 0: -1234.57
-1: 0013-Oct-05 03:00:21.227803Z
-2: first line
+1: first line
 second line
-3.1 isNull: true
-3.2 isNULL: true
-4.1: first
-4.2: second
-4.3: true
-4.4: true
-5: 6
+2.1 isNull: true
+2.2 isNULL: true
+3.1: first
+3.2: second
+3.3: true
+3.4: true
+4: 6
 ```
 
 TODO

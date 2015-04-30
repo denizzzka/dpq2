@@ -24,7 +24,6 @@ alias PGreal =          float; /// real
 alias PGdouble_precision = double; /// double precision
 alias PGtext =          string; /// text
 alias PGbytea =         const ubyte[]; /// bytea
-alias PGtime_stamp =    SysTime; /// time stamp with/without timezone
 alias PGuuid =          UUID; /// UUID
 
 /// Result table's cell coordinates 
@@ -560,14 +559,6 @@ void _integration_test( string connParam )
     assert( r[0][2].as!PGbigint == -9_223_372_036_854_775_806 );
     assert( r[0][3].as!PGreal == -12.3456f );
     assert( r[0][4].as!PGdouble_precision == -1234.56789012345 );
-    
-    /* Disabled because PGtime_stamp parsing is broken.
-     * Values on the right side of this expressions are wrong.
-    assert( r[0][5].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 03:00:21.227803Z" );
-    assert( r[0][6].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( r[0][7].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    assert( r[0][8].as!PGtime_stamp.toSimpleString() == "0013-Oct-05 11:00:21.227803Z" );
-    */
     
     assert( r[0][9].as!PGtext == "first line\nsecond line" );
     assert( r[0][10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
