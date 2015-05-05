@@ -18,7 +18,6 @@ Features
 * Representation of the binary query results to native D types
  * Text types
  * Integer and decimal types (except "numeric")
- * Timestamp type (with and without timezone)
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support
 
