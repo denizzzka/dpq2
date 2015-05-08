@@ -15,16 +15,19 @@ before_install:
 
 install:
   - if [ ${DC} = "dmd" ]; then make -C ~/Dscanner; fi
+  - dub fetch doveralls && dub build doveralls
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script:
-  - dub build
-  - dub test
-  - cd integration_tests && dub -- --conninfo "dbname=postgres" && cd -
+  - dub build --build=unittest-cov
+  - cd integration_tests && dub --build=unittest-cov -- --conninfo "dbname=postgres" && cd -
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -s; fi
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -S; fi
   - dub build --build=release
-  - cd example && dub && cd -
+  - cd example && dub --build=unittest-cov && cd -
   - cd example && dub --build=release && cd -
+
+after_success:
+    ~/.dub/packages/doveralls-*/doveralls
