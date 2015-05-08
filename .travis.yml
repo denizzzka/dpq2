@@ -31,4 +31,3 @@ script:
 
 after_success:
   - cd integration_tests && dub run doveralls && cd -
-  - cd example && dub run doveralls && cd -
