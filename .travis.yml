@@ -30,4 +30,5 @@ script:
   - cd example && dub --build=release && cd -
 
 after_success:
-  - dub run doveralls
+  - cd integration_tests && dub run doveralls && cd -
+  - cd example && dub run doveralls && cd -
