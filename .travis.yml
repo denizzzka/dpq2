@@ -22,7 +22,8 @@ before_script:
 
 script:
   - dub build --build=unittest-cov
-  - cd integration_tests && dub run --build=unittest-cov -- --conninfo "dbname=postgres" && cd -
+  - cd integration_tests && dub build --build=unittest-cov && cd -
+  - ./integration_tests/bin/dpq2-integration_tests --conninfo "dbname=postgres"
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -s; fi
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -S; fi
   - dub build --build=release
