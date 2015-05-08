@@ -21,14 +21,17 @@ before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script:
-  - dub build --build=unittest-cov
-  - cd integration_tests && dub build --build=unittest-cov && cd -
-  - ./integration_tests/bin/dpq2-integration_tests --conninfo "dbname=postgres"
+  - dub add-local .
+  - dub add-local dpq2-integration_tests
+  - dub add-local example
+
+  - dub run dpq2-integration_tests --build=unittest-cov
+
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -s; fi
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -S; fi
-  - dub build --build=release
-  - cd example && dub --build=unittest-cov && cd -
-  - cd example && dub --build=release && cd -
+
+  - dub build dpq2 --build=release
+  - dub run example --build=release
 
 after_success:
-  - cd integration_tests && dub run doveralls && cd -
+  - dub run doveralls
