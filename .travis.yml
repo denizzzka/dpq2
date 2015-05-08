@@ -31,7 +31,7 @@ script:
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -S; fi
 
   - dub build dpq2 --build=release
-  - dub run example --build=release
+  - dub run dpq2-example --build=release
 
 after_success:
   - dub run doveralls
