@@ -22,7 +22,7 @@ before_script:
 
 script:
   - dub build --build=unittest-cov
-  - cd integration_tests && dub --build=unittest-cov -- --conninfo "dbname=postgres" && cd -
+  - cd integration_tests && dub run --build=unittest-cov -- --conninfo "dbname=postgres" && cd -
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -s; fi
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -S; fi
   - dub build --build=release
@@ -30,4 +30,4 @@ script:
   - cd example && dub --build=release && cd -
 
 after_success:
-  - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
+  - dub run doveralls
