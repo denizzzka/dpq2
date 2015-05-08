@@ -22,7 +22,7 @@ before_script:
 
 script:
   - dub add-local .
-  - dub add-local dpq2-integration_tests
+  - dub add-local integration_tests
   - dub add-local example
 
   - dub run dpq2-integration_tests --build=unittest-cov
