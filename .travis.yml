@@ -25,7 +25,7 @@ script:
   - dub add-local integration_tests
   - dub add-local example
 
-  - dub run dpq2-integration_tests --build=unittest-cov -- --conninfo "dbname=postgres"
+  - dub run dpq2-integration_tests --build=unittest-cov -- --conninfo="dbname=postgres"
 
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -s; fi
   - if [ ${DC} = "dmd" ]; then ~/Dscanner/bin/dscanner -S; fi
