@@ -180,10 +180,10 @@ void _integration_test( string connParam )
     conn.connect();
     
     string sql_query =
-    "select now() as time, 'abc'::text as string, 123, 456.78\n"
-    "union all\n"
-    "select now(), 'абвгд'::text, 777, 910.11\n"
-    "union all\n"
+    "select now() as time, 'abc'::text as string, 123, 456.78\n"~
+    "union all\n"~
+    "select now(), 'абвгд'::text, 777, 910.11\n"~
+    "union all\n"~
     "select NULL, 'ijk'::text, 789, 12345.115345";
     
     conn.exec( sql_query );
@@ -191,7 +191,7 @@ void _integration_test( string connParam )
     const string sql_query2 =
     "select * from (\n"
     ~ sql_query ~
-    ") t\n"
+    ") t\n"~
     "where string = $1";
     
     QueryArg[1] args;
