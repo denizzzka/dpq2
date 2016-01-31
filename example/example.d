@@ -11,7 +11,7 @@ void main()
 
     // Only text query result can be obtained by this call:
     auto s = conn.exec(
-        "SELECT now() as current_time, 'abc'::text as field_name, "
+        "SELECT now() as current_time, 'abc'::text as field_name, "~
         "123 as field_3, 456.78 as field_4"
         );
     
