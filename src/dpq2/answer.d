@@ -503,11 +503,11 @@ void _integration_test( string connParam )
     conn.connect();
 
     string sql_query =
-    "select now() as time,  'abc'::text as field_name,   123,  456.78\n"
-    "union all\n"
+    "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
+    "union all\n"~
 
-    "select now(),          'def'::text,                 456,  910.11\n"
-    "union all\n"
+    "select now(),          'def'::text,                 456,  910.11\n"~
+    "union all\n"~
 
     "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
 
