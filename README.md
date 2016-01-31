@@ -107,5 +107,4 @@ TODO
 * Timestamp type support
 * PostGIS binary data support
 * Checking types by Oid
-* Row by row result reading
 * Binary arguments types
