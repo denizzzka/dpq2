@@ -14,9 +14,6 @@ before_install:
   - dub fetch dscanner
   - dub fetch doveralls
 
-install:
-  - if [ ${DC} = "dmd" ]; then make -C ~/Dscanner; fi
-
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
