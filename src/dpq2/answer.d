@@ -105,7 +105,13 @@ class Answer
     @property OidTypes OID( size_t colNum ) const
     {
         assertCol( colNum );
-        return cast(OidTypes) PQftype(res, cast(int)colNum);
+
+        Oid oid = PQftype(res, cast(int)colNum);
+        OidTypes res = cast(OidTypes) oid;
+
+        assert(res.oid == oid);
+
+        return res;
     }
     
     /// Returns column number by field name
