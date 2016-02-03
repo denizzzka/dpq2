@@ -14,21 +14,6 @@ OidType oid2oidType(Oid oid) pure
     return cast(OidType)(oid);
 }
 
-package enum NativeType
-{
-    NativeNumeric,
-    NativeString, /// strings, bytea
-    Boolean,
-    unsupported
-}
-
-private struct Attributes
-{
-    Oid oid;
-    NativeType nativeType;
-}
-
-
 bool isNativeInteger(OidType t) pure
 {
     with(OidType)
