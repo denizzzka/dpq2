@@ -251,6 +251,7 @@ struct Value
     if( is( T == const(ubyte[]) ) )
     {
         enforce(format == ValueFormat.BINARY, "Format of the column is not binary");
+        enforce(oidType == OidType.ByteArray, "Format of the column isn't D native byte array or string");
 
         return value;
     }
