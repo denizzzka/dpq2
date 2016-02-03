@@ -285,6 +285,8 @@ struct Value
     @property T as(T)() const
     if( is( T == SysTime ) )
     {
+        pragma(msg, "Date and time type support isn't tested very well and not recommended for use");
+
         ulong pre_time = as!(ulong)();
         // UTC because server always sends binary timestamps in UTC, not in TZ
         return SysTime( pre_time * 10, UTC() );
