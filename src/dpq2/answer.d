@@ -3,6 +3,7 @@ module dpq2.answer;
 @trusted:
 
 public import dpq2.query;
+import dpq2.oids: OidTypes;
 
 import derelict.pq.pq;
 
@@ -101,10 +102,10 @@ class Answer
     }
     
     /// Returns column Oid
-    @property Oid OID( size_t colNum ) const
+    @property OidTypes OID( size_t colNum ) const
     {
         assertCol( colNum );
-        return PQftype(res, cast(int)colNum);
+        return cast(OidTypes) PQftype(res, cast(int)colNum);
     }
     
     /// Returns column number by field name
