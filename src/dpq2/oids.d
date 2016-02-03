@@ -46,7 +46,7 @@ private struct Attributes
 }
 alias A = Attributes;
 
-enum OidType : A
+enum OidType : Attributes
 {
     Bool = A(16, V.Boolean),
     ByteArray = A(17, V.NativeString),
