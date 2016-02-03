@@ -3,7 +3,7 @@ module dpq2.answer;
 @trusted:
 
 public import dpq2.query;
-import dpq2.oids: OidTypes;
+import dpq2.oids;
 
 import derelict.pq.pq;
 
@@ -106,12 +106,7 @@ class Answer
     {
         assertCol( colNum );
 
-        Oid oid = PQftype(res, cast(int)colNum);
-        OidTypes res = cast(OidTypes) oid;
-
-        assert(res.oid == oid);
-
-        return res;
+        return oid2oidType(PQftype(res, cast(int)colNum));
     }
     
     /// Returns column number by field name
@@ -204,7 +199,7 @@ const struct Row
         Nullable!Value r;
         
         if(!isNULL(col))
-            r = Value( v, s, answer.columnFormat( col ) );
+            r = Value(v, s, answer.columnFormat(col), answer.OID(col));
         
         return r;
     }
@@ -235,17 +230,20 @@ struct Value
 {
     private ubyte[] value;
     private ValueFormat format;
-    
-    this( const (ubyte)* value, size_t valueSize, ValueFormat f )
+    private OidTypes type;
+
+    this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidTypes t )
     {
         this.value = cast(ubyte[]) value[0..valueSize];
         format = f;
+        type = t;
     }
     
-    this( const ubyte[] value )
+    this( const ubyte[] value, OidTypes t )
     {
         this.value = cast(ubyte[]) value;
         format = ValueFormat.BINARY;
+        type = t;
     }
 
     /// Returns value as bytes from binary formatted field
@@ -253,6 +251,8 @@ struct Value
     if( is( T == const(ubyte[]) ) )
     {
         enforce( format == ValueFormat.BINARY, "Format of the column is not binary" );
+        //enforce(
+
         return value;
     }
 
@@ -320,7 +320,7 @@ const struct Array
         struct ArrayHeader_net
         {
             ubyte[4] ndims; // number of dimensions of the array
-            ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it is conteins isNULL flag!
+            ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it contains isNULL flag!
             ubyte[4] OID; // element type OID
         }
 
@@ -407,7 +407,7 @@ const struct Array
         Nullable!Value r;
         
         if(!elementIsNULL[n])
-            r = Value( elements[n] );
+            r = Value(elements[n], oid2oidType(OID));
         
         return r;
     }

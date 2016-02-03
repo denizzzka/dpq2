@@ -10,6 +10,7 @@ module dpq2.oids;
 import derelict.pq.pq: Oid;
 
 /// Is Oid means native integer or decimal value?
+/// TODO: remove it
 bool isNativeNumeric(OidTypes t)
 {
     return t.nativeType == ValueType.NativeNumeric;
@@ -18,6 +19,15 @@ bool isNativeNumeric(OidTypes t)
 unittest
 {
     assert(isNativeNumeric(OidTypes.Int8));
+}
+
+OidTypes oid2oidType(Oid oid) pure
+{
+    OidTypes res = cast(OidTypes)(oid);
+
+    assert(res.oid == oid);
+
+    return res;
 }
 
 private enum ValueType
