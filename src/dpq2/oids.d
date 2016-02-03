@@ -8,11 +8,9 @@
 
 module dpq2.oids;
 
-package:
-
 import derelict.pq.pq: Oid;
 
-OidType oid2oidType(Oid oid) pure
+package OidType oid2oidType(Oid oid) pure
 {
     return cast(OidType)(oid);
 }
