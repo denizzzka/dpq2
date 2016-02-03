@@ -3,7 +3,7 @@ language: d
 d:
   - dmd
   - gdc
-#  - ldc
+  - ldc
 
 addons:
   postgresql: 9.4
