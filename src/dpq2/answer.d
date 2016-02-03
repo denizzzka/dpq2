@@ -295,7 +295,8 @@ struct Value
     if( is( T == UUID ) )
     {
         enforce( value.length == 16, "Value length isn't equal to UUID size" );
-        
+        enforce( oidType == OidType.UUID, "Format of the column is not UUID" );
+
         UUID r;
         r.data = value;
         return r;
