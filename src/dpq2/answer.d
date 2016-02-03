@@ -102,7 +102,7 @@ class Answer
     }
     
     /// Returns column Oid
-    @property OidTypes OID( size_t colNum ) const
+    @property OidType OID( size_t colNum ) const
     {
         assertCol( colNum );
 
@@ -230,16 +230,16 @@ struct Value
 {
     private ubyte[] value;
     private ValueFormat format;
-    private OidTypes type;
+    private OidType type;
 
-    this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidTypes t )
+    this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidType t )
     {
         this.value = cast(ubyte[]) value[0..valueSize];
         format = f;
         type = t;
     }
     
-    this( const ubyte[] value, OidTypes t )
+    this( const ubyte[] value, OidType t )
     {
         this.value = cast(ubyte[]) value;
         format = ValueFormat.BINARY;
@@ -571,7 +571,7 @@ void _integration_test( string connParam )
     assert( r[0][10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
     
     auto v = r[0][11];
-    assert( r.OID(11) == OidTypes.Int4Array );
+    assert( r.OID(11) == OidType.Int4Array );
     auto a = v.asArray;
     assert( a.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
     assert( a.getValue(2,1,2).as!PGinteger == 18 );

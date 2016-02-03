@@ -11,19 +11,19 @@ import derelict.pq.pq: Oid;
 
 /// Is Oid means native integer or decimal value?
 /// TODO: remove it
-bool isNativeNumeric(OidTypes t)
+bool isNativeNumeric(OidType t)
 {
     return t.nativeType == ValueType.NativeNumeric;
 }
 
 unittest
 {
-    assert(isNativeNumeric(OidTypes.Int8));
+    assert(isNativeNumeric(OidType.Int8));
 }
 
-OidTypes oid2oidType(Oid oid) pure
+OidType oid2oidType(Oid oid) pure
 {
-    OidTypes res = cast(OidTypes)(oid);
+    OidType res = cast(OidType)(oid);
 
     assert(res.oid == oid);
 
@@ -46,7 +46,7 @@ private struct Attributes
 }
 alias A = Attributes;
 
-enum OidTypes : A
+enum OidType : A
 {
     Bool = A(16, V.Boolean),
     ByteArray = A(17, V.NativeString),
