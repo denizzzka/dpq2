@@ -250,8 +250,8 @@ struct Value
     @property T as(T)() const
     if( is( T == const(ubyte[]) ) )
     {
-        enforce( format == ValueFormat.BINARY, "Format of the column is not binary" );
-        //enforce(
+        enforce(format == ValueFormat.BINARY, "Format of the column is not binary");
+        enforce(type.nativeType == NativeType.NativeString, "Format of the column is not bytes or string");
 
         return value;
     }

@@ -13,7 +13,7 @@ import derelict.pq.pq: Oid;
 /// TODO: remove it
 bool isNativeNumeric(OidType t)
 {
-    return t.nativeType == ValueType.NativeNumeric;
+    return t.nativeType == NativeType.NativeNumeric;
 }
 
 unittest
@@ -30,21 +30,22 @@ OidType oid2oidType(Oid oid) pure
     return res;
 }
 
-private enum ValueType
+package enum NativeType
 {
     NativeNumeric,
     NativeString, /// strings, bytea
     Boolean,
     unsupported
 }
-alias V = ValueType;
 
 private struct Attributes
 {
     Oid oid;
-    ValueType nativeType;
+    NativeType nativeType;
 }
+
 alias A = Attributes;
+alias V = NativeType;
 
 enum OidType : Attributes
 {
