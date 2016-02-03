@@ -28,6 +28,38 @@ private struct Attributes
     NativeType nativeType;
 }
 
+
+bool isNativeInteger(OidType t) pure
+{
+    with(OidType)
+    switch(t)
+    {
+        case Int8:
+        case Int2:
+        case Int4:
+            return true;
+        default:
+            break;
+    }
+
+    return false;
+}
+
+bool isNativeFloat(OidType t) pure
+{
+    with(OidType)
+    switch(t)
+    {
+        case Float4:
+        case Float8:
+            return true;
+        default:
+            break;
+    }
+
+    return false;
+}
+
 bool isArray(OidType t) pure
 {
     with(OidType)

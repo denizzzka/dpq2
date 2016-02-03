@@ -270,7 +270,12 @@ struct Value
     {
         enforce(format == ValueFormat.BINARY, "Format of the column is not binary");
         enforce(value.length == T.sizeof, "Value length isn't equal to type size");
-        // FIXME: enforce(type.nativeType == NativeType.NativeNumeric, "Format of the column isn't D native numeric");
+
+        static if(isIntegral!(T))
+            enforce(isNativeInteger(type), "Format of the column isn't D native integral type");
+
+        static if(isFloatingPoint!(T))
+            enforce(isNativeFloat(type), "Format of the column isn't D native floating point type");
 
         ubyte[T.sizeof] s = value[0..T.sizeof];
         return bigEndianToNative!(T)( s );
