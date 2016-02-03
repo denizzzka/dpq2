@@ -260,6 +260,10 @@ struct Value
     @property T as(T)() const
     if(is(T == string))
     {
+        if(format == ValueFormat.BINARY)
+            enforce(oidType == OidType.Text,
+                "Format of the column does not match to D native string");
+
         return cast(const(char[])) value;
     }
     
