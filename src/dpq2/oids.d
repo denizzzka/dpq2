@@ -9,25 +9,9 @@ module dpq2.oids;
 
 import derelict.pq.pq: Oid;
 
-/// Is Oid means native integer or decimal value?
-/// TODO: remove it
-bool isNativeNumeric(OidType t)
-{
-    return t.nativeType == NativeType.NativeNumeric;
-}
-
-unittest
-{
-    assert(isNativeNumeric(OidType.Int8));
-}
-
 OidType oid2oidType(Oid oid) pure
 {
-    OidType res = cast(OidType)(oid);
-
-    assert(res.oid == oid);
-
-    return res;
+    return cast(OidType)(oid);
 }
 
 package enum NativeType
@@ -44,171 +28,241 @@ private struct Attributes
     NativeType nativeType;
 }
 
-alias A = Attributes;
-alias V = NativeType;
-
-enum OidType : Attributes
+bool isArray(OidType t) pure
 {
-    Bool = A(16, V.Boolean),
-    ByteArray = A(17, V.NativeString),
-    Char = A(18, V.unsupported),
-    Name = A(19, V.unsupported),
-    Int8 = A(20, V.NativeNumeric),
-    Int2 = A(21, V.NativeNumeric),
-    Int2Vector = A(22, V.unsupported),
-    Int4 = A(23, V.NativeNumeric),
-    RegProc = A(24, V.unsupported),
-    Text = A(25, V.NativeString),
-    Oid = A(26, V.unsupported),
-    Tid = A(27, V.unsupported),
-    Xid = A(28, V.unsupported),
-    Cid = A(29, V.unsupported),
-    OidVector = A(30, V.unsupported),
+    with(OidType)
+    switch(t)
+    {
+        case BoolArray:
+        case ByteArrayArray:
+        case CharArray:
+        case NameArray:
+        case Int2Array:
+        case Int2VectorArray:
+        case Int4Array:
+        case RegProcArray:
+        case TextArray:
+        case OidArray:
+        case TidArray:
+        case XidArray:
+        case CidArray:
+        case OidVectorArray:
+        case FixedStringArray:
+        case VariableStringArray:
+        case Int8Array:
+        case PointArray:
+        case LineSegmentArray:
+        case PathArray:
+        case BoxArray:
+        case Float4Array:
+        case Float8Array:
+        case AbsTimeArray:
+        case RelTimeArray:
+        case IntervalArray:
+        case PolygonArray:
+        case AccessControlListArray:
+        case MacAddressArray:
+        case HostAdressArray:
+        case NetworkAdressArray:
+        case CStringArray:
+        case TimeStampArray:
+        case DateArray:
+        case TimeArray:
+        case TimeStampWithZoneArray:
+        case TimeIntervalArray:
+        case NumericArray:
+        case TimeWithZoneArray: 
+        case FixedBitStringArray:
+        case VariableBitStringArray:
+        case RefCursorArray:
+        case RegProcWithArgsArray:
+        case RegOperatorArray:
+        case RegOperatorWithArgsArray:
+        case RegClassArray:
+        case RegTypeArray:
+        case UUIDArray:
+        case TSVectorArray:
+        case GTSVectorArray:
+        case TSQueryArray:
+        case RegConfigArray:
+        case RegDictionaryArray:
+        case TXidSnapshotArray:
+        case Int4RangeArray:
+        case NumRangeArray:
+        case TimeStampRangeArray:
+        case TimeStampWithZoneRangeArray:
+        case DateRangeArray:
+        case Int8RangeArray:
+            return true;
+        default:
+            break;
+    }
 
-    AccessControlList = A(1033, V.unsupported),
-    TypeCatalog = A(71, V.unsupported),
-    AttributeCatalog = A(75, V.unsupported),
-    ProcCatalog = A(81, V.unsupported),
-    ClassCatalog = A(83, V.unsupported),
+    return false;
+}
+
+enum OidType : Oid
+{
+    Bool = 16,
+    ByteArray = 17,
+    Char = 18,
+    Name = 19,
+    Int8 = 20,
+    Int2 = 21,
+    Int2Vector = 22,
+    Int4 = 23,
+    RegProc = 24,
+    Text = 25,
+    Oid = 26,
+    Tid = 27,
+    Xid = 28,
+    Cid = 29,
+    OidVector = 30,
+
+    AccessControlList = 1033,
+    TypeCatalog = 71,
+    AttributeCatalog = 75,
+    ProcCatalog = 81,
+    ClassCatalog = 83,
     
-    Json = A(114, V.unsupported),
-    Xml = A(142, V.unsupported),
-    NodeTree = A(194, V.unsupported),
-    StorageManager = A(210, V.unsupported),
+    Json = 114,
+    Xml = 142,
+    NodeTree = 194,
+    StorageManager = 210,
     
-    Point = A(600, V.unsupported),
-    LineSegment = A(601, V.unsupported),
-    Path = A(602, V.unsupported),
-    Box = A(603, V.unsupported),
-    Polygon = A(604, V.unsupported),
-    Line = A(628, V.unsupported),
+    Point = 600,
+    LineSegment = 601,
+    Path = 602,
+    Box = 603,
+    Polygon = 604,
+    Line = 628,
     
-    Float4 = A(700, V.NativeNumeric),
-    Float8 = A(701, V.NativeNumeric),
-    AbsTime = A(702, V.unsupported),
-    RelTime = A(703, V.unsupported),
-    Interval = A(704, V.unsupported),
-    Unknown = A(705, V.unsupported),
+    Float4 = 700,
+    Float8 = 701,
+    AbsTime = 702,
+    RelTime = 703,
+    Interval = 704,
+    Unknown = 705,
     
-    Circle = A(718, V.unsupported),
-    Money = A(790, V.unsupported),
-    MacAddress = A(829, V.unsupported),
-    HostAddress = A(869, V.unsupported),
-    NetworkAddress = A(650, V.unsupported),
+    Circle = 718,
+    Money = 790,
+    MacAddress = 829,
+    HostAddress = 869,
+    NetworkAddress = 650,
     
-    FixedString = A(1042, V.unsupported),
-    VariableString = A(1043, V.unsupported),
+    FixedString = 1042,
+    VariableString = 1043,
     
-    Date = A(1082, V.unsupported),
-    Time = A(1083, V.unsupported),
-    TimeStamp = A(1114, V.unsupported),
-    TimeStampWithZone = A(1184, V.unsupported),
-    TimeInterval = A(1186, V.unsupported),
-    TimeWithZone = A(1266, V.unsupported),
+    Date = 1082,
+    Time = 1083,
+    TimeStamp = 1114,
+    TimeStampWithZone = 1184,
+    TimeInterval = 1186,
+    TimeWithZone = 1266,
     
-    FixedBitString = A(1560, V.unsupported),
-    VariableBitString = A(1562, V.unsupported),
+    FixedBitString = 1560,
+    VariableBitString = 1562,
     
-    Numeric = A(1700, V.unsupported),
-    RefCursor = A(1790, V.unsupported),
-    RegProcWithArgs = A(2202, V.unsupported),
-    RegOperator = A(2203, V.unsupported),
-    RegOperatorWithArgs = A(2204, V.unsupported),
-    RegClass = A(2205, V.unsupported),
-    RegType = A(2206, V.unsupported),
+    Numeric = 1700,
+    RefCursor = 1790,
+    RegProcWithArgs = 2202,
+    RegOperator = 2203,
+    RegOperatorWithArgs = 2204,
+    RegClass = 2205,
+    RegType = 2206,
     
-    UUID = A(2950, V.unsupported),
-    TSVector = A(3614, V.unsupported),
-    GTSVector = A(3642, V.unsupported),
-    TSQuery = A(3615, V.unsupported),
-    RegConfig = A(3734, V.unsupported),
-    RegDictionary = A(3769, V.unsupported),
-    TXidSnapshot = A(2970, V.unsupported),
+    UUID = 2950,
+    TSVector = 3614,
+    GTSVector = 3642,
+    TSQuery = 3615,
+    RegConfig = 3734,
+    RegDictionary = 3769,
+    TXidSnapshot = 2970,
     
-    Int4Range = A(3904, V.unsupported),
-    NumRange = A(3906, V.unsupported),
-    TimeStampRange = A(3908, V.unsupported),
-    TimeStampWithZoneRange = A(3910, V.unsupported),
-    DateRange = A(3912, V.unsupported),
-    Int8Range = A(3926, V.unsupported),
+    Int4Range = 3904,
+    NumRange = 3906,
+    TimeStampRange = 3908,
+    TimeStampWithZoneRange = 3910,
+    DateRange = 3912,
+    Int8Range = 3926,
     
     // Arrays
-    BoolArray = A(1000, V.Boolean),
-    ByteArrayArray = A(1001, V.NativeString),
-    CharArray = A(1002, V.unsupported),
-    NameArray = A(1003, V.unsupported),
-    Int2Array = A(1005, V.NativeNumeric),
-    Int2VectorArray = A(1006, V.unsupported),
-    Int4Array = A(1007, V.NativeNumeric),
-    RegProcArray = A(1008, V.unsupported),
-    TextArray = A(1009, V.NativeString),
-    OidArray  = A(1028, V.unsupported),
-    TidArray = A(1010, V.unsupported),
-    XidArray = A(1011, V.unsupported),
-    CidArray = A(1012, V.unsupported),
-    OidVectorArray = A(1013, V.unsupported),
-    FixedStringArray = A(1014, V.unsupported),
-    VariableStringArray = A(1015, V.unsupported),
-    Int8Array = A(1016, V.NativeNumeric),
-    PointArray = A(1017, V.unsupported),
-    LineSegmentArray = A(1018, V.unsupported),
-    PathArray = A(1019, V.unsupported),
-    BoxArray = A(1020, V.unsupported),
-    Float4Array = A(1021, V.NativeNumeric),
-    Float8Array = A(1022, V.NativeNumeric),
-    AbsTimeArray = A(1023, V.unsupported),
-    RelTimeArray = A(1024, V.unsupported),
-    IntervalArray = A(1025, V.unsupported),
-    PolygonArray = A(1027, V.unsupported),
-    AccessControlListArray = A(1034, V.unsupported),
-    MacAddressArray = A(1040, V.unsupported),
-    HostAdressArray = A(1041, V.unsupported),
-    NetworkAdressArray = A(651, V.unsupported),
-    CStringArray = A(1263, V.unsupported),
-    TimeStampArray = A(1115, V.unsupported),
-    DateArray = A(1182, V.unsupported),
-    TimeArray = A(1183, V.unsupported),
-    TimeStampWithZoneArray = A(1185, V.unsupported),
-    TimeIntervalArray = A(1187, V.unsupported),
-    NumericArray = A(1231, V.unsupported),
-    TimeWithZoneArray = A(1270, V.unsupported),
-    FixedBitStringArray = A(1561, V.unsupported),
-    VariableBitStringArray = A(1563, V.unsupported),
-    RefCursorArray = A(2201, V.unsupported),
-    RegProcWithArgsArray = A(2207, V.unsupported),
-    RegOperatorArray = A(2208, V.unsupported),
-    RegOperatorWithArgsArray = A(2209, V.unsupported),
-    RegClassArray = A(2210, V.unsupported),
-    RegTypeArray = A(2211, V.unsupported),
-    UUIDArray = A(2951, V.unsupported),
-    TSVectorArray = A(3643, V.unsupported),
-    GTSVectorArray = A(3644, V.unsupported),
-    TSQueryArray = A(3645, V.unsupported),
-    RegConfigArray = A(3735, V.unsupported),
-    RegDictionaryArray = A(3770, V.unsupported),
-    TXidSnapshotArray = A(2949, V.unsupported),
-    Int4RangeArray = A(3905, V.unsupported),
-    NumRangeArray = A(3907, V.unsupported),
-    TimeStampRangeArray = A(3909, V.unsupported),
-    TimeStampWithZoneRangeArray = A(3911, V.unsupported),
-    DateRangeArray = A(3913, V.unsupported),
-    Int8RangeArray = A(3927, V.unsupported),
+    BoolArray = 1000,
+    ByteArrayArray = 1001,
+    CharArray = 1002,
+    NameArray = 1003,
+    Int2Array = 1005,
+    Int2VectorArray = 1006,
+    Int4Array = 1007,
+    RegProcArray = 1008,
+    TextArray = 1009,
+    OidArray  = 1028,
+    TidArray = 1010,
+    XidArray = 1011,
+    CidArray = 1012,
+    OidVectorArray = 1013,
+    FixedStringArray = 1014,
+    VariableStringArray = 1015,
+    Int8Array = 1016,
+    PointArray = 1017,
+    LineSegmentArray = 1018,
+    PathArray = 1019,
+    BoxArray = 1020,
+    Float4Array = 1021,
+    Float8Array = 1022,
+    AbsTimeArray = 1023,
+    RelTimeArray = 1024,
+    IntervalArray = 1025,
+    PolygonArray = 1027,
+    AccessControlListArray = 1034,
+    MacAddressArray = 1040,
+    HostAdressArray = 1041,
+    NetworkAdressArray = 651,
+    CStringArray = 1263,
+    TimeStampArray = 1115,
+    DateArray = 1182,
+    TimeArray = 1183,
+    TimeStampWithZoneArray = 1185,
+    TimeIntervalArray = 1187,
+    NumericArray = 1231,
+    TimeWithZoneArray = 1270, 
+    FixedBitStringArray = 1561,
+    VariableBitStringArray = 1563,
+    RefCursorArray = 2201,
+    RegProcWithArgsArray = 2207,
+    RegOperatorArray = 2208,
+    RegOperatorWithArgsArray = 2209,
+    RegClassArray = 2210,
+    RegTypeArray = 2211,
+    UUIDArray = 2951,
+    TSVectorArray = 3643,
+    GTSVectorArray = 3644,
+    TSQueryArray = 3645,
+    RegConfigArray = 3735,
+    RegDictionaryArray = 3770,
+    TXidSnapshotArray = 2949,
+    Int4RangeArray = 3905,
+    NumRangeArray = 3907,
+    TimeStampRangeArray = 3909,
+    TimeStampWithZoneRangeArray = 3911,
+    DateRangeArray = 3913,
+    Int8RangeArray = 3927,
     
     // Pseudo types
-    Record = A(2249, V.unsupported),
-    RecordArray = A(2287, V.unsupported),
-    CString = A(2275, V.unsupported),
-    AnyVoid = A(2276, V.unsupported),
-    AnyArray = A(2277, V.unsupported),
-    Void = A(2278, V.unsupported),
-    Trigger = A(2279, V.unsupported),
-    EventTrigger = A(3838, V.unsupported),
-    LanguageHandler = A(2280, V.unsupported),
-    Internal = A(2281, V.unsupported),
-    Opaque = A(2282, V.unsupported),
-    AnyElement = A(2283, V.unsupported),
-    AnyNoArray = A(2776, V.unsupported),
-    AnyEnum = A(3500, V.unsupported),
-    FDWHandler = A(3115, V.unsupported),
-    AnyRange = A(3831, V.unsupported)
+    Record = 2249,
+    RecordArray = 2287,
+    CString = 2275,
+    AnyVoid = 2276,
+    AnyArray = 2277,
+    Void = 2278,
+    Trigger = 2279,
+    EventTrigger = 3838,
+    LanguageHandler = 2280,
+    Internal = 2281,
+    Opaque = 2282,
+    AnyElement = 2283,
+    AnyNoArray = 2776,
+    AnyEnum = 3500,
+    FDWHandler = 3115,
+    AnyRange = 3831
 }
