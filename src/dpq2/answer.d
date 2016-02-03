@@ -299,6 +299,8 @@ struct Value
     @property
     Array asArray() const
     {
+        enforce(isArray(type), "Format of the column isn't array");
+
         return const Array(this);
     }
 }
