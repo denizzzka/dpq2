@@ -230,20 +230,20 @@ struct Value
 {
     private ubyte[] value;
     private ValueFormat format;
-    private OidType type;
+    private OidType oidType;
 
     this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidType t )
     {
         this.value = cast(ubyte[]) value[0..valueSize];
         format = f;
-        type = t;
+        oidType = t;
     }
     
     this( const ubyte[] value, OidType t )
     {
         this.value = cast(ubyte[]) value;
         format = ValueFormat.BINARY;
-        type = t;
+        oidType = t;
     }
 
     /// Returns value as bytes from binary formatted field
@@ -272,10 +272,10 @@ struct Value
         enforce(value.length == T.sizeof, "Value length isn't equal to type size");
 
         static if(isIntegral!(T))
-            enforce(isNativeInteger(type), "Format of the column isn't D native integral type");
+            enforce(isNativeInteger(oidType), "Format of the column isn't D native integral type");
 
         static if(isFloatingPoint!(T))
-            enforce(isNativeFloat(type), "Format of the column isn't D native floating point type");
+            enforce(isNativeFloat(oidType), "Format of the column isn't D native floating point type");
 
         ubyte[T.sizeof] s = value[0..T.sizeof];
         return bigEndianToNative!(T)( s );
@@ -304,7 +304,7 @@ struct Value
     @property
     Array asArray() const
     {
-        enforce(isArray(type), "Format of the column isn't array");
+        enforce(isArray(oidType), "Format of the column isn't array");
 
         return const Array(this);
     }
