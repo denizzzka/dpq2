@@ -313,7 +313,7 @@ struct Value
 /// Link to the cell of the answer table
 const struct Array
 {
-    Oid OID;
+    OidType OID;
     int nDims; /// Number of dimensions
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
@@ -345,7 +345,7 @@ const struct Array
         
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
-        OID = bigEndianToNative!Oid(h.OID);
+        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
         
         // TODO: here is need exception, not enforce
         enforce( nDims > 0, "Dimensions number must be more than 0" );
@@ -414,7 +414,7 @@ const struct Array
         Nullable!Value r;
         
         if(!elementIsNULL[n])
-            r = Value(elements[n], oid2oidType(OID));
+            r = Value(elements[n], OID);
         
         return r;
     }
@@ -425,7 +425,7 @@ const struct Array
         auto n = coords2Serial( _argptr, _arguments );
         return elementIsNULL[n];
     }
-    
+
     private size_t coords2Serial( va_list _argptr, TypeInfo[] _arguments )
     {
         assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
@@ -580,7 +580,7 @@ void _integration_test( string connParam )
     auto v = r[0][11];
     assert( r.OID(11) == OidType.Int4Array );
     auto a = v.asArray;
-    assert( a.OID == 23 ); // -2 billion to 2 billion integer, 4-byte storage
+    assert( a.OID == OidType.Int4 );
     assert( a.getValue(2,1,2).as!PGinteger == 18 );
     assert( a.isNULL(2,0,2) );
     assert( !a.isNULL(2,1,2) );
