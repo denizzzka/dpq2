@@ -7,13 +7,17 @@ public import dpq2.connection;
 
 import derelict.pq.pq;
 
+enum ValueFormat : ubyte {
+    TEXT,
+    BINARY
+}
 
 /// Query parameters
 struct QueryParams
 {
     string sqlCommand; /// SQL command
     QueryArg[] args; /// SQL command arguments
-    valueFormat resultFormat = valueFormat.BINARY; /// Result value format
+    ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
 }
 
 /// Query argument
@@ -131,7 +135,7 @@ final class Connection: BaseConnection
         for( int i = 0; i < p.args.length; ++i )
         {
             a.types[i] = p.args[i].type;
-            a.formats[i] = valueFormat.TEXT;
+            a.formats[i] = ValueFormat.TEXT;
             a.values[i] = p.args[i].valueBin.ptr;
             a.lengths[i] = p.args[i].valueBin.length;
         }

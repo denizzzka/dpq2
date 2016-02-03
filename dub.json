@@ -8,7 +8,7 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"derelict-pq": "~>1.0.1"
+		"derelict-pq": "~>2.0.0"
 	},
 	"configurations": [
 		{

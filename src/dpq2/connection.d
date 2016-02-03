@@ -67,7 +67,7 @@ class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if( !nonBlocking && PQstatus(conn) != ConnStatusType.CONNECTION_OK )
+        if( !nonBlocking && PQstatus(conn) != CONNECTION_OK )
             throw new ConnException();
         
         readyForQuery = true;

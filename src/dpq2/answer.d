@@ -61,8 +61,8 @@ class Answer
     package void checkAnswerForErrors() const
     {
         cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
-        if(!(status == ExecStatusType.PGRES_COMMAND_OK ||
-             status == ExecStatusType.PGRES_TUPLES_OK))
+        if(!(status == PGRES_COMMAND_OK ||
+             status == PGRES_TUPLES_OK))
         {
             throw new AnswerException( AnswerException.ExceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")" );
@@ -94,10 +94,10 @@ class Answer
     @property size_t columnCount() const { return PQnfields(res); }
 
     /// Returns column format
-    valueFormat columnFormat( const size_t colNum ) const
+    ValueFormat columnFormat( const size_t colNum ) const
     {
         assertCol( colNum );
-        return PQfformat(res, cast(int)colNum);
+        return cast(ValueFormat) PQfformat(res, cast(int)colNum);
     }
     
     /// Returns column Oid
@@ -227,9 +227,9 @@ const struct Row
 struct Value
 {
     private ubyte[] value;
-    private valueFormat format;
+    private ValueFormat format;
     
-    this( const (ubyte)* value, size_t valueSize, valueFormat f )
+    this( const (ubyte)* value, size_t valueSize, ValueFormat f )
     {
         this.value = cast(ubyte[]) value[0..valueSize];
         format = f;
@@ -238,14 +238,14 @@ struct Value
     this( const ubyte[] value )
     {
         this.value = cast(ubyte[]) value;
-        format = valueFormat.BINARY;
+        format = ValueFormat.BINARY;
     }
 
     /// Returns value as bytes from binary formatted field
     @property T as(T)() const
     if( is( T == const(ubyte[]) ) )
     {
-        enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+        enforce( format == ValueFormat.BINARY, "Format of the column is not binary" );
         return value;
     }
 
@@ -262,7 +262,7 @@ struct Value
     @property T as(T)() const
     if( isNumeric!(T) )
     {
-        enforce( format == valueFormat.BINARY, "Format of the column is not binary" );
+        enforce( format == ValueFormat.BINARY, "Format of the column is not binary" );
         enforce( value.length == T.sizeof, "Value length isn't equal to type size" );
         
         ubyte[T.sizeof] s = value[0..T.sizeof];
@@ -327,7 +327,7 @@ const struct Array
     this(in Value c)
     {
         cell = c;
-        enforce( cell.format == valueFormat.BINARY, "Format of the column is not binary" );
+        enforce( cell.format == ValueFormat.BINARY, "Format of the column is not binary" );
         
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
@@ -515,8 +515,8 @@ void _integration_test( string connParam )
 
     assert( e.rowCount == 3 );
     assert( e.columnCount == 4);
-    assert( e.columnFormat(1) == valueFormat.TEXT );
-    assert( e.columnFormat(2) == valueFormat.TEXT );
+    assert( e.columnFormat(1) == ValueFormat.TEXT );
+    assert( e.columnFormat(2) == ValueFormat.TEXT );
 
     assert( e[1][2].as!PGtext == "456" );
     assert( e[2][1].as!PGtext == "ijk_АБВГД" );
@@ -527,7 +527,7 @@ void _integration_test( string connParam )
 
     // Value properties test
     QueryParams p;
-    p.resultFormat = valueFormat.BINARY;
+    p.resultFormat = ValueFormat.BINARY;
     p.sqlCommand = "SELECT "~
         "-32761::smallint, "~
         "-2147483646::integer, "~
