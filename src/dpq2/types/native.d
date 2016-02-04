@@ -17,7 +17,7 @@ alias PGtext =          string; /// text
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 
-void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
+private void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
     throw new AnswerException(
             ExceptionType.NOT_NATIVE,
