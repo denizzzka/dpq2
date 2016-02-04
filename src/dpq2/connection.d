@@ -111,13 +111,14 @@ package class BaseConnection
     /// Exception
     class ConnException : Dpq2Exception
     {
-        /// libpq connection status
-        const ConnStatusType statusType;
-
         this(string file, size_t line)
         {
-            statusType = PQstatus(conn);
-            super(to!string( statusType ), file, line);
+            super("Connection error", file, line);
+        }
+
+        BaseConnection getConnection()
+        {
+            return this.outer;
         }
     }
 }
@@ -133,9 +134,25 @@ class Dpq2Exception : Exception
 void _integration_test( string connParam )
 {
     assert( PQlibVersion() >= 9_0100 );
-    
-    auto c = new BaseConnection;
-	c.connString = connParam;
-    c.connect();
-    c.disconnect();
+
+    {
+        auto c = new BaseConnection;
+        c.connString = connParam;
+        c.connect();
+        c.disconnect();
+    }
+
+    {
+        bool exceptionFlag = false;
+        auto c = new BaseConnection;
+
+        try c.connect();
+        catch(BaseConnection.ConnException e)
+        {
+            exceptionFlag = true;
+            assert(e.getConnection() == c);
+        }
+        finally
+            assert(exceptionFlag);
+    }
 }
