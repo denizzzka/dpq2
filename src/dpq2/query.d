@@ -166,7 +166,7 @@ final class Connection: BaseConnection
     class QueryException: Exception
     {
         /// PQerrorMessage
-        immutable string message;
+        const string message;
         
         this()
         {

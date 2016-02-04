@@ -109,16 +109,24 @@ class BaseConnection
     }
     
     /// Exception
-    class ConnException : Exception
+    class ConnException : Dpq2Exception
     {
         /// libpq connection status
-        immutable ConnStatusType statusType;
+        const ConnStatusType statusType;
 
         this(string file, size_t line)
         {
             statusType = PQstatus(conn);
             super(to!string( statusType ), file, line);
         }
+    }
+}
+
+class Dpq2Exception : Exception
+{
+    this(string msg, string file, size_t line)
+    {
+        super(msg, file, line);
     }
 }
 
