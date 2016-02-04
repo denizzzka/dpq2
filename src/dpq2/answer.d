@@ -10,7 +10,7 @@ import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception: enforceEx;//, enforce;
+import std.exception: enforceEx, enforce;
 import core.exception: OutOfMemoryError, AssertError;
 import std.bitmanip: bigEndianToNative;
 import std.typecons: Nullable;
@@ -133,14 +133,19 @@ class Answer
         if(!(c < columnCount))
             throw new AnswerException(
                 ExceptionTypes.COLUMN_OUT_OF_RANGE,
-                to!string(c)~" col is out of range 0.."~to!string(columnCount)~" of result cols",
+                "Column "~to!string(c)~" is out of range 0.."~to!string(columnCount)~" of result columns",
                 __FILE__, __LINE__
             );
     }
     
     private void assertRow( const size_t r ) const
     {
-        enforce( r < rowCount, to!string(r)~" row is out of range 0.."~to!string(rowCount)~" of result rows" );
+        if(!(r < rowCount))
+            throw new AnswerException(
+                ExceptionTypes.ROW_OUT_OF_RANGE,
+                "Row "~to!string(r)~" is out of range 0.."~to!string(rowCount)~" of result rows",
+                __FILE__, __LINE__
+            );
     }
     
      private void assertCoords( const Coords c ) const
@@ -434,7 +439,8 @@ enum ExceptionTypes
 {
     UNDEFINED_FIXME, /// Undefined, please report if you came across this error
     COLUMN_NOT_FOUND, /// Column is not found
-    COLUMN_OUT_OF_RANGE
+    COLUMN_OUT_OF_RANGE,
+    ROW_OUT_OF_RANGE,
 }
 
 /// Exception
