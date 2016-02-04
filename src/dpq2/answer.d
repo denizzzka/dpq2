@@ -294,10 +294,8 @@ const struct Array
         cell = c;
         if(!(cell.format == ValueFormat.BINARY))
             throw new AnswerException(ExceptionTypes.NOT_BINARY,
-                "Format of the column is not binary",
-                __FILE__, __LINE__
-            );
-        
+                msg_NOT_BINARY, __FILE__, __LINE__);
+
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
@@ -461,6 +459,8 @@ class Notify
         assert( n != null );
     }
 }
+
+immutable msg_NOT_BINARY = "Format of the column is not binary";
 
 /// Exception types
 enum ExceptionTypes

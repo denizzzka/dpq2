@@ -23,7 +23,7 @@ alias PGuuid =          UUID; /// UUID
 @property T as(T)(const Value v)
 if( is( T == const(ubyte[]) ) )
 {
-    enforce(v.format == ValueFormat.BINARY, "Format of the column is not binary");
+    enforce(v.format == ValueFormat.BINARY, msg_NOT_BINARY);
     enforce(v.oidType == OidType.ByteArray, "Format of the column isn't D native byte array or string");
 
     return v.value;
@@ -46,7 +46,7 @@ if(is(T == string))
 @property T as(T)(const Value v)
 if( isNumeric!(T) )
 {
-    enforce(v.format == ValueFormat.BINARY, "Format of the column is not binary");
+    enforce(v.format == ValueFormat.BINARY, msg_NOT_BINARY);
     enforce(v.value.length == T.sizeof, "Value length isn't equal to type size");
 
     static if(isIntegral!(T))
