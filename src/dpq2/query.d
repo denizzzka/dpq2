@@ -39,6 +39,8 @@ struct QueryArg
 /// Connection
 final class Connection: BaseConnection
 {
+    // Inheritance used here for separation of query code from connection code
+
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {

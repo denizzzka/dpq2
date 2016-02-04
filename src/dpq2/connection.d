@@ -28,7 +28,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
 /// BaseConnection
-class BaseConnection
+package class BaseConnection
 {
     string connString; /// Database connection parameters
     
