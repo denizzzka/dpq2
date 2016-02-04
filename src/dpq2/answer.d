@@ -10,7 +10,7 @@ import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception: enforceEx, enforce;
+import std.exception: enforceEx;//, enforce;
 import core.exception: OutOfMemoryError, AssertError;
 import std.bitmanip: bigEndianToNative;
 import std.typecons: Nullable;
