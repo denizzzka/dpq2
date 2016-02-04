@@ -37,10 +37,9 @@ struct QueryArg
 }
 
 /// Connection
+// Inheritance used here for separation of query code from connection code
 final class Connection: BaseConnection
 {
-    // Inheritance used here for separation of query code from connection code
-
     /// Perform SQL query to DB
     Answer exec( string SQLcmd )
     {
@@ -161,11 +160,10 @@ final class Connection: BaseConnection
 }
 
 /// Exception
+// Inheritance is used here because ConnException provides same functional,
+// but it is need to distinguish connection and query exceptions.
 class QueryException: ConnException
 {
-    // Inheritance is used because ConnException provides same functional,
-    // but it is need to distinguish connection and query exceptions.
-
     this(Connection conn, string file, size_t line)
     {
         super(conn, file, line);
