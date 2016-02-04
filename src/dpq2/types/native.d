@@ -17,6 +17,15 @@ alias PGtext =          string; /// text
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 
+void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
+{
+    throw new AnswerException(
+            ExceptionType.NOT_NATIVE,
+            "Format of the column ("~to!string(receivedType)~") isn't D native "~expectedType,
+            file, line
+        );
+}
+
 private alias VF = ValueFormat;
 private alias AE = AnswerException;
 private alias ET = ExceptionType;
@@ -30,9 +39,7 @@ if( is( T == const(ubyte[]) ) )
             msg_NOT_BINARY, __FILE__, __LINE__);
 
     if(!(v.oidType == OidType.ByteArray))
-        throw new AE(ET.NOT_NATIVE,
-            "Format of the column isn't D native byte array or string",
-            __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "byte array or string", __FILE__, __LINE__);
 
     return v.value;
 }
