@@ -50,11 +50,12 @@ class Answer
     package void checkAnswerForErrors() const
     {
         cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
+
         if(!(status == PGRES_COMMAND_OK ||
              status == PGRES_TUPLES_OK))
         {
-            throw new AnswerException( AnswerException.ExceptionTypes.UNDEFINED_FIXME,
-                resultErrorMessage~" ("~to!string(status)~")" );
+            throw new AnswerException(AnswerException.ExceptionTypes.UNDEFINED_FIXME,
+                resultErrorMessage~" ("~to!string(status)~")", __FILE__, __LINE__);
         }
     }
     
@@ -101,9 +102,11 @@ class Answer
     size_t columnNum( string columnName ) const
     {    
         size_t n = PQfnumber(res, toStringz(columnName));
+
         if( n == -1 )
             throw new AnswerException(AnswerException.ExceptionTypes.COLUMN_NOT_FOUND,
-                                "Column '"~columnName~"' is not found");
+                    "Column '"~columnName~"' is not found", __FILE__, __LINE__);
+
         return n;
     }
     
@@ -421,9 +424,8 @@ class Notify
     }
 }
 
-
 /// Exception
-class AnswerException : Exception
+class AnswerException : Dpq2Exception
 {    
     /// Exception types
     enum ExceptionTypes
@@ -434,13 +436,12 @@ class AnswerException : Exception
     
     ExceptionTypes type; /// Exception type
     
-    this( ExceptionTypes t, string msg )
+    this(ExceptionTypes t, string msg, string file, size_t line)
     {
         type = t;
-        super( msg, null, null );
+        super( msg, file, line );
     }
 }
-
 
 void _integration_test( string connParam )
 {

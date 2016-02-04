@@ -172,7 +172,7 @@ final class Connection: BaseConnection
 }
 
 /// Exception
-// Inheritance is used here because ConnException provides same functional,
+// Inheritance is used here because ConnException provides same functional
 // but it is need to distinguish connection and query exceptions.
 class QueryException: ConnException
 {
