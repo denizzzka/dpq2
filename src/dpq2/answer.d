@@ -252,7 +252,7 @@ struct Value
     {
         if(!isArray(oidType))
             throw new AnswerException(ExceptionTypes.NOT_ARRAY,
-                "Format of the column isn't array",
+                "Format of the column is "~to!string(oidType)~", isn't array",
                 __FILE__, __LINE__
             );
 
