@@ -468,10 +468,11 @@ enum ExceptionTypes
     UNDEFINED_FIXME, /// Undefined, please report if you came across this error
     COLUMN_NOT_FOUND, /// Column is not found
     OUT_OF_RANGE,
-    NOT_ARRAY,
+    NOT_ARRAY, /// Format of the column isn't array
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
-    SMALL_DIMENSIONS_NUM,
+    NOT_NATIVE, /// Format isn't matches D native type
+    SMALL_DIMENSIONS_NUM
 }
 
 /// Exception

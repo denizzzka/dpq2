@@ -23,8 +23,14 @@ alias PGuuid =          UUID; /// UUID
 @property T as(T)(const Value v)
 if( is( T == const(ubyte[]) ) )
 {
-    enforce(v.format == ValueFormat.BINARY, msg_NOT_BINARY);
-    enforce(v.oidType == OidType.ByteArray, "Format of the column isn't D native byte array or string");
+    if(!(v.format == ValueFormat.BINARY))
+        throw new AnswerException(ExceptionTypes.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
+    if(!(v.oidType == OidType.ByteArray))
+        throw new AnswerException(ExceptionTypes.NOT_NATIVE,
+            "Format of the column isn't D native byte array or string",
+            __FILE__, __LINE__);
 
     return v.value;
 }
