@@ -55,7 +55,8 @@ class Answer
              status == PGRES_TUPLES_OK))
         {
             throw new AnswerException(ExceptionTypes.UNDEFINED_FIXME,
-                resultErrorMessage~" ("~to!string(status)~")", __FILE__, __LINE__);
+                "Please report if you came across this error! status="~to!string(status)~"\r\n"~
+                resultErrorMessage, __FILE__, __LINE__);
         }
     }
     
@@ -300,10 +301,13 @@ const struct Array
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
-        
-        // TODO: here is need exception, not enforce
-        enforce( nDims > 0, "Dimensions number must be more than 0" );
-        
+
+        if(!(nDims > 0))
+            throw new AnswerException(ExceptionTypes.SMALL_DIMENSIONS_NUM,
+                "Dimensions number is too small, it must be positive value",
+                __FILE__, __LINE__
+            );
+
         auto ds = new int[ nDims ];
         
         // Recognize dimensions of array
@@ -316,7 +320,12 @@ const struct Array
             int lbound = bigEndianToNative!int(d.lbound);
 
             // FIXME: What is lbound in postgresql array reply?
-            enforce( lbound == 1, "Please report if you came across this error." );
+            if(!(lbound == 1))
+                throw new AnswerException(ExceptionTypes.UNDEFINED_FIXME,
+                    "Please report if you came across this error! lbound=="~to!string(lbound),
+                    __FILE__, __LINE__
+                );
+
             assert( dim_size > 0 );
             
             ds[i] = dim_size;
@@ -452,6 +461,7 @@ enum ExceptionTypes
     NOT_ARRAY,
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
+    SMALL_DIMENSIONS_NUM,
 }
 
 /// Exception
