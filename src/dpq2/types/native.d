@@ -115,6 +115,6 @@ void _integration_test( string connParam )
 
     QueryParams p;
     p.resultFormat = ValueFormat.BINARY;
-    p.sqlCommand = "SELECT 123"; // FIXME: try to request wrong SQL query - it is causes error
+    p.sqlCommand = "SELECT 123";
     auto r = conn.exec( p );
 }
