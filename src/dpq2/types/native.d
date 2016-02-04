@@ -55,10 +55,6 @@ if( isNumeric!(T) )
         throw new AnswerException(ExceptionType.NOT_BINARY,
             msg_NOT_BINARY, __FILE__, __LINE__);
 
-    if(!(v.value.length == T.sizeof))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to type size", __FILE__, __LINE__);
-
     static if(isIntegral!(T))
         if(!isNativeInteger(v.oidType))
             throw new AnswerException(ExceptionType.NOT_NATIVE,
@@ -70,6 +66,10 @@ if( isNumeric!(T) )
             throw new AnswerException(ExceptionType.NOT_NATIVE,
                 "Format of the column isn't D native floating point type",
                 __FILE__, __LINE__);
+
+    if(!(v.value.length == T.sizeof))
+        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to type size", __FILE__, __LINE__);
 
     ubyte[T.sizeof] s = v.value[0..T.sizeof];
     return bigEndianToNative!(T)(s);
@@ -90,14 +90,14 @@ if( is( T == SysTime ) )
 @property T as(T)(const Value v)
 if( is( T == UUID ) )
 {
-    if(!(v.value.length == 16))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to UUID size", __FILE__, __LINE__);
-
     if(!(v.oidType == OidType.UUID))
         throw new AnswerException(ExceptionType.NOT_NATIVE,
             "Format of the column is not UUID",
             __FILE__, __LINE__);
+
+    if(!(v.value.length == 16))
+        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to UUID size", __FILE__, __LINE__);
 
     UUID r;
     r.data = v.value;
