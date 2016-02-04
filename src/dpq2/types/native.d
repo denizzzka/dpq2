@@ -39,11 +39,12 @@ if( is( T == const(ubyte[]) ) )
 @property T as(T)(const Value v)
 if(is(T == string))
 {
-    if(v.format == ValueFormat.BINARY)
-        enforce(v.oidType == OidType.Text,
-            "Format of the column does not match to D native string");
+    if(v.format == ValueFormat.BINARY && !(v.oidType == OidType.Text))
+        throw new AnswerException(ExceptionTypes.NOT_NATIVE,
+            "Format of the column does not match to D native string",
+            __FILE__, __LINE__);
 
-    return cast(const(char[])) v.value;
+    return to!string( cast(const(char[])) v.value );
 }
 
 /// Returns cell value as native integer or decimal values
