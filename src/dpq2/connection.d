@@ -8,7 +8,7 @@ import derelict.pq.pq;
 
 import std.conv: to;
 import std.string: toStringz;
-import std.exception;
+import std.exception: enforceEx;
 import std.range;
 import core.exception;
 
