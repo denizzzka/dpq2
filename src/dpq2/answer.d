@@ -3,29 +3,17 @@ module dpq2.answer;
 @trusted:
 
 public import dpq2.query;
+public import dpq2.types.native;
 import dpq2.oids;
 
 import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception;
-import core.exception;
-import std.traits;
+import std.exception: enforceEx, enforce;
+import core.exception: OutOfMemoryError, AssertError;
 import std.bitmanip: bigEndianToNative;
-import std.datetime;
-import std.uuid;
 import std.typecons: Nullable;
-
-// Supported PostgreSQL binary types
-alias PGsmallint =      short; /// smallint
-alias PGinteger =       int; /// integer
-alias PGbigint =        long; /// bigint
-alias PGreal =          float; /// real
-alias PGdouble_precision = double; /// double precision
-alias PGtext =          string; /// text
-alias PGbytea =         const ubyte[]; /// bytea
-alias PGuuid =          UUID; /// UUID
 
 /// Result table's cell coordinates 
 struct Coords
@@ -228,9 +216,9 @@ const struct Row
 /// Link to the cell of the answer table
 struct Value
 {
-    private ubyte[] value;
-    private ValueFormat format;
-    private OidType oidType;
+    package ubyte[] value;
+    package ValueFormat format;
+    package OidType oidType;
 
     this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidType t )
     {
@@ -246,69 +234,6 @@ struct Value
         oidType = t;
     }
 
-    /// Returns value as bytes from binary formatted field
-    @property T as(T)() const
-    if( is( T == const(ubyte[]) ) )
-    {
-        enforce(format == ValueFormat.BINARY, "Format of the column is not binary");
-        enforce(oidType == OidType.ByteArray, "Format of the column isn't D native byte array or string");
-
-        return value;
-    }
-
-    /// Returns cell value as native string type
-    @property T as(T)() const
-    if(is(T == string))
-    {
-        if(format == ValueFormat.BINARY)
-            enforce(oidType == OidType.Text,
-                "Format of the column does not match to D native string");
-
-        return cast(const(char[])) value;
-    }
-    
-    /// Returns cell value as native integer or decimal values
-    ///
-    /// Postgres type "numeric" is oversized and not supported by now
-    @property T as(T)() const
-    if( isNumeric!(T) )
-    {
-        enforce(format == ValueFormat.BINARY, "Format of the column is not binary");
-        enforce(value.length == T.sizeof, "Value length isn't equal to type size");
-
-        static if(isIntegral!(T))
-            enforce(isNativeInteger(oidType), "Format of the column isn't D native integral type");
-
-        static if(isFloatingPoint!(T))
-            enforce(isNativeFloat(oidType), "Format of the column isn't D native floating point type");
-
-        ubyte[T.sizeof] s = value[0..T.sizeof];
-        return bigEndianToNative!(T)( s );
-    }
-    
-    /// Returns cell value as native date and time
-    @property T as(T)() const
-    if( is( T == SysTime ) )
-    {
-        pragma(msg, "Date and time type support isn't tested very well and not recommended for use");
-
-        ulong pre_time = as!(ulong)();
-        // UTC because server always sends binary timestamps in UTC, not in TZ
-        return SysTime( pre_time * 10, UTC() );
-    }
-    
-    /// Returns UUID as native UUID value
-    @property T as(T)() const
-    if( is( T == UUID ) )
-    {
-        enforce( value.length == 16, "Value length isn't equal to UUID size" );
-        enforce( oidType == OidType.UUID, "Format of the column is not UUID" );
-
-        UUID r;
-        r.data = value;
-        return r;
-    }
-    
     @property
     Array asArray() const
     {
