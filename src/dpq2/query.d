@@ -158,12 +158,7 @@ final class Connection: BaseConnection
         
         return res;
     }
-    
-    private string errorMessage()
-    {
-        return to!(string)( PQerrorMessage(conn) );
-    }
-    
+
     /// Exception
     class QueryException: Exception
     {

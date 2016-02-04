@@ -102,7 +102,12 @@ package class BaseConnection
         assert( r >= 0 );
         return r;
     }
-    
+
+    package string errorMessage()
+    {
+        return to!(string)(PQerrorMessage(conn));
+    }
+
     ~this()
     {
         disconnect();
@@ -118,7 +123,7 @@ class ConnException : Dpq2Exception
     {
         conn = c;
 
-        super("Connection error", file, line);
+        super(conn.errorMessage(), file, line);
     }
 
     BaseConnection getConnection()
@@ -156,6 +161,7 @@ void _integration_test( string connParam )
         {
             exceptionFlag = true;
             assert(e.getConnection() == c);
+            assert(e.msg.length > 40); // error message check
         }
         finally
             assert(exceptionFlag);
