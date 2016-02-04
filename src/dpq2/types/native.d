@@ -21,7 +21,7 @@ void throwTypeComplaint(OidType receivedType, string expectedType, string file, 
 {
     throw new AnswerException(
             ExceptionType.NOT_NATIVE,
-            "Format of the column ("~to!string(receivedType)~") isn't D native "~expectedType,
+            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
             file, line
         );
 }
@@ -49,9 +49,7 @@ if( is( T == const(ubyte[]) ) )
 if(is(T == string))
 {
     if(v.format == VF.BINARY && !(v.oidType == OidType.Text))
-        throw new AE(ET.NOT_NATIVE,
-            "Format of the column does not match to D native string",
-            __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
 
     return to!string( cast(const(char[])) v.value );
 }
