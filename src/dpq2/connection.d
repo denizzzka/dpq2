@@ -55,7 +55,7 @@ package class BaseConnection
     private void setNonBlocking( bool state )
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
-            throw new ConnException(__FILE__, __LINE__);
+            throw new ConnException(this, __FILE__, __LINE__);
     }
     
 	/// Connect to DB
@@ -68,7 +68,7 @@ package class BaseConnection
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
         if( !nonBlocking && PQstatus(conn) != CONNECTION_OK )
-            throw new ConnException(__FILE__, __LINE__);
+            throw new ConnException(this, __FILE__, __LINE__);
         
         readyForQuery = true;
     }
@@ -86,13 +86,13 @@ package class BaseConnection
     package void consumeInput()
     {
         const size_t r = PQconsumeInput( conn );
-        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnException(__FILE__, __LINE__);
+        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnException(this, __FILE__, __LINE__);
     }
     
     package bool flush()
     {
         auto r = PQflush(conn);
-        if( r == -1 ) throw new ConnException(__FILE__, __LINE__);
+        if( r == -1 ) throw new ConnException(this, __FILE__, __LINE__);
         return r == 0;
     }
     
@@ -107,19 +107,23 @@ package class BaseConnection
     {
         disconnect();
     }
-    
-    /// Exception
-    class ConnException : Dpq2Exception
-    {
-        this(string file, size_t line)
-        {
-            super("Connection error", file, line);
-        }
+}
 
-        BaseConnection getConnection()
-        {
-            return this.outer;
-        }
+/// Connection exception
+class ConnException : Dpq2Exception
+{
+    private BaseConnection conn;
+
+    this(BaseConnection c, string file, size_t line)
+    {
+        conn = c;
+
+        super("Connection error", file, line);
+    }
+
+    BaseConnection getConnection()
+    {
+        return conn;
     }
 }
 
@@ -148,7 +152,7 @@ void _integration_test( string connParam )
         c.connString = "!!!some incorrect connection string!!!";
 
         try c.connect();
-        catch(BaseConnection.ConnException e)
+        catch(ConnException e)
         {
             exceptionFlag = true;
             assert(e.getConnection() == c);
