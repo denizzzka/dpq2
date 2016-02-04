@@ -17,16 +17,20 @@ alias PGtext =          string; /// text
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 
+private alias VF = ValueFormat;
+private alias AE = AnswerException;
+private alias ET = ExceptionType;
+
 /// Returns value as bytes from binary formatted field
 @property T as(T)(const Value v)
 if( is( T == const(ubyte[]) ) )
 {
-    if(!(v.format == ValueFormat.BINARY))
-        throw new AnswerException(ExceptionType.NOT_BINARY,
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
             msg_NOT_BINARY, __FILE__, __LINE__);
 
     if(!(v.oidType == OidType.ByteArray))
-        throw new AnswerException(ExceptionType.NOT_NATIVE,
+        throw new AE(ET.NOT_NATIVE,
             "Format of the column isn't D native byte array or string",
             __FILE__, __LINE__);
 
@@ -37,8 +41,8 @@ if( is( T == const(ubyte[]) ) )
 @property T as(T)(const Value v)
 if(is(T == string))
 {
-    if(v.format == ValueFormat.BINARY && !(v.oidType == OidType.Text))
-        throw new AnswerException(ExceptionType.NOT_NATIVE,
+    if(v.format == VF.BINARY && !(v.oidType == OidType.Text))
+        throw new AE(ET.NOT_NATIVE,
             "Format of the column does not match to D native string",
             __FILE__, __LINE__);
 
@@ -51,24 +55,24 @@ if(is(T == string))
 @property T as(T)(const Value v)
 if( isNumeric!(T) )
 {
-    if(!(v.format == ValueFormat.BINARY))
-        throw new AnswerException(ExceptionType.NOT_BINARY,
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
             msg_NOT_BINARY, __FILE__, __LINE__);
 
     static if(isIntegral!(T))
         if(!isNativeInteger(v.oidType))
-            throw new AnswerException(ExceptionType.NOT_NATIVE,
+            throw new AE(ET.NOT_NATIVE,
                 "Format of the column isn't D native integral type",
                 __FILE__, __LINE__);
 
     static if(isFloatingPoint!(T))
         if(!isNativeFloat(v.oidType))
-            throw new AnswerException(ExceptionType.NOT_NATIVE,
+            throw new AE(ET.NOT_NATIVE,
                 "Format of the column isn't D native floating point type",
                 __FILE__, __LINE__);
 
     if(!(v.value.length == T.sizeof))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+        throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to type size", __FILE__, __LINE__);
 
     ubyte[T.sizeof] s = v.value[0..T.sizeof];
@@ -91,12 +95,12 @@ if( is( T == SysTime ) )
 if( is( T == UUID ) )
 {
     if(!(v.oidType == OidType.UUID))
-        throw new AnswerException(ExceptionType.NOT_NATIVE,
+        throw new AE(ET.NOT_NATIVE,
             "Format of the column is not UUID",
             __FILE__, __LINE__);
 
     if(!(v.value.length == 16))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+        throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to UUID size", __FILE__, __LINE__);
 
     UUID r;
