@@ -54,7 +54,7 @@ class Answer
         if(!(status == PGRES_COMMAND_OK ||
              status == PGRES_TUPLES_OK))
         {
-            throw new AnswerException(AnswerException.ExceptionTypes.UNDEFINED_FIXME,
+            throw new AnswerException(ExceptionTypes.UNDEFINED_FIXME,
                 resultErrorMessage~" ("~to!string(status)~")", __FILE__, __LINE__);
         }
     }
@@ -104,7 +104,7 @@ class Answer
         size_t n = PQfnumber(res, toStringz(columnName));
 
         if( n == -1 )
-            throw new AnswerException(AnswerException.ExceptionTypes.COLUMN_NOT_FOUND,
+            throw new AnswerException(ExceptionTypes.COLUMN_NOT_FOUND,
                     "Column '"~columnName~"' is not found", __FILE__, __LINE__);
 
         return n;
@@ -130,7 +130,12 @@ class Answer
     
     private void assertCol( const size_t c ) const
     {
-        enforce( c < columnCount, to!string(c)~" col is out of range 0.."~to!string(columnCount)~" of result cols" );
+        if(!(c < columnCount))
+            throw new AnswerException(
+                ExceptionTypes.COLUMN_OUT_OF_RANGE,
+                to!string(c)~" col is out of range 0.."~to!string(columnCount)~" of result cols",
+                __FILE__, __LINE__
+            );
     }
     
     private void assertRow( const size_t r ) const
@@ -424,16 +429,17 @@ class Notify
     }
 }
 
+/// Exception types
+enum ExceptionTypes
+{
+    UNDEFINED_FIXME, /// Undefined, please report if you came across this error
+    COLUMN_NOT_FOUND, /// Column is not found
+    COLUMN_OUT_OF_RANGE
+}
+
 /// Exception
 class AnswerException : Dpq2Exception
 {    
-    /// Exception types
-    enum ExceptionTypes
-    {
-        COLUMN_NOT_FOUND, /// Column not found
-        UNDEFINED_FIXME /// Undefined, need to find and fix it
-    }
-    
     ExceptionTypes type; /// Exception type
     
     this(ExceptionTypes t, string msg, string file, size_t line)
