@@ -6,7 +6,7 @@ import dpq2.oids;
 import std.traits;
 import std.datetime;
 import std.uuid;
-import std.exception;
+//import std.exception;
 //import core.exception;
 
 // Supported PostgreSQL binary types
@@ -92,8 +92,14 @@ if( is( T == SysTime ) )
 @property T as(T)(const Value v)
 if( is( T == UUID ) )
 {
-    enforce( v.value.length == 16, "Value length isn't equal to UUID size" );
-    enforce( v.oidType == OidType.UUID, "Format of the column is not UUID" );
+    if(!(v.value.length == 16))
+        throw new AnswerException(ExceptionTypes.SIZE_MISMATCH,
+            "Value length isn't equal to UUID size", __FILE__, __LINE__);
+
+    if(!(v.oidType == OidType.UUID))
+        throw new AnswerException(ExceptionTypes.NOT_NATIVE,
+            "Format of the column is not UUID",
+            __FILE__, __LINE__);
 
     UUID r;
     r.data = v.value;
