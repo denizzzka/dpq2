@@ -200,6 +200,8 @@ const struct Row
     @property
     bool isNULL( const size_t col ) const
     {
+        answer.assertCol(col);
+
         return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
     
@@ -540,15 +542,7 @@ void _integration_test( string connParam )
     p.sqlCommand = "SELECT "~
         "-32761::smallint, "~
         "-2147483646::integer, "~
-        "-9223372036854775806::bigint, "~
-        "-12.3456::real, "~
-        "-1234.56789012345::double precision, "~
-        "'2012-10-04 11:00:21.227803+08'::timestamp with time zone, "~
-        "'2012-10-04 11:00:21.227803+08'::timestamp without time zone, "~
-        "'2012-10-04 11:00:21.227803+00'::timestamp with time zone, "~
-        "'2012-10-04 11:00:21.227803+00'::timestamp without time zone, "~
         "'first line\nsecond line'::text, "~
-        r"E'\\x44 20 72 75 6c 65 73 00 21'::bytea, "~ // "D rules\x00!" (ASCII)
         "array[[[1,  2, 3], "~
                "[4,  5, 6]], "~
                
@@ -556,45 +550,34 @@ void _integration_test( string connParam )
               "[10, 11,12]], "~
               
               "[[13,14,NULL], "~
-               "[16,17,18]]]::integer[], "~
-        "NULL, "~
-        "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'::uuid";
-
+               "[16,17,18]]]::integer[] as test_array, "~
+        "NULL";
 
     auto r = conn.exec( p );
-    
-    assert( r[0][0].as!PGsmallint == -32_761 );
-    assert( r[0][1].as!PGinteger == -2_147_483_646 );
-    assert( r[0][2].as!PGbigint == -9_223_372_036_854_775_806 );
-    assert( r[0][3].as!PGreal == -12.3456f );
-    assert( r[0][4].as!PGdouble_precision == -1234.56789012345 );
-    
-    assert( r[0][9].as!PGtext == "first line\nsecond line" );
-    assert( r[0][10].as!PGbytea == [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21] ); // "D rules\x00!" (ASCII)
-    
-    auto v = r[0][11];
-    assert( r.OID(11) == OidType.Int4Array );
-    auto a = v.asArray;
-    assert( a.OID == OidType.Int4 );
-    assert( a.getValue(2,1,2).as!PGinteger == 18 );
-    assert( a.isNULL(2,0,2) );
-    assert( !a.isNULL(2,1,2) );
-    
-    assert( r[0].isNULL(12) );
 
     {
-        bool isNullFlag = false;
-        try
-            cast(void) r[0][12].as!PGsmallint;
-        catch(AssertError)
-            isNullFlag = true;
-        finally
-            assert(isNullFlag);
+        assert( r[0].isNULL(4) );
+        assert( !r[0].isNULL(2) );
+
+        assert( r.OID(3) == OidType.Int4Array );
+        auto v = r[0]["test_array"];
+        auto a = v.asArray;
+        assert( a.OID == OidType.Int4 );
+        assert( a.getValue(2,1,2).as!PGinteger == 18 );
+        assert( a.isNULL(2,0,2) );
+        assert( !a.isNULL(2,1,2) );
+
+        {
+            bool isNullFlag = false;
+            try
+                cast(void) r[0][4].as!PGsmallint;
+            catch(AssertError)
+                isNullFlag = true;
+            finally
+                assert(isNullFlag);
+        }
     }
 
-    assert( !r[0].isNULL(9) );
-    assert( r[0][13].as!PGuuid.toString() == "8b9ab33a-96e9-499b-9c36-aad1fe86d640" );
-    
     // Notifies test
     conn.exec( "listen test_notify; notify test_notify" );
     assert( conn.getNextNotify.name == "test_notify" );
