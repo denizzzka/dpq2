@@ -291,7 +291,11 @@ const struct Array
     this(in Value c)
     {
         cell = c;
-        enforce( cell.format == ValueFormat.BINARY, "Format of the column is not binary" );
+        if(!(cell.format == ValueFormat.BINARY))
+            throw new AnswerException(ExceptionTypes.NOT_BINARY,
+                "Format of the column is not binary",
+                __FILE__, __LINE__
+            );
         
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
@@ -445,7 +449,9 @@ enum ExceptionTypes
     COLUMN_NOT_FOUND, /// Column is not found
     COLUMN_OUT_OF_RANGE,
     ROW_OUT_OF_RANGE,
-    NOT_ARRAY
+    NOT_ARRAY,
+    NOT_BINARY, /// Format of the column isn't binary
+    NOT_TEXT, /// Format of the column isn't text string
 }
 
 /// Exception
