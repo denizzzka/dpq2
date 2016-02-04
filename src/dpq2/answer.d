@@ -550,5 +550,20 @@ void _integration_test( string connParam )
     
     // Range test
     foreach( elem; r )
+    {
         assert( elem[0].as!PGsmallint == -32_761 );
+    }
+
+    {
+        bool exceptionFlag = false;
+
+        try conn.exec("WRONG SQL QUERY");
+        catch(AnswerException e)
+        {
+            exceptionFlag = true;
+            assert(e.msg.length > 20); // error message check
+        }
+        finally
+            assert(exceptionFlag);
+    }
 }
