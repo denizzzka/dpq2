@@ -102,7 +102,7 @@ if( is( T == UUID ) )
 
     if(!(v.value.length == 16))
         throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to UUID size", __FILE__, __LINE__);
+            "Value length isn't equal to native D UUID size", __FILE__, __LINE__);
 
     UUID r;
     r.data = v.value;
