@@ -57,6 +57,10 @@ class Answer
             case PGRES_TUPLES_OK:
                 break;
 
+            case PGRES_EMPTY_QUERY:
+                throw new AnswerException(ExceptionType.EMPTY_QUERY,
+                    "Empty query", __FILE__, __LINE__);
+
             case PGRES_FATAL_ERROR:
                 throw new AnswerException(ExceptionType.FATAL_ERROR,
                     resultErrorMessage, __FILE__, __LINE__);
@@ -482,6 +486,7 @@ enum ExceptionType
     NOT_NATIVE, /// Format isn't matches D native type
     SMALL_DIMENSIONS_NUM,
     SIZE_MISMATCH,
+    EMPTY_QUERY,
     FATAL_ERROR
 }
 
