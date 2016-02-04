@@ -6,8 +6,6 @@ import dpq2.oids;
 import std.traits;
 import std.datetime;
 import std.uuid;
-//import std.exception;
-//import core.exception;
 
 // Supported PostgreSQL binary types
 alias PGsmallint =      short; /// smallint
