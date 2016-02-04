@@ -76,7 +76,7 @@ final class Connection: BaseConnection
     void sendQuery( string SQLcmd )
     {
         const size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
-        if( r != 1 ) throw new QueryException();
+        if( r != 1 ) throw new QueryException(__FILE__, __LINE__);
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -94,7 +94,7 @@ final class Connection: BaseConnection
                     cast(int)p.resultFormat                    
                     );
                     
-        if( !r ) throw new QueryException();
+        if( !r ) throw new QueryException(__FILE__, __LINE__);
     }
     
     /// Waits for the next result from a sendQuery
@@ -170,7 +170,7 @@ final class Connection: BaseConnection
         /// PQerrorMessage
         const string message;
         
-        this()
+        this(string file, size_t line)
         {
             message = errorMessage();
             super( message, null, null );
