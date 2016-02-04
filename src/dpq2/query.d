@@ -99,7 +99,17 @@ final class Connection: BaseConnection
     /// Waits for the next result from a sendQuery
     package Answer getResult()
     {
-        return getAnswer( PQgetResult( conn ) );
+        Answer res;
+
+        auto r = PQgetResult( conn );
+
+        if(r)
+        {
+            res = new Answer(r);
+            res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
+        }
+
+        return res;
     }
     
     /// getResult would block waiting for input?
@@ -143,7 +153,8 @@ final class Connection: BaseConnection
         
         return a;
     }
-    
+
+    /// Get Answer from PQexec* functions
     // It is important to do a separate check because of Answer ctor is nothrow
     private Answer getAnswer( PGresult* r )
     {
@@ -154,6 +165,7 @@ final class Connection: BaseConnection
             res = new Answer( r );
             res.checkAnswerForErrors();
         }
+        else throw new QueryException(this, __FILE__, __LINE__);
         
         return res;
     }
@@ -167,6 +179,11 @@ class QueryException: ConnException
     this(Connection conn, string file, size_t line)
     {
         super(conn, file, line);
+    }
+
+    override Connection getConnection()
+    {
+        return cast(Connection) super.getConnection();
     }
 }
 
@@ -195,12 +212,27 @@ void _integration_test( string connParam )
     QueryArg arg;
     arg.value = "абвгд";
     args[0] = arg;
-    
-    QueryParams p;
-    p.sqlCommand = sql_query2;
-    p.args = args[];
-    
-    conn.exec( p );
-    
+
+    {
+        QueryParams p;
+        p.sqlCommand = sql_query2;
+        p.args = args[];
+        conn.exec( p );
+    }
+
     conn.disconnect();
+
+    {
+        bool exceptionFlag = false;
+
+        try conn.exec("SELECT 'abc'::text");
+        catch(QueryException e)
+        {
+            exceptionFlag = true;
+            assert(e.getConnection() == conn);
+            assert(e.msg.length > 15); // error message check
+        }
+        finally
+            assert(exceptionFlag);
+    }
 }
