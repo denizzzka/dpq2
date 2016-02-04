@@ -54,7 +54,7 @@ class Answer
         if(!(status == PGRES_COMMAND_OK ||
              status == PGRES_TUPLES_OK))
         {
-            throw new AnswerException(ExceptionTypes.UNDEFINED_FIXME,
+            throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
                 "Please report if you came across this error! status="~to!string(status)~"\r\n"~
                 resultErrorMessage, __FILE__, __LINE__);
         }
@@ -105,7 +105,7 @@ class Answer
         size_t n = PQfnumber(res, toStringz(columnName));
 
         if( n == -1 )
-            throw new AnswerException(ExceptionTypes.COLUMN_NOT_FOUND,
+            throw new AnswerException(ExceptionType.COLUMN_NOT_FOUND,
                     "Column '"~columnName~"' is not found", __FILE__, __LINE__);
 
         return n;
@@ -133,7 +133,7 @@ class Answer
     {
         if(!(c < columnCount))
             throw new AnswerException(
-                ExceptionTypes.OUT_OF_RANGE,
+                ExceptionType.OUT_OF_RANGE,
                 "Column "~to!string(c)~" is out of range 0.."~to!string(columnCount)~" of result columns",
                 __FILE__, __LINE__
             );
@@ -143,7 +143,7 @@ class Answer
     {
         if(!(r < rowCount))
             throw new AnswerException(
-                ExceptionTypes.OUT_OF_RANGE,
+                ExceptionType.OUT_OF_RANGE,
                 "Row "~to!string(r)~" is out of range 0.."~to!string(rowCount)~" of result rows",
                 __FILE__, __LINE__
             );
@@ -252,7 +252,7 @@ struct Value
     Array asArray() const
     {
         if(!isArray(oidType))
-            throw new AnswerException(ExceptionTypes.NOT_ARRAY,
+            throw new AnswerException(ExceptionType.NOT_ARRAY,
                 "Format of the column is "~to!string(oidType)~", isn't array",
                 __FILE__, __LINE__
             );
@@ -293,7 +293,7 @@ const struct Array
     {
         cell = c;
         if(!(cell.format == ValueFormat.BINARY))
-            throw new AnswerException(ExceptionTypes.NOT_BINARY,
+            throw new AnswerException(ExceptionType.NOT_BINARY,
                 msg_NOT_BINARY, __FILE__, __LINE__);
 
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
@@ -301,7 +301,7 @@ const struct Array
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
         if(!(nDims > 0))
-            throw new AnswerException(ExceptionTypes.SMALL_DIMENSIONS_NUM,
+            throw new AnswerException(ExceptionType.SMALL_DIMENSIONS_NUM,
                 "Dimensions number is too small, it must be positive value",
                 __FILE__, __LINE__
             );
@@ -319,7 +319,7 @@ const struct Array
 
             // FIXME: What is lbound in postgresql array reply?
             if(!(lbound == 1))
-                throw new AnswerException(ExceptionTypes.UNDEFINED_FIXME,
+                throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
                     "Please report if you came across this error! lbound=="~to!string(lbound),
                     __FILE__, __LINE__
                 );
@@ -396,7 +396,7 @@ const struct Array
 
         if(!(nDims == args.length))
             throw new AnswerException(
-                ExceptionTypes.OUT_OF_RANGE,
+                ExceptionType.OUT_OF_RANGE,
                 "Mismatched dimensions number in arguments and server reply",
                 __FILE__, __LINE__
             );
@@ -408,7 +408,7 @@ const struct Array
 
             if(!(dimsSize[i] > args[i]))
                 throw new AnswerException(
-                    ExceptionTypes.OUT_OF_RANGE,
+                    ExceptionType.OUT_OF_RANGE,
                     "Out of range",
                     __FILE__, __LINE__
                 );
@@ -463,7 +463,7 @@ class Notify
 immutable msg_NOT_BINARY = "Format of the column is not binary";
 
 /// Exception types
-enum ExceptionTypes
+enum ExceptionType
 {
     UNDEFINED_FIXME, /// Undefined, please report if you came across this error
     COLUMN_NOT_FOUND, /// Column is not found
@@ -479,9 +479,9 @@ enum ExceptionTypes
 /// Exception
 class AnswerException : Dpq2Exception
 {    
-    ExceptionTypes type; /// Exception type
+    ExceptionType type; /// Exception type
     
-    this(ExceptionTypes t, string msg, string file, size_t line)
+    this(ExceptionType t, string msg, string file, size_t line)
     {
         type = t;
         super( msg, file, line );
