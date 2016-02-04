@@ -51,12 +51,20 @@ class Answer
     {
         cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
 
-        if(!(status == PGRES_COMMAND_OK ||
-             status == PGRES_TUPLES_OK))
+        switch(status)
         {
-            throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
-                "Please report if you came across this error! status="~to!string(status)~"\r\n"~
-                resultErrorMessage, __FILE__, __LINE__);
+            case PGRES_COMMAND_OK:
+            case PGRES_TUPLES_OK:
+                break;
+
+            case PGRES_FATAL_ERROR:
+                throw new AnswerException(ExceptionType.FATAL_ERROR,
+                    resultErrorMessage, __FILE__, __LINE__);
+
+            default:
+                throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
+                    "Please report if you came across this error! status="~to!string(status)~"\r\n"~
+                    resultErrorMessage, __FILE__, __LINE__);
         }
     }
     
@@ -473,7 +481,8 @@ enum ExceptionType
     NOT_TEXT, /// Format of the column isn't text string
     NOT_NATIVE, /// Format isn't matches D native type
     SMALL_DIMENSIONS_NUM,
-    SIZE_MISMATCH
+    SIZE_MISMATCH,
+    FATAL_ERROR
 }
 
 /// Exception
@@ -484,7 +493,7 @@ class AnswerException : Dpq2Exception
     this(ExceptionType t, string msg, string file, size_t line)
     {
         type = t;
-        super( msg, file, line );
+        super(msg, file, line);
     }
 }
 
