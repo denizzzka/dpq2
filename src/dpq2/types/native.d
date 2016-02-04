@@ -53,14 +53,25 @@ if(is(T == string))
 @property T as(T)(const Value v)
 if( isNumeric!(T) )
 {
-    enforce(v.format == ValueFormat.BINARY, msg_NOT_BINARY);
-    enforce(v.value.length == T.sizeof, "Value length isn't equal to type size");
+    if(!(v.format == ValueFormat.BINARY))
+        throw new AnswerException(ExceptionTypes.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
+    if(!(v.value.length == T.sizeof))
+        throw new AnswerException(ExceptionTypes.SIZE_MISMATCH,
+            "Value length isn't equal to type size", __FILE__, __LINE__);
 
     static if(isIntegral!(T))
-        enforce(isNativeInteger(v.oidType), "Format of the column isn't D native integral type");
+        if(!isNativeInteger(v.oidType))
+            throw new AnswerException(ExceptionTypes.NOT_NATIVE,
+                "Format of the column isn't D native integral type",
+                __FILE__, __LINE__);
 
     static if(isFloatingPoint!(T))
-        enforce(isNativeFloat(v.oidType), "Format of the column isn't D native floating point type");
+        if(!isNativeFloat(v.oidType))
+            throw new AnswerException(ExceptionTypes.NOT_NATIVE,
+                "Format of the column isn't D native floating point type",
+                __FILE__, __LINE__);
 
     ubyte[T.sizeof] s = v.value[0..T.sizeof];
     return bigEndianToNative!(T)(s);
