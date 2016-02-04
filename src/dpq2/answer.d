@@ -520,15 +520,17 @@ void _integration_test( string connParam )
     assert( !a.isNULL(2,1,2) );
     
     assert( r[0].isNULL(12) );
-    
-    bool isNullFlag = false;
-    try
-        cast(void) r[0][12].as!PGsmallint;
-    catch(AssertError)
-        isNullFlag = true;
-    finally
-        assert(isNullFlag);
-    
+
+    {
+        bool isNullFlag = false;
+        try
+            cast(void) r[0][12].as!PGsmallint;
+        catch(AssertError)
+            isNullFlag = true;
+        finally
+            assert(isNullFlag);
+    }
+
     assert( !r[0].isNULL(9) );
     assert( r[0][13].as!PGuuid.toString() == "8b9ab33a-96e9-499b-9c36-aad1fe86d640" );
     
