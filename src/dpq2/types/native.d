@@ -113,8 +113,21 @@ void _integration_test( string connParam )
 	conn.connString = connParam;
     conn.connect();
 
-    QueryParams p;
-    p.resultFormat = ValueFormat.BINARY;
-    p.sqlCommand = "SELECT 123";
-    auto r = conn.exec( p );
+    QueryParams params;
+    params.resultFormat = ValueFormat.BINARY;
+
+    {
+        void testIt(T, V)(T nativeValue, string pgType, V pgValue)
+        {
+            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as test_result";
+            auto answer = conn.exec(params);
+
+            assert(answer[0][0].as!T == nativeValue, "pgType="~pgType~" pgValue="~pgValue~" nativeType="~to!string(typeid(T))~" nativeValue="~to!string(nativeValue));
+        }
+
+        alias C = testIt; // "C" means "case"
+
+        C!PGsmallint(-32_761, "smallint", "-32761");
+        C!PGinteger(-2_147_483_646, "integer", "-2147483646");
+    }
 }
