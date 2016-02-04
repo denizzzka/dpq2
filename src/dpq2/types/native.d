@@ -109,5 +109,12 @@ if( is( T == UUID ) )
 
 void _integration_test( string connParam )
 {
-    
+    auto conn = new Connection;
+	conn.connString = connParam;
+    conn.connect();
+
+    QueryParams p;
+    p.resultFormat = ValueFormat.BINARY;
+    p.sqlCommand = "SELECT 123"; // FIXME: try to request wrong SQL query - it is causes error
+    auto r = conn.exec( p );
 }
