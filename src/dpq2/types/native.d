@@ -106,3 +106,8 @@ if( is( T == UUID ) )
     r.data = v.value;
     return r;
 }
+
+void _integration_test( string connParam )
+{
+    
+}
