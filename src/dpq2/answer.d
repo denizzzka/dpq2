@@ -490,33 +490,35 @@ class AnswerException : Dpq2Exception
 
 void _integration_test( string connParam )
 {
-    // Answer properies test
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
 
-    string sql_query =
-    "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
-    "union all\n"~
+    // Answer properies test
+    {
+        string sql_query =
+        "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
+        "union all\n"~
 
-    "select now(),          'def'::text,                 456,  910.11\n"~
-    "union all\n"~
+        "select now(),          'def'::text,                 456,  910.11\n"~
+        "union all\n"~
 
-    "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
+        "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
 
-    auto e = conn.exec( sql_query );
+        auto e = conn.exec(sql_query);
 
-    assert( e.rowCount == 3 );
-    assert( e.columnCount == 4);
-    assert( e.columnFormat(1) == ValueFormat.TEXT );
-    assert( e.columnFormat(2) == ValueFormat.TEXT );
+        assert( e.rowCount == 3 );
+        assert( e.columnCount == 4);
+        assert( e.columnFormat(1) == ValueFormat.TEXT );
+        assert( e.columnFormat(2) == ValueFormat.TEXT );
 
-    assert( e[1][2].as!PGtext == "456" );
-    assert( e[2][1].as!PGtext == "ijk_АБВГД" );
-    assert( !e[0].isNULL(0) );
-    assert( e[2].isNULL(0) );
-    assert( e.columnNum( "field_name" ) == 1 );
-    assert( e[1]["field_name"].as!PGtext == "def" );
+        assert( e[1][2].as!PGtext == "456" );
+        assert( e[2][1].as!PGtext == "ijk_АБВГД" );
+        assert( !e[0].isNULL(0) );
+        assert( e[2].isNULL(0) );
+        assert( e.columnNum( "field_name" ) == 1 );
+        assert( e[1]["field_name"].as!PGtext == "def" );
+    }
 
     // Value properties test
     QueryParams p;
