@@ -66,15 +66,11 @@ if( isNumeric!(T) )
 
     static if(isIntegral!(T))
         if(!isNativeInteger(v.oidType))
-            throw new AE(ET.NOT_NATIVE,
-                "Format of the column isn't D native integral type",
-                __FILE__, __LINE__);
+            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
 
     static if(isFloatingPoint!(T))
         if(!isNativeFloat(v.oidType))
-            throw new AE(ET.NOT_NATIVE,
-                "Format of the column isn't D native floating point type",
-                __FILE__, __LINE__);
+            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
 
     if(!(v.value.length == T.sizeof))
         throw new AE(ET.SIZE_MISMATCH,
