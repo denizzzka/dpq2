@@ -145,6 +145,7 @@ void _integration_test( string connParam )
     {
         bool exceptionFlag = false;
         auto c = new BaseConnection;
+        c.connString = "!!!some incorrect connection string!!!";
 
         try c.connect();
         catch(BaseConnection.ConnException e)
