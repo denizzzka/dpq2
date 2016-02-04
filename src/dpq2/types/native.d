@@ -96,9 +96,7 @@ if( is( T == SysTime ) )
 if( is( T == UUID ) )
 {
     if(!(v.oidType == OidType.UUID))
-        throw new AE(ET.NOT_NATIVE,
-            "Format of the column is not UUID",
-            __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
 
     if(!(v.value.length == 16))
         throw new AE(ET.SIZE_MISMATCH,
