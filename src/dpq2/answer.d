@@ -10,7 +10,7 @@ import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception: enforceEx, enforce;
+import std.exception: enforceEx;
 import core.exception: OutOfMemoryError, AssertError;
 import std.bitmanip: bigEndianToNative;
 import std.typecons: Nullable;
@@ -133,7 +133,7 @@ class Answer
     {
         if(!(c < columnCount))
             throw new AnswerException(
-                ExceptionTypes.COLUMN_OUT_OF_RANGE,
+                ExceptionTypes.OUT_OF_RANGE,
                 "Column "~to!string(c)~" is out of range 0.."~to!string(columnCount)~" of result columns",
                 __FILE__, __LINE__
             );
@@ -143,7 +143,7 @@ class Answer
     {
         if(!(r < rowCount))
             throw new AnswerException(
-                ExceptionTypes.ROW_OUT_OF_RANGE,
+                ExceptionTypes.OUT_OF_RANGE,
                 "Row "~to!string(r)~" is out of range 0.."~to!string(rowCount)~" of result rows",
                 __FILE__, __LINE__
             );
@@ -395,14 +395,25 @@ const struct Array
         
         // Variadic args parsing
         auto args = new int[ _arguments.length ];
-        // TODO: here is need exception, not enforce
-        enforce( nDims == args.length, "Mismatched dimensions number in arguments and server reply" );
-        
+
+        if(!(nDims == args.length))
+            throw new AnswerException(
+                ExceptionTypes.OUT_OF_RANGE,
+                "Mismatched dimensions number in arguments and server reply",
+                __FILE__, __LINE__
+            );
+
         for( uint i; i < args.length; ++i )
         {
             assert( _arguments[i] == typeid(int) );
             args[i] = va_arg!(int)(_argptr);
-            enforce(dimsSize[i] > args[i], "Out of range"); // TODO: here is need exception, not enforce
+
+            if(!(dimsSize[i] > args[i]))
+                throw new AnswerException(
+                    ExceptionTypes.OUT_OF_RANGE,
+                    "Out of range",
+                    __FILE__, __LINE__
+                );
         }
         
         // Calculates serial number of the element
@@ -456,8 +467,7 @@ enum ExceptionTypes
 {
     UNDEFINED_FIXME, /// Undefined, please report if you came across this error
     COLUMN_NOT_FOUND, /// Column is not found
-    COLUMN_OUT_OF_RANGE,
-    ROW_OUT_OF_RANGE,
+    OUT_OF_RANGE,
     NOT_ARRAY,
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
