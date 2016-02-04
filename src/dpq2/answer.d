@@ -250,7 +250,11 @@ struct Value
     @property
     Array asArray() const
     {
-        enforce(isArray(oidType), "Format of the column isn't array");
+        if(!isArray(oidType))
+            throw new AnswerException(ExceptionTypes.NOT_ARRAY,
+                "Format of the column isn't array",
+                __FILE__, __LINE__
+            );
 
         return const Array(this);
     }
@@ -441,6 +445,7 @@ enum ExceptionTypes
     COLUMN_NOT_FOUND, /// Column is not found
     COLUMN_OUT_OF_RANGE,
     ROW_OUT_OF_RANGE,
+    NOT_ARRAY
 }
 
 /// Exception
