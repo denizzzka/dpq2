@@ -18,6 +18,22 @@ Bson toBson(const Value v)
 
     Bson res;
 
+    with(OidType)
+    with(Bson.Type)
+    switch(v.oidType)
+    {
+        case ByteArray:
+            res = Bson(binData, v.value.idup);
+            break;
+
+        default:
+            throw new AnswerException(
+                    ExceptionType.NOT_IMPLEMENTED,
+                    "Format of the column (~to!string(v.oidType)~) doesn't supported by Bson converter",
+                    __FILE__, __LINE__
+                );
+    }
+
     return res;
 }
 
