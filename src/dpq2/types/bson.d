@@ -19,12 +19,17 @@ Bson toBson(const Value v)
     switch(v.oidType)
     {
         case Int2:
-            int n = cast(int) v.as!PGsmallint;
+            auto n = cast(int) v.as!PGsmallint;
             res = Bson(n);
             break;
 
         case Int4:
-            int n = cast(int) v.as!PGinteger;
+            auto n = cast(int) v.as!PGinteger;
+            res = Bson(n);
+            break;
+
+        case Int8:
+            auto n = cast(long) v.as!PGbigint;
             res = Bson(n);
             break;
 
@@ -66,6 +71,7 @@ void _integration_test( string connParam )
 
         C(Bson(-32_761), "smallint", "-32761");
         C(Bson(-2_147_483_646), "integer", "-2147483646");
+        C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
     }
 }
