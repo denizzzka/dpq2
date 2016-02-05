@@ -126,6 +126,7 @@ class ConnException : Dpq2Exception
         super(conn.errorMessage(), file, line);
     }
 
+    deprecated
     BaseConnection getConnection()
     {
         return conn;
