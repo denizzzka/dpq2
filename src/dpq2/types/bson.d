@@ -65,6 +65,8 @@ Bson toBson(const Value v)
 
 void _integration_test( string connParam )
 {
+    import std.uuid;
+
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
@@ -90,10 +92,41 @@ void _integration_test( string connParam )
         //C(Bson(-12.3456f), "real", "-12.3456"); // FIXME: https://github.com/rejectedsoftware/vibe.d/issues/1403
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
+
         C(Bson(BsonBinData(
                     BsonBinData.Type.userDefined,
                     [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21]
                 )),
                 "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
+
+        //~ C(Bson(BsonBinData(
+                    //~ BsonBinData.Type.userDefined,
+                    //~ [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21]
+                //~ )),
+                //~ "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
     }
+}
+
+import std.uuid;
+
+Bson Uuid2Bson(in UUID uuid)
+{
+    return Bson(BsonBinData(BsonBinData.Type.uuid, uuid.data.idup));
+}
+
+UUID Bson2Uuid(in Bson bson)
+{
+    const ubyte[16] b = bson.get!(BsonBinData)().rawData;
+
+    return UUID(b);
+}
+
+unittest
+{
+    auto srcUuid = UUID("00010203-0405-0607-0809-0a0b0c0d0e0f");
+
+    auto b = Uuid2Bson(srcUuid);
+    auto u = Bson2Uuid(b);
+
+    assert(u == srcUuid);
 }
