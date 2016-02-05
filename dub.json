@@ -8,7 +8,8 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"derelict-pq": "~>2.0.0"
+		"derelict-pq": "~>2.0.0",
+		"vibe-d:data": "~>0.7.27-rc.2"
 	},
 	"configurations": [
 		{
