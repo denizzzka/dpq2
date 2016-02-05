@@ -24,12 +24,12 @@ Bson toBson(const Value v)
             break;
 
         case Int4:
-            auto n = cast(int) v.as!PGinteger;
+            int n = v.as!PGinteger;
             res = Bson(n);
             break;
 
         case Int8:
-            auto n = cast(long) v.as!PGbigint;
+            long n = v.as!PGbigint;
             res = Bson(n);
             break;
 
