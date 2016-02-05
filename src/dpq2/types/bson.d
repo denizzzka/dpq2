@@ -53,7 +53,8 @@ void _integration_test( string connParam )
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as sql_test_value";
             auto answer = conn.exec(params);
 
-            assert(answer[0][0].toBson == bsonValue, "pgType="~pgType~" pgValue="~pgValue~" nativeValue="~to!string(bsonValue));
+            assert(answer[0][0].toBson == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
+                " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
         }
 
         alias C = testIt; // "C" means "case"
