@@ -485,7 +485,7 @@ enum ExceptionType
     NOT_ARRAY, /// Format of the column isn't array
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
-    NOT_NATIVE, /// Format isn't matches D native type
+    NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
     SMALL_DIMENSIONS_NUM,
     SIZE_MISMATCH,
     EMPTY_QUERY,

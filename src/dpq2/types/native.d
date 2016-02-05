@@ -20,7 +20,7 @@ alias PGuuid =          UUID; /// UUID
 private void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
     throw new AnswerException(
-            ExceptionType.NOT_NATIVE,
+            ExceptionType.NOT_IMPLEMENTED,
             "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
             file, line
         );
@@ -119,7 +119,7 @@ void _integration_test( string connParam )
     params.resultFormat = ValueFormat.BINARY;
 
     {
-        void testIt(T, V)(T nativeValue, string pgType, V pgValue)
+        void testIt(T)(T nativeValue, string pgType, string pgValue)
         {
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as sql_test_value";
             auto answer = conn.exec(params);
