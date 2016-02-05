@@ -213,7 +213,6 @@ void _integration_test( string connParam )
         catch(ConnException e)
         {
             exceptionFlag = true;
-            assert(e.getConnection() == conn);
             assert(e.msg.length > 15); // error message check
         }
         finally

@@ -125,12 +125,6 @@ class ConnException : Dpq2Exception
 
         super(conn.errorMessage(), file, line);
     }
-
-    deprecated
-    BaseConnection getConnection()
-    {
-        return conn;
-    }
 }
 
 class Dpq2Exception : Exception
@@ -161,7 +155,6 @@ void _integration_test( string connParam )
         catch(ConnException e)
         {
             exceptionFlag = true;
-            assert(e.getConnection() == c);
             assert(e.msg.length > 40); // error message check
         }
         finally
