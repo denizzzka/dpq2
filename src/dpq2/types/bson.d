@@ -116,7 +116,7 @@ Bson Uuid2Bson(in UUID uuid)
 
 UUID Bson2Uuid(in Bson bson)
 {
-    const ubyte[16] b = bson.get!(BsonBinData)().rawData;
+    const ubyte[16] b = bson.get!BsonBinData().rawData;
 
     return UUID(b);
 }
@@ -128,5 +128,7 @@ unittest
     auto b = Uuid2Bson(srcUuid);
     auto u = Bson2Uuid(b);
 
+    assert(b.type == Bson.Type.binData);
+    assert(b.get!BsonBinData().type == BsonBinData.Type.uuid);
     assert(u == srcUuid);
 }
