@@ -23,6 +23,11 @@ Bson toBson(const Value v)
             res = Bson(n);
             break;
 
+        case Int4:
+            int n = cast(int) v.as!PGinteger;
+            res = Bson(n);
+            break;
+
         case Text:
             res = Bson(v.as!PGtext);
             break;
@@ -50,7 +55,7 @@ void _integration_test( string connParam )
     {
         void testIt(Bson bsonValue, string pgType, string pgValue)
         {
-            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as sql_test_value";
+            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
             auto answer = conn.exec(params);
 
             assert(answer[0][0].toBson == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
@@ -60,6 +65,7 @@ void _integration_test( string connParam )
         alias C = testIt; // "C" means "case"
 
         C(Bson(-32_761), "smallint", "-32761");
+        C(Bson(-2_147_483_646), "integer", "-2147483646");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
     }
 }

@@ -121,7 +121,7 @@ void _integration_test( string connParam )
     {
         void testIt(T)(T nativeValue, string pgType, string pgValue)
         {
-            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as sql_test_value";
+            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as d_type_test_value";
             auto answer = conn.exec(params);
 
             assert(answer[0][0].as!T == nativeValue, "pgType="~pgType~" pgValue="~pgValue~" nativeType="~to!string(typeid(T))~" nativeValue="~to!string(nativeValue));
