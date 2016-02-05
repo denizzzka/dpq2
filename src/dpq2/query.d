@@ -75,7 +75,7 @@ final class Connection: BaseConnection
     void sendQuery( string SQLcmd )
     {
         const size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
-        if( r != 1 ) throw new QueryException(this, __FILE__, __LINE__);
+        if( r != 1 ) throw new ConnException(this, __FILE__, __LINE__);
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -93,7 +93,7 @@ final class Connection: BaseConnection
                     cast(int)p.resultFormat                    
                     );
                     
-        if( !r ) throw new QueryException(this, __FILE__, __LINE__);
+        if( !r ) throw new ConnException(this, __FILE__, __LINE__);
     }
     
     /// Waits for the next result from a sendQuery
@@ -165,25 +165,9 @@ final class Connection: BaseConnection
             res = new Answer( r );
             res.checkAnswerForErrors();
         }
-        else throw new QueryException(this, __FILE__, __LINE__);
+        else throw new ConnException(this, __FILE__, __LINE__);
         
         return res;
-    }
-}
-
-/// Exception
-// Inheritance is used here because ConnException provides same functional
-// but it is need to distinguish connection and query exceptions.
-class QueryException: ConnException
-{
-    this(Connection conn, string file, size_t line)
-    {
-        super(conn, file, line);
-    }
-
-    override Connection getConnection()
-    {
-        return cast(Connection) super.getConnection();
     }
 }
 
@@ -226,7 +210,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try conn.exec("SELECT 'abc'::text");
-        catch(QueryException e)
+        catch(ConnException e)
         {
             exceptionFlag = true;
             assert(e.getConnection() == conn);
