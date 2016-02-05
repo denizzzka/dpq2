@@ -47,6 +47,11 @@ Bson toBson(const Value v)
             res = Bson(v.as!PGtext);
             break;
 
+        case ByteArray:
+            auto b = BsonBinData(BsonBinData.Type.userDefined, v.value.idup);
+            res = Bson(b);
+            break;
+
         default:
             throw new AnswerException(
                     ExceptionType.NOT_IMPLEMENTED,
@@ -73,7 +78,6 @@ void _integration_test( string connParam )
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
             auto answer = conn.exec(params);
 
-            assert(answer[0][0].toBson.type == bsonValue.type);
             assert(answer[0][0].toBson == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
                 " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
         }
@@ -86,5 +90,10 @@ void _integration_test( string connParam )
         //C(Bson(-12.3456f), "real", "-12.3456"); // FIXME: https://github.com/rejectedsoftware/vibe.d/issues/1403
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
+        C(Bson(BsonBinData(
+                    BsonBinData.Type.userDefined,
+                    [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21]
+                )),
+                "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
     }
 }
