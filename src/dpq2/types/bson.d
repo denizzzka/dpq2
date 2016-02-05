@@ -19,7 +19,7 @@ Bson toBson(const Value v)
     switch(v.oidType)
     {
         case Int2:
-            auto n = cast(int) v.as!PGsmallint;
+            auto n = to!int(v.as!PGsmallint);
             res = Bson(n);
             break;
 
@@ -34,7 +34,7 @@ Bson toBson(const Value v)
             break;
 
         case Float4:
-            double n = cast(double) v.as!PGreal;
+            auto n = to!double(v.as!PGreal);
             res = Bson(n);
             break;
 
@@ -83,7 +83,7 @@ void _integration_test( string connParam )
         C(Bson(-32_761), "smallint", "-32761");
         C(Bson(-2_147_483_646), "integer", "-2147483646");
         C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
-        //C(Bson(-12.3456f), "real", "-12.3456"); // FIXME
+        //C(Bson(-12.3456f), "real", "-12.3456"); // FIXME: https://github.com/rejectedsoftware/vibe.d/issues/1403
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
     }
