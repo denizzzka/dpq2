@@ -152,7 +152,7 @@ class Answer
     @property
     private string resultErrorField(int fieldcode) const
     {
-        return to!string( PQresultErrorField(res, fieldcode) );
+        return to!string( PQresultErrorField(cast(PGresult*)res, fieldcode) ); // FIXME: res should be a const
     }
 
     private void assertCol( const size_t c ) const
