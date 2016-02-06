@@ -349,14 +349,18 @@ const struct Array
                 int dim_size = bigEndianToNative!int( d.dim_size );
                 int lbound = bigEndianToNative!int(d.lbound);
 
+                if(!(dim_size > 0))
+                    throw new AnswerException(ExceptionType.FATAL_ERROR,
+                        "Dimension size isn't positive ("~to!string(dim_size)~")",
+                        __FILE__, __LINE__
+                    );
+
                 // FIXME: What is lbound in postgresql array reply?
                 if(!(lbound == 1))
                     throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
                         "Please report if you came across this error! lbound=="~to!string(lbound),
                         __FILE__, __LINE__
                     );
-
-                assert( dim_size > 0 );
 
                 ds[i] = dim_size;
                 n_elems *= dim_size;
