@@ -296,23 +296,16 @@ struct Value
     }
 }
 
-/// Link to the cell of the answer table
-const struct Array
+package struct ArrayProperties
 {
     OidType OID;
     int nDims; /// Number of dimensions
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
-
-    private ubyte[][] elements;
-    private bool[] elementIsNULL;
+    size_t dataOffset;
 
     this(in Value cell)
     {
-        if(!(cell.format == ValueFormat.BINARY))
-            throw new AnswerException(ExceptionType.NOT_BINARY,
-                msg_NOT_BINARY, __FILE__, __LINE__);
-
         struct ArrayHeader_net // network byte order
         {
             ubyte[4] ndims; // number of dimensions of the array
@@ -326,56 +319,74 @@ const struct Array
             ubyte[4] lbound; // unknown
         }
 
-        // Reading array properties
-        {
-            ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
-            nDims = bigEndianToNative!int(h.ndims);
-            OID = oid2oidType(bigEndianToNative!Oid(h.OID));
+        ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
+        nDims = bigEndianToNative!int(h.ndims);
+        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
-            if(!(nDims > 0))
-                throw new AnswerException(ExceptionType.SMALL_DIMENSIONS_NUM,
-                    "Dimensions number is too small, it must be positive value",
+        if(!(nDims > 0))
+            throw new AnswerException(ExceptionType.SMALL_DIMENSIONS_NUM,
+                "Dimensions number is too small, it must be positive value",
+                __FILE__, __LINE__
+            );
+
+        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
+
+        auto ds = new int[ nDims ];
+
+        // Recognize dimensions of array
+        int n_elems = 1;
+        for( auto i = 0; i < nDims; ++i )
+        {
+            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+
+            int dim_size = bigEndianToNative!int( d.dim_size );
+            int lbound = bigEndianToNative!int(d.lbound);
+
+            if(!(dim_size > 0))
+                throw new AnswerException(ExceptionType.FATAL_ERROR,
+                    "Dimension size isn't positive ("~to!string(dim_size)~")",
                     __FILE__, __LINE__
                 );
 
-            auto ds = new int[ nDims ];
+            // FIXME: What is lbound in postgresql array reply?
+            if(!(lbound == 1))
+                throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
+                    "Please report if you came across this error! lbound=="~to!string(lbound),
+                    __FILE__, __LINE__
+                );
 
-            // Recognize dimensions of array
-            int n_elems = 1;
-            for( auto i = 0; i < nDims; ++i )
-            {
-                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
-
-                int dim_size = bigEndianToNative!int( d.dim_size );
-                int lbound = bigEndianToNative!int(d.lbound);
-
-                if(!(dim_size > 0))
-                    throw new AnswerException(ExceptionType.FATAL_ERROR,
-                        "Dimension size isn't positive ("~to!string(dim_size)~")",
-                        __FILE__, __LINE__
-                    );
-
-                // FIXME: What is lbound in postgresql array reply?
-                if(!(lbound == 1))
-                    throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
-                        "Please report if you came across this error! lbound=="~to!string(lbound),
-                        __FILE__, __LINE__
-                    );
-
-                ds[i] = dim_size;
-                n_elems *= dim_size;
-            }
-
-            nElems = n_elems;
-            dimsSize = ds.idup;
+            ds[i] = dim_size;
+            n_elems *= dim_size;
         }
+
+        nElems = n_elems;
+        dimsSize = ds;
+    }
+}
+
+/// Link to the cell of the answer table
+const struct Array
+{
+    ArrayProperties ap;
+    alias ap this;
+
+    private ubyte[][] elements;
+    private bool[] elementIsNULL;
+
+    this(in Value cell)
+    {
+        if(!(cell.format == ValueFormat.BINARY))
+            throw new AnswerException(ExceptionType.NOT_BINARY,
+                msg_NOT_BINARY, __FILE__, __LINE__);
+
+        ap = ArrayProperties(cell);
 
         // Looping through all elements and fill out index of them
         {
             auto elements = new const (ubyte)[][ nElems ];
             auto elementIsNULL = new bool[ nElems ];
 
-            auto curr_offset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
+            size_t curr_offset = ap.dataOffset;
 
             for(uint i = 0; i < nElems; ++i )
             {
