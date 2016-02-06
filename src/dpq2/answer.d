@@ -371,7 +371,7 @@ const struct Array
     alias ap this;
 
     private ubyte[][] elements; // TODO: it is too slow to place every elements to this array instead of ptrs to them
-    private bool[] elementIsNULL;
+    private bool[] elementIsNULL; // ditto
 
     this(in Value cell)
     {
@@ -390,7 +390,7 @@ const struct Array
 
             for(uint i = 0; i < nElems; ++i )
             {
-                ubyte[int.sizeof] size_net;
+                ubyte[int.sizeof] size_net; // network byte order
                 size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
                 uint size = bigEndianToNative!uint( size_net );
                 if( size == size.max ) // NULL magic number

@@ -24,11 +24,38 @@ Bson toBson(const Value v)
         return rawValueToBson(v);
 }
 
-private Bson arrayValueToBson(const Value v)
+private Bson arrayValueToBson(in Value cell)
 {
-    auto ap = ArrayProperties(v);
+    auto ap = ArrayProperties(cell);
+    size_t curr_offset = ap.dataOffset;
+    Bson[] res;
 
-    return Bson(null);
+    for(uint i = 0; i < ap.nElems; ++i )
+    {
+        ubyte[int.sizeof] size_net; // network byte order
+        size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+        uint size = bigEndianToNative!uint( size_net );
+
+        Bson b;
+
+        if(size == size.max) // NULL magic number
+        {
+            b = Bson(null);
+            size = 0;
+        }
+        else
+        {
+            auto v = Value(cell.value[curr_offset .. curr_offset + size], ap.OID);
+            b = v.toBson;
+        }
+
+        curr_offset += size_net.sizeof;
+        curr_offset += size;
+
+        res ~= b;
+    }
+
+    return Bson(res);
 }
 
 private Bson rawValueToBson(const Value v)
