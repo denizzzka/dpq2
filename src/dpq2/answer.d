@@ -4,6 +4,7 @@ module dpq2.answer;
 
 public import dpq2.query;
 public import dpq2.types.native;
+public import dpq2.types.bson;
 import dpq2.oids;
 
 import derelict.pq.pq;
@@ -110,7 +111,14 @@ class Answer
 
         return oid2oidType(PQftype(res, cast(int)colNum));
     }
-    
+
+    @property bool isArray( const size_t colNum ) const
+    {
+        assertCol(colNum);
+
+        return dpq2.oids.isArray(OID(colNum));
+    }
+
     /// Returns column number by field name
     size_t columnNum( string columnName ) const
     {    
@@ -204,7 +212,7 @@ const struct Row
 
         return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
     }
-    
+
     Nullable!Value opIndex(in size_t col) const
     {
         answer.assertCoords( Coords( row, col ) );
@@ -244,9 +252,9 @@ const struct Row
 /// Link to the cell of the answer table
 struct Value
 {
-    package ubyte[] value;
     package ValueFormat format;
     package OidType oidType;
+    package ubyte[] value;
 
     this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidType t )
     {
@@ -263,9 +271,15 @@ struct Value
     }
 
     @property
+    bool isArray() const
+    {
+        return dpq2.oids.isArray(oidType);
+    }
+
+    @property
     Array asArray() const
     {
-        if(!isArray(oidType))
+        if(!isArray)
             throw new AnswerException(ExceptionType.NOT_ARRAY,
                 "Format of the column is "~to!string(oidType)~", isn't array",
                 __FILE__, __LINE__
@@ -560,7 +574,11 @@ void _integration_test( string connParam )
         assert( !r[0].isNULL(2) );
 
         assert( r.OID(3) == OidType.Int4Array );
+        assert( r.isArray(3) );
+        assert( !r.isArray(2) );
         auto v = r[0]["test_array"];
+        assert( v.isArray );
+        assert( !r[0][2].isArray );
         auto a = v.asArray;
         assert( a.OID == OidType.Int4 );
         assert( a.getValue(2,1,2).as!PGinteger == 18 );
