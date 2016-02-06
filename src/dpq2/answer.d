@@ -303,6 +303,10 @@ const struct Array
 
     this(in Value cell)
     {
+        if(!(cell.format == ValueFormat.BINARY))
+            throw new AnswerException(ExceptionType.NOT_BINARY,
+                msg_NOT_BINARY, __FILE__, __LINE__);
+
         struct ArrayHeader_net // network byte order
         {
             ubyte[4] ndims; // number of dimensions of the array
@@ -315,10 +319,6 @@ const struct Array
             ubyte[4] dim_size; // number of elements in dimension
             ubyte[4] lbound; // unknown
         }
-
-        if(!(cell.format == ValueFormat.BINARY))
-            throw new AnswerException(ExceptionType.NOT_BINARY,
-                msg_NOT_BINARY, __FILE__, __LINE__);
 
         ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
