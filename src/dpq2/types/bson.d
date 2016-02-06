@@ -19,6 +19,11 @@ Bson toBson(const Value v)
     with(Bson.Type)
     switch(v.oidType)
     {
+        case OidType.Bool:
+            bool n = v.as!PGboolean;
+            res = Bson(n);
+            break;
+
         case Int2:
             auto n = to!int(v.as!PGsmallint);
             res = Bson(n);
@@ -91,6 +96,8 @@ void _integration_test( string connParam )
 
         alias C = testIt; // "C" means "case"
 
+        C(Bson(true), "boolean", "true");
+        C(Bson(false), "boolean", "false");
         C(Bson(-32_761), "smallint", "-32761");
         C(Bson(-2_147_483_646), "integer", "-2147483646");
         C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
