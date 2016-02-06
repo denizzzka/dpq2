@@ -2,6 +2,7 @@ dpq2
 ====
 [![Build Status](https://travis-ci.org/denizzzka/dpq2.svg?branch=master)](https://travis-ci.org/denizzzka/dpq2)
 [![Coverage Status](https://coveralls.io/repos/denizzzka/dpq2/badge.svg?branch=master)](https://coveralls.io/r/denizzzka/dpq2)
+[![codecov.io](https://codecov.io/github/denizzzka/dpq2/coverage.svg?branch=master)](https://codecov.io/github/denizzzka/dpq2)
 
 This is yet another attempt to create a good interface to PostgreSQL for the 
 D programming language.

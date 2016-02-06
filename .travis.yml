@@ -35,3 +35,4 @@ script:
 after_success:
   - rm -f ..-*.lst
   - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
+  - if [ ${DC} = "dmd" ]; then bash <(curl -s https://codecov.io/bash); fi
