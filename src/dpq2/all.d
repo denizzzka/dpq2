@@ -10,7 +10,7 @@ shared static ~this()
     debug
     {
         import std.stdio: write, writeln;
-        write("DerelictPQ is unloading... ");
+        write("DerelictPQ unloading... ");
     }
     
     import core.memory: GC;

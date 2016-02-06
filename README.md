@@ -46,7 +46,7 @@ void main()
 
     // Only text query result can be obtained by this call:
     auto s = conn.exec(
-        "SELECT now() as current_time, 'abc'::text as field_name, "
+        "SELECT now() as current_time, 'abc'::text as field_name, "~
         "123 as field_3, 456.78 as field_4"
         );
     
@@ -79,7 +79,15 @@ void main()
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
     writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
-    
+
+    // It is possible to read values of unknown type using BSON:
+    for(auto column = 0; column < r.columnCount; column++)
+    {
+        auto cell = r[0][column];
+        if(!cell.isNull && !cell.isArray)
+            writeln("bson=", cell.toBson);
+    }
+
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
 ```
@@ -99,6 +107,8 @@ second line
 3.3: true
 3.4: true
 4: 6
+bson=-1234.56789012345
+bson="first line\nsecond line"
 ```
 
 TODO
