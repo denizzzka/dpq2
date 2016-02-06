@@ -34,4 +34,4 @@ script:
 
 after_success:
   - rm -f ..-*.lst
-  - dub run doveralls
+  - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
