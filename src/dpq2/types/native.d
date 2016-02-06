@@ -8,6 +8,7 @@ import std.datetime;
 import std.uuid;
 
 // Supported PostgreSQL binary types
+alias PGboolean =       bool; /// boolean
 alias PGsmallint =      short; /// smallint
 alias PGinteger =       int; /// integer
 alias PGbigint =        long; /// bigint
@@ -102,11 +103,25 @@ if( is( T == UUID ) )
 
     if(!(v.value.length == 16))
         throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to native D UUID size", __FILE__, __LINE__);
+            "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
 
     UUID r;
     r.data = v.value;
     return r;
+}
+
+/// Returns boolean as native bool value
+@property bool as(T)(const Value v)
+if( is( T == bool ) )
+{
+    if(!(v.oidType == OidType.Bool))
+        throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
+
+    if(!(v.value.length == 1))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
+
+    return v.value[0] != 0;
 }
 
 void _integration_test( string connParam )
@@ -129,6 +144,8 @@ void _integration_test( string connParam )
 
         alias C = testIt; // "C" means "case"
 
+        C!PGboolean(true, "boolean", "true");
+        C!PGboolean(false, "boolean", "false");
         C!PGsmallint(-32_761, "smallint", "-32761");
         C!PGinteger(-2_147_483_646, "integer", "-2147483646");
         C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
