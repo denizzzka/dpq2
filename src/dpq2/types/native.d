@@ -94,7 +94,7 @@ if( is( T == SysTime ) )
 }
 
 /// Returns UUID as native UUID value
-@property T as(T)(const Value v)
+@property UUID as(T)(const Value v)
 if( is( T == UUID ) )
 {
     if(!(v.oidType == OidType.UUID))

@@ -61,8 +61,7 @@ Bson toBson(const Value v)
                         __FILE__, __LINE__
                     );
 
-            ubyte[16] b = v.as!PGbytea;
-            res = Uuid2Bson(std.uuid.UUID(b));
+            res = Uuid2Bson(v.as!PGuuid);
             break;
 
         default:
