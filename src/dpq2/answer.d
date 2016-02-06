@@ -300,10 +300,12 @@ const struct Array
     
     private
     {
-        Value cell;
         ubyte[][] elements;
         bool[] elementIsNULL;
-        
+    }
+
+    this(in Value cell)
+    {
         struct ArrayHeader_net
         {
             ubyte[4] ndims; // number of dimensions of the array
@@ -316,11 +318,7 @@ const struct Array
             ubyte[4] dim_size; // number of elements in dimension
             ubyte[4] lbound; // unknown
         }
-    }
-    
-    this(in Value c)
-    {
-        cell = c;
+
         if(!(cell.format == ValueFormat.BINARY))
             throw new AnswerException(ExceptionType.NOT_BINARY,
                 msg_NOT_BINARY, __FILE__, __LINE__);
