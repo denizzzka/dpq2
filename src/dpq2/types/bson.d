@@ -32,13 +32,14 @@ private Bson arrayValueToBson(in Value cell)
 
     Bson recursive(size_t dimNum)
     {
-        Bson[] res;
+        const dimSize = ap.dimsSize[dimNum];
+        Bson[] res = new Bson[dimSize];
 
-        foreach(elemNum; 0 .. ap.dimsSize[dimNum])
+        foreach(elemNum; 0..dimSize)
         {
             if(dimNum < ap.nDims - 1)
             {
-                res ~= recursive(dimNum + 1);
+                res[elemNum] = recursive(dimNum + 1);
             }
             else
             {
@@ -61,7 +62,7 @@ private Bson arrayValueToBson(in Value cell)
                 }
 
                 curr_offset += size;
-                res ~= b;
+                res[elemNum] = b;
             }
         }
 
