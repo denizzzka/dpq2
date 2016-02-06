@@ -297,12 +297,9 @@ const struct Array
     int nDims; /// Number of dimensions
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
-    
-    private
-    {
-        ubyte[][] elements;
-        bool[] elementIsNULL;
-    }
+
+    private ubyte[][] elements;
+    private bool[] elementIsNULL;
 
     this(in Value cell)
     {
