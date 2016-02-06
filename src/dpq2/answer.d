@@ -205,6 +205,7 @@ const struct Row
     }
     
     /// Value NULL checking
+    /// Do not confuse it with Nullable's isNull property
     @property
     bool isNULL( const size_t col ) const
     {
