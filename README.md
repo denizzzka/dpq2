@@ -41,7 +41,7 @@ import std.stdio: writeln;
 void main()
 {
     Connection conn = new Connection;
-    conn.connString = "dbname=postgres";
+    conn.connString = "dbname=postgres user=postgres";
     conn.connect();
 
     // Only text query result can be obtained by this call:
@@ -83,9 +83,7 @@ void main()
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        auto cell = r[0][column];
-        if(!cell.isNull && !cell.isArray)
-            writeln("bson=", cell.toBson);
+        writeln("bson = ", r[0][column].toBson);
     }
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
@@ -107,8 +105,11 @@ second line
 3.3: true
 3.4: true
 4: 6
-bson=-1234.56789012345
-bson="first line\nsecond line"
+bson = -1234.56789012345
+bson = "first line\nsecond line"
+bson = null
+bson = ["first","second",null]
+bson = [[1,2,3],[4,5,6]]
 ```
 
 TODO
