@@ -6,7 +6,7 @@ import std.stdio: writeln;
 void main()
 {
     Connection conn = new Connection;
-    conn.connString = "dbname=postgres";
+    conn.connString = "dbname=postgres user=postgres";
     conn.connect();
 
     // Only text query result can be obtained by this call:
