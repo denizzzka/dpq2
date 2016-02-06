@@ -48,9 +48,7 @@ void main()
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        auto cell = r[0][column];
-        if(!cell.isNull && !cell.isArray)
-            writeln("bson=", cell.toBson);
+        writeln("bson = ", r[0][column].toBson);
     }
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
