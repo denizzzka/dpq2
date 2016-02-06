@@ -19,20 +19,14 @@ Bson toBson(const Nullable!Value v)
 Bson toBson(const Value v)
 {
     if(v.isArray)
-        return arrayValueToBson(v.asArray);
+        return arrayValueToBson(v);
     else
         return rawValueToBson(v);
 }
 
-private Bson arrayValueToBson(const Array a)
+private Bson arrayValueToBson(const Value v)
 {
-    Bson[] vec;
-    vec.length = a.nElems;
-
-    foreach(i, n; a.dimsSize)
-    {
-
-    }
+    auto ap = ArrayProperties(v);
 
     return Bson(null);
 }
