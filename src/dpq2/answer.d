@@ -296,6 +296,19 @@ struct Value
     }
 }
 
+private struct ArrayHeader_net // network byte order
+{
+    ubyte[4] ndims; // number of dimensions of the array
+    ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it contains isNULL flag!
+    ubyte[4] OID; // element type OID
+}
+
+private struct Dim_net // network byte order
+{
+    ubyte[4] dim_size; // number of elements in dimension
+    ubyte[4] lbound; // unknown
+}
+
 package struct ArrayProperties
 {
     OidType OID;
@@ -306,19 +319,6 @@ package struct ArrayProperties
 
     this(in Value cell)
     {
-        struct ArrayHeader_net // network byte order
-        {
-            ubyte[4] ndims; // number of dimensions of the array
-            ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it contains isNULL flag!
-            ubyte[4] OID; // element type OID
-        }
-
-        struct Dim_net // network byte order
-        {
-            ubyte[4] dim_size; // number of elements in dimension
-            ubyte[4] lbound; // unknown
-        }
-
         const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
@@ -370,7 +370,7 @@ const struct Array
     ArrayProperties ap;
     alias ap this;
 
-    private ubyte[][] elements;
+    private ubyte[][] elements; // TODO: it is too slow to place every elements to this array instead of ptrs to them
     private bool[] elementIsNULL;
 
     this(in Value cell)
