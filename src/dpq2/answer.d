@@ -539,6 +539,7 @@ void _integration_test( string connParam )
         auto e = conn.exec(sql_query);
 
         assert( e.cmdStatus.length > 0 );
+        assert( e.columnCount == 4 );
         assert( e.rowCount == 3 );
         assert( e.columnCount == 4);
         assert( e.columnFormat(1) == ValueFormat.TEXT );
