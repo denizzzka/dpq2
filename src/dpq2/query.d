@@ -211,6 +211,8 @@ void _integration_test( string connParam )
 
         assert( a.columnFormat(1) == ValueFormat.BINARY );
         assert( a.columnFormat(2) == ValueFormat.BINARY );
+
+        destroy(a);
     }
 
     conn.disconnect();

@@ -613,6 +613,8 @@ void _integration_test( string connParam )
         assert( elem[0].as!PGsmallint == -32_761 );
     }
 
+    destroy(r);
+
     {
         bool exceptionFlag = false;
 

@@ -142,8 +142,14 @@ void _integration_test( string connParam )
     {
         auto c = new BaseConnection;
         c.connString = connParam;
+
         c.connect();
         c.disconnect();
+
+        c.connect();
+        c.disconnect();
+
+        destroy(c);
     }
 
     {
