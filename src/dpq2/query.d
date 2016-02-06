@@ -176,32 +176,41 @@ void _integration_test( string connParam )
     auto conn = new Connection;
 	conn.connString = connParam;
     conn.connect();
-    
-    string sql_query =
-    "select now() as time, 'abc'::text as string, 123, 456.78\n"~
-    "union all\n"~
-    "select now(), 'абвгд'::text, 777, 910.11\n"~
-    "union all\n"~
-    "select NULL, 'ijk'::text, 789, 12345.115345";
-    
-    conn.exec( sql_query );
-    
-    const string sql_query2 =
-    "select * from (\n"
-    ~ sql_query ~
-    ") t\n"~
-    "where string = $1";
-    
-    QueryArg[1] args;
-    QueryArg arg;
-    arg.value = "абвгд";
-    args[0] = arg;
+
+    {    
+        string sql_query =
+        "select now() as time, 'abc'::text as string, 123, 456.78\n"~
+        "union all\n"~
+        "select now(), 'абвгд'::text, 777, 910.11\n"~
+        "union all\n"~
+        "select NULL, 'ijk'::text, 789, 12345.115345";
+
+        auto a = conn.exec( sql_query );
+
+        assert( a.cmdStatus.length > 2 );
+        assert( a.columnCount == 4 );
+        assert( a.rowCount == 3 );
+        assert( a.columnFormat(1) == ValueFormat.TEXT );
+        assert( a.columnFormat(2) == ValueFormat.TEXT );
+    }
 
     {
+        const string sql_query =
+        "select $1::text, $2::integer, $3::text";
+
+        QueryArg[3] args;
+        args[0].value = "абвгд";
+        args[1].value = null;
+        args[2].value = "123";
+
         QueryParams p;
-        p.sqlCommand = sql_query2;
+        p.sqlCommand = sql_query;
         p.args = args[];
-        conn.exec( p );
+
+        auto a = conn.exec( p );
+
+        assert( a.columnFormat(1) == ValueFormat.BINARY );
+        assert( a.columnFormat(2) == ValueFormat.BINARY );
     }
 
     conn.disconnect();

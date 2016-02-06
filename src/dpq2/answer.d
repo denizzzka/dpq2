@@ -525,7 +525,6 @@ void _integration_test( string connParam )
 	conn.connString = connParam;
     conn.connect();
 
-    // Answer properies test
     {
         string sql_query =
         "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
@@ -538,13 +537,6 @@ void _integration_test( string connParam )
 
         auto e = conn.exec(sql_query);
 
-        assert( e.cmdStatus.length > 0 );
-        assert( e.columnCount == 4 );
-        assert( e.rowCount == 3 );
-        assert( e.columnCount == 4);
-        assert( e.columnFormat(1) == ValueFormat.TEXT );
-        assert( e.columnFormat(2) == ValueFormat.TEXT );
-
         assert( e[1][2].as!PGtext == "456" );
         assert( e[2][1].as!PGtext == "ijk_АБВГД" );
         assert( !e[0].isNULL(0) );
@@ -553,7 +545,6 @@ void _integration_test( string connParam )
         assert( e[1]["field_name"].as!PGtext == "def" );
     }
 
-    // Value properties test
     QueryParams p;
     p.resultFormat = ValueFormat.BINARY;
     p.sqlCommand = "SELECT "~
