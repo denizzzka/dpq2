@@ -54,13 +54,6 @@ Bson toBson(const Value v)
             break;
 
         case UUID:
-            if(v.value.length != 16)
-                throw new AnswerException(
-                        ExceptionType.SIZE_MISMATCH,
-                        "Value size isn't equal to native D type UUID",
-                        __FILE__, __LINE__
-                    );
-
             res = Uuid2Bson(v.as!PGuuid);
             break;
 
