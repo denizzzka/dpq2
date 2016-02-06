@@ -33,4 +33,5 @@ script:
   - dub run dpq2-example --build=release
 
 after_success:
+  - rm -f ..-*.lst
   - dub run doveralls
