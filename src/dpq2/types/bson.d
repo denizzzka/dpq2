@@ -36,8 +36,9 @@ private Bson arrayValueToBson(in Value cell)
         size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
         uint size = bigEndianToNative!uint( size_net );
 
-        Bson b;
+        curr_offset += size_net.sizeof;
 
+        Bson b;
         if(size == size.max) // NULL magic number
         {
             b = Bson(null);
@@ -49,7 +50,6 @@ private Bson arrayValueToBson(in Value cell)
             b = v.toBson;
         }
 
-        curr_offset += size_net.sizeof;
         curr_offset += size;
 
         res ~= b;
@@ -151,8 +151,12 @@ void _integration_test( string connParam )
             }
             else
             {
+                string s = bsonRes.toString;
+                import std.stdio;
+                writeln(s);
+
                 assert(bsonRes.type == Bson.Type.array, "pgType="~pgType~" pgValue="~pgValue~
-                    " bsonValue="~to!string(bsonValue));                
+                    " bsonValue="~to!string(bsonValue));
             }
         }
 
@@ -178,7 +182,7 @@ void _integration_test( string connParam )
         C(Uuid2Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
                 "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
 
-        C(Bson([Bson(1),Bson(2)]), "integer[]", "array[1,2]");
+        C(Bson([Bson(1),Bson(2)]), "integer[]", "array[1,2,null,4]");
     }
 }
 
