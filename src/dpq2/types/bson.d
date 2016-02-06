@@ -7,6 +7,15 @@ import vibe.data.bson;
 import std.uuid;
 
 @property
+Bson toBson(const Nullable!Value v)
+{
+    if(v.isNull)
+        return Bson(null);
+    else
+        return v.toBson;
+}
+
+@property
 Bson toBson(const Value v)
 {
     if(!(v.format == ValueFormat.BINARY))
@@ -96,6 +105,8 @@ void _integration_test( string connParam )
 
         alias C = testIt; // "C" means "case"
 
+        C(Bson(null), "text", "null");
+        C(Bson(null), "integer", "null");
         C(Bson(true), "boolean", "true");
         C(Bson(false), "boolean", "false");
         C(Bson(-32_761), "smallint", "-32761");
