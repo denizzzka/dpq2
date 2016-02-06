@@ -4,6 +4,7 @@ import dpq2.answer;
 import dpq2.oids;
 
 import vibe.data.bson;
+import std.uuid;
 
 @property
 Bson toBson(const Value v)
@@ -50,6 +51,18 @@ Bson toBson(const Value v)
         case ByteArray:
             auto b = BsonBinData(BsonBinData.Type.userDefined, v.value.idup);
             res = Bson(b);
+            break;
+
+        case UUID:
+            if(v.value.length != 16)
+                throw new AnswerException(
+                        ExceptionType.SIZE_MISMATCH,
+                        "Value size isn't equal to native D type UUID",
+                        __FILE__, __LINE__
+                    );
+
+            ubyte[16] b = v.as!PGbytea;
+            res = Uuid2Bson(std.uuid.UUID(b));
             break;
 
         default:
@@ -99,15 +112,10 @@ void _integration_test( string connParam )
                 )),
                 "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
 
-        //~ C(Bson(BsonBinData(
-                    //~ BsonBinData.Type.userDefined,
-                    //~ [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21]
-                //~ )),
-                //~ "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+        C(Uuid2Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
+                "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
     }
 }
-
-import std.uuid;
 
 Bson Uuid2Bson(in UUID uuid)
 {
