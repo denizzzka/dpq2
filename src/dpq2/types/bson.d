@@ -12,11 +12,19 @@ Bson toBson(const Nullable!Value v)
     if(v.isNull)
         return Bson(null);
     else
-        return v.toBson;
+        return v.valueToBson;
 }
 
 @property
 Bson toBson(const Value v)
+{
+    if(v.isArray)
+        return Bson();
+    else
+        return valueToBson(v);
+}
+
+private Bson valueToBson(const Value v)
 {
     if(!(v.format == ValueFormat.BINARY))
         throw new AnswerException(ExceptionType.NOT_BINARY,
