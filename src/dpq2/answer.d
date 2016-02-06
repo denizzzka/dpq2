@@ -148,7 +148,13 @@ class Answer
     {
         return to!string( PQresultErrorMessage(res) );
     }
-    
+
+    @property
+    private string resultErrorField(int fieldcode) const
+    {
+        return to!string( PQresultErrorField(res, fieldcode) );
+    }
+
     private void assertCol( const size_t c ) const
     {
         if(!(c < columnCount))
@@ -562,7 +568,8 @@ void _integration_test( string connParam )
               "[[13,14,NULL], "~
                "[16,17,18]]]::integer[] as test_array, "~
         "NULL,"~
-        "array[11,22,NULL,44]::integer[] as small_array";
+        "array[11,22,NULL,44]::integer[] as small_array, "~
+        "array['1','23',NULL,'789A']::text[] as text_array";
 
     auto r = conn.exec( p );
 
@@ -583,6 +590,7 @@ void _integration_test( string connParam )
         assert( !a.isNULL(2,1,2) );
         assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
         assert( r[0]["small_array"].asArray[2].isNull );
+        assert( r[0]["text_array"].asArray[2].isNull );
 
         {
             bool isNullFlag = false;
