@@ -320,49 +320,52 @@ const struct Array
             ubyte[4] lbound; // unknown
         }
 
-        ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
-        nDims = bigEndianToNative!int(h.ndims);
-        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
-
-        if(!(nDims > 0))
-            throw new AnswerException(ExceptionType.SMALL_DIMENSIONS_NUM,
-                "Dimensions number is too small, it must be positive value",
-                __FILE__, __LINE__
-            );
-
-        auto ds = new int[ nDims ];
-        
-        // Recognize dimensions of array
-        int n_elems = 1;
-        for( auto i = 0; i < nDims; ++i )
+        // Reading array properties
         {
-            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
-            
-            int dim_size = bigEndianToNative!int( d.dim_size );
-            int lbound = bigEndianToNative!int(d.lbound);
+            ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
+            nDims = bigEndianToNative!int(h.ndims);
+            OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
-            // FIXME: What is lbound in postgresql array reply?
-            if(!(lbound == 1))
-                throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
-                    "Please report if you came across this error! lbound=="~to!string(lbound),
+            if(!(nDims > 0))
+                throw new AnswerException(ExceptionType.SMALL_DIMENSIONS_NUM,
+                    "Dimensions number is too small, it must be positive value",
                     __FILE__, __LINE__
                 );
 
-            assert( dim_size > 0 );
-            
-            ds[i] = dim_size;
-            n_elems *= dim_size;
+            auto ds = new int[ nDims ];
+
+            // Recognize dimensions of array
+            int n_elems = 1;
+            for( auto i = 0; i < nDims; ++i )
+            {
+                Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+
+                int dim_size = bigEndianToNative!int( d.dim_size );
+                int lbound = bigEndianToNative!int(d.lbound);
+
+                // FIXME: What is lbound in postgresql array reply?
+                if(!(lbound == 1))
+                    throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
+                        "Please report if you came across this error! lbound=="~to!string(lbound),
+                        __FILE__, __LINE__
+                    );
+
+                assert( dim_size > 0 );
+
+                ds[i] = dim_size;
+                n_elems *= dim_size;
+            }
+
+            nElems = n_elems;
+            dimsSize = ds.idup;
         }
-        
-        nElems = n_elems;
-        dimsSize = ds.idup;
         
         auto elements = new const (ubyte)[][ nElems ];
         auto elementIsNULL = new bool[ nElems ];
         
         // Looping through all elements and fill out index of them
         auto curr_offset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
-        for(uint i = 0; i < n_elems; ++i )
+        for(uint i = 0; i < nElems; ++i )
         {
             ubyte[int.sizeof] size_net;
             size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
