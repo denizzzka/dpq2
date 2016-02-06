@@ -359,32 +359,36 @@ const struct Array
             nElems = n_elems;
             dimsSize = ds.idup;
         }
-        
-        auto elements = new const (ubyte)[][ nElems ];
-        auto elementIsNULL = new bool[ nElems ];
-        
+
         // Looping through all elements and fill out index of them
-        auto curr_offset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;            
-        for(uint i = 0; i < nElems; ++i )
         {
-            ubyte[int.sizeof] size_net;
-            size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-            uint size = bigEndianToNative!uint( size_net );
-            if( size == size.max ) // NULL magic number
+            auto elements = new const (ubyte)[][ nElems ];
+            auto elementIsNULL = new bool[ nElems ];
+
+            auto curr_offset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
+
+            for(uint i = 0; i < nElems; ++i )
             {
-                elementIsNULL[i] = true;
-                size = 0;
+                ubyte[int.sizeof] size_net;
+                size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+                uint size = bigEndianToNative!uint( size_net );
+                if( size == size.max ) // NULL magic number
+                {
+                    elementIsNULL[i] = true;
+                    size = 0;
+                }
+                else
+                {
+                    elementIsNULL[i] = false;
+                }
+                curr_offset += size_net.sizeof;
+                elements[i] = cell.value[curr_offset .. curr_offset + size];
+                curr_offset += size;
             }
-            else
-            {
-                elementIsNULL[i] = false;
-            }
-            curr_offset += size_net.sizeof;
-            elements[i] = cell.value[curr_offset .. curr_offset + size];
-            curr_offset += size;
+
+            this.elements = elements.dup;
+            this.elementIsNULL = elementIsNULL.idup;
         }
-        this.elements = elements.dup;
-        this.elementIsNULL = elementIsNULL.idup;
     }
     
     /// Returns Value struct by index
