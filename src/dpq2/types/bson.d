@@ -7,16 +7,16 @@ import vibe.data.bson;
 import std.uuid;
 
 @property
-Bson toBson(const Nullable!Value v)
+Bson toBson(in Nullable!Value v)
 {
     if(v.isNull)
         return Bson(null);
     else
-        return v.rawValueToBson;
+        return toBson(v.get);
 }
 
 @property
-Bson toBson(const Value v)
+Bson toBson(in Value v)
 {
     if(v.isArray)
         return arrayValueToBson(v);
@@ -26,7 +26,7 @@ Bson toBson(const Value v)
 
 private Bson arrayValueToBson(in Value cell)
 {
-    auto ap = ArrayProperties(cell);
+    const ap = ArrayProperties(cell);
     size_t curr_offset = ap.dataOffset;
     Bson[] res;
 
@@ -116,7 +116,7 @@ private Bson rawValueToBson(const Value v)
         default:
             throw new AnswerException(
                     ExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column (~to!string(v.oidType)~) doesn't supported by Bson converter",
+                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Bson converter",
                     __FILE__, __LINE__
                 );
     }
@@ -141,8 +141,19 @@ void _integration_test( string connParam )
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
             auto answer = conn.exec(params);
 
-            assert(answer[0][0].toBson == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
-                " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
+            Nullable!Value v = answer[0][0];
+            Bson bsonRes = toBson(v);
+
+            if(v.isNull || !v.isArray)
+            {
+                assert(bsonRes == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
+                    " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
+            }
+            else
+            {
+                assert(bsonRes.type == Bson.Type.array, "pgType="~pgType~" pgValue="~pgValue~
+                    " bsonValue="~to!string(bsonValue));                
+            }
         }
 
         alias C = testIt; // "C" means "case"
@@ -166,6 +177,8 @@ void _integration_test( string connParam )
 
         C(Uuid2Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
                 "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+
+        C(Bson([Bson(1),Bson(2)]), "integer[]", "array[1,2]");
     }
 }
 
