@@ -319,7 +319,7 @@ package struct ArrayProperties
             ubyte[4] lbound; // unknown
         }
 
-        ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
+        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
         nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
