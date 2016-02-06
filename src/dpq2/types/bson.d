@@ -148,12 +148,12 @@ void _integration_test( string connParam )
     }
 }
 
-Bson Uuid2Bson(in UUID uuid)
+private Bson Uuid2Bson(in UUID uuid)
 {
     return Bson(BsonBinData(BsonBinData.Type.uuid, uuid.data.idup));
 }
 
-UUID Bson2Uuid(in Bson bson)
+private UUID Bson2Uuid(in Bson bson)
 {
     const ubyte[16] b = bson.get!BsonBinData().rawData;
 
