@@ -303,7 +303,7 @@ const struct Array
 
     this(in Value cell)
     {
-        struct ArrayHeader_net
+        struct ArrayHeader_net // network byte order
         {
             ubyte[4] ndims; // number of dimensions of the array
             ubyte[4] dataoffset_ign; // offset for data, removed by libpq. may be it contains isNULL flag!
