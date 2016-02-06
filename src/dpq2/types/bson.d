@@ -27,35 +27,48 @@ Bson toBson(in Value v)
 private Bson arrayValueToBson(in Value cell)
 {
     const ap = ArrayProperties(cell);
+
     size_t curr_offset = ap.dataOffset;
-    Bson[] res;
 
-    for(uint i = 0; i < ap.nElems; ++i )
+    Bson recursive(size_t dimNum)
     {
-        ubyte[int.sizeof] size_net; // network byte order
-        size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
-        uint size = bigEndianToNative!uint( size_net );
+        Bson[] res;
 
-        curr_offset += size_net.sizeof;
-
-        Bson b;
-        if(size == size.max) // NULL magic number
+        foreach(elemNum; 0 .. ap.dimsSize[dimNum])
         {
-            b = Bson(null);
-            size = 0;
-        }
-        else
-        {
-            auto v = Value(cell.value[curr_offset .. curr_offset + size], ap.OID);
-            b = v.toBson;
+            if(dimNum < ap.nDims - 1)
+            {
+                res ~= recursive(dimNum + 1);
+            }
+            else
+            {
+                ubyte[int.sizeof] size_net; // network byte order
+                size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+                uint size = bigEndianToNative!uint( size_net );
+
+                curr_offset += size_net.sizeof;
+
+                Bson b;
+                if(size == size.max) // NULL magic number
+                {
+                    b = Bson(null);
+                    size = 0;
+                }
+                else
+                {
+                    auto v = Value(cell.value[curr_offset .. curr_offset + size], ap.OID);
+                    b = v.toBson;
+                }
+
+                curr_offset += size;
+                res ~= b;
+            }
         }
 
-        curr_offset += size;
-
-        res ~= b;
+        return Bson(res);
     }
 
-    return Bson(res);
+    return recursive(0);
 }
 
 private Bson rawValueToBson(const Value v)
@@ -144,19 +157,15 @@ void _integration_test( string connParam )
             Nullable!Value v = answer[0][0];
             Bson bsonRes = toBson(v);
 
-            if(v.isNull || !v.isArray)
+            if(v.isNull || !v.isArray) // standalone
             {
                 assert(bsonRes == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
                     " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
             }
-            else
+            else // arrays
             {
-                string s = bsonRes.toString;
-                import std.stdio;
-                writeln(s);
-
-                assert(bsonRes.type == Bson.Type.array, "pgType="~pgType~" pgValue="~pgValue~
-                    " bsonValue="~to!string(bsonValue));
+                assert(bsonRes.type == Bson.Type.array && bsonRes.toString == bsonValue.toString,
+                    "pgType="~pgType~" pgValue="~pgValue~" bsonValue="~to!string(bsonValue));
             }
         }
 
@@ -182,7 +191,10 @@ void _integration_test( string connParam )
         C(Uuid2Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
                 "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
 
-        C(Bson([Bson(1),Bson(2)]), "integer[]", "array[1,2,null,4]");
+        C(Bson([
+                Bson([Bson([Bson("1")]),Bson([Bson("22")]),Bson([Bson("333")])]),
+                Bson([Bson([Bson("4")]),Bson([Bson(null)]),Bson([Bson("6")])])
+            ]), "text[]", "'{{{1},{22},{333}},{{4},{null},{6}}}'");
     }
 }
 
