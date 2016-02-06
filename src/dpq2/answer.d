@@ -568,7 +568,8 @@ void _integration_test( string connParam )
               
               "[[13,14,NULL], "~
                "[16,17,18]]]::integer[] as test_array, "~
-        "NULL";
+        "NULL,"~
+        "array[11,22,NULL,44]::integer[] as small_array";
 
     auto r = conn.exec( p );
 
@@ -587,6 +588,8 @@ void _integration_test( string connParam )
         assert( a.getValue(2,1,2).as!PGinteger == 18 );
         assert( a.isNULL(2,0,2) );
         assert( !a.isNULL(2,1,2) );
+        assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
+        assert( r[0]["small_array"].asArray[2].isNull );
 
         {
             bool isNullFlag = false;
