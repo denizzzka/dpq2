@@ -227,7 +227,37 @@ if(type == PQType.Numeric)
 
 package string rawValueToNumeric(in Value v)
 {
-    return "not implemented";
+    struct NumericVar_net // network byte order
+    {
+	ubyte[2] num; // num of digits
+        ubyte[2] weight;
+        ubyte[2] sign;
+        ubyte[2] dscale;
+    }
+
+    assert(v.value.length >= NumericVar_net.sizeof);
+
+    NumericVar_net* h = cast(NumericVar_net*) v.value.ptr;
+
+    NumericVar res;
+    res.weight = bigEndianToNative!short(h.weight);
+    res.sign   = bigEndianToNative!ushort(h.sign);
+    res.dscale = bigEndianToNative!ushort(h.dscale);
+
+    auto len = (v.value.length - NumericVar_net.sizeof) / NumericDigit.sizeof;
+    assert(len > 0);
+    res.digits = new NumericDigit[len];
+
+    size_t offset = NumericVar_net.sizeof;
+    foreach(i; 0 .. len)
+    {
+	res.digits[i] = bigEndianToNative!NumericDigit(
+		(&(v.value[offset]))[0..NumericDigit.sizeof]
+	    );
+	offset += NumericDigit.sizeof;
+    }
+
+    return numeric_out(res);
 }
 
 version(IntegrationTest2)
