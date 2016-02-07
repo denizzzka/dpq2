@@ -352,3 +352,8 @@ version(IntegrationTest2)
         testValue(delayed, "2354877787627192443.00000");
     }
 }
+
+
+void _integration_test( string connParam )
+{
+}

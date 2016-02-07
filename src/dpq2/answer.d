@@ -5,6 +5,7 @@ module dpq2.answer;
 public import dpq2.query;
 public import dpq2.types.native;
 public import dpq2.types.bson;
+public import dpq2.types.numeric;
 import dpq2.oids;
 
 import derelict.pq.pq;
