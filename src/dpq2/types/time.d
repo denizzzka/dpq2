@@ -27,9 +27,11 @@ module dpq2.types.time;
 
 import dpq2.answer;
 import dpq2.oids;
+
+import std.datetime;
+
 /+
 import core.stdc.time;
-import std.datetime;
 import std.bitmanip;
 import vibe.data.bson;
 import std.math;

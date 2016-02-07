@@ -7,11 +7,8 @@
 */
 module dpq2.types.numeric;
 
-import dpq2.answer;
-import dpq2.oids;
-
-import std.conv: to;
-import std.string: fromStringz;
+//import dpq2.answer;
+//import dpq2.oids;
 
 private pure // inner representation from libpq sources
 {
@@ -188,8 +185,14 @@ private pure // inner representation from libpq sources
     }
 }
 
-package string rawValueToNumeric(in Value v)
+import std.conv: to;
+import std.string: fromStringz;
+import std.bitmanip: bigEndianToNative;
+
+package string rawValueToNumeric(in ubyte[] v)
 {
+
+
     struct NumericVar_net // network byte order
     {
 	ubyte[2] num; // num of digits
@@ -198,16 +201,16 @@ package string rawValueToNumeric(in Value v)
         ubyte[2] dscale;
     }
 
-    assert(v.value.length >= NumericVar_net.sizeof);
+    assert(v.length >= NumericVar_net.sizeof);
 
-    NumericVar_net* h = cast(NumericVar_net*) v.value.ptr;
+    NumericVar_net* h = cast(NumericVar_net*) v.ptr;
 
     NumericVar res;
     res.weight = bigEndianToNative!short(h.weight);
     res.sign   = bigEndianToNative!ushort(h.sign);
     res.dscale = bigEndianToNative!ushort(h.dscale);
 
-    auto len = (v.value.length - NumericVar_net.sizeof) / NumericDigit.sizeof;
+    auto len = (v.length - NumericVar_net.sizeof) / NumericDigit.sizeof;
 
     res.digits = new NumericDigit[len];
 
@@ -215,7 +218,7 @@ package string rawValueToNumeric(in Value v)
     foreach(i; 0 .. len)
     {
 	res.digits[i] = bigEndianToNative!NumericDigit(
-		(&(v.value[offset]))[0..NumericDigit.sizeof]
+		(&(v[offset]))[0..NumericDigit.sizeof]
 	    );
 	offset += NumericDigit.sizeof;
     }

@@ -34,7 +34,7 @@ private alias AE = AnswerException;
 private alias ET = ExceptionType;
 
 /// Returns value as bytes from binary formatted field
-@property T as(T)(const Value v)
+@property T as(T)(in Value v)
 if( is( T == const(ubyte[]) ) )
 {
     if(!(v.format == VF.BINARY))
@@ -48,7 +48,7 @@ if( is( T == const(ubyte[]) ) )
 }
 
 /// Returns cell value as native string type
-@property string as(T)(const Value v)
+@property string as(T)(in Value v)
 if(is(T == string))
 {
     if(v.format == VF.BINARY)
@@ -57,7 +57,7 @@ if(is(T == string))
             throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
-            return rawValueToNumeric(v);
+            return rawValueToNumeric(v.value);
     }
 
     return to!string( cast(const(char[])) v.value );
@@ -66,7 +66,7 @@ if(is(T == string))
 /// Returns cell value as native integer or decimal values
 ///
 /// Postgres type "numeric" is oversized and not supported by now
-@property T as(T)(const Value v)
+@property T as(T)(in Value v)
 if( isNumeric!(T) )
 {
     if(!(v.format == VF.BINARY))
@@ -92,7 +92,7 @@ if( isNumeric!(T) )
 }
 
 /// Returns cell value as native date and time
-@property T as(T)(const Value v)
+@property T as(T)(in Value v)
 if( is( T == SysTime ) )
 {
     pragma(msg, "Date and time type support isn't tested very well and not recommended for use");
@@ -103,7 +103,7 @@ if( is( T == SysTime ) )
 }
 
 /// Returns UUID as native UUID value
-@property UUID as(T)(const Value v)
+@property UUID as(T)(in Value v)
 if( is( T == UUID ) )
 {
     if(!(v.oidType == OidType.UUID))
@@ -119,7 +119,7 @@ if( is( T == UUID ) )
 }
 
 /// Returns boolean as native bool value
-@property bool as(T)(const Value v)
+@property bool as(T)(in Value v)
 if( is( T == bool ) )
 {
     if(!(v.oidType == OidType.Bool))
