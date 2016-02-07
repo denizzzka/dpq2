@@ -36,7 +36,7 @@ package:
 
 // Here is used names from the original Postgresql source
 
-Date j2date(int jd)
+void j2date(int jd, out int year, out int month, out int day)
 {
     enum POSTGRES_EPOCH_JDATE = 2451545;
     enum MONTHS_PER_YEAR = 12;
@@ -52,12 +52,10 @@ Date j2date(int jd)
     int y = julian * 4 / 1461;
     julian = ((y != 0) ? ((julian + 305) % 365) : ((julian + 306) % 366))
         + 123;
-    int year = (y+ quad * 4) - 4800;
+    year = (y+ quad * 4) - 4800;
     quad = julian * 2141 / 65536;
-    int day = julian - 7834 * quad / 256;
-    int month = (quad + 10) % MONTHS_PER_YEAR + 1;
-
-    return Date(year, month, day);
+    day = julian - 7834 * quad / 256;
+    month = (quad + 10) % MONTHS_PER_YEAR + 1;
 }
 
 import std.math;
@@ -148,10 +146,9 @@ struct pg_tm
     int         tm_sec;
     int         tm_min;
     int         tm_hour;
-    Date        date;
-//    int         tm_mday;
-//    int         tm_mon;         /* origin 0, not 1 */
-//    int         tm_year;        /* relative to 1900 */
+    int         tm_mday;
+    int         tm_mon;         /* origin 0, not 1 */
+    int         tm_year;        /* relative to 1900 */
     int         tm_wday;
     int         tm_yday;
     int         tm_isdst;
@@ -202,7 +199,7 @@ int timestamp2tm(Timestamp dt, out pg_tm tm, out fsec_t fsec)
             date -= 1;
         }
 
-        tm.date = j2date(cast(int) date);
+        j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
         dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
     } else
     {

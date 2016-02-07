@@ -103,7 +103,10 @@ if( is( T == Date ) )
             "Value length isn't equal to native D type Date", __FILE__, __LINE__);
 
     int jd = bigEndianToNative!uint(v.value.ptr[0..uint.sizeof]);
-    return j2date(jd);
+    int year, month, day;
+    j2date(jd, year, month, day);
+
+    return Date(year, month, day);
 }
 
 /// Returns cell value as native TimeOfDay
