@@ -10,7 +10,6 @@ module dpq2.types.numeric;
 import dpq2.answer;
 import dpq2.oids;
 
-import core.memory;
 import std.conv: to;
 import std.string: fromStringz;
 
@@ -53,9 +52,9 @@ private pure // inner representation from libpq sources
     string get_str_from_var(in NumericVar var)
     {
 	int          dscale;
-	char*        str;
-	char*        cp;
-	char*        endcp;
+	ubyte[]      str;
+	ubyte*       cp;
+	ubyte*       endcp;
 	int          i;
 	int          d;
 	NumericDigit dig;
@@ -79,8 +78,8 @@ private pure // inner representation from libpq sources
 	if (i <= 0)
 	    i = 1;
 
-	str = cast(char*)GC.malloc(i + dscale + DEC_DIGITS + 2);
-	cp = str;
+	str = new ubyte[i + dscale + DEC_DIGITS + 2];
+	cp = str.ptr;
 
 	/*
 	 * Output a dash for negative values
@@ -184,7 +183,8 @@ private pure // inner representation from libpq sources
 	 * terminate the string and return it
 	 */
 	*cp = '\0';
-	return str.fromStringz.idup;
+
+	return (cast(char*) str).fromStringz;
     }
 }
 
