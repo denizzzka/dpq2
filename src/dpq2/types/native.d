@@ -1,7 +1,8 @@
-module dpq2.types.native;
+﻿module dpq2.types.native;
 
 import dpq2.answer;
 import dpq2.oids;
+import dpq2.types.numeric;
 
 import std.traits;
 import std.datetime;
@@ -15,6 +16,7 @@ alias PGbigint =        long; /// bigint
 alias PGreal =          float; /// real
 alias PGdouble_precision = double; /// double precision
 alias PGtext =          string; /// text
+alias PGnumeric =       string; /// numeric represented as string
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 
@@ -40,17 +42,23 @@ if( is( T == const(ubyte[]) ) )
             msg_NOT_BINARY, __FILE__, __LINE__);
 
     if(!(v.oidType == OidType.ByteArray))
-        throwTypeComplaint(v.oidType, "byte array or string", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
 
     return v.value;
 }
 
 /// Returns cell value as native string type
-@property T as(T)(const Value v)
+@property string as(T)(const Value v)
 if(is(T == string))
 {
-    if(v.format == VF.BINARY && !(v.oidType == OidType.Text))
-        throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
+    if(v.format == VF.BINARY)
+    {
+        if(!(v.oidType == OidType.Text || v.oidType == OidType.Numeric))
+            throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
+
+        if(v.oidType == OidType.Numeric)
+            return rawValueToNumeric(v);
+    }
 
     return to!string( cast(const(char[])) v.value );
 }
@@ -138,8 +146,11 @@ void _integration_test( string connParam )
         {
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as d_type_test_value";
             auto answer = conn.exec(params);
+            Value v = answer[0][0].get;
+            auto result = v.as!T;
 
-            assert(answer[0][0].as!T == nativeValue, "pgType="~pgType~" pgValue="~pgValue~" nativeType="~to!string(typeid(T))~" nativeValue="~to!string(nativeValue));
+            assert(result == nativeValue, "received pgType="~to!string(v.oidType)~", sended pgValue="~pgValue~
+                ", nativeType="~to!string(typeid(T))~", result="~to!string(result));
         }
 
         alias C = testIt; // "C" means "case"
@@ -155,5 +166,38 @@ void _integration_test( string connParam )
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+
+        // numeric testing
+        C!PGnumeric("NaN", "numeric", "'NaN'");
+
+        const string[] numericTests = [
+            "42",
+            "-42",
+            "0",
+            "0.0146328",
+            "0.0007",
+            "0.007",
+            "0.07",
+            "0.7",
+            "7",
+            "70",
+            "700",
+            "7000",
+            "70000",
+
+            "7.0",
+            "70.0",
+            "700.0",
+            "7000.0",
+            "70000.000",
+
+            "2354877787627192443",
+            "2354877787627192443.0",
+            "2354877787627192443.00000",
+            "-2354877787627192443.00000"
+        ];
+
+        foreach(i, s; numericTests)
+            C!PGnumeric(s, "numeric", s);
     }
 }

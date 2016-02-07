@@ -1,4 +1,4 @@
-module dpq2.connection;
+﻿module dpq2.connection;
 
 @trusted:
 

@@ -1,4 +1,4 @@
-dpq2
+﻿dpq2
 ====
 [![Build Status](https://travis-ci.org/denizzzka/dpq2.svg?branch=master)](https://travis-ci.org/denizzzka/dpq2)
 [![Coverage Status](https://coveralls.io/repos/denizzzka/dpq2/badge.svg?branch=master)](https://coveralls.io/r/denizzzka/dpq2)

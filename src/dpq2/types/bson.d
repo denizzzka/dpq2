@@ -1,4 +1,4 @@
-module dpq2.types.bson;
+﻿module dpq2.types.bson;
 
 import dpq2.answer;
 import dpq2.oids;
@@ -109,6 +109,7 @@ private Bson rawValueToBson(const Value v)
             res = Bson(n);
             break;
 
+        case Numeric:
         case Text:
             res = Bson(v.as!PGtext);
             break;
@@ -155,6 +156,8 @@ void _integration_test( string connParam )
 
             if(v.isNull || !v.isArray) // standalone
             {
+                if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
+
                 assert(bsonRes == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
                     " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
             }
@@ -176,6 +179,7 @@ void _integration_test( string connParam )
         C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
+        C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
 
         C(Bson(BsonBinData(
                     BsonBinData.Type.userDefined,
