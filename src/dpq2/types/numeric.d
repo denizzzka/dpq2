@@ -29,7 +29,7 @@ private // inner representation from libpq sources
         NumericDigit[] digits;
     }
 
-    string numeric_out(ref NumericVar num)
+    string numeric_out(in NumericVar num)
     {
         string str;
 
@@ -50,7 +50,7 @@ private // inner representation from libpq sources
      *  The var is displayed to the number of digits indicated by its dscale.
      *  Returns a palloc'd string.
      */
-    string get_str_from_var(ref NumericVar var)
+    string get_str_from_var(in NumericVar var)
     {
 	int         dscale;
 	char*       str;
