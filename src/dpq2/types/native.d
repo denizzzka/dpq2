@@ -98,14 +98,14 @@ if( isNumeric!(T) )
 @property Date as(T)(in Value v)
 if( is( T == Date ) )
 {
-    return rawValueToDate(v.value);
+    return j2date(v.value);
 }
 
 /// Returns cell value as native TimeOfDay
 @property TimeOfDay as(T)(in Value v)
 if( is( T == TimeOfDay ) )
 {
-    return rawValueToTimeOfDay(v.value);
+    return time2tm(v.value);
 }
 
 /// Returns cell value as native date and time

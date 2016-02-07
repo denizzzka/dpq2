@@ -34,7 +34,9 @@ import std.bitmanip: bigEndianToNative;
 pure:
 package:
 
-Date rawValueToDate(in ubyte[] val)
+// Here is used names from the original Postgresql source
+
+Date j2date(in ubyte[] val)
 {
     assert(val.length == uint.sizeof);
 
@@ -100,7 +102,7 @@ else
     }
 }
 
-TimeOfDay rawValueToTimeOfDay(in ubyte[] val)
+TimeOfDay time2tm(in ubyte[] val)
 {
     TimeADT time = bigEndianToNative!TimeADT(val.ptr[0..TimeADT.sizeof]);
 
