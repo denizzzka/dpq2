@@ -62,68 +62,7 @@ Date rawValueToDate(in ubyte[] val)
     return Date(year, month, day);
 }
 
-/+
-import core.stdc.time;
-import std.bitmanip;
-import vibe.data.bson;
 import std.math;
-
-/**
-*   Wrapper around SysTime to handle libpq abstime.
-*
-*   Note: abstime is stored in UTC timezone.
-*/
-struct PGAbsTime
-{
-    private SysTime time;
-    alias time this;
-    
-    static PGAbsTime fromBson(Bson bson)
-    {
-        auto val = SysTime.fromISOExtString(bson.get!string);
-        return PGAbsTime(val);
-    }
-    
-    Bson toBson() const
-    {
-        return Bson(time.toISOExtString);
-    }
-}
-
-PGAbsTime convert(PQType type)(ubyte[] val)
-    if(type == PQType.AbsTime)
-{
-    assert(val.length == 4);
-    return PGAbsTime(SysTime(unixTimeToStdTime(val.read!int), UTC()));
-}
-
-/**
-*   Wrapper around Duration to handle libpq reltime.
-*
-*   Note: reltime can be negative.
-*/
-struct PGRelTime
-{
-    private Duration dur;
-    alias dur this;
-    
-    static PGRelTime fromBson(Bson bson)
-    {
-        return PGRelTime(bson.get!long.dur!"seconds");
-    }
-    
-    Bson toBson() const
-    {
-        return Bson(dur.total!"seconds");
-    }
-}
-
-PGRelTime convert(PQType type)(ubyte[] val)
-    if(type == PQType.RelTime)
-{
-    assert(val.length == 4);
-    return PGRelTime(val.read!int.dur!"seconds");
-}
 
 version(Have_Int64_TimeStamp)
 {
@@ -141,8 +80,6 @@ version(Have_Int64_TimeStamp)
 }
 else
 {
-    import std.math;
-    
     private alias double Timestamp;
     private alias double TimestampTz;
     private alias double TimeADT;
@@ -162,6 +99,55 @@ else
         return rint((cast(double) j) * TIME_PREC_INV) / TIME_PREC_INV;
     }
 }
+
+TimeOfDay rawValueToTimeOfDay(in ubyte[] val)
+{
+    TimeADT time = bigEndianToNative!TimeADT(val.ptr[0..TimeADT.sizeof]);
+
+    version(Have_Int64_TimeStamp)
+    {
+        immutable long USECS_PER_HOUR  = 3600000000;
+        immutable long USECS_PER_MINUTE = 60000000;
+        immutable long USECS_PER_SEC = 1000000;
+
+        int tm_hour = cast(int)(time / USECS_PER_HOUR);
+        time -= tm_hour * USECS_PER_HOUR;
+        int tm_min = cast(int)(time / USECS_PER_MINUTE);
+        time -= tm_min * USECS_PER_MINUTE;
+        int tm_sec = cast(int)(time / USECS_PER_SEC);
+        time -= tm_sec * USECS_PER_SEC;
+
+        return TimeOfDay(tm_hour, tm_min, tm_sec);
+    }
+    else
+    {
+        enum SECS_PER_HOUR = 3600;
+        enum SECS_PER_MINUTE = 60;
+
+        double      trem;
+        int tm_hour, tm_min, tm_sec;
+    recalc:
+        trem = time;
+        TMODULO(trem, tm_hour, cast(double) SECS_PER_HOUR);
+        TMODULO(trem, tm_min, cast(double) SECS_PER_MINUTE);
+        TMODULO(trem, tm_sec, 1.0);
+        trem = TIMEROUND(trem);
+        /* roundoff may need to propagate to higher-order fields */
+        if (trem >= 1.0)
+        {
+            time = ceil(time);
+            goto recalc;
+        }
+
+        return TimeOfDay(tm_hour, tm_min, tm_sec);
+    }
+}
+
+/+
+import core.stdc.time;
+import std.bitmanip;
+import vibe.data.bson;
+import std.math;
 
 private TimeOfDay time2tm(TimeADT time)
 {

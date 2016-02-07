@@ -21,6 +21,7 @@ alias PGnumeric =       string; /// numeric represented as string
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
+alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 
 private void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
@@ -94,10 +95,17 @@ if( isNumeric!(T) )
 }
 
 /// Returns cell value as native Date
-@property T as(T)(in Value v)
+@property Date as(T)(in Value v)
 if( is( T == Date ) )
 {
     return rawValueToDate(v.value);
+}
+
+/// Returns cell value as native TimeOfDay
+@property TimeOfDay as(T)(in Value v)
+if( is( T == TimeOfDay ) )
+{
+    return rawValueToTimeOfDay(v.value);
 }
 
 /// Returns cell value as native date and time
@@ -176,6 +184,7 @@ void _integration_test( string connParam )
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
         C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
+        C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");
