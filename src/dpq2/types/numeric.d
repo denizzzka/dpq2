@@ -188,43 +188,6 @@ private pure // inner representation from libpq sources
     }
 }
 
-struct PGNumeric
-{
-    string payload;
-
-    void toString(scope void delegate(const(char)[]) sink) const
-    {
-        sink(payload);
-    }
-
-    static PGNumeric fromString(string src)
-    {
-        return PGNumeric(src);
-    }
-}
-
-PGNumeric convert(OidType type)(ubyte[] val)
-if(type == PQType.Numeric)
-{
-    assert(val.length >= 4*ushort.sizeof);
-
-    NumericVar      value;
-    val.read!ushort; // num of digits
-    value.weight = val.read!short;
-    value.sign = val.read!ushort;
-    value.dscale = val.read!ushort;
-
-    auto len = val.length / NumericDigit.sizeof;
-    value.digits = new NumericDigit[len];
-    foreach(i; 0 .. len)
-    {
-	    NumericDigit d = val.read!NumericDigit;
-	    value.digits[i] = d;
-    }
-
-    return PGNumeric(numeric_out(value));
-}
-
 package string rawValueToNumeric(in Value v)
 {
     struct NumericVar_net // network byte order
