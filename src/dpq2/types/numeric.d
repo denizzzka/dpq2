@@ -1,4 +1,4 @@
-/**
+﻿/**
 *   PostgreSQL numeric format
 *
 *   Copyright: © 2014 DSoftOut
@@ -14,9 +14,9 @@ import core.memory;
 import std.conv: to;
 import std.string: fromStringz;
 
-private // inner representation from libpq sources
+private pure // inner representation from libpq sources
 {
-    alias ushort NumericDigit;
+    alias NumericDigit = ushort;
     enum DEC_DIGITS = 4;
     enum NUMERIC_NEG       = 0x4000;
     enum NUMERIC_NAN       = 0xC000;
@@ -62,7 +62,7 @@ private // inner representation from libpq sources
 
 	static if(DEC_DIGITS > 1)
 	{
-		NumericDigit d1;
+	    NumericDigit d1;
 	}
 
 	dscale = var.dscale;
