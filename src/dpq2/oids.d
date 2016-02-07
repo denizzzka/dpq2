@@ -1,4 +1,4 @@
-/**
+﻿/**
 *   PostgreSQL major types oids.
 *
 *   Copyright: © 2014 DSoftOut

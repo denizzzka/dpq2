@@ -52,12 +52,12 @@ private pure // inner representation from libpq sources
      */
     string get_str_from_var(in NumericVar var)
     {
-	int         dscale;
-	char*       str;
-	char*       cp;
-	char*       endcp;
-	int         i;
-	int         d;
+	int          dscale;
+	char*        str;
+	char*        cp;
+	char*        endcp;
+	int          i;
+	int          d;
 	NumericDigit dig;
 
 	static if(DEC_DIGITS > 1)
