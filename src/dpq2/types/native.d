@@ -2,6 +2,7 @@ module dpq2.types.native;
 
 import dpq2.answer;
 import dpq2.oids;
+import dpq2.types.numeric;
 
 import std.traits;
 import std.datetime;
@@ -15,6 +16,7 @@ alias PGbigint =        long; /// bigint
 alias PGreal =          float; /// real
 alias PGdouble_precision = double; /// double precision
 alias PGtext =          string; /// text
+alias PGnumeric =       string; /// numeric represented as string
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 
@@ -40,17 +42,23 @@ if( is( T == const(ubyte[]) ) )
             msg_NOT_BINARY, __FILE__, __LINE__);
 
     if(!(v.oidType == OidType.ByteArray))
-        throwTypeComplaint(v.oidType, "byte array or string", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
 
     return v.value;
 }
 
 /// Returns cell value as native string type
-@property T as(T)(const Value v)
+@property string as(T)(const Value v)
 if(is(T == string))
 {
-    if(v.format == VF.BINARY && !(v.oidType == OidType.Text))
-        throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
+    if(v.format == VF.BINARY)
+    {
+        if(!(v.oidType == OidType.Text || v.oidType == OidType.Numeric))
+            throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
+
+        if(v.oidType == OidType.Numeric)
+            return rawValueToNumeric(v);
+    }
 
     return to!string( cast(const(char[])) v.value );
 }

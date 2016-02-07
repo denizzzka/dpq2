@@ -7,6 +7,7 @@
 */
 module dpq2.types.numeric;
 
+import dpq2.answer;
 import dpq2.oids;
 /*
 import pgator.util.string;
@@ -258,6 +259,11 @@ PGNumeric convert(OidType type)(ubyte[] val)
 	return PGNumeric(numeric_out(value));
 }
 
+package string rawValueToNumeric(in Value v)
+{
+    return "not implemented";
+}
+
 version(IntegrationTest2)
 {
     import pgator.db.pool;
@@ -351,9 +357,4 @@ version(IntegrationTest2)
         testValue(delayed, "2354877787627192443.0");
         testValue(delayed, "2354877787627192443.00000");
     }
-}
-
-
-void _integration_test( string connParam )
-{
 }
