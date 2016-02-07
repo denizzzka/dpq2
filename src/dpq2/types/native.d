@@ -98,7 +98,12 @@ if( isNumeric!(T) )
 @property Date as(T)(in Value v)
 if( is( T == Date ) )
 {
-    return j2date(v.value);
+    if(!(v.value.length == uint.sizeof))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to native D type Date", __FILE__, __LINE__);
+
+    int jd = bigEndianToNative!uint(v.value.ptr[0..uint.sizeof]);
+    return j2date(jd);
 }
 
 /// Returns cell value as native TimeOfDay

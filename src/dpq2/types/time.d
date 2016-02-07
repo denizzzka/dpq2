@@ -36,12 +36,8 @@ package:
 
 // Here is used names from the original Postgresql source
 
-Date j2date(in ubyte[] val)
+Date j2date(int jd)
 {
-    assert(val.length == uint.sizeof);
-
-    uint jd = bigEndianToNative!uint(val.ptr[0..uint.sizeof]);
-
     enum POSTGRES_EPOCH_JDATE = 2451545;
     enum MONTHS_PER_YEAR = 12;
 
@@ -142,6 +138,127 @@ TimeOfDay time2tm(in ubyte[] val)
         }
 
         return TimeOfDay(tm_hour, tm_min, tm_sec);
+    }
+}
+
+private:
+
+struct pg_tm
+{
+    int         tm_sec;
+    int         tm_min;
+    int         tm_hour;
+    Date        date;
+//    int         tm_mday;
+//    int         tm_mon;         /* origin 0, not 1 */
+//    int         tm_year;        /* relative to 1900 */
+    int         tm_wday;
+    int         tm_yday;
+    int         tm_isdst;
+    long        tm_gmtoff;
+    string      tm_zone;
+}
+
+alias long pg_time_t;
+
+immutable ulong SECS_PER_DAY = 86400;
+immutable ulong POSTGRES_EPOCH_JDATE = 2451545;
+immutable ulong UNIX_EPOCH_JDATE     = 2440588;
+
+immutable ulong USECS_PER_DAY    = 86_400_000_000;
+immutable ulong USECS_PER_HOUR   = 3_600_000_000;
+immutable ulong USECS_PER_MINUTE = 60_000_000;
+immutable ulong USECS_PER_SEC    = 1_000_000;
+
+immutable ulong SECS_PER_HOUR   = 3600;
+immutable ulong SECS_PER_MINUTE = 60;
+
+/**
+* timestamp2tm() - Convert timestamp data type to POSIX time structure.
+*
+* Note that year is _not_ 1900-based, but is an explicit full value.
+* Also, month is one-based, _not_ zero-based.
+* Returns:
+*   0 on success
+*  -1 on out of range
+*
+* If attimezone is null, the global timezone (including possibly brute forced
+* timezone) will be used.
+*/
+int timestamp2tm(Timestamp dt, out pg_tm tm, out fsec_t fsec)
+{
+    Timestamp   date;
+    Timestamp   time;
+    pg_time_t   utime;
+
+    version(Have_Int64_TimeStamp)
+    {
+        time = dt;
+        TMODULO(time, date, USECS_PER_DAY);
+
+        if (time < 0)
+        {
+            time += USECS_PER_DAY;
+            date -= 1;
+        }
+
+        tm.date = j2date(cast(int) date);
+        dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
+    } else
+    {
+        time = dt;
+        TMODULO(time, date, cast(double) SECS_PER_DAY);
+
+        if (time < 0)
+        {
+            time += SECS_PER_DAY;
+            date -= 1;
+        }
+
+    recalc_d:
+        j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
+    recalc_t:
+        dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
+
+        fsec = TSROUND(fsec);
+        /* roundoff may need to propagate to higher-order fields */
+        if (fsec >= 1.0)
+        {
+            time = cast(Timestamp)ceil(time);
+            if (time >= cast(double) SECS_PER_DAY)
+            {
+                time = 0;
+                date += 1;
+                goto recalc_d;
+            }
+            goto recalc_t;
+        }
+    }
+
+    return 0;
+}
+
+void dt2time(Timestamp jd, out int hour, out int min, out int sec, out fsec_t fsec)
+{
+    TimeOffset  time;
+
+    time = jd;
+    version(Have_Int64_TimeStamp)
+    {
+        hour = cast(int)(time / USECS_PER_HOUR);
+        time -= hour * USECS_PER_HOUR;
+        min = cast(int)(time / USECS_PER_MINUTE);
+        time -= min * USECS_PER_MINUTE;
+        sec = cast(int)(time / USECS_PER_SEC);
+        fsec = cast(int)(time - sec*USECS_PER_SEC);
+    } else
+    {
+        hour = cast(int)(time / SECS_PER_HOUR);
+        time -= hour * SECS_PER_HOUR;
+        min = cast(int)(time / SECS_PER_MINUTE);
+        time -= min * SECS_PER_MINUTE;
+        sec = cast(int)time;
+        fsec = cast(int)(time - sec);
     }
 }
 
@@ -325,94 +442,6 @@ private
     }
 }
 
- /*
- * timestamp2tm() - Convert timestamp data type to POSIX time structure.
- *
- * Note that year is _not_ 1900-based, but is an explicit full value.
- * Also, month is one-based, _not_ zero-based.
- * Returns:
- *   0 on success
- *  -1 on out of range
- *
- * If attimezone is null, the global timezone (including possibly brute forced
- * timezone) will be used.
- */
-private int timestamp2tm(Timestamp dt, out pg_tm tm, out fsec_t fsec)
-{
-    Timestamp   date;
-    Timestamp   time;
-    pg_time_t   utime;
-
-    version(Have_Int64_TimeStamp)
-    {
-        time = dt;
-        TMODULO(time, date, USECS_PER_DAY);
-
-        if (time < 0)
-        {
-            time += USECS_PER_DAY;
-            date -= 1;
-        }       
-    
-        j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
-        dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
-    } else
-    {
-        time = dt;
-        TMODULO(time, date, cast(double) SECS_PER_DAY);
-    
-        if (time < 0)
-        {
-            time += SECS_PER_DAY;
-            date -= 1;
-        }    
-         
-    recalc_d:
-        j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
-    recalc_t:
-        dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
-    
-        fsec = TSROUND(fsec);
-        /* roundoff may need to propagate to higher-order fields */
-        if (fsec >= 1.0)
-        {
-            time = cast(Timestamp)ceil(time);
-            if (time >= cast(double) SECS_PER_DAY)
-            {
-                time = 0;
-                date += 1;
-                goto recalc_d;
-            }
-            goto recalc_t;
-        }
-    }
-
-    return 0;
-}
-
-private void dt2time(Timestamp jd, out int hour, out int min, out int sec, out fsec_t fsec)
-{
-    TimeOffset  time;
-
-    time = jd;
-    version(Have_Int64_TimeStamp)
-    {
-        hour = cast(int)(time / USECS_PER_HOUR);
-        time -= hour * USECS_PER_HOUR;
-        min = cast(int)(time / USECS_PER_MINUTE);
-        time -= min * USECS_PER_MINUTE;
-        sec = cast(int)(time / USECS_PER_SEC);
-        fsec = cast(int)(time - sec*USECS_PER_SEC);
-    } else
-    {
-        hour = cast(int)(time / SECS_PER_HOUR);
-        time -= hour * SECS_PER_HOUR;
-        min = cast(int)(time / SECS_PER_MINUTE);
-        time -= min * SECS_PER_MINUTE;
-        sec = cast(int)time;
-        fsec = cast(int)(time - sec);
-    }
-} 
 
 /**
 *   Wrapper around std.datetime.SysTime to handle [de]serializing of libpq
