@@ -7,9 +7,6 @@
 */
 module dpq2.types.numeric;
 
-//import dpq2.answer;
-//import dpq2.oids;
-
 private pure // inner representation from libpq sources
 {
     alias NumericDigit = ushort;
