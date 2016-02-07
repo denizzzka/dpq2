@@ -19,7 +19,7 @@ Features
 * Reading of the text query results to native D text types
 * Representation of the binary query results to native D types
  * Text types
- * Integer and decimal types (except "numeric")
+ * Integer and decimal types
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support
 
