@@ -188,8 +188,6 @@ import std.bitmanip: bigEndianToNative;
 
 package string rawValueToNumeric(in ubyte[] v)
 {
-
-
     struct NumericVar_net // network byte order
     {
 	ubyte[2] num; // num of digits
@@ -198,7 +196,7 @@ package string rawValueToNumeric(in ubyte[] v)
         ubyte[2] dscale;
     }
 
-    assert(v.length >= NumericVar_net.sizeof);
+    assert(v.length >= NumericVar_net.sizeof); // FIXME: exception is need
 
     NumericVar_net* h = cast(NumericVar_net*) v.ptr;
 

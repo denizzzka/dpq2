@@ -31,8 +31,34 @@ import dpq2.oids;
 import std.datetime;
 import std.bitmanip: bigEndianToNative;
 
+/// Returns cell value as native Date
+@property Date as(T)(in Value v)
+if( is( T == Date ) )
+{
+    if(!(v.value.length == uint.sizeof))
+        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
+
+    int jd = bigEndianToNative!uint(v.value.ptr[0..uint.sizeof]);
+    int year, month, day;
+    j2date(jd, year, month, day);
+
+    return Date(year, month, day);
+}
+
+/// Returns cell value as native TimeOfDay
+@property TimeOfDay as(T)(in Value v)
+if( is( T == TimeOfDay ) )
+{
+    if(!(v.value.length == TimeADT.sizeof))
+        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
+
+    return time2tm(bigEndianToNative!TimeADT(v.value.ptr[0..TimeADT.sizeof]));
+}
+
 pure:
-package:
+private:
 
 // Here is used names from the original Postgresql source
 
@@ -96,10 +122,8 @@ else
     }
 }
 
-TimeOfDay time2tm(in ubyte[] val)
+TimeOfDay time2tm(TimeADT time)
 {
-    TimeADT time = bigEndianToNative!TimeADT(val.ptr[0..TimeADT.sizeof]);
-
     version(Have_Int64_TimeStamp)
     {
         immutable long USECS_PER_HOUR  = 3600000000;
@@ -138,8 +162,6 @@ TimeOfDay time2tm(in ubyte[] val)
         return TimeOfDay(tm_hour, tm_min, tm_sec);
     }
 }
-
-private:
 
 struct pg_tm
 {

@@ -2,12 +2,12 @@
 
 import dpq2.answer;
 import dpq2.oids;
-import dpq2.types.numeric;
-import dpq2.types.time;
+import dpq2.types.numeric: rawValueToNumeric;
+import dpq2.types.time: as;
 
 import std.traits;
-import std.datetime;
 import std.uuid;
+import std.datetime;
 
 // Supported PostgreSQL binary types
 alias PGboolean =       bool; /// boolean
@@ -92,28 +92,6 @@ if( isNumeric!(T) )
 
     ubyte[T.sizeof] s = v.value[0..T.sizeof];
     return bigEndianToNative!(T)(s);
-}
-
-/// Returns cell value as native Date
-@property Date as(T)(in Value v)
-if( is( T == Date ) )
-{
-    if(!(v.value.length == uint.sizeof))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to native D type Date", __FILE__, __LINE__);
-
-    int jd = bigEndianToNative!uint(v.value.ptr[0..uint.sizeof]);
-    int year, month, day;
-    j2date(jd, year, month, day);
-
-    return Date(year, month, day);
-}
-
-/// Returns cell value as native TimeOfDay
-@property TimeOfDay as(T)(in Value v)
-if( is( T == TimeOfDay ) )
-{
-    return time2tm(v.value);
 }
 
 /// Returns cell value as native date and time
