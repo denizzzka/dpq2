@@ -32,6 +32,7 @@ import std.datetime;
 import std.bitmanip: bigEndianToNative;
 
 pure:
+package:
 
 Date rawValueToDate(in ubyte[] val)
 {
@@ -66,39 +67,6 @@ import core.stdc.time;
 import std.bitmanip;
 import vibe.data.bson;
 import std.math;
-
-private void j2date(int jd, out int year, out int month, out int day)
-{
-    enum POSTGRES_EPOCH_JDATE = 2451545;
-    enum MONTHS_PER_YEAR = 12;
-
-    jd += POSTGRES_EPOCH_JDATE;
-    
-    uint julian = jd + 32044;
-    uint quad = julian / 146097;
-    uint extra = (julian - quad * 146097) * 4 + 3;
-    julian += 60 + quad * 3 + extra / 146097;
-    quad = julian / 1461;
-    julian -= quad * 1461;
-    int y = julian * 4 / 1461;
-    julian = ((y != 0) ? ((julian + 305) % 365) : ((julian + 306) % 366))
-        + 123;
-    year = (y+ quad * 4) - 4800;
-    quad = julian * 2141 / 65536;
-    day = julian - 7834 * quad / 256;
-    month = (quad + 10) % MONTHS_PER_YEAR + 1;
-}
-
-Date convert(PQType type)(ubyte[] val)
-    if(type == PQType.Date)
-{
-    assert(val.length == uint.sizeof);
-    uint raw = val.read!uint;
-    int year, month, day;
-    j2date(raw, year, month, day);
-    
-    return Date(year, month, day);
-}
 
 /**
 *   Wrapper around SysTime to handle libpq abstime.
