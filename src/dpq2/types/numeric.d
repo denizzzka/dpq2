@@ -23,9 +23,9 @@ private // inner representation from libpq sources
 
     struct NumericVar
     {
-        int                     weight;
-        int             sign;
-        int                     dscale;
+        int weight;
+        int sign;
+        int dscale;
         NumericDigit[] digits;
     }
 
@@ -35,7 +35,7 @@ private // inner representation from libpq sources
 
         if(num.sign == NUMERIC_NAN)
         {
-                return "NaN";
+	    return "NaN";
         }
 
         str = get_str_from_var(num);
@@ -60,10 +60,10 @@ private // inner representation from libpq sources
 	int         d;
 	NumericDigit dig;
 
-	    static if(DEC_DIGITS > 1)
-	    {
-		    NumericDigit d1;
-	    }
+	static if(DEC_DIGITS > 1)
+	{
+		NumericDigit d1;
+	}
 
 	dscale = var.dscale;
 
@@ -204,25 +204,25 @@ struct PGNumeric
 }
 
 PGNumeric convert(OidType type)(ubyte[] val)
-    if(type == PQType.Numeric)
+if(type == PQType.Numeric)
 {
-        assert(val.length >= 4*ushort.sizeof);
+    assert(val.length >= 4*ushort.sizeof);
 
-        NumericVar      value;
-        val.read!ushort; // num of digits
-        value.weight = val.read!short;
-        value.sign = val.read!ushort;
-        value.dscale = val.read!ushort;
+    NumericVar      value;
+    val.read!ushort; // num of digits
+    value.weight = val.read!short;
+    value.sign = val.read!ushort;
+    value.dscale = val.read!ushort;
 
-        auto len = val.length / NumericDigit.sizeof;
-        value.digits = new NumericDigit[len];
-        foreach(i; 0 .. len)
-        {
-                NumericDigit d = val.read!NumericDigit;
-                value.digits[i] = d;
-        }
+    auto len = val.length / NumericDigit.sizeof;
+    value.digits = new NumericDigit[len];
+    foreach(i; 0 .. len)
+    {
+	    NumericDigit d = val.read!NumericDigit;
+	    value.digits[i] = d;
+    }
 
-        return PGNumeric(numeric_out(value));
+    return PGNumeric(numeric_out(value));
 }
 
 package string rawValueToNumeric(in Value v)
