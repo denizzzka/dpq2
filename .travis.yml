@@ -1,4 +1,4 @@
-language: d
+﻿language: d
 
 d:
   - dmd

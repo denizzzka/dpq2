@@ -1,4 +1,4 @@
-{
+﻿{
 	"name": "dpq2",
 	"description": "Medium-level binding to the PostgreSQL database",
 	"homepage": "https://github.com/denizzzka/dpq2",

@@ -1,4 +1,4 @@
-module dpq2.query;
+﻿module dpq2.query;
 
 @trusted:
 

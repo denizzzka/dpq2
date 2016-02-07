@@ -1,4 +1,4 @@
-@trusted:
+﻿@trusted:
 
 import std.getopt;
 

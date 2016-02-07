@@ -1,4 +1,4 @@
-#!/usr/bin/env rdmd
+﻿#!/usr/bin/env rdmd
 
 import dpq2.all;
 import std.stdio: writeln;
