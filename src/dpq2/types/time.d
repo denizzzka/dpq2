@@ -29,6 +29,37 @@ import dpq2.answer;
 import dpq2.oids;
 
 import std.datetime;
+import std.bitmanip: bigEndianToNative;
+
+pure:
+
+Date rawValueToDate(in ubyte[] val)
+{
+    assert(val.length == uint.sizeof);
+
+    uint jd = bigEndianToNative!uint(val.ptr[0..uint.sizeof]);
+
+    enum POSTGRES_EPOCH_JDATE = 2451545;
+    enum MONTHS_PER_YEAR = 12;
+
+    jd += POSTGRES_EPOCH_JDATE;
+
+    uint julian = jd + 32044;
+    uint quad = julian / 146097;
+    uint extra = (julian - quad * 146097) * 4 + 3;
+    julian += 60 + quad * 3 + extra / 146097;
+    quad = julian / 1461;
+    julian -= quad * 1461;
+    int y = julian * 4 / 1461;
+    julian = ((y != 0) ? ((julian + 305) % 365) : ((julian + 306) % 366))
+        + 123;
+    int year = (y+ quad * 4) - 4800;
+    quad = julian * 2141 / 65536;
+    int day = julian - 7834 * quad / 256;
+    int month = (quad + 10) % MONTHS_PER_YEAR + 1;
+
+    return Date(year, month, day);
+}
 
 /+
 import core.stdc.time;

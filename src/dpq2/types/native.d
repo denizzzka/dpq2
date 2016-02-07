@@ -3,6 +3,7 @@
 import dpq2.answer;
 import dpq2.oids;
 import dpq2.types.numeric;
+import dpq2.types.time;
 
 import std.traits;
 import std.datetime;
@@ -19,6 +20,7 @@ alias PGtext =          string; /// text
 alias PGnumeric =       string; /// numeric represented as string
 alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
+alias PGdate =          Date; /// Date (no time of day)
 
 private void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
@@ -89,6 +91,13 @@ if( isNumeric!(T) )
 
     ubyte[T.sizeof] s = v.value[0..T.sizeof];
     return bigEndianToNative!(T)(s);
+}
+
+/// Returns cell value as native Date
+@property T as(T)(in Value v)
+if( is( T == Date ) )
+{
+    return rawValueToDate(v.value);
 }
 
 /// Returns cell value as native date and time
@@ -166,6 +175,7 @@ void _integration_test( string connParam )
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+        C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");
