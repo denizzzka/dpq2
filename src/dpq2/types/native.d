@@ -146,8 +146,11 @@ void _integration_test( string connParam )
         {
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as d_type_test_value";
             auto answer = conn.exec(params);
+            Value v = answer[0][0].get;
+            auto result = v.as!T;
 
-            assert(answer[0][0].as!T == nativeValue, "pgType="~pgType~" pgValue="~pgValue~" nativeType="~to!string(typeid(T))~" nativeValue="~to!string(nativeValue));
+            assert(result == nativeValue, "received pgType="~to!string(v.oidType)~", sended pgValue="~pgValue~
+                ", nativeType="~to!string(typeid(T))~", result nativeValue="~to!string(result));
         }
 
         alias C = testIt; // "C" means "case"
@@ -163,5 +166,8 @@ void _integration_test( string connParam )
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+
+        // numeric
+        C!PGnumeric("42", "numeric", "42");
     }
 }
