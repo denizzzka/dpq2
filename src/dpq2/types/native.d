@@ -172,9 +172,9 @@ void _integration_test( string connParam )
 
         const string[] numericTests = [
             "42",
+            "-42",
             "0",
             "0.0146328",
-            "42",
             "0.0007",
             "0.007",
             "0.07",
@@ -193,7 +193,8 @@ void _integration_test( string connParam )
 
             "2354877787627192443",
             "2354877787627192443.0",
-            "2354877787627192443.00000"
+            "2354877787627192443.00000",
+            "-2354877787627192443.00000"
         ];
 
         foreach(i, s; numericTests)
