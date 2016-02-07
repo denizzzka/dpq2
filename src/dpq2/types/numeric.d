@@ -208,7 +208,7 @@ package string rawValueToNumeric(in Value v)
     res.dscale = bigEndianToNative!ushort(h.dscale);
 
     auto len = (v.value.length - NumericVar_net.sizeof) / NumericDigit.sizeof;
-    //assert(len > 0);
+
     res.digits = new NumericDigit[len];
 
     size_t offset = NumericVar_net.sizeof;
