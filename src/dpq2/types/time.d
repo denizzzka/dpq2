@@ -30,6 +30,8 @@ import dpq2.oids;
 
 import std.datetime;
 import std.bitmanip: bigEndianToNative;
+import std.math;
+import core.stdc.time: time_t;
 
 /// Returns cell value as native Date
 @property Date as(T)(in Value v)
@@ -83,8 +85,6 @@ void j2date(int jd, out int year, out int month, out int day)
     day = julian - 7834 * quad / 256;
     month = (quad + 10) % MONTHS_PER_YEAR + 1;
 }
-
-import std.math;
 
 version(Have_Int64_TimeStamp)
 {
@@ -294,9 +294,29 @@ struct PGTimeStamp
     private SysTime time;
     alias time this;
 
-    this(SysTime time)
+    this(SysTime t)
     {
-        this.time = time;
+        time = t;
+    }
+
+    this(long raw)
+    {
+        version(Have_Int64_TimeStamp)
+        {
+            if(raw > time_t.max) time = SysTime.max;
+            if(raw < time_t.min) time = SysTime.min;
+        }
+
+        pg_tm tm;
+        fsec_t ts;
+
+        if(timestamp2tm(raw, tm, ts) < 0)
+            throw new AnswerException(
+                ExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
+                __FILE__, __LINE__
+            );
+
+        this = PGTimeStamp(tm, ts);
     }
 
     this(pg_tm tm, fsec_t ts)
@@ -305,12 +325,14 @@ struct PGTimeStamp
         time += (tm.tm_hour % 24).dur!"hours";
         time += (tm.tm_min % 60).dur!"minutes";
         time += (tm.tm_sec  % 60).dur!"seconds";
+
         version(Have_Int64_TimeStamp)
         {
             time += ts.dur!"usecs";
-        } else
+        }
+        else
         {
-            time += (cast(long)(ts*10e6)).dur!"usecs";
+            time += (cast(long)(ts * 10e6)).dur!"usecs";
         }
     }
 }
@@ -493,32 +515,6 @@ private
     {
         return cast(fsec_t)(rint((cast(double) (j)) * TS_PREC_INV) / TS_PREC_INV);
     }
-}
-
-PGTimeStamp convert(PQType type)(ubyte[] val)
-    if(type == PQType.TimeStamp)
-{
-    auto raw = val.read!long;
-    
-    version(Have_Int64_TimeStamp)
-    {
-        if(raw >= time_t.max)
-        {
-            return PGTimeStamp(SysTime.max);
-        }
-        if(raw <= time_t.min)
-        {
-            return PGTimeStamp(SysTime.min);
-        }
-    }
-    
-    pg_tm tm;
-    fsec_t ts;
-    
-    if(timestamp2tm(raw, tm, ts) < 0)
-        throw new Exception("Timestamp is out of range!");
-
-    return PGTimeStamp(tm, ts);
 }
 
 /**
