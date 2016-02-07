@@ -281,6 +281,40 @@ void dt2time(Timestamp jd, out int hour, out int min, out int sec, out fsec_t fs
     }
 }
 
+/**
+*   Wrapper around std.datetime.SysTime to handle [de]serializing of libpq
+*   timestamps (without time zone).
+*
+*   Note: libpq has two compile configuration with HAS_INT64_TIMESTAMP and
+*   without (double timestamp format). The pgator should be compiled with
+*   conform flag to operate properly. 
+*/
+struct PGTimeStamp
+{
+    private SysTime time;
+    alias time this;
+
+    this(SysTime time)
+    {
+        this.time = time;
+    }
+
+    this(pg_tm tm, fsec_t ts)
+    {
+        time = SysTime(Date(tm.tm_year, tm.tm_mon, tm.tm_mday), UTC());
+        time += (tm.tm_hour % 24).dur!"hours";
+        time += (tm.tm_min % 60).dur!"minutes";
+        time += (tm.tm_sec  % 60).dur!"seconds";
+        version(Have_Int64_TimeStamp)
+        {
+            time += ts.dur!"usecs";
+        } else
+        {
+            time += (cast(long)(ts*10e6)).dur!"usecs";
+        }
+    }
+}
+
 /+
 import core.stdc.time;
 import std.bitmanip;
@@ -458,52 +492,6 @@ private
     fsec_t TSROUND(fsec_t j)
     {
         return cast(fsec_t)(rint((cast(double) (j)) * TS_PREC_INV) / TS_PREC_INV);
-    }
-}
-
-
-/**
-*   Wrapper around std.datetime.SysTime to handle [de]serializing of libpq
-*   timestamps (without time zone).
-*
-*   Note: libpq has two compile configuration with HAS_INT64_TIMESTAMP and
-*   without (double timestamp format). The pgator should be compiled with
-*   conform flag to operate properly. 
-*/
-struct PGTimeStamp
-{
-    private SysTime time;
-    alias time this;
-    
-    this(SysTime time)
-    {
-        this.time = time;
-    }
-    
-    this(pg_tm tm, fsec_t ts)
-    {
-        time = SysTime(Date(tm.tm_year, tm.tm_mon, tm.tm_mday), UTC());
-        time += (tm.tm_hour % 24).dur!"hours";
-        time += (tm.tm_min % 60).dur!"minutes";
-        time += (tm.tm_sec  % 60).dur!"seconds";
-        version(Have_Int64_TimeStamp)
-        {
-            time += ts.dur!"usecs";
-        } else
-        {
-            time += (cast(long)(ts*10e6)).dur!"usecs";
-        }
-    }
-    
-    static PGTimeStamp fromBson(Bson bson)
-    {
-        auto val = SysTime.fromISOExtString(bson.get!string);
-        return PGTimeStamp(val);
-    }
-    
-    Bson toBson() const
-    {
-        return Bson(time.toISOExtString);
     }
 }
 
