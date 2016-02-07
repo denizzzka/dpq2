@@ -167,7 +167,36 @@ void _integration_test( string connParam )
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
 
-        // numeric
-        C!PGnumeric("42", "numeric", "42");
+        // numeric testing
+        C!PGnumeric("NaN", "numeric", "'NaN'");
+
+        const string[] numericTests = [
+            "42",
+            "0",
+            "0.0146328",
+            "42",
+            "0.0007",
+            "0.007",
+            "0.07",
+            "0.7",
+            "7",
+            "70",
+            "700",
+            "7000",
+            "70000",
+
+            "7.0",
+            "70.0",
+            "700.0",
+            "7000.0",
+            "70000.000",
+
+            "2354877787627192443",
+            "2354877787627192443.0",
+            "2354877787627192443.00000"
+        ];
+
+        foreach(i, s; numericTests)
+            C!PGnumeric(s, "numeric", s);
     }
 }
