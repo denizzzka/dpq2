@@ -1,4 +1,3 @@
-// Written in D programming language
 /**
 *   PostgreSQL numeric format
 *
@@ -6,20 +5,23 @@
 *   License: Subject to the terms of the MIT license, as written in the included LICENSE file.
 *   Authors: NCrashed <ncrashed@gmail.com>
 */
-module pgator.db.pq.types.numeric;
+module dpq2.types.numeric;
 
-import pgator.db.pq.types.oids;
+import dpq2.oids;
+/*
 import pgator.util.string;
 import vibe.data.json;
 import std.bitmanip;
 import std.algorithm;
 import std.array;
 import std.format;
-import std.conv;
 import std.exception;
 import std.bigint;
 import std.range;
+*/
 import core.memory;
+import std.conv: to;
+import std.string: fromStringz;
 
 private // inner representation from libpq sources
 {
@@ -197,29 +199,7 @@ private // inner representation from libpq sources
 
 struct PGNumeric 
 {
-	string payload;
-	
-    /**
-    *   If the numeric fits double boundaries, stores it 
-    *   into $(B val) and returns true, else returns false
-    *   and fills $(B val) with NaN.
-    */
-    bool canBeNative(out double val) const
-    {
-        try
-        {
-            val = payload.to!double;
-            
-            auto builder = appender!string;
-            formattedWrite(builder, "%."~payload.find('.').length.to!string~"f", val);
-            enforce(builder.data.strip('0') == payload);
-        } catch(Exception e)
-        {
-            val = double.nan;
-            return false;
-        }
-        return true;
-    }
+    string payload;
     
     void toString(scope void delegate(const(char)[]) sink) const
     {
@@ -230,7 +210,7 @@ struct PGNumeric
     {
         return PGNumeric(src);
     }
-    
+/*    
     Json toJson() const
     {
         double val;
@@ -253,9 +233,10 @@ struct PGNumeric
             default: throw new Exception(text("Cannot convert ", src.type, " to PGNumeric!"));
         }
     }
+*/
 }
 
-PGNumeric convert(PQType type)(ubyte[] val)
+PGNumeric convert(OidType type)(ubyte[] val)
     if(type == PQType.Numeric)
 {
 	assert(val.length >= 4*ushort.sizeof);
