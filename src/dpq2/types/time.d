@@ -65,9 +65,9 @@ if( is( T == TimeOfDay ) )
     return time2tm(bigEndianToNative!TimeADT(v.value.ptr[0..TimeADT.sizeof]));
 }
 
-/// Returns value timestamp without time zone as native SysTime
-@property SysTime as(T)(in Value v)
-if( is( T == SysTime ) )
+/// Returns value timestamp without time zone as TimeStampWithoutTZ
+@property TimeStampWithoutTZ as(T)(in Value v)
+if( is( T == TimeStampWithoutTZ ) )
 {
     if(!(v.oidType == OidType.TimeStamp))
         throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
@@ -76,17 +76,23 @@ if( is( T == SysTime ) )
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2SysTime(bigEndianToNative!long(v.value.ptr[0..long.sizeof]));
+    return rawTimeStamp2nativeTime(bigEndianToNative!long(v.value.ptr[0..long.sizeof]));
+}
+
+struct TimeStampWithoutTZ
+{
+    DateTime dateTime;
+    FracSec fracSec; /// fractional seconds
 }
 
 private:
 
-SysTime rawTimeStamp2SysTime(long raw)
+TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
 {
     version(Have_Int64_TimeStamp)
     {
-        if(raw >= time_t.max) return SysTime.max;
-        if(raw <= time_t.min) return SysTime.min;
+        if(raw >= time_t.max) return TimeStampWithoutTZ(DateTime.max, FracSec.from!"hnsecs"(long.max));
+        if(raw <= time_t.min) return TimeStampWithoutTZ(DateTime.min, FracSec.zero);
     }
 
     pg_tm tm;
@@ -98,26 +104,32 @@ SysTime rawTimeStamp2SysTime(long raw)
             __FILE__, __LINE__
         );
 
-    return raw_pg_tm2SysTime(tm, ts);
+    return raw_pg_tm2nativeTime(tm, ts);
 }
 
-SysTime raw_pg_tm2SysTime(pg_tm tm, fsec_t ts)
+TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 {
-    SysTime time = SysTime(Date(tm.tm_year, tm.tm_mon, tm.tm_mday));
-    time += (tm.tm_hour % 24).dur!"hours";
-    time += (tm.tm_min % 60).dur!"minutes";
-    time += (tm.tm_sec  % 60).dur!"seconds";
+    TimeStampWithoutTZ res;
+
+    res.dateTime = DateTime(
+            tm.tm_year,
+            tm.tm_mon,
+            tm.tm_mday,
+            tm.tm_hour,
+            tm.tm_min,
+            tm.tm_sec
+        );
 
     version(Have_Int64_TimeStamp)
     {
-        time += ts.dur!"usecs";
+        res.fracSec = FracSec.from!"usecs"(ts);
     }
     else
     {
-        time += (cast(long)(ts * 10e6)).dur!"usecs";
+        res.fracSec = FracSec.from!"usecs"((cast(long)(ts * 10e6)));
     }
 
-    return time;
+    return res;
 }
 
 pure:

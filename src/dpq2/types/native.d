@@ -3,7 +3,7 @@
 import dpq2.answer;
 import dpq2.oids;
 import dpq2.types.numeric: rawValueToNumeric;
-import dpq2.types.time: as;
+import dpq2.types.time: as, TimeStampWithoutTZ;
 
 import std.traits;
 import std.uuid;
@@ -22,7 +22,7 @@ alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
-alias PGtimestamp_without_time_zone = SysTime; /// Both date and time (no time zone)
+alias PGtimestamp_without_time_zone = TimeStampWithoutTZ; /// Both date and time (no time zone)
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
@@ -161,9 +161,9 @@ void _integration_test( string connParam )
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
         C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
-        C!PGtimestamp_without_time_zone(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(123456)), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
-        C!PGtimestamp_without_time_zone(SysTime.max, "timestamp without time zone", "'infinity'");
-        C!PGtimestamp_without_time_zone(SysTime.min, "timestamp without time zone", "'-infinity'");
+        C!PGtimestamp_without_time_zone(TimeStampWithoutTZ(DateTime(1997, 12, 17, 7, 37, 16), FracSec.from!"usecs"(123456)), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
+        //C!PGtimestamp_without_time_zone(SysTime.max, "timestamp without time zone", "'infinity'");
+        //C!PGtimestamp_without_time_zone(SysTime.min, "timestamp without time zone", "'-infinity'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");
