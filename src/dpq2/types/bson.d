@@ -5,8 +5,7 @@ import dpq2.oids;
 
 import vibe.data.bson;
 import std.uuid;
-import std.datetime: SysTime, dur;
-public import std.datetime: TimeZone;
+import std.datetime: SysTime, dur, TimeZone;
 
 @property
 Bson toBson(in Nullable!Value v, immutable TimeZone tz = null)
