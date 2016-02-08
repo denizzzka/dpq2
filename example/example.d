@@ -18,6 +18,12 @@ void main()
     writeln( "Text query result by name: ", answer[0]["current_time"].as!PGtext );
     writeln( "Text query result by index: ", answer[0][3].as!PGtext );
 
+    // It is possible to read values of unknown type using BSON:
+    for(auto column = 0; column < answer.columnCount; column++)
+    {
+        writeln("column name: '"~answer.columnName(column)~"', bson: ", answer[0][column].toBson);
+    }
+
     // Separated arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
@@ -52,7 +58,7 @@ void main()
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("column name: "~r.columnName(column)~", bson: ", r[0][column].toBson);
+        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].toBson);
     }
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
