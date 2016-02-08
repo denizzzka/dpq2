@@ -117,7 +117,7 @@ class Answer
     {
         assertCol(colNum);
 
-        return dpq2.oids.isArray(OID(colNum));
+        return dpq2.oids.isSupportedArray(OID(colNum));
     }
 
     /// Returns column number by field name
@@ -281,7 +281,7 @@ struct Value
     @property
     bool isArray() const
     {
-        return dpq2.oids.isArray(oidType);
+        return dpq2.oids.isSupportedArray(oidType);
     }
 
     @property
@@ -289,7 +289,7 @@ struct Value
     {
         if(!isArray)
             throw new AnswerException(ExceptionType.NOT_ARRAY,
-                "Format of the column is "~to!string(oidType)~", isn't array",
+                "Format of the column is "~to!string(oidType)~", isn't supported array",
                 __FILE__, __LINE__
             );
 

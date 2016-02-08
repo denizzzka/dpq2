@@ -46,7 +46,7 @@ bool isNativeFloat(OidType t) pure
     return false;
 }
 
-bool isArray(OidType t) pure
+bool isSupportedArray(OidType t) pure
 {
     with(OidType)
     switch(t)
@@ -54,66 +54,19 @@ bool isArray(OidType t) pure
         case BoolArray:
         case ByteArrayArray:
         case CharArray:
-        case NameArray:
         case Int2Array:
-        case Int2VectorArray:
         case Int4Array:
-        case RegProcArray:
         case TextArray:
-        case OidArray:
-        case TidArray:
-        case XidArray:
-        case CidArray:
-        case OidVectorArray:
-        case FixedStringArray:
-        case VariableStringArray:
         case Int8Array:
-        case PointArray:
-        case LineSegmentArray:
-        case PathArray:
-        case BoxArray:
         case Float4Array:
         case Float8Array:
-        case AbsTimeArray:
-        case RelTimeArray:
-        case IntervalArray:
-        case PolygonArray:
-        case AccessControlListArray:
-        case MacAddressArray:
-        case HostAdressArray:
-        case NetworkAdressArray:
-        case CStringArray:
         case TimeStampArray:
         case DateArray:
         case TimeArray:
-        case TimeStampWithZoneArray:
-        case TimeIntervalArray:
         case NumericArray:
-        case TimeWithZoneArray: 
-        case FixedBitStringArray:
-        case VariableBitStringArray:
-        case RefCursorArray:
-        case RegProcWithArgsArray:
-        case RegOperatorArray:
-        case RegOperatorWithArgsArray:
-        case RegClassArray:
-        case RegTypeArray:
         case UUIDArray:
-        case TSVectorArray:
-        case GTSVectorArray:
-        case TSQueryArray:
-        case RegConfigArray:
-        case RegDictionaryArray:
-        case TXidSnapshotArray:
-        case Int4RangeArray:
-        case NumRangeArray:
-        case TimeStampRangeArray:
-        case TimeStampWithZoneRangeArray:
-        case DateRangeArray:
-        case Int8RangeArray:
-        case XmlArray:
-        case JsonArray:
-        case JsonbArray:
+        //case JsonArray:
+        //case JsonbArray:
             return true;
         default:
             break;
