@@ -57,6 +57,12 @@ void main()
     writeln( "Text query result by name: ", answer[0]["current_time"].as!PGtext );
     writeln( "Text query result by index: ", answer[0][3].as!PGtext );
 
+    // It is possible to read values of unknown type using BSON:
+    for(auto column = 0; column < answer.columnCount; column++)
+    {
+        writeln("column name: '"~answer.columnName(column)~"', bson: ", answer[0][column].toBson);
+    }
+
     // Separated arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
@@ -91,7 +97,7 @@ void main()
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("column name: "~r.columnName(column)~", bson: ", r[0][column].toBson);
+        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].toBson);
     }
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
@@ -102,8 +108,13 @@ void main()
 $ cd example
 $ dub build --build=release
 $ sudo -u postgres ./dpq2-example
-Text query result by name: 2016-02-09 02:39:11.007327
+Text query result by name: 2016-02-09 04:32:15.351469
 Text query result by index: 456.78
+column name: 'current_time', bson: "2016-02-09 04:32:15.351469"
+column name: 'field_name', bson: "abc"
+column name: 'field_3', bson: "123"
+column name: 'field_4', bson: "456.78"
+column name: 'json', bson: {"JSON field name":123.456}
 0: -1234.57
 1: first line
 second line
@@ -116,12 +127,12 @@ second line
 4: 6
 5.1 Json: {"text_str":"text string","float_value":123.456}
 5.2 Bson: {"text_str":"text string","float_value":123.456}
-column name: double_field, bson: -1234.56789012345
-column name: text, bson: "first line\nsecond line"
-column name: null_field, bson: null
-column name: array_field, bson: ["first","second",null]
-column name: multi_array, bson: [[1,2,3],[4,5,6]]
-column name: json_value, bson: {"text_str":"text string","float_value":123.456}
+column name: 'double_field', bson: -1234.56789012345
+column name: 'text', bson: "first line\nsecond line"
+column name: 'null_field', bson: null
+column name: 'array_field', bson: ["first","second",null]
+column name: 'multi_array', bson: [[1,2,3],[4,5,6]]
+column name: 'json_value', bson: {"text_str":"text string","float_value":123.456}
 ```
 
 TODO
