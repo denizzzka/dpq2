@@ -131,7 +131,7 @@ class Answer
         return n;
     }
 
-    /// Returns column number by field name
+    /// Returns column name by field number
     string columnName( in size_t colNum ) const
     {
         const char* s = PQfname(cast(PGresult*) res, to!int(colNum));
@@ -260,7 +260,13 @@ const struct Row
     {
         return answer.columnNum( columnName );
     }
-    
+
+    /// Returns column name by field number
+    string columnName( in size_t colNum ) const
+    {
+        return answer.columnName( colNum );
+    }
+
     /// Returns column count
     @property size_t columnCount() const{ return answer.columnCount(); }
     
@@ -622,6 +628,7 @@ void _integration_test( string connParam )
         assert( r[0]["small_array"].asArray[2].isNull );
         assert( r[0]["text_array"].asArray[2].isNull );
         assert( r.columnName(3) == "test_array" );
+        assert( r[0].columnName(3) == "test_array" );
 
         {
             bool isNullFlag = false;
