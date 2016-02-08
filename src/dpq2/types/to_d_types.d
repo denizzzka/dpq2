@@ -5,6 +5,8 @@ import dpq2.oids;
 import dpq2.types.numeric: rawValueToNumeric;
 import dpq2.types.time: as, TimeStampWithoutTZ;
 
+import vibe.data.json: Json, parseJsonString;
+
 import std.traits;
 import std.uuid;
 import std.datetime;
@@ -23,6 +25,7 @@ alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp_without_time_zone = TimeStampWithoutTZ; /// Both date and time (no time zone)
+alias PGjson =          Json; /// json
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
@@ -99,6 +102,10 @@ if( isNumeric!(T) )
 @property UUID as(T)(in Value v)
 if( is( T == UUID ) )
 {
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
     if(!(v.oidType == OidType.UUID))
         throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
 
@@ -115,6 +122,10 @@ if( is( T == UUID ) )
 @property bool as(T)(in Value v)
 if( is( T == bool ) )
 {
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
     if(!(v.oidType == OidType.Bool))
         throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
 
@@ -123,6 +134,22 @@ if( is( T == bool ) )
             "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
 
     return v.value[0] != 0;
+}
+
+/// Returns Vibe.d's Json
+@property Json as(T)(in Value v)
+if( is( T == Json ) )
+{
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
+    if(!(v.oidType == OidType.Json))
+        throwTypeComplaint(v.oidType, "json", __FILE__, __LINE__);
+
+    // represent value as text and parse it to json
+    auto t = Value(v.value, OidType.Text);
+    return parseJsonString(t.as!PGtext);
 }
 
 void _integration_test( string connParam )
@@ -199,5 +226,9 @@ void _integration_test( string connParam )
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ(DateTime(1997, 12, 17, 7, 37, 16), FracSec.from!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.max, "timestamp without time zone", "'infinity'");
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.min, "timestamp without time zone", "'-infinity'");
+
+        // json
+        C!PGjson(Json(["integer": Json(123), "float": Json(123.456), "text_string": Json("This is a text string")]), "json",
+            "'{\"integer\": 123, \"float\": 123.456,\"text_string\": \"This is a text string\"}'");
     }
 }
