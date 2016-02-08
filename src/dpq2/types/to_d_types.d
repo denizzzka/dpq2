@@ -67,6 +67,8 @@ if(!is(T == string))
     return binaryValueAs!T(v);
 }
 
+package:
+
 /// Returns value as bytes from binary formatted field
 @property T binaryValueAs(T)(in Value v)
 if( is( T == const(ubyte[]) ) )
@@ -176,7 +178,7 @@ if( is( T == Json ) )
     return res;
 }
 
-void _integration_test( string connParam )
+public void _integration_test( string connParam )
 {
     auto conn = new Connection;
 	conn.connString = connParam;
