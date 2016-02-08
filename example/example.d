@@ -10,13 +10,14 @@ void main()
     conn.connect();
 
     // Only text query result can be obtained by this call:
-    auto s = conn.exec(
-        "SELECT now() as current_time, 'abc'::text as field_name, "~
-        "123 as field_3, 456.78 as field_4"
+    auto answer = conn.exec(
+        "SELECT now()::timestamp as current_time, 'abc'::text as field_name, "~
+        "123 as field_3, 456.78 as field_4, '{\"JSON field name\": 123.456}'::json"
         );
-    
-    writeln( "Text query result: ", s[0][3].as!PGtext );
-    
+
+    writeln( "Text query result by name: ", answer[0]["current_time"].as!PGtext );
+    writeln( "Text query result by index: ", answer[0][3].as!PGtext );
+
     // Separated arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
@@ -24,7 +25,8 @@ void main()
         "$2::text, "~
         "$3::text as null_field, "~
         "array['first', 'second', NULL]::text[] as array_field, "~
-        "$4::integer[] as multi_array";
+        "$4::integer[] as multi_array, "~
+        "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'::json as json_value";
     
     p.args.length = 4;
     
@@ -44,6 +46,8 @@ void main()
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
     writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
+    writeln( "5.2 Bson: ", r[0]["json_value"].toBson);
 
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)

@@ -76,7 +76,13 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
 private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 {
     if(v.format == ValueFormat.TEXT)
-        return Bson(v.valueAsString);
+    {
+        import std.traits;
+        pragma(msg, "Value type detection by Oid for text answers currently is unimplemented: any value treated as Json text");
+        // TODO
+
+        return Bson(v.valueAsString.parseJsonString);
+    }
 
     Bson res;
 
