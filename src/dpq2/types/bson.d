@@ -189,7 +189,6 @@ void _integration_test( string connParam )
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
         C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
-        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
 
         C(Bson(BsonBinData(
                     BsonBinData.Type.userDefined,
@@ -204,6 +203,8 @@ void _integration_test( string connParam )
                 Bson([Bson([Bson("1")]),Bson([Bson("22")]),Bson([Bson("333")])]),
                 Bson([Bson([Bson("4")]),Bson([Bson(null)]),Bson([Bson("6")])])
             ]), "text[]", "'{{{1},{22},{333}},{{4},{null},{6}}}'");
+
+        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
     }
 }
 
