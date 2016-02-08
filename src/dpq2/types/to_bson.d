@@ -73,11 +73,10 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
     return recursive(0);
 }
 
-private Bson rawValueToBson(const Value v, immutable TimeZone tz = null)
+private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 {
-    if(!(v.format == ValueFormat.BINARY))
-        throw new AnswerException(ExceptionType.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
+    if(v.format == ValueFormat.TEXT)
+        return Bson(v.valueAsString);
 
     Bson res;
 
@@ -132,6 +131,11 @@ private Bson rawValueToBson(const Value v, immutable TimeZone tz = null)
             auto time = BsonDate(SysTime(ts.dateTime, tz));
             auto usecs = ts.fracSec.usecs;
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
+            break;
+
+        case Json:
+            vibe.data.json.Json json = binaryValueAs!PGjson(v);
+            res = Bson(json);
             break;
 
         default:
@@ -208,6 +212,8 @@ void _integration_test( string connParam )
             ]), "text[]", "'{{{1},{22},{333}},{{4},{null},{6}}}'");
 
         C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+
+        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
     }
 }
 
