@@ -16,7 +16,7 @@ import std.math;
 import core.stdc.time: time_t;
 
 /// Returns value data as native Date
-@property Date as(T)(in Value v)
+@property Date binaryValueAs(T)(in Value v)
 if( is( T == Date ) )
 {
     if(!(v.oidType == OidType.Date))
@@ -34,7 +34,7 @@ if( is( T == Date ) )
 }
 
 /// Returns value time without time zone as native TimeOfDay
-@property TimeOfDay as(T)(in Value v)
+@property TimeOfDay binaryValueAs(T)(in Value v)
 if( is( T == TimeOfDay ) )
 {
     if(!(v.oidType == OidType.Time))
@@ -48,7 +48,7 @@ if( is( T == TimeOfDay ) )
 }
 
 /// Returns value timestamp without time zone as TimeStampWithoutTZ
-@property TimeStampWithoutTZ as(T)(in Value v)
+@property TimeStampWithoutTZ binaryValueAs(T)(in Value v)
 if( is( T == TimeStampWithoutTZ ) )
 {
     if(!(v.oidType == OidType.TimeStamp))

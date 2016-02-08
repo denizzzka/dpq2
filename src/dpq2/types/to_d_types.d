@@ -3,7 +3,7 @@
 import dpq2.answer;
 import dpq2.oids;
 import dpq2.types.numeric: rawValueToNumeric;
-import dpq2.types.time: as, TimeStampWithoutTZ;
+import dpq2.types.time: binaryValueAs, TimeStampWithoutTZ;
 
 import vibe.data.json: Json, parseJsonString;
 
@@ -40,20 +40,6 @@ private alias VF = ValueFormat;
 private alias AE = AnswerException;
 private alias ET = ExceptionType;
 
-/// Returns value as bytes from binary formatted field
-@property T as(T)(in Value v)
-if( is( T == const(ubyte[]) ) )
-{
-    if(!(v.format == VF.BINARY))
-        throw new AE(ET.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
-
-    if(!(v.oidType == OidType.ByteArray))
-        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
-
-    return v.value;
-}
-
 /// Returns cell value as native string type
 @property string as(T)(in Value v)
 if(is(T == string))
@@ -70,10 +56,35 @@ if(is(T == string))
     return to!string( cast(const(char[])) v.value );
 }
 
+/// Returns value as D type value from binary formatted field
+@property T as(T)(in Value v)
+if(!is(T == string))
+{
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
+    return binaryValueAs!T(v);
+}
+
+/// Returns value as bytes from binary formatted field
+@property T binaryValueAs(T)(in Value v)
+if( is( T == const(ubyte[]) ) )
+{
+    if(!(v.format == VF.BINARY))
+        throw new AE(ET.NOT_BINARY,
+            msg_NOT_BINARY, __FILE__, __LINE__);
+
+    if(!(v.oidType == OidType.ByteArray))
+        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
+
+    return v.value;
+}
+
 /// Returns cell value as native integer or decimal values
 ///
 /// Postgres type "numeric" is oversized and not supported by now
-@property T as(T)(in Value v)
+@property T binaryValueAs(T)(in Value v)
 if( isNumeric!(T) )
 {
     if(!(v.format == VF.BINARY))
@@ -99,7 +110,7 @@ if( isNumeric!(T) )
 }
 
 /// Returns UUID as native UUID value
-@property UUID as(T)(in Value v)
+@property UUID binaryValueAs(T)(in Value v)
 if( is( T == UUID ) )
 {
     if(!(v.format == VF.BINARY))
@@ -119,7 +130,7 @@ if( is( T == UUID ) )
 }
 
 /// Returns boolean as native bool value
-@property bool as(T)(in Value v)
+@property bool binaryValueAs(T)(in Value v)
 if( is( T == bool ) )
 {
     if(!(v.format == VF.BINARY))
@@ -137,7 +148,7 @@ if( is( T == bool ) )
 }
 
 /// Returns Vibe.d's Json
-@property Json as(T)(in Value v)
+@property Json binaryValueAs(T)(in Value v)
 if( is( T == Json ) )
 {
     if(!(v.format == VF.BINARY))
