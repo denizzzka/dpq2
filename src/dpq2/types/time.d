@@ -56,7 +56,7 @@ if( is( T == Date ) )
 if( is( T == TimeOfDay ) )
 {
     if(!(v.oidType == OidType.Time))
-        throwTypeComplaint(v.oidType, "Time", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "time without time zone", __FILE__, __LINE__);
 
     if(!(v.value.length == TimeADT.sizeof))
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
@@ -70,7 +70,7 @@ if( is( T == TimeOfDay ) )
 if( is( T == SysTime ) )
 {
     if(!(v.oidType == OidType.TimeStamp))
-        throwTypeComplaint(v.oidType, "time stamp without time zone", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
 
     if(!(v.value.length == long.sizeof))
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
