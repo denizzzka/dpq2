@@ -101,7 +101,7 @@ class Answer
     ValueFormat columnFormat( const size_t colNum ) const
     {
         assertCol( colNum );
-        return cast(ValueFormat) PQfformat(res, cast(int)colNum);
+        return cast(ValueFormat) PQfformat(res, to!int(colNum));
     }
     
     /// Returns column Oid
@@ -109,7 +109,7 @@ class Answer
     {
         assertCol( colNum );
 
-        return oid2oidType(PQftype(res, cast(int)colNum));
+        return oid2oidType(PQftype(res, to!int(colNum)));
     }
 
     @property bool isSupportedArray( const size_t colNum ) const
@@ -222,7 +222,7 @@ const struct Row
     size_t size( const size_t col ) const
     {
         answer.assertCol(col);
-        return PQgetlength(answer.res, cast(int)row, cast(int)col);
+        return PQgetlength(answer.res, to!int(row), to!int(col));
     }
     
     /// Value NULL checking
@@ -232,14 +232,14 @@ const struct Row
     {
         answer.assertCol(col);
 
-        return PQgetisnull(answer.res, cast(int)row, cast(int)col) != 0;
+        return PQgetisnull(answer.res, to!int(row), to!int(col)) != 0;
     }
 
     Nullable!Value opIndex(in size_t col) const
     {
         answer.assertCoords( Coords( row, col ) );
         
-        auto v = PQgetvalue(answer.res, cast(int)row, cast(int)col);
+        auto v = PQgetvalue(answer.res, to!int(row), to!int(col));
         auto s = size( col );
         
         Nullable!Value r;
