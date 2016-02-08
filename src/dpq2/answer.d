@@ -10,7 +10,7 @@ import dpq2.oids;
 import derelict.pq.pq;
 
 import core.vararg;
-import std.string: toStringz;
+import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import core.exception: OutOfMemoryError, AssertError;
 import std.bitmanip: bigEndianToNative;
@@ -130,7 +130,22 @@ class Answer
 
         return n;
     }
-    
+
+    /// Returns column number by field name
+    string columnName( in size_t colNum ) const
+    {
+        const char* s = PQfname(cast(PGresult*) res, to!int(colNum));
+
+        if( s == null )
+            throw new AnswerException(
+                    ExceptionType.OUT_OF_RANGE,
+                    "Column "~to!string(colNum)~" is out of range 0.."~to!string(columnCount),
+                    __FILE__, __LINE__
+                );
+
+        return to!string(fromStringz(s));
+    }
+
     /// Returns pointer to row of cells
     Row opIndex(in size_t row) const
     {
@@ -606,6 +621,7 @@ void _integration_test( string connParam )
         assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
         assert( r[0]["small_array"].asArray[2].isNull );
         assert( r[0]["text_array"].asArray[2].isNull );
+        assert( r.columnName(3) == "test_array" );
 
         {
             bool isNullFlag = false;
