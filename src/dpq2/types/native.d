@@ -22,6 +22,7 @@ alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
+alias PGtimestamp_without_time_zone = SysTime; /// Both date and time (no time zone)
 
 private void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
@@ -94,17 +95,6 @@ if( isNumeric!(T) )
     return bigEndianToNative!(T)(s);
 }
 
-/// Returns cell value as native date and time
-@property T as(T)(in Value v)
-if( is( T == SysTime ) )
-{
-    pragma(msg, "Date and time type support isn't tested very well and not recommended for use");
-
-    ulong pre_time = v.as!(ulong)();
-    // UTC because server always sends binary timestamps in UTC, not in TZ
-    return SysTime( pre_time * 10, UTC() );
-}
-
 /// Returns UUID as native UUID value
 @property UUID as(T)(in Value v)
 if( is( T == UUID ) )
@@ -171,6 +161,11 @@ void _integration_test( string connParam )
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
         C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
+
+import std.stdio;
+writeln(SysTime(DateTime(1982, 4, 1, 20, 59, 22)));
+
+        C!PGtimestamp_without_time_zone(SysTime(DateTime(1982, 4, 1, 20, 59, 22), dur!"usec"(123.456)), "timestamp without time zone", "'1997-12-17 07:37:16'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");

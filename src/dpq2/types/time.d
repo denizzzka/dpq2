@@ -33,7 +33,7 @@ import std.bitmanip: bigEndianToNative;
 import std.math;
 import core.stdc.time: time_t;
 
-/// Returns cell value as native Date
+/// Returns value data as native Date
 @property Date as(T)(in Value v)
 if( is( T == Date ) )
 {
@@ -48,7 +48,7 @@ if( is( T == Date ) )
     return Date(year, month, day);
 }
 
-/// Returns cell value as native TimeOfDay
+/// Returns value time without time zone as native TimeOfDay
 @property TimeOfDay as(T)(in Value v)
 if( is( T == TimeOfDay ) )
 {
@@ -57,6 +57,17 @@ if( is( T == TimeOfDay ) )
             "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
 
     return time2tm(bigEndianToNative!TimeADT(v.value.ptr[0..TimeADT.sizeof]));
+}
+
+/// Returns value timestamp without time zoneas native SysTime
+@property SysTime as(T)(in Value v)
+if( is( T == SysTime ) )
+{
+    if(!(v.value.length == long.sizeof))
+        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
+
+    return PGTimeStamp(bigEndianToNative!long(v.value.ptr[0..long.sizeof])).time;
 }
 
 pure:
