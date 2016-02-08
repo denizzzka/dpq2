@@ -161,11 +161,9 @@ void _integration_test( string connParam )
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
         C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
-
-import std.stdio;
-writeln(SysTime(DateTime(1982, 4, 1, 20, 59, 22)));
-
-        C!PGtimestamp_without_time_zone(SysTime(DateTime(1982, 4, 1, 20, 59, 22), dur!"usec"(123.456)), "timestamp without time zone", "'1997-12-17 07:37:16'");
+        C!PGtimestamp_without_time_zone(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(123456)), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
+        C!PGtimestamp_without_time_zone(SysTime.max, "timestamp without time zone", "'infinity'");
+        C!PGtimestamp_without_time_zone(SysTime.min, "timestamp without time zone", "'-infinity'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");

@@ -67,11 +67,51 @@ if( is( T == SysTime ) )
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return PGTimeStamp(bigEndianToNative!long(v.value.ptr[0..long.sizeof])).time;
+    return rawTimeStamp2SysTime(bigEndianToNative!long(v.value.ptr[0..long.sizeof]));
+}
+
+private:
+
+SysTime rawTimeStamp2SysTime(long raw)
+{
+    version(Have_Int64_TimeStamp)
+    {
+        if(raw >= time_t.max) return SysTime.max;
+        if(raw <= time_t.min) return SysTime.min;
+    }
+
+    pg_tm tm;
+    fsec_t ts;
+
+    if(timestamp2tm(raw, tm, ts) < 0)
+        throw new AnswerException(
+            ExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
+            __FILE__, __LINE__
+        );
+
+    return raw_pg_tm2SysTime(tm, ts);
+}
+
+SysTime raw_pg_tm2SysTime(pg_tm tm, fsec_t ts)
+{
+    SysTime time = SysTime(Date(tm.tm_year, tm.tm_mon, tm.tm_mday));
+    time += (tm.tm_hour % 24).dur!"hours";
+    time += (tm.tm_min % 60).dur!"minutes";
+    time += (tm.tm_sec  % 60).dur!"seconds";
+
+    version(Have_Int64_TimeStamp)
+    {
+        time += ts.dur!"usecs";
+    }
+    else
+    {
+        time += (cast(long)(ts * 10e6)).dur!"usecs";
+    }
+
+    return time;
 }
 
 pure:
-private:
 
 // Here is used names from the original Postgresql source
 
@@ -289,62 +329,6 @@ void dt2time(Timestamp jd, out int hour, out int min, out int sec, out fsec_t fs
         time -= min * SECS_PER_MINUTE;
         sec = cast(int)time;
         fsec = cast(int)(time - sec);
-    }
-}
-
-/**
-*   Wrapper around std.datetime.SysTime to handle [de]serializing of libpq
-*   timestamps (without time zone).
-*
-*   Note: libpq has two compile configuration with HAS_INT64_TIMESTAMP and
-*   without (double timestamp format). The pgator should be compiled with
-*   conform flag to operate properly. 
-*/
-struct PGTimeStamp
-{
-    private SysTime time;
-    alias time this;
-
-    this(SysTime t)
-    {
-        time = t;
-    }
-
-    this(long raw)
-    {
-        version(Have_Int64_TimeStamp)
-        {
-            if(raw > time_t.max) time = SysTime.max;
-            if(raw < time_t.min) time = SysTime.min;
-        }
-
-        pg_tm tm;
-        fsec_t ts;
-
-        if(timestamp2tm(raw, tm, ts) < 0)
-            throw new AnswerException(
-                ExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
-                __FILE__, __LINE__
-            );
-
-        this = PGTimeStamp(tm, ts);
-    }
-
-    this(pg_tm tm, fsec_t ts)
-    {
-        time = SysTime(Date(tm.tm_year, tm.tm_mon, tm.tm_mday), UTC());
-        time += (tm.tm_hour % 24).dur!"hours";
-        time += (tm.tm_min % 60).dur!"minutes";
-        time += (tm.tm_sec  % 60).dur!"seconds";
-
-        version(Have_Int64_TimeStamp)
-        {
-            time += ts.dur!"usecs";
-        }
-        else
-        {
-            time += (cast(long)(ts * 10e6)).dur!"usecs";
-        }
     }
 }
 
