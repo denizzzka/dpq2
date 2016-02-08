@@ -59,7 +59,7 @@ if( is( T == TimeOfDay ) )
     return time2tm(bigEndianToNative!TimeADT(v.value.ptr[0..TimeADT.sizeof]));
 }
 
-/// Returns value timestamp without time zoneas native SysTime
+/// Returns value timestamp without time zone as native SysTime
 @property SysTime as(T)(in Value v)
 if( is( T == SysTime ) )
 {

@@ -142,8 +142,8 @@ void _integration_test( string connParam )
             Value v = answer[0][0].get;
             auto result = v.as!T;
 
-            assert(result == nativeValue, "received pgType="~to!string(v.oidType)~", nativeType="~to!string(typeid(T))~
-                ", sent pgValue="~pgValue~", expected nativeValue="~to!string(nativeValue)~", result="~to!string(result));
+            assert(result == nativeValue, "Received unexpected value type\nreceived pgType="~to!string(v.oidType)~"\nexpected nativeType="~to!string(typeid(T))~
+                "\nsent pgValue="~pgValue~"\nexpected nativeValue="~to!string(nativeValue)~"\nresult="~to!string(result));
         }
 
         alias C = testIt; // "C" means "case"
