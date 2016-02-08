@@ -19,7 +19,7 @@ Bson toBson(in Nullable!Value v, immutable TimeZone tz = null)
 @property
 Bson toBson(in Value v, immutable TimeZone tz = null)
 {
-    if(v.isArray)
+    if(v.isSupportedArray)
         return arrayValueToBson(v, tz);
     else
         return rawValueToBson(v, tz);
@@ -163,7 +163,7 @@ void _integration_test( string connParam )
             Nullable!Value v = answer[0][0];
             Bson bsonRes = toBson(v, UTC());
 
-            if(v.isNull || !v.isArray) // standalone
+            if(v.isNull || !v.isSupportedArray) // standalone
             {
                 if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
 

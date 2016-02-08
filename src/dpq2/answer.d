@@ -113,7 +113,7 @@ class Answer
         return oid2oidType(PQftype(res, cast(int)colNum));
     }
 
-    @property bool isArray( const size_t colNum ) const
+    @property bool isSupportedArray( const size_t colNum ) const
     {
         assertCol(colNum);
 
@@ -279,7 +279,7 @@ struct Value
     }
 
     @property
-    bool isArray() const
+    bool isSupportedArray() const
     {
         return dpq2.oids.isSupportedArray(oidType);
     }
@@ -287,7 +287,7 @@ struct Value
     @property
     Array asArray() const
     {
-        if(!isArray)
+        if(!isSupportedArray)
             throw new AnswerException(ExceptionType.NOT_ARRAY,
                 "Format of the column is "~to!string(oidType)~", isn't supported array",
                 __FILE__, __LINE__
@@ -594,11 +594,11 @@ void _integration_test( string connParam )
         assert( !r[0].isNULL(2) );
 
         assert( r.OID(3) == OidType.Int4Array );
-        assert( r.isArray(3) );
-        assert( !r.isArray(2) );
+        assert( r.isSupportedArray(3) );
+        assert( !r.isSupportedArray(2) );
         auto v = r[0]["test_array"];
-        assert( v.isArray );
-        assert( !r[0][2].isArray );
+        assert( v.isSupportedArray );
+        assert( !r[0][2].isSupportedArray );
         auto a = v.asArray;
         assert( a.OID == OidType.Int4 );
         assert( a.getValue(2,1,2).as!PGinteger == 18 );
