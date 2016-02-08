@@ -65,7 +65,7 @@ bool isSupportedArray(OidType t) pure
         case TimeArray:
         case NumericArray:
         case UUIDArray:
-        //case JsonArray:
+        case JsonArray:
         //case JsonbArray:
             return true;
         default:

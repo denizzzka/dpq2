@@ -25,7 +25,7 @@ alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp_without_time_zone = TimeStampWithoutTZ; /// Both date and time (no time zone)
-alias PGjson =          Json; /// json
+alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
@@ -144,12 +144,25 @@ if( is( T == Json ) )
         throw new AE(ET.NOT_BINARY,
             msg_NOT_BINARY, __FILE__, __LINE__);
 
-    if(!(v.oidType == OidType.Json))
-        throwTypeComplaint(v.oidType, "json", __FILE__, __LINE__);
+    Json res;
 
-    // represent value as text and parse it to json
-    auto t = Value(v.value, OidType.Text);
-    return parseJsonString(t.as!PGtext);
+    switch(v.oidType)
+    {
+        case OidType.Json:
+            // represent value as text and parse it into Json
+            auto t = Value(v.value, OidType.Text);
+            res = parseJsonString(t.as!PGtext);
+            break;
+
+        case OidType.Jsonb:
+            assert(false, "Is not implemented");
+            //break;
+
+        default:
+            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
+    }
+
+    return res;
 }
 
 void _integration_test( string connParam )
@@ -228,7 +241,9 @@ void _integration_test( string connParam )
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.min, "timestamp without time zone", "'-infinity'");
 
         // json
-        C!PGjson(Json(["integer": Json(123), "float": Json(123.456), "text_string": Json("This is a text string")]), "json",
-            "'{\"integer\": 123, \"float\": 123.456,\"text_string\": \"This is a text string\"}'");
+        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+
+        //C!PGjson(Json(["integer": Json(123), "float": Json(123.456), "text_string": Json("This is a text string")]), "jsonb",
+            //"'{\"integer\": 123, \"float\": 123.456,\"text_string\": \"This is a text string\"}'");
     }
 }
