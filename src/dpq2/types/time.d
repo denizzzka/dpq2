@@ -37,6 +37,9 @@ import core.stdc.time: time_t;
 @property Date as(T)(in Value v)
 if( is( T == Date ) )
 {
+    if(!(v.oidType == OidType.Date))
+        throwTypeComplaint(v.oidType, "Date", __FILE__, __LINE__);
+
     if(!(v.value.length == uint.sizeof))
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
@@ -52,6 +55,9 @@ if( is( T == Date ) )
 @property TimeOfDay as(T)(in Value v)
 if( is( T == TimeOfDay ) )
 {
+    if(!(v.oidType == OidType.Time))
+        throwTypeComplaint(v.oidType, "Time", __FILE__, __LINE__);
+
     if(!(v.value.length == TimeADT.sizeof))
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
@@ -63,6 +69,9 @@ if( is( T == TimeOfDay ) )
 @property SysTime as(T)(in Value v)
 if( is( T == SysTime ) )
 {
+    if(!(v.oidType == OidType.TimeStamp))
+        throwTypeComplaint(v.oidType, "time stamp without time zone", __FILE__, __LINE__);
+
     if(!(v.value.length == long.sizeof))
         throw new AnswerException(ExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);

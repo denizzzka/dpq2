@@ -24,7 +24,7 @@ alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp_without_time_zone = SysTime; /// Both date and time (no time zone)
 
-private void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
+package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
 {
     throw new AnswerException(
             ExceptionType.NOT_IMPLEMENTED,
