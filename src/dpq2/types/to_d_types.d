@@ -1,4 +1,4 @@
-﻿module dpq2.types.native;
+﻿module dpq2.types.to_d_types;
 
 import dpq2.answer;
 import dpq2.oids;

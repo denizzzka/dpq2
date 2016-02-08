@@ -3,9 +3,8 @@
 @trusted:
 
 public import dpq2.query;
-public import dpq2.types.native;
-public import dpq2.types.bson;
-public import dpq2.types.numeric;
+public import dpq2.types.to_d_types;
+public import dpq2.types.to_bson;
 import dpq2.oids;
 
 import derelict.pq.pq;
