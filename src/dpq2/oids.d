@@ -111,6 +111,9 @@ bool isArray(OidType t) pure
         case TimeStampWithZoneRangeArray:
         case DateRangeArray:
         case Int8RangeArray:
+        case XmlArray:
+        case JsonArray:
+        case JsonbArray:
             return true;
         default:
             break;
@@ -144,6 +147,7 @@ enum OidType : Oid
     ClassCatalog = 83,
     
     Json = 114,
+    Jsonb = 3802,
     Xml = 142,
     NodeTree = 194,
     StorageManager = 210,
@@ -205,6 +209,9 @@ enum OidType : Oid
     Int8Range = 3926,
     
     // Arrays
+    XmlArray = 143,
+    JsonArray = 3807,
+    JsonbArray = 199,
     BoolArray = 1000,
     ByteArrayArray = 1001,
     CharArray = 1002,
