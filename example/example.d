@@ -52,7 +52,7 @@ void main()
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("bson = ", r[0][column].toBson);
+        writeln("column name: "~r.columnName(column)~", bson: ", r[0][column].toBson);
     }
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
