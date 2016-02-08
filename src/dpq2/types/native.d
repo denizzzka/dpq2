@@ -142,7 +142,7 @@ void _integration_test( string connParam )
             Value v = answer[0][0].get;
             auto result = v.as!T;
 
-            assert(result == nativeValue, "Received unexpected value type\nreceived pgType="~to!string(v.oidType)~"\nexpected nativeType="~to!string(typeid(T))~
+            assert(result == nativeValue, "Received unexpected value\nreceived pgType="~to!string(v.oidType)~"\nexpected nativeType="~to!string(typeid(T))~
                 "\nsent pgValue="~pgValue~"\nexpected nativeValue="~to!string(nativeValue)~"\nresult="~to!string(result));
         }
 

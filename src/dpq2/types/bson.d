@@ -123,6 +123,10 @@ private Bson rawValueToBson(const Value v)
             res = Uuid2Bson(v.as!PGuuid);
             break;
 
+        case TimeStamp:
+            res = Bson(BsonDate(v.as!PGtimestamp_without_time_zone));
+            break;
+
         default:
             throw new AnswerException(
                     ExceptionType.NOT_IMPLEMENTED,
@@ -137,6 +141,7 @@ private Bson rawValueToBson(const Value v)
 void _integration_test( string connParam )
 {
     import std.uuid;
+    import std.datetime: SysTime, DateTime, dur;
 
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -158,8 +163,8 @@ void _integration_test( string connParam )
             {
                 if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
 
-                assert(bsonRes == bsonValue, "pgType="~pgType~" pgValue="~pgValue~
-                    " bsonType="~to!string(bsonValue.type)~" bsonValue="~to!string(bsonValue));
+                assert(bsonRes == bsonValue, "Received unexpected value\nreceived bsonType="~to!string(bsonValue.type)~"\nexpected nativeType="~pgType~
+                    "\nsent pgValue="~pgValue~"\nexpected bsonValue="~to!string(bsonValue)~"\nresult="~to!string(bsonRes));
             }
             else // arrays
             {
@@ -180,6 +185,7 @@ void _integration_test( string connParam )
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
         C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
+        C(Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(123456)))), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
 
         C(Bson(BsonBinData(
                     BsonBinData.Type.userDefined,
