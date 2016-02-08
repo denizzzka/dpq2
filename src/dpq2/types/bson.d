@@ -5,27 +5,27 @@ import dpq2.oids;
 
 import vibe.data.bson;
 import std.uuid;
-import std.datetime: SysTime, dur;
+import std.datetime: SysTime, dur, TimeZone;
 
 @property
-Bson toBson(in Nullable!Value v)
+Bson toBson(in Nullable!Value v, immutable TimeZone tz)
 {
     if(v.isNull)
         return Bson(null);
     else
-        return toBson(v.get);
+        return toBson(v.get, tz);
 }
 
 @property
-Bson toBson(in Value v)
+Bson toBson(in Value v, immutable TimeZone tz)
 {
     if(v.isArray)
-        return arrayValueToBson(v);
+        return arrayValueToBson(v, tz);
     else
-        return rawValueToBson(v);
+        return rawValueToBson(v, tz);
 }
 
-private Bson arrayValueToBson(in Value cell)
+private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
 {
     const ap = ArrayProperties(cell);
 
@@ -59,7 +59,7 @@ private Bson arrayValueToBson(in Value cell)
                 else
                 {
                     auto v = Value(cell.value[curr_offset .. curr_offset + size], ap.OID);
-                    b = v.toBson;
+                    b = v.toBson(tz);
                 }
 
                 curr_offset += size;
@@ -73,7 +73,7 @@ private Bson arrayValueToBson(in Value cell)
     return recursive(0);
 }
 
-private Bson rawValueToBson(const Value v)
+private Bson rawValueToBson(const Value v, immutable TimeZone tz = null)
 {
     if(!(v.format == ValueFormat.BINARY))
         throw new AnswerException(ExceptionType.NOT_BINARY,
@@ -126,7 +126,7 @@ private Bson rawValueToBson(const Value v)
 
         case TimeStamp:
             auto ts = v.as!PGtimestamp_without_time_zone;
-            auto time = BsonDate(SysTime(ts.dateTime));
+            auto time = BsonDate(SysTime(ts.dateTime, tz));
             auto usecs = ts.fracSec.usecs;
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
             break;
@@ -145,7 +145,7 @@ private Bson rawValueToBson(const Value v)
 void _integration_test( string connParam )
 {
     import std.uuid;
-    import std.datetime: SysTime, DateTime, dur;
+    import std.datetime: SysTime, DateTime, UTC;
 
     auto conn = new Connection;
 	conn.connString = connParam;
@@ -161,7 +161,7 @@ void _integration_test( string connParam )
             auto answer = conn.exec(params);
 
             Nullable!Value v = answer[0][0];
-            Bson bsonRes = toBson(v);
+            Bson bsonRes = toBson(v, UTC());
 
             if(v.isNull || !v.isArray) // standalone
             {
@@ -189,7 +189,7 @@ void _integration_test( string connParam )
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
         C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
-        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16)))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
 
         C(Bson(BsonBinData(
                     BsonBinData.Type.userDefined,
