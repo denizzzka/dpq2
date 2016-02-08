@@ -20,6 +20,7 @@ Features
 * Representation of the binary query results to native D types
  * Text types
  * Integer and decimal types
+ * Some data and time types
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support
 
@@ -116,6 +117,5 @@ bson = [[1,2,3],[4,5,6]]
 TODO
 ----
 
-* Timestamp type support
 * PostGIS binary data support
 * Binary arguments types
