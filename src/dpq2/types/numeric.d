@@ -188,6 +188,8 @@ import std.bitmanip: bigEndianToNative;
 
 package string rawValueToNumeric(in ubyte[] v)
 {
+    import dpq2.answer: AnswerException, ExceptionType;
+
     struct NumericVar_net // network byte order
     {
 	ubyte[2] num; // num of digits
@@ -196,7 +198,10 @@ package string rawValueToNumeric(in ubyte[] v)
         ubyte[2] dscale;
     }
 
-    assert(v.length >= NumericVar_net.sizeof); // FIXME: exception is need
+    if(!(v.length >= NumericVar_net.sizeof))
+        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+            "Value length ("~to!string(v.length)~") less than it is possible for numeric type",
+            __FILE__, __LINE__);
 
     NumericVar_net* h = cast(NumericVar_net*) v.ptr;
 
