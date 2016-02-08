@@ -21,6 +21,8 @@ Features
  * Text types
  * Integer and decimal types
  * Some data and time types
+ * JSON type (stored into vibe.data.json.Json)
+* Conversion of values to BSON (into vibe.data.bson.Bson)
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support
 
