@@ -78,10 +78,6 @@ package:
 @property T binaryValueAs(T)(in Value v)
 if( is( T == const(ubyte[]) ) )
 {
-    if(!(v.format == VF.BINARY))
-        throw new AE(ET.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
-
     if(!(v.oidType == OidType.ByteArray))
         throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
 
@@ -94,10 +90,6 @@ if( is( T == const(ubyte[]) ) )
 @property T binaryValueAs(T)(in Value v)
 if( isNumeric!(T) )
 {
-    if(!(v.format == VF.BINARY))
-        throw new AE(ET.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
-
     static if(isIntegral!(T))
         if(!isNativeInteger(v.oidType))
             throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
@@ -120,10 +112,6 @@ if( isNumeric!(T) )
 @property UUID binaryValueAs(T)(in Value v)
 if( is( T == UUID ) )
 {
-    if(!(v.format == VF.BINARY))
-        throw new AE(ET.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
-
     if(!(v.oidType == OidType.UUID))
         throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
 
@@ -140,10 +128,6 @@ if( is( T == UUID ) )
 @property bool binaryValueAs(T)(in Value v)
 if( is( T == bool ) )
 {
-    if(!(v.format == VF.BINARY))
-        throw new AE(ET.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
-
     if(!(v.oidType == OidType.Bool))
         throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
 
@@ -158,10 +142,6 @@ if( is( T == bool ) )
 @property Json binaryValueAs(T)(in Value v)
 if( is( T == Json ) )
 {
-    if(!(v.format == VF.BINARY))
-        throw new AE(ET.NOT_BINARY,
-            msg_NOT_BINARY, __FILE__, __LINE__);
-
     Json res;
 
     switch(v.oidType)
