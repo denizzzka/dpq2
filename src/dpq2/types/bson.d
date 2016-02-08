@@ -5,6 +5,7 @@ import dpq2.oids;
 
 import vibe.data.bson;
 import std.uuid;
+import std.datetime: SysTime;
 
 @property
 Bson toBson(in Nullable!Value v)
@@ -123,9 +124,11 @@ private Bson rawValueToBson(const Value v)
             res = Uuid2Bson(v.as!PGuuid);
             break;
 
-        //~ case TimeStamp:
-            //~ res = Bson(BsonDate(v.as!PGtimestamp_without_time_zone));
-            //~ break;
+        case TimeStamp:
+            auto ts = v.as!PGtimestamp_without_time_zone;
+            auto s = SysTime(ts.dateTime, ts.fracSec);
+            res = Bson(BsonDate(s));
+            break;
 
         default:
             throw new AnswerException(
@@ -185,7 +188,7 @@ void _integration_test( string connParam )
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
         C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
-        //C(Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(123456)))), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
+        C(Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(123455)))), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
 
         C(Bson(BsonBinData(
                     BsonBinData.Type.userDefined,
