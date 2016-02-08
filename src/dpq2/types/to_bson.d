@@ -77,11 +77,14 @@ private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 {
     if(v.format == ValueFormat.TEXT)
     {
-        import std.traits;
-        pragma(msg, "Value type detection by Oid for text answers currently is unimplemented: any value treated as Json text");
-        // TODO
+        const text = v.valueAsString;
 
-        return Bson(v.valueAsString.parseJsonString);
+        if(v.oidType == OidType.Json)
+        {
+            return Bson(text.parseJsonString);
+        }
+
+        return Bson(text);
     }
 
     Bson res;
@@ -164,6 +167,24 @@ void _integration_test( string connParam )
 	conn.connString = connParam;
     conn.connect();
 
+    // text answer tests
+    {
+        auto a = conn.exec(
+                "SELECT 123::int8 as int_num_value,"~
+                       "'text string'::text as text_value,"~
+                       "'123.456'::json as json_numeric_value,"~
+                       "'\"json_value_string\"'::json as json_text_value"
+            );
+
+        Row r = a[0]; // first row
+
+        assert(r["int_num_value"].toBson == Bson("123"));
+        assert(r["text_value"].toBson == Bson("text string"));
+        assert(r["json_numeric_value"].toBson == Bson(123.456));
+        assert(r["json_text_value"].toBson == Bson("json_value_string"));
+    }
+
+    // binary answer tests
     QueryParams params;
     params.resultFormat = ValueFormat.BINARY;
 
