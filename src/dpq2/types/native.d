@@ -162,8 +162,8 @@ void _integration_test( string connParam )
         C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ(DateTime(1997, 12, 17, 7, 37, 16), FracSec.from!"usecs"(123456)), "timestamp without time zone", "'1997-12-17 07:37:16.123456'");
-        //C!PGtimestamp_without_time_zone(SysTime.max, "timestamp without time zone", "'infinity'");
-        //C!PGtimestamp_without_time_zone(SysTime.min, "timestamp without time zone", "'-infinity'");
+        C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.max, "timestamp without time zone", "'infinity'");
+        C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.min, "timestamp without time zone", "'-infinity'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");

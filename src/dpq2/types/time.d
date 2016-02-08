@@ -83,6 +83,16 @@ struct TimeStampWithoutTZ
 {
     DateTime dateTime;
     FracSec fracSec; /// fractional seconds
+
+    static max()
+    {
+        return TimeStampWithoutTZ(DateTime.max, FracSec.from!"hnsecs"(long.max));
+    }
+
+    static min()
+    {
+        return TimeStampWithoutTZ(DateTime.min, FracSec.zero);
+    }
 }
 
 private:
@@ -91,8 +101,8 @@ TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
 {
     version(Have_Int64_TimeStamp)
     {
-        if(raw >= time_t.max) return TimeStampWithoutTZ(DateTime.max, FracSec.from!"hnsecs"(long.max));
-        if(raw <= time_t.min) return TimeStampWithoutTZ(DateTime.min, FracSec.zero);
+        if(raw >= time_t.max) return TimeStampWithoutTZ.max;
+        if(raw <= time_t.min) return TimeStampWithoutTZ.min;
     }
 
     pg_tm tm;
