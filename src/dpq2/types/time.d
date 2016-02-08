@@ -1,24 +1,6 @@
 ﻿/**
 *   PostgreSQL time types binary format.
 *   
-*   There are following supported libpq formats:
-*   <ul>
-*   <li>$(B date) - handles year, month, day. Corresponding D type - $(B std.datetime.Date).</li>
-*   <li>$(B abstime) - unix time in seconds without timezone. Corresponding D type - $(B PGAbsTime) 
-*        wrapper around $(B std.datetime.SysTime).</li>
-*   <li>$(B reltime) - seconds count positive or negative for representation of time durations.
-*        Corresponding D type - $(B PGRelTime) wrapper around $(B core.time.Duration). Note that
-*        D's duration holds hnsecs count, but reltime precise at least seconds.</li>
-*   <li>$(B time) - day time without time zone. Corresponding D type - $(B PGTime) wrapper around
-*        $(B std.datetime.TimeOfDay).</li>
-*   <li>$(B time with zone) - day time with time zone. Corresponding D type - $(B PGTimeWithZone)
-*        structure that can be casted to $(B std.datetime.TimeOfDay) and $(B std.datetime.SimpleTimeZone).</li>
-*   <li>$(B interval) - time duration (modern replacement for $(B reltime)). Corresponding D time - 
-*        $(B TimeInterval) that handles microsecond, day and month counts.</li>
-*   <li>$(B tinterval) - interval between two points in time. Consists of two abstime values: begin and end.
-*        Correponding D type - $(B PGInterval) wrapper around $(B std.datetime.Interval).</li>
-*   </ul>
-*
 *   Copyright: © 2014 DSoftOut
 *   License: Subject to the terms of the MIT license, as written in the included LICENSE file.
 *   Authors: NCrashed <ncrashed@gmail.com>
