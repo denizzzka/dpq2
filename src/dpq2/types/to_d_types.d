@@ -40,20 +40,20 @@ private alias VF = ValueFormat;
 private alias AE = AnswerException;
 private alias ET = ExceptionType;
 
-/// Returns cell value as native string type
+/// Returns cell value as native string type from text or binary formatted field
 @property string as(T)(in Value v)
 if(is(T == string))
 {
     if(v.format == VF.BINARY)
     {
         if(!(v.oidType == OidType.Text || v.oidType == OidType.Numeric))
-            throwTypeComplaint(v.oidType, "string", __FILE__, __LINE__);
+            throwTypeComplaint(v.oidType, "string or numeric", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
             return rawValueToNumeric(v.value);
     }
 
-    return to!string( cast(const(char[])) v.value );
+    return valueAsString(v);
 }
 
 /// Returns value as D type value from binary formatted field
@@ -68,6 +68,11 @@ if(!is(T == string))
 }
 
 package:
+
+@property string valueAsString(in Value v)
+{
+    return to!string( cast(const(char[])) v.value );
+}
 
 /// Returns value as bytes from binary formatted field
 @property T binaryValueAs(T)(in Value v)
