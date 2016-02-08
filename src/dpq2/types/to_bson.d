@@ -86,27 +86,27 @@ private Bson rawValueToBson(const Value v, immutable TimeZone tz = null)
     switch(v.oidType)
     {
         case OidType.Bool:
-            bool n = v.as!PGboolean;
+            bool n = v.binaryValueAs!PGboolean;
             res = Bson(n);
             break;
 
         case Int2:
-            auto n = to!int(v.as!PGsmallint);
+            auto n = to!int(v.binaryValueAs!PGsmallint);
             res = Bson(n);
             break;
 
         case Int4:
-            int n = v.as!PGinteger;
+            int n = v.binaryValueAs!PGinteger;
             res = Bson(n);
             break;
 
         case Int8:
-            long n = v.as!PGbigint;
+            long n = v.binaryValueAs!PGbigint;
             res = Bson(n);
             break;
 
         case Float8:
-            double n = v.as!PGdouble_precision;
+            double n = v.binaryValueAs!PGdouble_precision;
             res = Bson(n);
             break;
 
@@ -121,11 +121,11 @@ private Bson rawValueToBson(const Value v, immutable TimeZone tz = null)
             break;
 
         case UUID:
-            res = Uuid2Bson(v.as!PGuuid);
+            res = Uuid2Bson(v.binaryValueAs!PGuuid);
             break;
 
         case TimeStamp:
-            auto ts = v.as!PGtimestamp_without_time_zone;
+            auto ts = v.binaryValueAs!PGtimestamp_without_time_zone;
             auto time = BsonDate(SysTime(ts.dateTime, tz));
             auto usecs = ts.fracSec.usecs;
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
