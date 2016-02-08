@@ -111,8 +111,11 @@ private Bson rawValueToBson(const Value v, immutable TimeZone tz = null)
             break;
 
         case Numeric:
+            res = Bson(rawValueToNumeric(v.value));
+            break;
+
         case Text:
-            res = Bson(v.as!PGtext);
+            res = Bson(v.valueAsString);
             break;
 
         case ByteArray:
