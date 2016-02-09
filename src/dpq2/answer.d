@@ -94,7 +94,7 @@ class Answer
     }
 
     /// Returns row count
-    @property size_t rowCount() const { return PQntuples(res); }
+    @property size_t length() const { return PQntuples(res); }
 
     /// Returns column count
     @property size_t columnCount() const { return PQnfields(res); }
@@ -157,7 +157,7 @@ class Answer
     @property
     debug override string toString() const
     {
-        return "Rows: "~to!string(rowCount)~" Columns: "~to!string(columnCount);
+        return "Rows: "~to!string(length)~" Columns: "~to!string(columnCount);
     }
     
     @property
@@ -184,10 +184,10 @@ class Answer
     
     private void assertRow( const size_t r ) const
     {
-        if(!(r < rowCount))
+        if(!(r < length))
             throw new AnswerException(
                 ExceptionType.OUT_OF_RANGE,
-                "Row "~to!string(r)~" is out of range 0.."~to!string(rowCount)~" of result rows",
+                "Row "~to!string(r)~" is out of range 0.."~to!string(length)~" of result rows",
                 __FILE__, __LINE__
             );
     }
@@ -203,6 +203,13 @@ class Answer
     @property Row front(){ return this[currRow]; }
     @property void popFront(){ ++currRow; }
     @property bool empty(){ return currRow >= rowCount; }
+}
+
+unittest
+{
+    import std.range;
+
+    assert(isRandomAccessRange!Answer);
 }
 
 /// Represents one row from the answer table

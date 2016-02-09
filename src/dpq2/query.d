@@ -171,7 +171,7 @@ void _integration_test( string connParam )
 
         assert( a.cmdStatus.length > 2 );
         assert( a.columnCount == 4 );
-        assert( a.rowCount == 3 );
+        assert( a.length == 3 );
         assert( a.columnFormat(1) == ValueFormat.TEXT );
         assert( a.columnFormat(2) == ValueFormat.TEXT );
     }
