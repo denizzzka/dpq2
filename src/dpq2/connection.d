@@ -73,6 +73,21 @@ package class BaseConnection
         readyForQuery = true;
     }
 
+	/// Connect to DB in a nonblocking manner
+    void connectNonblockingStart()
+    {
+        assert( !readyForQuery );
+
+        conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
+
+        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+
+        if( PQstatus(conn) == CONNECTION_BAD )
+            throw new ConnException(this, __FILE__, __LINE__);
+
+        readyForQuery = true;
+    }
+
 	/// Disconnect from DB
     void disconnect()
     {
