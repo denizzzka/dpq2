@@ -136,6 +136,15 @@ package class BaseConnection
     {
         disconnect();
     }
+
+    /**
+     * returns the previous notice receiver or processor function pointer, and sets the new value.
+     * If you supply a null function pointer, no action is taken, but the current pointer is returned.
+     */
+    PQnoticeProcessor setNoticeProcessor(PQnoticeProcessor proc, void* arg) nothrow
+    {
+        return PQsetNoticeProcessor(conn, proc, arg);
+    }
 }
 
 /// Connection exception
