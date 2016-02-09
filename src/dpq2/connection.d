@@ -2,8 +2,7 @@
 
 @trusted:
 
-import dpq2.answer;
-
+public import derelict.pq.pq: PostgresPollingStatusType, ConnStatusType;
 import derelict.pq.pq;
 
 import std.conv: to;
