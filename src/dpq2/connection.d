@@ -88,6 +88,11 @@ package class BaseConnection
         readyForQuery = true;
     }
 
+    PostgresPollingStatusType poll()
+    {
+        return PQconnectPoll(conn);
+    }
+
     ConnStatusType status()
     {
         return PQstatus(conn);
