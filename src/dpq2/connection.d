@@ -67,7 +67,7 @@ package class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if( !nonBlocking && PQstatus(conn) != CONNECTION_OK )
+        if( !nonBlocking && status != Status.CONNECTION_OK )
             throw new ConnException(this, __FILE__, __LINE__);
         
         readyForQuery = true;
@@ -82,10 +82,15 @@ package class BaseConnection
 
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 
-        if( PQstatus(conn) == CONNECTION_BAD )
+        if( status == Status.CONNECTION_BAD )
             throw new ConnException(this, __FILE__, __LINE__);
 
         readyForQuery = true;
+    }
+
+    Status status()
+    {
+        return cast(Status) PQstatus(conn);
     }
 
 	/// Disconnect from DB
@@ -127,6 +132,22 @@ package class BaseConnection
     {
         disconnect();
     }
+}
+
+import pq = derelict.pq.pq;
+
+enum Status : int
+{
+    // right side is imported from derelict-pq
+    CONNECTION_OK = pq.CONNECTION_OK,
+    CONNECTION_BAD = pq.CONNECTION_BAD,
+    CONNECTION_STARTED = pq.CONNECTION_STARTED,
+    CONNECTION_MADE = pq.CONNECTION_MADE,
+    CONNECTION_AWAITING_RESPONSE = pq.CONNECTION_AWAITIN_RESPONSE, // TODO: report this typo
+    CONNECTION_AUTH_OK = pq.CONNECTION_AUTH_OK,
+    CONNECTION_SETENV = pq.CONNECTION_SETENV,
+    CONNECTION_SSL_STARTUP = pq.CONNECTION_SSL_STARTUP,
+    CONNECTION_NEEDED = pq.CONNECTION_NEEDED
 }
 
 /// Connection exception
