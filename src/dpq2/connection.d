@@ -34,7 +34,7 @@ package class BaseConnection
     package PGconn* conn;
     private
     {
-        bool readyForQuery;
+        debug bool readyForQuery; // connection started and not disconnect() was called
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
@@ -42,15 +42,11 @@ package class BaseConnection
         }
     }
     
-    @property bool nonBlocking(){ return PQisnonblocking(conn) == 1; }
-
-    @disable
-    @property bool nonBlocking( bool m )
+    @property bool nonBlocking()
     {
-        setNonBlocking( m );
-        return m;
+        return PQisnonblocking(conn) == 1;
     }
-    
+
     private void setNonBlocking( bool state )
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
@@ -89,6 +85,8 @@ package class BaseConnection
 
     PostgresPollingStatusType poll()
     {
+        assert( readyForQuery );
+
         return PQconnectPoll(conn);
     }
 
@@ -104,17 +102,22 @@ package class BaseConnection
         {
             readyForQuery = false;
             PQfinish( conn );
+            // TODO: remove readyForQuery and just use conn = null as flag
         }
     }
 
     package void consumeInput()
     {
+        assert( readyForQuery );
+
         const size_t r = PQconsumeInput( conn );
         if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnException(this, __FILE__, __LINE__);
     }
     
     package bool flush()
     {
+        assert( readyForQuery );
+
         auto r = PQflush(conn);
         if( r == -1 ) throw new ConnException(this, __FILE__, __LINE__);
         return r == 0;
@@ -143,6 +146,8 @@ package class BaseConnection
      */
     PQnoticeProcessor setNoticeProcessor(PQnoticeProcessor proc, void* arg) nothrow
     {
+        assert( readyForQuery );
+
         return PQsetNoticeProcessor(conn, proc, arg);
     }
 }
