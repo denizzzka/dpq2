@@ -2,12 +2,7 @@
 
 @trusted:
 
-public import derelict.pq.pq:
-    PostgresPollingStatusType,
-    ConnStatusType,
-    PQnoticeProcessor;
-
-import derelict.pq.pq;
+public import derelict.pq.pq;
 import dpq2.answer: Answer;
 import std.conv: to;
 import std.string: toStringz;

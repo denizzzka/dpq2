@@ -2,10 +2,8 @@
 
 @trusted:
 
-import dpq2.answer: Notify;
 public import dpq2.connection;
-
-import derelict.pq.pq;
+import dpq2.answer: Notify;
 
 enum ValueFormat : ubyte {
     TEXT,

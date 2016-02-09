@@ -7,7 +7,7 @@ public import dpq2.types.to_d_types;
 public import dpq2.types.to_bson;
 import dpq2.oids;
 
-public import derelict.pq.pq: ExecStatusType;
+public import derelict.pq.pq;
 
 import derelict.pq.pq;
 
