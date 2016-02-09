@@ -96,22 +96,6 @@ final class Connection: BaseConnection
         if( !r ) throw new ConnException(this, __FILE__, __LINE__);
     }
     
-    /// Waits for the next result from a sendQuery
-    package Answer getResult()
-    {
-        Answer res;
-
-        auto r = PQgetResult( conn );
-
-        if(r)
-        {
-            res = new Answer(r);
-            res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
-        }
-
-        return res;
-    }
-    
     /// getResult would block waiting for input?
     package bool isBusy()
     {

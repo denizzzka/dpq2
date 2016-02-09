@@ -8,7 +8,7 @@ public import derelict.pq.pq:
     PQnoticeProcessor;
 
 import derelict.pq.pq;
-
+import dpq2.answer: Answer;
 import std.conv: to;
 import std.string: toStringz;
 import std.exception: enforceEx;
@@ -153,6 +153,22 @@ package class BaseConnection
         assert( readyForQuery );
 
         return PQsetNoticeProcessor(conn, proc, arg);
+    }
+
+    /// Waits for the next result from a sendQuery
+    package Answer getResult()
+    {
+        Answer res;
+
+        auto r = PQgetResult( conn );
+
+        if(r)
+        {
+            res = new Answer(r);
+            res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
+        }
+
+        return res;
     }
 }
 
