@@ -134,7 +134,7 @@ class Answer
     /// Returns column name by field number
     string columnName( in size_t colNum ) const
     {
-        const char* s = PQfname(cast(PGresult*) res, to!int(colNum));
+        const char* s = PQfname(cast(PGresult*) res, to!int(colNum)); // FIXME: res should be a const
 
         if( s == null )
             throw new AnswerException(
