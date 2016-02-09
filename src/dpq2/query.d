@@ -2,7 +2,7 @@
 
 @trusted:
 
-import dpq2.answer;
+import dpq2.answer: Notify;
 public import dpq2.connection;
 
 import derelict.pq.pq;
