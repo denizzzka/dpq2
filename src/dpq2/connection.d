@@ -145,7 +145,7 @@ package class BaseConnection
 
     string errorMessage() const nothrow
     {
-        return to!(string)(PQerrorMessage(cast(PGconn*) conn)); //TODO: need report to derelict pq
+        return to!string(PQerrorMessage(cast(PGconn*) conn)); //TODO: need report to derelict pq
     }
 
     ~this()
@@ -229,7 +229,7 @@ package class BaseConnection
         return to!string(res);
     }
 
-    string host() const
+    string host() const nothrow
     {
         assert( readyForQuery );
 
