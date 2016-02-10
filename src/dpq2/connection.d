@@ -150,16 +150,30 @@ package class BaseConnection
         return PQsetNoticeProcessor(conn, proc, arg);
     }
 
-    /// Waits for the next result from a sendQuery
-    package Answer getResult()
+    /// Get for the next result from a sendQuery. Can return null.
+    package Answer getAnswer()
+    {
+        return _getAnswer(PQgetResult(conn));
+    }
+
+    /// Get Answer from PQexec* functions or throw error if pull is empty
+    package Answer getAnswer( PGresult* r )
+    {
+        auto a = _getAnswer(r);
+
+        if(!a) throw new ConnException(this, __FILE__, __LINE__);
+
+        return a;
+    }
+
+    /// Get Answer from PQexec* functions
+    private Answer _getAnswer( PGresult* r )
     {
         Answer res;
 
-        auto r = PQgetResult( conn );
-
         if(r)
         {
-            res = new Answer(r);
+            res = new Answer(cast(immutable) r );
             res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
         }
 

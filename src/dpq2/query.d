@@ -135,22 +135,6 @@ final class Connection: BaseConnection
         
         return a;
     }
-
-    /// Get Answer from PQexec* functions
-    // It is important to do a separate check because of Answer ctor is nothrow
-    private Answer getAnswer( PGresult* r )
-    {
-        Answer res;
-        
-        if( r )
-        {
-            res = new Answer( r );
-            res.checkAnswerForErrors();
-        }
-        else throw new ConnException(this, __FILE__, __LINE__);
-        
-        return res;
-    }
 }
 
 void _integration_test( string connParam )

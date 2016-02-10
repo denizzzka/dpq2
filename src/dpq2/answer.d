@@ -28,14 +28,14 @@ struct Coords
 /// Answer
 class Answer
 {
-    private const (PGresult*) res;
+    private immutable (PGresult*) res;
 
     nothrow invariant()
     {
         assert( res != null );
     }
         
-    package this(PGresult* r) nothrow
+    package this(immutable PGresult* r) nothrow
     {
         res = r;
     }
@@ -656,13 +656,13 @@ void _integration_test( string connParam )
     
     // Async query test 1
     conn.sendQuery( "select 123; select 456; select 789" );
-    while( conn.getResult() !is null ){}
-    assert( conn.getResult() is null ); // removes null answer at the end
+    while( conn.getAnswer() !is null ){}
+    assert( conn.getAnswer() is null ); // removes null answer at the end
 
     // Async query test 2
     conn.sendQuery( p );
-    while( conn.getResult() !is null ){}
-    assert( conn.getResult() is null ); // removes null answer at the end
+    while( conn.getAnswer() !is null ){}
+    assert( conn.getAnswer() is null ); // removes null answer at the end
 
     {
         // Range test
