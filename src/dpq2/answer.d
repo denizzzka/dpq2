@@ -202,21 +202,26 @@ immutable class Answer
     }
 }
 
-struct Rangify(T)
+auto rangify(T)(T obj)
 {
-    T obj;
-    alias obj this;
-
-    private int currRow;
-
-    this(T o)
+    struct Rangify(T)
     {
-        obj = o;
+        T obj;
+        alias obj this;
+
+        private int curr;
+
+        this(T o)
+        {
+            obj = o;
+        }
+
+        @property auto front(){ return obj[curr]; }
+        @property void popFront(){ ++curr; }
+        @property bool empty(){ return curr >= obj.length; }
     }
 
-    @property auto front(){ return obj[currRow]; }
-    @property void popFront(){ ++currRow; }
-    @property bool empty(){ return currRow >= obj.length; }
+    return Rangify!(T)(obj);
 }
 
 /// Represents one row from the answer table
@@ -672,11 +677,11 @@ void _integration_test( string connParam )
 
     {
         // Range test
-        auto rowsRange = Rangify!(immutable Answer)(r);
+        auto rowsRange = rangify(r);
         size_t count = 0;
 
         foreach(row; rowsRange)
-            foreach(elem; Rangify!(immutable Row)(row))
+            foreach(elem; rangify(row))
                 count++;
 
         assert(count == 7);
