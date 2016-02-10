@@ -204,7 +204,7 @@ immutable class Answer
 
 struct Rangify(T)
 {
-    immutable T obj;
+    T obj;
     alias obj this;
 
     private int currRow;
@@ -676,7 +676,7 @@ void _integration_test( string connParam )
         size_t count = 0;
 
         foreach(row; rowsRange)
-            foreach(elem; Rangify!Row(row))
+            foreach(elem; Rangify!(immutable Row)(row))
                 count++;
 
         assert(count == 7);
