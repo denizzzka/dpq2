@@ -103,13 +103,13 @@ package class BaseConnection
         return PQresetPoll(conn);
     }
 
-    ConnStatusType status()
+    ConnStatusType status() nothrow
     {
         return PQstatus(conn);
     }
 
 	/// Disconnect from DB
-    void disconnect()
+    void disconnect() nothrow
     {
         if( readyForQuery )
         {
