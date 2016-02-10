@@ -33,7 +33,8 @@ package class BaseConnection
     package PGconn* conn;
     private
     {
-        debug bool readyForQuery; // connection started and not disconnect() was called
+        bool readyForQuery; // connection started and not disconnect() was called
+
         enum ConsumeResult
         {
             PQ_CONSUME_ERROR,
