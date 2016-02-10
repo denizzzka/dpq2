@@ -41,20 +41,17 @@ final class Connection: BaseConnection
     /// Perform SQL query to DB
     immutable (Answer) exec( string SQLcmd )
     {
-        auto r = getAnswer(
-            PQexec(conn, toStringz( SQLcmd ))
-        );
-        
-        return r;
+        auto pgResult = PQexec(conn, toStringz( SQLcmd ));
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        return getAnswer(cast(immutable) pgResult);
     }
     
     /// Perform SQL query to DB
-    immutable (Answer) exec(ref const QueryParams p)
+    immutable (Answer) exec(in QueryParams p)
     {
         auto a = prepareArgs( p );
-        auto r = getAnswer
-        (
-            PQexecParams (
+        auto pgResult = PQexecParams (
                 conn,
                 cast(const char*)toStringz( p.sqlCommand ),
                 cast(int)p.args.length,
@@ -63,10 +60,10 @@ final class Connection: BaseConnection
                 cast(int*)a.lengths.ptr,
                 cast(int*)a.formats.ptr,
                 cast(int)p.resultFormat
-            )
         );
-        
-        return r;
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        return getAnswer(cast(immutable) pgResult);
     }
     
     /// Submits a command to the server without waiting for the result(s)

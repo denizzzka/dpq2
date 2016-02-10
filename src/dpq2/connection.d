@@ -169,11 +169,12 @@ package class BaseConnection
     {
         assert( readyForQuery );
 
-        return _getAnswer(PQgetResult(conn));
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        return _getAnswer(cast(immutable) PQgetResult(conn));
     }
 
     /// Get Answer from PQexec* functions or throw error if pull is empty
-    package immutable(Answer) getAnswer( PGresult* r )
+    package immutable(Answer) getAnswer(immutable PGresult* r) const
     {
         auto a = _getAnswer(r);
 
@@ -183,11 +184,11 @@ package class BaseConnection
     }
 
     /// Get Answer from PQexec* functions
-    private immutable(Answer) _getAnswer(in PGresult* r)
+    private static immutable(Answer) _getAnswer(immutable PGresult* r)
     {
         if(r)
         {
-            auto res = new immutable Answer(cast(immutable) r);
+            auto res = new immutable Answer(r);
             res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
             return res;
         }
