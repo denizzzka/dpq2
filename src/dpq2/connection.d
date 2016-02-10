@@ -119,7 +119,7 @@ package class BaseConnection
         }
     }
 
-    package void consumeInput()
+    void consumeInput()
     {
         assert( readyForQuery );
 
