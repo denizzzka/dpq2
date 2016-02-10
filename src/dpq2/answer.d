@@ -261,7 +261,10 @@ immutable struct Row
         Nullable!Value r;
 
         if(!isNULL(col))
-            r = Value(v[0..s].dup, answer.OID(col), answer.columnFormat(col));
+        {
+            // it is legal to cast here because immutable value will be returned
+            r = Value(cast(ubyte[]) v[0..s], answer.OID(col), answer.columnFormat(col));
+        }
 
         return cast(immutable) r;
     }
@@ -294,7 +297,7 @@ immutable struct Row
 }
 
 /// Link to the cell of the answer table
-struct Value
+struct Value // TODO: better to make it immutable
 {
     package ValueFormat format;
     package OidType oidType;
@@ -457,7 +460,10 @@ immutable struct Array
         Nullable!Value r;
 
         if(!elementIsNULL[n])
-            r = Value(elements[n].dup, OID);
+        {
+            // it is legal to cast here because immutable value will be returned
+            r = Value(cast(ubyte[]) elements[n], OID);
+        }
 
         return cast(immutable) r;
     }
