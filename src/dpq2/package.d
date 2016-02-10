@@ -1,4 +1,4 @@
-﻿module dpq2.all;
+﻿module dpq2;
 
 shared static this()
 {

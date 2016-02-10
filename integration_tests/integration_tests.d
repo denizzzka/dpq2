@@ -2,7 +2,7 @@
 
 import std.getopt;
 
-import dpq2.all;
+import dpq2;
 import conn = dpq2.connection: _integration_test;
 import query = dpq2.query: _integration_test;
 import answer = dpq2.answer: _integration_test;

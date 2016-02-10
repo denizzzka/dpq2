@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env rdmd
 
-import dpq2.all;
+import dpq2;
 import std.stdio: writeln;
 
 void main()
@@ -19,9 +19,10 @@ void main()
     writeln( "Text query result by index: ", answer[0][3].as!PGtext );
 
     // It is possible to read values of unknown type using BSON:
-    for(auto column = 0; column < answer.columnCount; column++)
+    auto firstRow = answer[0];
+    foreach(cell; Rangify!(immutable Row)(firstRow))
     {
-        writeln("column name: '"~answer.columnName(column)~"', bson: ", answer[0][column].toBson);
+        writeln("bson: ", cell.toBson);
     }
 
     // Separated arguments query with binary result:
