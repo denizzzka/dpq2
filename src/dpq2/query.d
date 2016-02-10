@@ -77,7 +77,7 @@ final class Connection: BaseConnection
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQuery( ref const QueryParams p )
+    void sendQuery( in QueryParams p )
     {
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
