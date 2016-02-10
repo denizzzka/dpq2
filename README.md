@@ -39,7 +39,7 @@ Example
 ```D
 #!/usr/bin/env rdmd
 
-import dpq2.all;
+import dpq2;
 import std.stdio: writeln;
 
 void main()
@@ -58,9 +58,10 @@ void main()
     writeln( "Text query result by index: ", answer[0][3].as!PGtext );
 
     // It is possible to read values of unknown type using BSON:
-    for(auto column = 0; column < answer.columnCount; column++)
+    auto firstRow = answer[0];
+    foreach(cell; rangify(firstRow))
     {
-        writeln("column name: '"~answer.columnName(column)~"', bson: ", answer[0][column].toBson);
+        writeln("bson: ", cell.toBson);
     }
 
     // Separated arguments query with binary result:
@@ -105,9 +106,9 @@ void main()
 ```
 ####Compile and run:
 ```
-Text query result by name: 2016-02-10 12:06:22.237939
+Text query result by name: 2016-02-10 22:48:07.827245
 Text query result by index: 456.78
-bson: "2016-02-10 12:06:22.237939"
+bson: "2016-02-10 22:48:07.827245"
 bson: "abc"
 bson: "123"
 bson: "456.78"
