@@ -39,7 +39,7 @@ struct QueryArg
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    Answer exec( string SQLcmd )
+    immutable (Answer) exec( string SQLcmd )
     {
         auto r = getAnswer(
             PQexec(conn, toStringz( SQLcmd ))
@@ -49,7 +49,7 @@ final class Connection: BaseConnection
     }
     
     /// Perform SQL query to DB
-    Answer exec(ref const QueryParams p)
+    immutable (Answer) exec(ref const QueryParams p)
     {
         auto a = prepareArgs( p );
         auto r = getAnswer

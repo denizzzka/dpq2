@@ -151,7 +151,7 @@ class Answer
     /// Returns pointer to row of cells
     Row opIndex(in size_t row) const
     {
-        return const Row( this, row );
+        return const Row(this, row);
     }
     
     @property
@@ -200,12 +200,16 @@ class Answer
 }
 
 struct Rangify(T)
-if(is(T == Answer) || is(T == Row))
 {
     T obj;
     alias obj this;
 
     private int currRow;
+
+    this(T o)
+    {
+        obj = o;
+    }
 
     @property auto front(){ return obj[currRow]; }
     @property void popFront(){ ++currRow; }
@@ -218,7 +222,7 @@ const struct Row
     private const Answer answer;
     private immutable size_t row;
     
-    this( const Answer answer, size_t row )
+    this(in Answer answer, in size_t row)
     {
         answer.assertRow( row );
         
@@ -666,7 +670,7 @@ void _integration_test( string connParam )
 
     {
         // Range test
-        auto rowsRange = Rangify!Answer(r);
+        auto rowsRange = Rangify!(immutable Answer)(r);
         size_t count = 0;
 
         foreach(row; rowsRange)

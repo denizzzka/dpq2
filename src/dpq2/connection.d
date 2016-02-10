@@ -151,13 +151,13 @@ package class BaseConnection
     }
 
     /// Get for the next result from a sendQuery. Can return null.
-    package Answer getAnswer()
+    package immutable(Answer) getAnswer()
     {
         return _getAnswer(PQgetResult(conn));
     }
 
     /// Get Answer from PQexec* functions or throw error if pull is empty
-    package Answer getAnswer( PGresult* r )
+    package immutable(Answer) getAnswer( PGresult* r )
     {
         auto a = _getAnswer(r);
 
@@ -167,7 +167,7 @@ package class BaseConnection
     }
 
     /// Get Answer from PQexec* functions
-    private Answer _getAnswer( PGresult* r )
+    private immutable(Answer) _getAnswer( PGresult* r )
     {
         Answer res;
 
@@ -177,7 +177,7 @@ package class BaseConnection
             res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
         }
 
-        return res;
+        return cast(immutable) res;
     }
 }
 
