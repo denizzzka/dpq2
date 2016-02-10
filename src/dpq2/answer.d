@@ -251,11 +251,11 @@ const struct Row
         return PQgetisnull(answer.res, to!int(row), to!int(col)) != 0;
     }
 
-    Nullable!Value opIndex(in size_t col) const
+    immutable (Nullable!Value) opIndex(in size_t col)
     {
         answer.assertCoords( Coords( row, col ) );
-        
-        auto v = PQgetvalue(answer.res, to!int(row), to!int(col));
+
+        auto v = cast(immutable) PQgetvalue(answer.res, to!int(row), to!int(col));
         auto s = size( col );
         
         Nullable!Value r;
@@ -263,10 +263,10 @@ const struct Row
         if(!isNULL(col))
             r = Value(v, s, answer.columnFormat(col), answer.OID(col));
         
-        return r;
+        return cast(immutable) r;
     }
     
-    Nullable!Value opIndex(in string column) const
+    immutable (Nullable!Value) opIndex(in string column) const
     {
         return opIndex(columnNum(column));
     }
@@ -300,7 +300,7 @@ struct Value
     package OidType oidType;
     package ubyte[] value;
 
-    this( const (ubyte)* value, size_t valueSize, ValueFormat f, OidType t )
+    this(immutable (ubyte)* value, size_t valueSize, ValueFormat f, OidType t)
     {
         this.value = cast(ubyte[]) value[0..valueSize];
         format = f;

@@ -177,7 +177,7 @@ public void _integration_test( string connParam )
         {
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as d_type_test_value";
             auto answer = conn.exec(params);
-            Value v = answer[0][0].get;
+            immutable Value v = answer[0][0].get;
             auto result = v.as!T;
 
             assert(result == nativeValue, "Received unexpected value\nreceived pgType="~to!string(v.oidType)~"\nexpected nativeType="~to!string(typeid(T))~

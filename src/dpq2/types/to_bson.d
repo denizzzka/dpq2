@@ -194,7 +194,7 @@ void _integration_test( string connParam )
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
             auto answer = conn.exec(params);
 
-            Nullable!Value v = answer[0][0];
+            immutable (Nullable!Value) v = answer[0][0];
             Bson bsonRes = toBson(v, UTC());
 
             if(v.isNull || !v.isSupportedArray) // standalone
