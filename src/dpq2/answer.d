@@ -70,7 +70,7 @@ immutable class Answer
 
             default:
                 throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
-                    "Please report if you came across this error! status="~to!string(status)~"\r\n"~
+                    "Please report if you came across this error! status="~to!string(status)~": "~statusString~"\r\n"~
                     resultErrorMessage, __FILE__, __LINE__);
         }
     }
@@ -79,6 +79,12 @@ immutable class Answer
     ExecStatusType status()
     {
         return PQresultStatus(res);
+    }
+
+    @property
+    string statusString()
+    {
+        return to!string(fromStringz(PQresStatus(status)));
     }
 
     /// Returns the command status tag from the SQL command that generated the PGresult
