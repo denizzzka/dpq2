@@ -204,7 +204,7 @@ package class BaseConnection
 
     string parameterStatus(string paramName) const
     {
-        auto res = PQparameterStatus(cast(PGconn*) conn, cast(char*) toStringz(paramName));
+        auto res = PQparameterStatus(cast(PGconn*) conn, cast(char*) toStringz(paramName)); //TODO: need report to derelict pq
 
         if(res is null)
             throw new ConnException(this, __FILE__, __LINE__);

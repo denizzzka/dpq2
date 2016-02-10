@@ -93,13 +93,7 @@ final class Connection: BaseConnection
                     
         if( !r ) throw new ConnException(this, __FILE__, __LINE__);
     }
-    
-    /// getResult would block waiting for input?
-    package bool isBusy()
-    {
-        return PQisBusy(conn) == 1;
-    }
-    
+
     /// Returns null if no notifies was received
     Notify getNextNotify()
     {
