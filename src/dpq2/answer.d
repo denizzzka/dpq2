@@ -35,7 +35,7 @@ immutable class Answer
         assert( res != null );
     }
         
-    package this(immutable PGresult* r) nothrow immutable
+    package this(immutable PGresult* r) nothrow
     {
         res = r;
     }
@@ -50,7 +50,7 @@ immutable class Answer
             assert( true, "double free!" );
     }
     
-    package void checkAnswerForErrors() const
+    package void checkAnswerForErrors()
     {
         cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
 
@@ -76,7 +76,7 @@ immutable class Answer
     }
     
     @property
-    ExecStatusType status() const
+    ExecStatusType status()
     {
         return PQresultStatus(res);
     }
@@ -88,33 +88,33 @@ immutable class Answer
      * not free the result directly. It will be freed when the associated 
      * PGresult handle is passed to PQclear.
      */
-    @property string cmdStatus() const
+    @property string cmdStatus()
     {
         return to!string( PQcmdStatus(res) );
     }
 
     /// Returns row count
-    @property size_t length() const { return PQntuples(res); }
+    @property size_t length() { return PQntuples(res); }
 
     /// Returns column count
-    @property size_t columnCount() const { return PQnfields(res); }
+    @property size_t columnCount() { return PQnfields(res); }
 
     /// Returns column format
-    ValueFormat columnFormat( const size_t colNum ) const
+    ValueFormat columnFormat( const size_t colNum )
     {
         assertCol( colNum );
         return cast(ValueFormat) PQfformat(res, to!int(colNum));
     }
     
     /// Returns column Oid
-    @property OidType OID( size_t colNum ) const
+    @property OidType OID( size_t colNum )
     {
         assertCol( colNum );
 
         return oid2oidType(PQftype(res, to!int(colNum)));
     }
 
-    @property bool isSupportedArray( const size_t colNum ) const
+    @property bool isSupportedArray( const size_t colNum )
     {
         assertCol(colNum);
 
@@ -122,7 +122,7 @@ immutable class Answer
     }
 
     /// Returns column number by field name
-    size_t columnNum( string columnName ) const
+    size_t columnNum( string columnName )
     {    
         size_t n = PQfnumber(res, toStringz(columnName));
 
@@ -134,7 +134,7 @@ immutable class Answer
     }
 
     /// Returns column name by field number
-    string columnName( in size_t colNum ) const
+    string columnName( in size_t colNum )
     {
         const char* s = PQfname(cast(PGresult*) res, to!int(colNum)); // FIXME: res should be a const
 
@@ -158,24 +158,24 @@ immutable class Answer
     }
 
     @property
-    debug string toString() const
+    debug string toString()
     {
         return "Rows: "~to!string(length)~" Columns: "~to!string(columnCount);
     }
     
     @property
-    private string resultErrorMessage() const
+    private string resultErrorMessage()
     {
         return to!string( PQresultErrorMessage(res) );
     }
 
     @property
-    private string resultErrorField(int fieldcode) const
+    private string resultErrorField(int fieldcode)
     {
         return to!string( PQresultErrorField(cast(PGresult*)res, fieldcode) ); // FIXME: res should be a const
     }
 
-    private void assertCol( const size_t c ) const
+    private void assertCol( const size_t c )
     {
         if(!(c < columnCount))
             throw new AnswerException(
@@ -185,7 +185,7 @@ immutable class Answer
             );
     }
     
-    private void assertRow( const size_t r ) const
+    private void assertRow( const size_t r )
     {
         if(!(r < length))
             throw new AnswerException(
@@ -195,7 +195,7 @@ immutable class Answer
             );
     }
     
-     private void assertCoords( const Coords c ) const
+     private void assertCoords( const Coords c )
     {
         assertRow( c.row );
         assertCol( c.col );
@@ -297,7 +297,7 @@ immutable struct Row
 }
 
 /// Link to the cell of the answer table
-struct Value // TODO: better to make it immutable
+struct Value // TODO: better to make it immutable, but Nullable don't allow use it with const or immutable
 {
     package ValueFormat format;
     package OidType oidType;
