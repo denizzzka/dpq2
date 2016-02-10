@@ -20,7 +20,7 @@ void main()
 
     // It is possible to read values of unknown type using BSON:
     auto firstRow = answer[0];
-    foreach(cell; Rangify!(typeof(firstRow))(firstRow))
+    foreach(cell; rangify(firstRow))
     {
         writeln("bson: ", cell.toBson);
     }
