@@ -105,16 +105,13 @@ void main()
 ```
 ####Compile and run:
 ```
-$ cd example
-$ dub build --build=release
-$ sudo -u postgres ./dpq2-example
-Text query result by name: 2016-02-09 04:32:15.351469
+Text query result by name: 2016-02-10 12:06:22.237939
 Text query result by index: 456.78
-column name: 'current_time', bson: "2016-02-09 04:32:15.351469"
-column name: 'field_name', bson: "abc"
-column name: 'field_3', bson: "123"
-column name: 'field_4', bson: "456.78"
-column name: 'json', bson: {"JSON field name":123.456}
+bson: "2016-02-10 12:06:22.237939"
+bson: "abc"
+bson: "123"
+bson: "456.78"
+bson: {"JSON field name":123.456}
 0: -1234.57
 1: first line
 second line
