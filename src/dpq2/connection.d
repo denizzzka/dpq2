@@ -192,6 +192,11 @@ package class BaseConnection
 
         return null;
     }
+
+    bool isBusy() nothrow
+    {
+        return PQisBusy(conn) == 1;
+    }
 }
 
 /// Connection exception
