@@ -165,7 +165,7 @@ package class BaseConnection
     }
 
     /// Get for the next result from a sendQuery. Can return null.
-    package immutable(Answer) getAnswer()
+    immutable(Answer) getAnswer()
     {
         assert( readyForQuery );
 
