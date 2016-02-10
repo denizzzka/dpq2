@@ -143,9 +143,9 @@ package class BaseConnection
         return r;
     }
 
-    package string errorMessage()
+    string errorMessage() const nothrow
     {
-        return to!(string)(PQerrorMessage(conn));
+        return to!(string)(PQerrorMessage(cast(PGconn*) conn)); //TODO: need report to derelict pq
     }
 
     ~this()
