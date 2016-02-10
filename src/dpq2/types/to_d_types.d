@@ -148,7 +148,7 @@ if( is( T == Json ) )
     {
         case OidType.Json:
             // represent value as text and parse it into Json
-            auto t = Value(v.value.dup, OidType.Text);
+            auto t = Value(cast(ubyte[]) v.value, OidType.Text);
             res = parseJsonString(t.as!PGtext);
             break;
 

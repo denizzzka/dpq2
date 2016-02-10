@@ -58,7 +58,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: re
                 }
                 else
                 {
-                    auto v = Value(cell.value[curr_offset .. curr_offset + size].dup, ap.OID); // FIXME: .dup isn't need
+                    auto v = Value(cast(ubyte[]) cell.value[curr_offset .. curr_offset + size], ap.OID);
                     b = v.toBson(tz);
                 }
 
