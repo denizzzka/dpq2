@@ -196,20 +196,20 @@ class Answer
     {
         assertRow( c.row );
         assertCol( c.col );
-    }    
-    
-    package size_t currRow;
-    
-    @property Row front(){ return this[currRow]; }
-    @property void popFront(){ ++currRow; }
-    @property bool empty(){ return currRow >= rowCount; }
+    }
 }
 
-unittest
+struct Rangify(T)
+if(is(T == Answer) || is(T == Row))
 {
-    import std.range;
+    T obj;
+    alias obj this;
 
-    assert(isRandomAccessRange!Answer);
+    private int currRow;
+
+    @property auto front(){ return obj[currRow]; }
+    @property void popFront(){ ++currRow; }
+    @property bool empty(){ return currRow >= obj.length; }
 }
 
 /// Represents one row from the answer table
@@ -665,7 +665,8 @@ void _integration_test( string connParam )
     assert( conn.getResult() is null ); // removes null answer at the end
     
     // Range test
-    foreach( elem; r )
+    auto rowsRange = Rangify!Answer(r);
+    foreach( elem; rowsRange )
     {
         assert( elem[0].as!PGsmallint == -32_761 );
     }
