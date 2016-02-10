@@ -204,7 +204,7 @@ immutable class Answer
 
 struct Rangify(T)
 {
-    T obj;
+    immutable T obj;
     alias obj this;
 
     private int currRow;
@@ -220,7 +220,7 @@ struct Rangify(T)
 }
 
 /// Represents one row from the answer table
-const struct Row
+immutable struct Row
 {
     private immutable Answer answer;
     private immutable size_t row;

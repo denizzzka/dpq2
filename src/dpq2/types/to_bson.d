@@ -176,7 +176,7 @@ void _integration_test( string connParam )
                        "'\"json_value_string\"'::json as json_text_value"
             );
 
-        Row r = a[0]; // first row
+        auto r = a[0]; // first row
 
         assert(r["int_num_value"].toBson == Bson("123"));
         assert(r["text_value"].toBson == Bson("text string"));
