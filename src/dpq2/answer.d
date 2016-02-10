@@ -277,12 +277,12 @@ const struct Row
     }
 
     /// Returns column count
-    @property size_t columnCount() const{ return answer.columnCount(); }
+    @property size_t length() const{ return answer.columnCount(); }
     
     @property
     debug string toString() const
     {
-        return "Columns: "~to!string(columnCount);
+        return "Columns: "~to!string(length);
     }
 }
 
@@ -663,12 +663,17 @@ void _integration_test( string connParam )
     conn.sendQuery( p );
     while( conn.getResult() !is null ){}
     assert( conn.getResult() is null ); // removes null answer at the end
-    
-    // Range test
-    auto rowsRange = Rangify!Answer(r);
-    foreach( elem; rowsRange )
+
     {
-        assert( elem[0].as!PGsmallint == -32_761 );
+        // Range test
+        auto rowsRange = Rangify!Answer(r);
+        size_t count = 0;
+
+        foreach(row; rowsRange)
+            foreach(elem; Rangify!Row(row))
+                count++;
+
+        assert(count == 7);
     }
 
     destroy(r);
