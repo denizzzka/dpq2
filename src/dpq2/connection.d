@@ -3,7 +3,7 @@
 @trusted:
 
 public import derelict.pq.pq;
-import dpq2.answer: Answer;
+public import dpq2.answer;
 import std.conv: to;
 import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
