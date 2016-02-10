@@ -5,7 +5,7 @@
 public import derelict.pq.pq;
 import dpq2.answer: Answer;
 import std.conv: to;
-import std.string: toStringz;
+import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import std.range;
 import core.exception;
@@ -167,6 +167,8 @@ package class BaseConnection
     /// Get for the next result from a sendQuery. Can return null.
     package immutable(Answer) getAnswer()
     {
+        assert( readyForQuery );
+
         return _getAnswer(PQgetResult(conn));
     }
 
@@ -195,16 +197,28 @@ package class BaseConnection
 
     bool isBusy() nothrow
     {
+        assert( readyForQuery );
+
         return PQisBusy(conn) == 1;
+    }
+
+    string parameterStatus(string paramName) const
+    {
+        auto res = PQparameterStatus(cast(PGconn*) conn, cast(char*) toStringz(paramName));
+
+        if(res is null)
+            throw new ConnException(this, __FILE__, __LINE__);
+
+        return to!string(fromStringz(res));
     }
 }
 
 /// Connection exception
 class ConnException : Dpq2Exception
 {
-    private BaseConnection conn;
+    private const BaseConnection conn;
 
-    this(BaseConnection c, string file, size_t line)
+    this(in BaseConnection c, string file, size_t line)
     {
         conn = c;
 
