@@ -202,14 +202,32 @@ package class BaseConnection
         return PQisBusy(conn) == 1;
     }
 
-    string parameterStatus(string paramName) const
+    string parameterStatus(string paramName)
     {
-        auto res = PQparameterStatus(cast(PGconn*) conn, cast(char*) toStringz(paramName)); //TODO: need report to derelict pq
+        assert( readyForQuery );
+
+        auto res = PQparameterStatus(conn, cast(char*) toStringz(paramName)); //TODO: need report to derelict pq
 
         if(res is null)
             throw new ConnException(this, __FILE__, __LINE__);
 
         return to!string(fromStringz(res));
+    }
+
+    string escapeLiteral(string msg)
+    {
+        assert( readyForQuery );
+
+        auto buf = PQescapeLiteral(conn, msg.toStringz, msg.length);
+
+        if(buf is null)
+            throw new ConnException(this, __FILE__, __LINE__);
+
+        const char[] res = buf.fromStringz;
+
+        PQfreemem(buf);
+
+        return to!string(res);
     }
 }
 
