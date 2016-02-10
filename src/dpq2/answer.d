@@ -321,7 +321,7 @@ struct Value
     }
 
     @property
-    Array asArray() const
+    immutable (Array) asArray() immutable
     {
         if(!isSupportedArray)
             throw new AnswerException(ExceptionType.NOT_ARRAY,
@@ -329,7 +329,7 @@ struct Value
                 __FILE__, __LINE__
             );
 
-        return const Array(this);
+        return immutable Array(this);
     }
 }
 
@@ -402,25 +402,25 @@ package struct ArrayProperties
 }
 
 /// Link to the cell of the answer table
-const struct Array
+immutable struct Array
 {
     ArrayProperties ap;
     alias ap this;
 
     private ubyte[][] elements; // TODO: it is too slow to place every elements to this array instead of ptrs to them
-    private bool[] elementIsNULL; // ditto
+    private bool[] elementIsNULL;
 
-    this(in Value cell)
+    this(immutable Value cell)
     {
         if(!(cell.format == ValueFormat.BINARY))
             throw new AnswerException(ExceptionType.NOT_BINARY,
                 msg_NOT_BINARY, __FILE__, __LINE__);
 
-        ap = ArrayProperties(cell);
+        ap = cast(immutable) ArrayProperties(cell);
 
         // Looping through all elements and fill out index of them
         {
-            auto elements = new const (ubyte)[][ nElems ];
+            auto elements = new immutable (ubyte)[][ nElems ];
             auto elementIsNULL = new bool[ nElems ];
 
             size_t curr_offset = ap.dataOffset;
@@ -444,20 +444,20 @@ const struct Array
                 curr_offset += size;
             }
 
-            this.elements = elements.dup;
+            this.elements = elements.idup;
             this.elementIsNULL = elementIsNULL.idup;
         }
     }
     
     /// Returns Value struct by index
-    Nullable!Value opIndex(int n) const
+    immutable (Nullable!Value) opIndex(int n) const
     {
         return getValue(n);
     }
     
     /// Returns Value struct
     /// Useful for multidimensional arrays
-    Nullable!Value getValue( ... ) const
+    immutable (Nullable!Value) getValue( ... ) immutable
     {
         auto n = coords2Serial( _argptr, _arguments );
         
@@ -466,7 +466,7 @@ const struct Array
         if(!elementIsNULL[n])
             r = Value(elements[n], OID);
         
-        return r;
+        return cast(immutable) r;
     }
     
     /// Value NULL checking
