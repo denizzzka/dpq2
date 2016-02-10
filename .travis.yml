@@ -35,5 +35,6 @@ script:
 after_success:
     # removes coverage from foreign packages
   - rm -f .?-*.lst
+  - echo Sending coverage info
   - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
   - if [ ${DC} = "dmd" ]; then bash <(curl -s https://codecov.io/bash); fi
