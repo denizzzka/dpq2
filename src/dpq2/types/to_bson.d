@@ -25,7 +25,7 @@ Bson toBson(in Value v, immutable TimeZone tz = null)
         return rawValueToBson(v, tz);
 }
 
-private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
+private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: ref Value should be used
 {
     const ap = ArrayProperties(cell);
 
@@ -58,7 +58,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
                 }
                 else
                 {
-                    auto v = Value(cell.value[curr_offset .. curr_offset + size], ap.OID);
+                    auto v = Value(cell.value[curr_offset .. curr_offset + size].dup, ap.OID); // FIXME: .dup isn't need
                     b = v.toBson(tz);
                 }
 

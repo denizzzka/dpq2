@@ -257,12 +257,12 @@ immutable struct Row
 
         auto v = cast(immutable) PQgetvalue(answer.res, to!int(row), to!int(col));
         auto s = size( col );
-        
+
         Nullable!Value r;
-        
+
         if(!isNULL(col))
-            r = Value(v, s, answer.columnFormat(col), answer.OID(col));
-        
+            r = Value(v[0..s].dup, answer.OID(col), answer.columnFormat(col));
+
         return cast(immutable) r;
     }
     
@@ -300,17 +300,10 @@ struct Value
     package OidType oidType;
     package ubyte[] value;
 
-    this(immutable (ubyte)* value, size_t valueSize, ValueFormat f, OidType t)
+    this(ubyte[] value, in OidType t, in ValueFormat f = ValueFormat.BINARY)
     {
-        this.value = cast(ubyte[]) value[0..valueSize];
+        this.value = value;
         format = f;
-        oidType = t;
-    }
-    
-    this( const ubyte[] value, OidType t )
-    {
-        this.value = cast(ubyte[]) value;
-        format = ValueFormat.BINARY;
         oidType = t;
     }
 
@@ -407,7 +400,7 @@ immutable struct Array
     ArrayProperties ap;
     alias ap this;
 
-    private ubyte[][] elements; // TODO: it is too slow to place every elements to this array instead of ptrs to them
+    private ubyte[][] elements;
     private bool[] elementIsNULL;
 
     this(immutable Value cell)
@@ -462,10 +455,10 @@ immutable struct Array
         auto n = coords2Serial( _argptr, _arguments );
         
         Nullable!Value r;
-        
+
         if(!elementIsNULL[n])
-            r = Value(elements[n], OID);
-        
+            r = Value(elements[n].dup, OID);
+
         return cast(immutable) r;
     }
     

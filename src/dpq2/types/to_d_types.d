@@ -139,7 +139,7 @@ if( is( T == bool ) )
 }
 
 /// Returns Vibe.d's Json
-@property Json binaryValueAs(T)(in Value v)
+@property Json binaryValueAs(T)(in Value v) // FIXME ref is need
 if( is( T == Json ) )
 {
     Json res;
@@ -148,7 +148,7 @@ if( is( T == Json ) )
     {
         case OidType.Json:
             // represent value as text and parse it into Json
-            auto t = Value(v.value, OidType.Text);
+            auto t = Value(v.value.dup, OidType.Text);
             res = parseJsonString(t.as!PGtext);
             break;
 
