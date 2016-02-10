@@ -225,7 +225,7 @@ immutable struct Row
     private immutable Answer answer;
     private immutable size_t row;
     
-    this(immutable Answer answer, in size_t row) immutable
+    this(immutable Answer answer, in size_t row)
     {
         answer.assertRow( row );
         
@@ -235,7 +235,7 @@ immutable struct Row
     
     /// Returns cell size
     @property
-    size_t size( const size_t col ) const
+    size_t size( const size_t col )
     {
         answer.assertCol(col);
         return PQgetlength(answer.res, to!int(row), to!int(col));
@@ -244,7 +244,7 @@ immutable struct Row
     /// Value NULL checking
     /// Do not confuse it with Nullable's isNull property
     @property
-    bool isNULL( const size_t col ) const
+    bool isNULL( const size_t col )
     {
         answer.assertCol(col);
 
@@ -269,28 +269,28 @@ immutable struct Row
         return cast(immutable) r;
     }
     
-    immutable (Nullable!Value) opIndex(in string column) const
+    immutable (Nullable!Value) opIndex(in string column)
     {
         return opIndex(columnNum(column));
     }
     
     /// Returns column number by field name
-    size_t columnNum( string columnName ) const
+    size_t columnNum( string columnName )
     {
         return answer.columnNum( columnName );
     }
 
     /// Returns column name by field number
-    string columnName( in size_t colNum ) const
+    string columnName( in size_t colNum )
     {
         return answer.columnName( colNum );
     }
 
     /// Returns column count
-    @property size_t length() const{ return answer.columnCount(); }
+    @property size_t length() { return answer.columnCount(); }
     
     @property
-    debug string toString() const
+    debug string toString()
     {
         return "Columns: "~to!string(length);
     }
