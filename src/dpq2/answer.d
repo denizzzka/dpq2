@@ -19,7 +19,7 @@ import std.bitmanip: bigEndianToNative;
 import std.typecons: Nullable;
 
 /// Result table's cell coordinates 
-struct Coords
+private struct Coords
 {
     size_t row; /// Row
     size_t col; /// Column
