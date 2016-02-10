@@ -8,7 +8,7 @@ import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
 
 @property
-Bson toBson(in Nullable!Value v, immutable TimeZone tz = null)
+Bson toBson(immutable (Nullable!Value) v, immutable TimeZone tz = null)
 {
     if(v.isNull)
         return Bson(null);
