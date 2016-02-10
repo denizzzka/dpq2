@@ -446,14 +446,14 @@ immutable struct Array
     }
     
     /// Returns Value struct by index
-    immutable (Nullable!Value) opIndex(int n) const
+    immutable (Nullable!Value) opIndex(int n)
     {
         return getValue(n);
     }
     
     /// Returns Value struct
     /// Useful for multidimensional arrays
-    immutable (Nullable!Value) getValue( ... ) immutable
+    immutable (Nullable!Value) getValue( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
         
