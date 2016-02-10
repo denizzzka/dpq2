@@ -83,11 +83,24 @@ package class BaseConnection
         readyForQuery = true;
     }
 
+    void resetStart()
+    {
+        if(PQresetStart(conn) == 0)
+            throw new ConnException(this, __FILE__, __LINE__);
+    }
+
     PostgresPollingStatusType poll() nothrow
     {
         assert( readyForQuery );
 
         return PQconnectPoll(conn);
+    }
+
+    PostgresPollingStatusType resetPoll() nothrow
+    {
+        assert( readyForQuery );
+
+        return PQresetPoll(conn);
     }
 
     ConnStatusType status()
