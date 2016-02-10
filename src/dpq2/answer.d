@@ -35,7 +35,7 @@ class Answer
         assert( res != null );
     }
         
-    package this(immutable PGresult* r) nothrow
+    package this(immutable PGresult* r) nothrow immutable
     {
         res = r;
     }

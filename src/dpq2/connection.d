@@ -168,17 +168,16 @@ package class BaseConnection
     }
 
     /// Get Answer from PQexec* functions
-    private immutable(Answer) _getAnswer( PGresult* r )
+    private immutable(Answer) _getAnswer(in PGresult* r)
     {
-        Answer res;
-
         if(r)
         {
-            res = new Answer(cast(immutable) r );
+            auto res = new immutable Answer(cast(immutable) r);
             res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
+            return res;
         }
 
-        return cast(immutable) res;
+        return null;
     }
 }
 
