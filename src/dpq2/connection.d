@@ -83,7 +83,7 @@ package class BaseConnection
         readyForQuery = true;
     }
 
-    PostgresPollingStatusType poll()
+    PostgresPollingStatusType poll() nothrow
     {
         assert( readyForQuery );
 
