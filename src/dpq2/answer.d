@@ -26,7 +26,7 @@ struct Coords
 }
 
 /// Answer
-class Answer
+immutable class Answer
 {
     private immutable (PGresult*) res;
 
@@ -148,14 +148,17 @@ class Answer
         return to!string(fromStringz(s));
     }
 
-    /// Returns pointer to row of cells
-    Row opIndex(in size_t row) const
+    /// Returns row of cells
+    immutable (Row) opIndex(in size_t row)
     {
-        return const Row(this, row);
+        return immutable Row(
+            cast(immutable)(this), // legal because this.ctor is immutable
+            row
+        );
     }
-    
+
     @property
-    debug override string toString() const
+    debug string toString() const
     {
         return "Rows: "~to!string(length)~" Columns: "~to!string(columnCount);
     }
@@ -219,10 +222,10 @@ struct Rangify(T)
 /// Represents one row from the answer table
 const struct Row
 {
-    private const Answer answer;
+    private immutable Answer answer;
     private immutable size_t row;
     
-    this(in Answer answer, in size_t row)
+    this(immutable Answer answer, in size_t row) immutable
     {
         answer.assertRow( row );
         
