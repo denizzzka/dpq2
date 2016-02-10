@@ -228,6 +228,13 @@ package class BaseConnection
 
         return to!string(res);
     }
+
+    string host() const
+    {
+        assert( readyForQuery );
+
+        return to!string(PQhost(cast(PGconn*) conn).fromStringz); //TODO: need report to derelict pq
+    }
 }
 
 /// Connection exception
