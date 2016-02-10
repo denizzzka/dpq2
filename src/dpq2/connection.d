@@ -188,9 +188,7 @@ package class BaseConnection
     {
         if(r)
         {
-            auto res = new immutable Answer(r);
-            res.checkAnswerForErrors(); // It is important to do a separate check because of Answer ctor is nothrow
-            return res;
+            return new immutable Answer(r);
         }
 
         return null;

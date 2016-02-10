@@ -35,9 +35,11 @@ immutable class Answer
         assert( res != null );
     }
         
-    package this(immutable PGresult* r) nothrow
+    package this(immutable PGresult* r)
     {
         res = r;
+
+        checkAnswerForErrors();
     }
     
     ~this()
@@ -50,7 +52,7 @@ immutable class Answer
             assert( true, "double free!" );
     }
     
-    package void checkAnswerForErrors()
+    private void checkAnswerForErrors()
     {
         cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
 
