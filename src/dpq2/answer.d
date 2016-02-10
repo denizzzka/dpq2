@@ -28,7 +28,7 @@ private struct Coords
 /// Answer
 immutable class Answer
 {
-    private immutable (PGresult*) res;
+    private PGresult* res;
 
     nothrow invariant()
     {
@@ -222,8 +222,8 @@ struct Rangify(T)
 /// Represents one row from the answer table
 immutable struct Row
 {
-    private immutable Answer answer;
-    private immutable size_t row;
+    private Answer answer;
+    private size_t row;
     
     this(immutable Answer answer, in size_t row)
     {
