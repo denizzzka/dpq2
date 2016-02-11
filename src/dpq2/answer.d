@@ -102,10 +102,10 @@ immutable class Answer
     }
 
     /// Returns row count
-    @property size_t length() { return PQntuples(res); }
+    @property size_t length() nothrow { return PQntuples(res); }
 
     /// Returns column count
-    @property size_t columnCount() { return PQnfields(res); }
+    @property size_t columnCount() nothrow { return PQnfields(res); }
 
     /// Returns column format
     ValueFormat columnFormat( const size_t colNum )
@@ -172,7 +172,7 @@ immutable class Answer
     }
     
     @property
-    private string resultErrorMessage()
+    string resultErrorMessage()
     {
         return to!string( PQresultErrorMessage(res) );
     }
