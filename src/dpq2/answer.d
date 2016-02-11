@@ -28,25 +28,25 @@ private struct Coords
 /// Answer
 immutable class Answer
 {
-    private PGresult* res;
+    private PGresult* result;
 
     nothrow invariant()
     {
-        assert( res != null );
+        assert( result != null );
     }
         
     package this(immutable PGresult* r)
     {
-        res = r;
+        result = r;
 
         checkAnswerForErrors();
     }
     
     ~this()
     {
-        if( res )
+        if( result )
         {
-            PQclear(res);
+            PQclear(result);
         }
         else
             assert( true, "double free!" );
@@ -54,7 +54,7 @@ immutable class Answer
     
     private void checkAnswerForErrors()
     {
-        cast(void) enforceEx!OutOfMemoryError(res, "Can't write query result");
+        cast(void) enforceEx!OutOfMemoryError(result, "Can't write query result");
 
         switch(status)
         {
@@ -80,7 +80,7 @@ immutable class Answer
     @property
     ExecStatusType status() nothrow
     {
-        return PQresultStatus(res);
+        return PQresultStatus(result);
     }
 
     @property
@@ -98,20 +98,20 @@ immutable class Answer
      */
     @property string cmdStatus()
     {
-        return to!string( PQcmdStatus(res) );
+        return to!string( PQcmdStatus(result) );
     }
 
     /// Returns row count
-    @property size_t length() nothrow { return PQntuples(res); }
+    @property size_t length() nothrow { return PQntuples(result); }
 
     /// Returns column count
-    @property size_t columnCount() nothrow { return PQnfields(res); }
+    @property size_t columnCount() nothrow { return PQnfields(result); }
 
     /// Returns column format
     ValueFormat columnFormat( const size_t colNum )
     {
         assertCol( colNum );
-        return cast(ValueFormat) PQfformat(res, to!int(colNum));
+        return cast(ValueFormat) PQfformat(result, to!int(colNum));
     }
     
     /// Returns column Oid
@@ -119,7 +119,7 @@ immutable class Answer
     {
         assertCol( colNum );
 
-        return oid2oidType(PQftype(res, to!int(colNum)));
+        return oid2oidType(PQftype(result, to!int(colNum)));
     }
 
     @property bool isSupportedArray( const size_t colNum )
@@ -132,7 +132,7 @@ immutable class Answer
     /// Returns column number by field name
     size_t columnNum( string columnName )
     {    
-        size_t n = PQfnumber(res, toStringz(columnName));
+        size_t n = PQfnumber(result, toStringz(columnName));
 
         if( n == -1 )
             throw new AnswerException(ExceptionType.COLUMN_NOT_FOUND,
@@ -144,7 +144,7 @@ immutable class Answer
     /// Returns column name by field number
     string columnName( in size_t colNum )
     {
-        const char* s = PQfname(cast(PGresult*) res, to!int(colNum)); // FIXME: res should be a const
+        const char* s = PQfname(cast(PGresult*) result, to!int(colNum)); // FIXME: result should be a const
 
         if( s == null )
             throw new AnswerException(
@@ -174,13 +174,13 @@ immutable class Answer
     @property
     string resultErrorMessage()
     {
-        return to!string( PQresultErrorMessage(res) );
+        return to!string( PQresultErrorMessage(result) );
     }
 
     @property
     private string resultErrorField(int fieldcode)
     {
-        return to!string( PQresultErrorField(cast(PGresult*)res, fieldcode) ); // FIXME: res should be a const
+        return to!string( PQresultErrorField(cast(PGresult*)result, fieldcode) ); // FIXME: result should be a const
     }
 
     private void assertCol( const size_t c )
@@ -251,7 +251,7 @@ immutable struct Row
     size_t size( const size_t col )
     {
         answer.assertCol(col);
-        return PQgetlength(answer.res, to!int(row), to!int(col));
+        return PQgetlength(answer.result, to!int(row), to!int(col));
     }
     
     /// Value NULL checking
@@ -261,14 +261,14 @@ immutable struct Row
     {
         answer.assertCol(col);
 
-        return PQgetisnull(answer.res, to!int(row), to!int(col)) != 0;
+        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
     }
 
     immutable (Nullable!Value) opIndex(in size_t col)
     {
         answer.assertCoords( Coords( row, col ) );
 
-        auto v = cast(immutable) PQgetvalue(answer.res, to!int(row), to!int(col));
+        auto v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
         auto s = size( col );
 
         Nullable!Value r;
