@@ -44,12 +44,9 @@ immutable class Answer
     
     ~this()
     {
-        if( result )
-        {
-            PQclear(result);
-        }
-        else
-            assert(false, "double free!");
+        assert(result, "double free!");
+
+        PQclear(result);
     }
 
     private void checkAnswerForErrors()
