@@ -78,7 +78,7 @@ immutable class Answer
     }
     
     @property
-    ExecStatusType status()
+    ExecStatusType status() nothrow
     {
         return PQresultStatus(res);
     }
