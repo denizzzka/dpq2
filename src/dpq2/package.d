@@ -1,15 +1,26 @@
 ﻿module dpq2;
 
+debug import std.stdio: write, writeln;
+
 shared static this()
 {
+    debug
+    {
+        write("DerelictPQ loading... ");
+    }
+
     DerelictPQ.load();
+
+    debug
+    {
+        writeln("DerelictPQ loading finished");
+    }
 }
 
 shared static ~this()
 {
     debug
     {
-        import std.stdio: write, writeln;
         write("DerelictPQ unloading... ");
     }
     
@@ -19,7 +30,7 @@ shared static ~this()
     
     debug
     {
-        writeln("finished.");
+        writeln("DerelictPQ unloading finished");
     }
 }
 
