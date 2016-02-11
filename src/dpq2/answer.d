@@ -49,9 +49,9 @@ immutable class Answer
             PQclear(result);
         }
         else
-            assert( true, "double free!" );
+            assert(false, "double free!");
     }
-    
+
     private void checkAnswerForErrors()
     {
         cast(void) enforceEx!OutOfMemoryError(result, "Can't write query result");
