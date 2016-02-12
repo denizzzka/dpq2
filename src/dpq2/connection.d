@@ -50,7 +50,7 @@ package class BaseConnection
     private void setNonBlocking( bool state )
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
-            throw new ConnException(this, __FILE__, __LINE__);
+            throw new ConnectionException(this, __FILE__, __LINE__);
     }
     
 	/// Connect to DB
@@ -63,7 +63,7 @@ package class BaseConnection
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
         if( !nonBlocking && status != CONNECTION_OK )
-            throw new ConnException(this, __FILE__, __LINE__);
+            throw new ConnectionException(this, __FILE__, __LINE__);
         
         readyForQuery = true;
     }
@@ -78,7 +78,7 @@ package class BaseConnection
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 
         if( status == CONNECTION_BAD )
-            throw new ConnException(this, __FILE__, __LINE__);
+            throw new ConnectionException(this, __FILE__, __LINE__);
 
         readyForQuery = true;
     }
@@ -86,7 +86,7 @@ package class BaseConnection
     void resetStart()
     {
         if(PQresetStart(conn) == 0)
-            throw new ConnException(this, __FILE__, __LINE__);
+            throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
     PostgresPollingStatusType poll() nothrow
@@ -124,7 +124,7 @@ package class BaseConnection
         assert( readyForQuery );
 
         const size_t r = PQconsumeInput( conn );
-        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnException(this, __FILE__, __LINE__);
+        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
     
     package bool flush()
@@ -132,7 +132,7 @@ package class BaseConnection
         assert( readyForQuery );
 
         auto r = PQflush(conn);
-        if( r == -1 ) throw new ConnException(this, __FILE__, __LINE__);
+        if( r == -1 ) throw new ConnectionException(this, __FILE__, __LINE__);
         return r == 0;
     }
     
@@ -182,7 +182,7 @@ package class BaseConnection
     /// Get result from PQexec* functions or throw error if pull is empty
     package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
     {
-        if(r is null) throw new ConnException(this, __FILE__, __LINE__);
+        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
 
         return new immutable ResultContainer(r);
     }
@@ -201,7 +201,7 @@ package class BaseConnection
         auto res = PQparameterStatus(conn, cast(char*) toStringz(paramName)); //TODO: need report to derelict pq
 
         if(res is null)
-            throw new ConnException(this, __FILE__, __LINE__);
+            throw new ConnectionException(this, __FILE__, __LINE__);
 
         return to!string(fromStringz(res));
     }
@@ -213,7 +213,7 @@ package class BaseConnection
         auto buf = PQescapeLiteral(conn, msg.toStringz, msg.length);
 
         if(buf is null)
-            throw new ConnException(this, __FILE__, __LINE__);
+            throw new ConnectionException(this, __FILE__, __LINE__);
 
         const char[] res = buf.fromStringz;
 
@@ -231,7 +231,7 @@ package class BaseConnection
 }
 
 /// Connection exception
-class ConnException : Dpq2Exception
+class ConnectionException : Dpq2Exception
 {
     private const BaseConnection conn;
 
@@ -274,7 +274,7 @@ void _integration_test( string connParam )
         c.connString = "!!!some incorrect connection string!!!";
 
         try c.connect();
-        catch(ConnException e)
+        catch(ConnectionException e)
         {
             exceptionFlag = true;
             assert(e.msg.length > 40); // error message check

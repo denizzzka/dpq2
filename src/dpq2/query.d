@@ -74,7 +74,7 @@ final class Connection: BaseConnection
     void sendQuery( string SQLcmd )
     {
         const size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
-        if( r != 1 ) throw new ConnException(this, __FILE__, __LINE__);
+        if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -92,7 +92,7 @@ final class Connection: BaseConnection
                     cast(int)p.resultFormat                    
                     );
                     
-        if( !r ) throw new ConnException(this, __FILE__, __LINE__);
+        if( !r ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
     /// Returns null if no notifies was received
@@ -182,7 +182,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try conn.exec("SELECT 'abc'::text").getAnswer;
-        catch(ConnException e)
+        catch(ConnectionException e)
         {
             exceptionFlag = true;
             assert(e.msg.length > 15); // error message check
