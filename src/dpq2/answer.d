@@ -25,12 +25,12 @@ private struct Coords
     size_t col; /// Column
 }
 
-/// Contains result of query regardless of whether it contains an error or data answer
-immutable final class Result
+package immutable final class ResultContainer
 {
-    // It is allowed only one copy of PGresult* due to avoid double free.
+    // ResultContainer allows only one copy of PGresult* due to avoid double free.
     // For the same reason this class is declared as final.
     private PGresult* result;
+    alias result this;
 
     nothrow invariant()
     {
@@ -44,16 +44,27 @@ immutable final class Result
         result = r;
     }
 
-    private this(immutable Result r)
-    {
-        result = r.result;
-    }
-
     ~this()
     {
         assert(result != null, "double free!");
 
         PQclear(result);
+    }
+
+    immutable(Result) getResult()
+    {
+        return new immutable Result(this);
+    }
+}
+
+/// Contains result of query regardless of whether it contains an error or data answer
+immutable class Result
+{
+    private ResultContainer result;
+
+    package this(immutable ResultContainer r)
+    {
+        result = r;
     }
 
     @property

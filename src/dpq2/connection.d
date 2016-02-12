@@ -172,7 +172,7 @@ package class BaseConnection
 
         if(r)
         {
-            return new immutable Result(r);
+            return (new immutable ResultContainer(r)).getResult();
         }
 
         return null;
@@ -183,7 +183,7 @@ package class BaseConnection
     {
         if(r is null) throw new ConnException(this, __FILE__, __LINE__);
 
-        return new immutable Result(r);
+        return (new immutable ResultContainer(r)).getResult();
     }
 
     bool isBusy() nothrow
