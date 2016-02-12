@@ -33,7 +33,7 @@ package class BaseConnection
     package PGconn* conn;
     private
     {
-        bool readyForQuery; // connection started and not disconnect() was called
+        bool readyForQuery = false; // connection started and not disconnect() was called
 
         enum ConsumeResult
         {
@@ -165,33 +165,25 @@ package class BaseConnection
     }
 
     /// Get for the next result from a sendQuery. Can return null.
-    immutable(Answer) getAnswer()
+    immutable(Result) getResult()
     {
-        assert( readyForQuery );
-
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
-        return _getAnswer(cast(immutable) PQgetResult(conn));
-    }
+        auto r = cast(immutable) PQgetResult(conn);
 
-    /// Get Answer from PQexec* functions or throw error if pull is empty
-    package immutable(Answer) getAnswer(immutable PGresult* r) const
-    {
-        auto a = _getAnswer(r);
-
-        if(!a) throw new ConnException(this, __FILE__, __LINE__);
-
-        return a;
-    }
-
-    /// Get Answer from PQexec* functions
-    private static immutable(Answer) _getAnswer(immutable PGresult* r)
-    {
         if(r)
         {
-            return new immutable Answer(r);
+            return new immutable Result(r);
         }
 
         return null;
+    }
+
+    /// Get Result from PQexec* functions or throw error if pull is empty
+    package immutable(Result) createResult(immutable PGresult* r) const
+    {
+        if(r is null) throw new ConnException(this, __FILE__, __LINE__);
+
+        return new immutable Result(r);
     }
 
     bool isBusy() nothrow

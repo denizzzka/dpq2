@@ -14,7 +14,7 @@ import derelict.pq.pq;
 import core.vararg;
 import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
-import core.exception: OutOfMemoryError, AssertError;
+import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.typecons: Nullable;
 
@@ -25,8 +25,8 @@ private struct Coords
     size_t col; /// Column
 }
 
-/// Answer
-immutable class Answer
+/// Contains result of query regardless of whether it contains an error or data answer
+immutable class Result
 {
     private PGresult* result;
 
@@ -37,18 +37,57 @@ immutable class Answer
 
     package this(immutable PGresult* r)
     {
-        cast(void) enforceEx!OutOfMemoryError(r, "Can't write query result");
+        assert(r);
 
         result = r;
+        import std.stdio; writeln("Result Ctor:", cast(void*)this, " PGresult=", result);
+    }
 
-        checkAnswerForErrors();
+    private this(immutable Result r)
+    {
+        result = r.result;
     }
 
     ~this()
     {
-        assert(result, "double free!");
+        assert(result != null, "double free!");
 
-        PQclear(result);
+        import std.stdio; writeln("Result dtor:", cast(void*)this, " PGresult=", result);
+        //PQclear(result);
+    }
+
+    @property
+    ExecStatusType status() nothrow
+    {
+        return PQresultStatus(result);
+    }
+
+    @property
+    string statusString()
+    {
+        return to!string(fromStringz(PQresStatus(status)));
+    }
+
+    @property
+    string resultErrorMessage()
+    {
+        return to!string( PQresultErrorMessage(result) );
+    }
+
+    immutable(Answer) getAnswer()
+    {
+        return new immutable Answer(this);
+    }
+}
+
+/// Answer
+immutable class Answer : Result
+{
+    private this(immutable Result r)
+    {
+        super(r);
+
+        checkAnswerForErrors();
     }
 
     private void checkAnswerForErrors()
@@ -72,18 +111,6 @@ immutable class Answer
                     "Please report if you came across this error! status="~to!string(status)~": "~statusString~"\r\n"~
                     resultErrorMessage, __FILE__, __LINE__);
         }
-    }
-    
-    @property
-    ExecStatusType status() nothrow
-    {
-        return PQresultStatus(result);
-    }
-
-    @property
-    string statusString()
-    {
-        return to!string(fromStringz(PQresStatus(status)));
     }
 
     /// Returns the command status tag from the SQL command that generated the PGresult
@@ -166,12 +193,6 @@ immutable class Answer
     debug string toString()
     {
         return "Rows: "~to!string(length)~" Columns: "~to!string(columnCount);
-    }
-    
-    @property
-    string resultErrorMessage()
-    {
-        return to!string( PQresultErrorMessage(result) );
     }
 
     @property
@@ -537,7 +558,7 @@ class Notify
         n = pgn;
         cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
     }
-        
+
     ~this()
     {
         PQfreemem( cast(void*) n );
@@ -590,120 +611,122 @@ class AnswerException : Dpq2Exception
 
 void _integration_test( string connParam )
 {
-    auto conn = new Connection;
-	conn.connString = connParam;
-    conn.connect();
+    //~ import core.exception: AssertError;
 
-    {
-        string sql_query =
-        "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
-        "union all\n"~
+    //~ auto conn = new Connection;
+	//~ conn.connString = connParam;
+    //~ conn.connect();
 
-        "select now(),          'def'::text,                 456,  910.11\n"~
-        "union all\n"~
+    //~ {
+        //~ string sql_query =
+        //~ "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
+        //~ "union all\n"~
 
-        "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
+        //~ "select now(),          'def'::text,                 456,  910.11\n"~
+        //~ "union all\n"~
 
-        auto e = conn.exec(sql_query);
+        //~ "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
 
-        assert( e[1][2].as!PGtext == "456" );
-        assert( e[2][1].as!PGtext == "ijk_АБВГД" );
-        assert( !e[0].isNULL(0) );
-        assert( e[2].isNULL(0) );
-        assert( e.columnNum( "field_name" ) == 1 );
-        assert( e[1]["field_name"].as!PGtext == "def" );
-    }
+        //~ auto e = conn.exec(sql_query);
 
-    QueryParams p;
-    p.resultFormat = ValueFormat.BINARY;
-    p.sqlCommand = "SELECT "~
-        "-32761::smallint, "~
-        "-2147483646::integer, "~
-        "'first line\nsecond line'::text, "~
-        "array[[[1,  2, 3], "~
-               "[4,  5, 6]], "~
+        //~ assert( e[1][2].as!PGtext == "456" );
+        //~ assert( e[2][1].as!PGtext == "ijk_АБВГД" );
+        //~ assert( !e[0].isNULL(0) );
+        //~ assert( e[2].isNULL(0) );
+        //~ assert( e.columnNum( "field_name" ) == 1 );
+        //~ assert( e[1]["field_name"].as!PGtext == "def" );
+    //~ }
+
+    //~ QueryParams p;
+    //~ p.resultFormat = ValueFormat.BINARY;
+    //~ p.sqlCommand = "SELECT "~
+        //~ "-32761::smallint, "~
+        //~ "-2147483646::integer, "~
+        //~ "'first line\nsecond line'::text, "~
+        //~ "array[[[1,  2, 3], "~
+               //~ "[4,  5, 6]], "~
                
-              "[[7,  8, 9], "~
-              "[10, 11,12]], "~
+              //~ "[[7,  8, 9], "~
+              //~ "[10, 11,12]], "~
               
-              "[[13,14,NULL], "~
-               "[16,17,18]]]::integer[] as test_array, "~
-        "NULL,"~
-        "array[11,22,NULL,44]::integer[] as small_array, "~
-        "array['1','23',NULL,'789A']::text[] as text_array";
+              //~ "[[13,14,NULL], "~
+               //~ "[16,17,18]]]::integer[] as test_array, "~
+        //~ "NULL,"~
+        //~ "array[11,22,NULL,44]::integer[] as small_array, "~
+        //~ "array['1','23',NULL,'789A']::text[] as text_array";
 
-    auto r = conn.exec( p );
+    //~ auto r = conn.exec( p );
 
-    {
-        assert( r[0].isNULL(4) );
-        assert( !r[0].isNULL(2) );
+    //~ {
+        //~ assert( r[0].isNULL(4) );
+        //~ assert( !r[0].isNULL(2) );
 
-        assert( r.OID(3) == OidType.Int4Array );
-        assert( r.isSupportedArray(3) );
-        assert( !r.isSupportedArray(2) );
-        auto v = r[0]["test_array"];
-        assert( v.isSupportedArray );
-        assert( !r[0][2].isSupportedArray );
-        auto a = v.asArray;
-        assert( a.OID == OidType.Int4 );
-        assert( a.getValue(2,1,2).as!PGinteger == 18 );
-        assert( a.isNULL(2,0,2) );
-        assert( !a.isNULL(2,1,2) );
-        assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
-        assert( r[0]["small_array"].asArray[2].isNull );
-        assert( r[0]["text_array"].asArray[2].isNull );
-        assert( r.columnName(3) == "test_array" );
-        assert( r[0].columnName(3) == "test_array" );
+        //~ assert( r.OID(3) == OidType.Int4Array );
+        //~ assert( r.isSupportedArray(3) );
+        //~ assert( !r.isSupportedArray(2) );
+        //~ auto v = r[0]["test_array"];
+        //~ assert( v.isSupportedArray );
+        //~ assert( !r[0][2].isSupportedArray );
+        //~ auto a = v.asArray;
+        //~ assert( a.OID == OidType.Int4 );
+        //~ assert( a.getValue(2,1,2).as!PGinteger == 18 );
+        //~ assert( a.isNULL(2,0,2) );
+        //~ assert( !a.isNULL(2,1,2) );
+        //~ assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
+        //~ assert( r[0]["small_array"].asArray[2].isNull );
+        //~ assert( r[0]["text_array"].asArray[2].isNull );
+        //~ assert( r.columnName(3) == "test_array" );
+        //~ assert( r[0].columnName(3) == "test_array" );
 
-        {
-            bool isNullFlag = false;
-            try
-                cast(void) r[0][4].as!PGsmallint;
-            catch(AssertError)
-                isNullFlag = true;
-            finally
-                assert(isNullFlag);
-        }
-    }
+        //~ {
+            //~ bool isNullFlag = false;
+            //~ try
+                //~ cast(void) r[0][4].as!PGsmallint;
+            //~ catch(AssertError)
+                //~ isNullFlag = true;
+            //~ finally
+                //~ assert(isNullFlag);
+        //~ }
+    //~ }
 
-    // Notifies test
-    conn.exec( "listen test_notify; notify test_notify" );
-    assert( conn.getNextNotify.name == "test_notify" );
+    //~ // Notifies test
+    //~ conn.exec( "listen test_notify; notify test_notify" );
+    //~ assert( conn.getNextNotify.name == "test_notify" );
     
-    // Async query test 1
-    conn.sendQuery( "select 123; select 456; select 789" );
-    while( conn.getAnswer() !is null ){}
-    assert( conn.getAnswer() is null ); // removes null answer at the end
+    //~ // Async query test 1
+    //~ conn.sendQuery( "select 123; select 456; select 789" );
+    //~ while( conn.getResult() !is null ){}
+    //~ assert( conn.getResult() is null ); // removes null answer at the end
 
-    // Async query test 2
-    conn.sendQuery( p );
-    while( conn.getAnswer() !is null ){}
-    assert( conn.getAnswer() is null ); // removes null answer at the end
+    //~ // Async query test 2
+    //~ conn.sendQuery( p );
+    //~ while( conn.getResult() !is null ){}
+    //~ assert( conn.getResult() is null ); // removes null answer at the end
 
-    {
-        // Range test
-        auto rowsRange = rangify(r);
-        size_t count = 0;
+    //~ {
+        //~ // Range test
+        //~ auto rowsRange = rangify(r);
+        //~ size_t count = 0;
 
-        foreach(row; rowsRange)
-            foreach(elem; rangify(row))
-                count++;
+        //~ foreach(row; rowsRange)
+            //~ foreach(elem; rangify(row))
+                //~ count++;
 
-        assert(count == 7);
-    }
+        //~ assert(count == 7);
+    //~ }
 
-    destroy(r);
+    //~ destroy(r);
 
-    {
-        bool exceptionFlag = false;
+    //~ {
+        //~ bool exceptionFlag = false;
 
-        try conn.exec("WRONG SQL QUERY");
-        catch(AnswerException e)
-        {
-            exceptionFlag = true;
-            assert(e.msg.length > 20); // error message check
-        }
-        finally
-            assert(exceptionFlag);
-    }
+        //~ try conn.exec("WRONG SQL QUERY");
+        //~ catch(AnswerException e)
+        //~ {
+            //~ exceptionFlag = true;
+            //~ assert(e.msg.length > 20); // error message check
+        //~ }
+        //~ finally
+            //~ assert(exceptionFlag);
+    //~ }
 }
