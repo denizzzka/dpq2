@@ -179,7 +179,7 @@ package class BaseConnection
         return null;
     }
 
-    /// Get Result from PQexec* functions or throw error if pull is empty
+    /// Get result from PQexec* functions or throw error if pull is empty
     package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
     {
         if(r is null) throw new ConnException(this, __FILE__, __LINE__);
