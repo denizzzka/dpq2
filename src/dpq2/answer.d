@@ -28,6 +28,8 @@ private struct Coords
 /// Contains result of query regardless of whether it contains an error or data answer
 immutable final class Result
 {
+    // It is allowed only one copy of PGresult* due to avoid double free.
+    // For the same reason this class is declared as final.
     private PGresult* result;
 
     nothrow invariant()
