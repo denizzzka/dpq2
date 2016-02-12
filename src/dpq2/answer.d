@@ -46,7 +46,7 @@ package immutable final class ResultContainer
 
     ~this()
     {
-        assert(result != null, "double free!");
+        assert(result != null);
 
         PQclear(result);
     }
