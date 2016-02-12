@@ -87,19 +87,16 @@ immutable class Result
 
     immutable(Answer) getAnswer()
     {
-        return new immutable Answer(this);
+        return new immutable Answer(result);
     }
 }
 
-/// Answer
-immutable class Answer
+/// Contains result of query with valid data answer
+immutable class Answer : Result
 {
-    Result resultObject;
-    alias resultObject this;
-
-    private this(immutable Result r)
+    private this(immutable ResultContainer r)
     {
-        resultObject = r;
+        super(r);
 
         checkAnswerForErrors();
     }
