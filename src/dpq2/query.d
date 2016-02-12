@@ -44,7 +44,9 @@ final class Connection: BaseConnection
         auto pgResult = PQexec(conn, toStringz( SQLcmd ));
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
-        return createResult(cast(immutable) pgResult).getAnswer;
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
     }
     
     /// Perform SQL query to DB
@@ -63,7 +65,9 @@ final class Connection: BaseConnection
         );
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
-        return createResult(cast(immutable) pgResult).getAnswer;
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
     }
     
     /// Submits a command to the server without waiting for the result(s)

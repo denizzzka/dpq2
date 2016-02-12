@@ -50,11 +50,6 @@ package immutable final class ResultContainer
 
         PQclear(result);
     }
-
-    immutable(Result) getResult()
-    {
-        return new immutable Result(this);
-    }
 }
 
 /// Contains result of query regardless of whether it contains an error or data answer
@@ -94,7 +89,7 @@ immutable class Result
 /// Contains result of query with valid data answer
 immutable class Answer : Result
 {
-    private this(immutable ResultContainer r)
+    package this(immutable ResultContainer r)
     {
         super(r);
 

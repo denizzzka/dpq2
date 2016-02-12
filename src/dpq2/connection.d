@@ -172,18 +172,19 @@ package class BaseConnection
 
         if(r)
         {
-            return (new immutable ResultContainer(r)).getResult();
+            auto container = new immutable ResultContainer(r);
+            return new immutable Result(container);
         }
 
         return null;
     }
 
     /// Get Result from PQexec* functions or throw error if pull is empty
-    package immutable(Result) createResult(immutable PGresult* r) const
+    package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
     {
         if(r is null) throw new ConnException(this, __FILE__, __LINE__);
 
-        return (new immutable ResultContainer(r)).getResult();
+        return new immutable ResultContainer(r);
     }
 
     bool isBusy() nothrow
