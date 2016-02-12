@@ -39,7 +39,7 @@ struct QueryArg
 final class Connection: BaseConnection
 {
     /// Perform SQL query to DB
-    immutable (Answer) exec( string SQLcmd )
+    shared (const Answer) exec( string SQLcmd )
     {
         auto pgResult = PQexec(conn, toStringz( SQLcmd ));
 
@@ -48,7 +48,7 @@ final class Connection: BaseConnection
     }
     
     /// Perform SQL query to DB
-    immutable (Answer) exec(in QueryParams p)
+    shared (const Answer) exec(in QueryParams p)
     {
         auto a = prepareArgs( p );
         auto pgResult = PQexecParams (
@@ -63,7 +63,7 @@ final class Connection: BaseConnection
         );
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
-        return createResult(cast(immutable) pgResult).getAnswer;
+        return createResult(cast(shared const) pgResult).getAnswer;
     }
     
     /// Submits a command to the server without waiting for the result(s)

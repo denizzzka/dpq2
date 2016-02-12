@@ -26,26 +26,27 @@ private struct Coords
 }
 
 /// Contains result of query regardless of whether it contains an error or data answer
-immutable class Result
+shared const class Result
 {
-    private PGresult* result;
+    private PGresult* _result;
+
+    /// result wrapper for non-shared PQ functions
+    private PGresult* result() nothrow
+    {
+        return cast(PGresult*) _result;
+    }
 
     nothrow invariant()
     {
         assert( result != null );
     }
 
-    package this(immutable PGresult* r)
+    package this(shared const PGresult* r)
     {
         assert(r);
 
-        result = r;
+        _result = r;
         import std.stdio; writeln("Result Ctor:", cast(void*)this, " PGresult=", result);
-    }
-
-    private this(immutable Result r)
-    {
-        result = r.result;
     }
 
     ~this()
@@ -74,18 +75,18 @@ immutable class Result
         return to!string( PQresultErrorMessage(result) );
     }
 
-    immutable(Answer) getAnswer()
+    shared(const Answer) getAnswer()
     {
-        return new immutable Answer(this);
+        return new shared const Answer(this);
     }
 }
 
 /// Answer
-immutable class Answer : Result
+shared const class Answer : Result
 {
-    private this(immutable Result r)
+    private this(shared const Result r)
     {
-        super(r);
+        super(r._result);
 
         checkAnswerForErrors();
     }
