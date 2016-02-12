@@ -130,60 +130,60 @@ final class Connection: BaseConnection
 
 void _integration_test( string connParam )
 {
-    //~ auto conn = new Connection;
-	//~ conn.connString = connParam;
-    //~ conn.connect();
+    auto conn = new Connection;
+	conn.connString = connParam;
+    conn.connect();
 
-    //~ {    
-        //~ string sql_query =
-        //~ "select now() as time, 'abc'::text as string, 123, 456.78\n"~
-        //~ "union all\n"~
-        //~ "select now(), 'абвгд'::text, 777, 910.11\n"~
-        //~ "union all\n"~
-        //~ "select NULL, 'ijk'::text, 789, 12345.115345";
+    {    
+        string sql_query =
+        "select now() as time, 'abc'::text as string, 123, 456.78\n"~
+        "union all\n"~
+        "select now(), 'абвгд'::text, 777, 910.11\n"~
+        "union all\n"~
+        "select NULL, 'ijk'::text, 789, 12345.115345";
 
-        //~ auto a = conn.exec( sql_query );
+        auto a = conn.exec( sql_query );
 
-        //~ assert( a.cmdStatus.length > 2 );
-        //~ assert( a.columnCount == 4 );
-        //~ assert( a.length == 3 );
-        //~ assert( a.columnFormat(1) == ValueFormat.TEXT );
-        //~ assert( a.columnFormat(2) == ValueFormat.TEXT );
-    //~ }
+        assert( a.cmdStatus.length > 2 );
+        assert( a.columnCount == 4 );
+        assert( a.length == 3 );
+        assert( a.columnFormat(1) == ValueFormat.TEXT );
+        assert( a.columnFormat(2) == ValueFormat.TEXT );
+    }
 
-    //~ {
-        //~ const string sql_query =
-        //~ "select $1::text, $2::integer, $3::text";
+    {
+        const string sql_query =
+        "select $1::text, $2::integer, $3::text";
 
-        //~ QueryArg[3] args;
-        //~ args[0].value = "абвгд";
-        //~ args[1].value = null;
-        //~ args[2].value = "123";
+        QueryArg[3] args;
+        args[0].value = "абвгд";
+        args[1].value = null;
+        args[2].value = "123";
 
-        //~ QueryParams p;
-        //~ p.sqlCommand = sql_query;
-        //~ p.args = args[];
+        QueryParams p;
+        p.sqlCommand = sql_query;
+        p.args = args[];
 
-        //~ auto a = conn.exec( p );
+        auto a = conn.exec( p );
 
-        //~ assert( a.columnFormat(1) == ValueFormat.BINARY );
-        //~ assert( a.columnFormat(2) == ValueFormat.BINARY );
+        assert( a.columnFormat(1) == ValueFormat.BINARY );
+        assert( a.columnFormat(2) == ValueFormat.BINARY );
 
-        //~ destroy(a);
-    //~ }
+        destroy(a);
+    }
 
-    //~ conn.disconnect();
+    conn.disconnect();
 
-    //~ {
-        //~ bool exceptionFlag = false;
+    {
+        bool exceptionFlag = false;
 
-        //~ try conn.exec("SELECT 'abc'::text").getAnswer;
-        //~ catch(ConnException e)
-        //~ {
-            //~ exceptionFlag = true;
-            //~ assert(e.msg.length > 15); // error message check
-        //~ }
-        //~ finally
-            //~ assert(exceptionFlag);
-    //~ }
+        try conn.exec("SELECT 'abc'::text").getAnswer;
+        catch(ConnException e)
+        {
+            exceptionFlag = true;
+            assert(e.msg.length > 15); // error message check
+        }
+        finally
+            assert(exceptionFlag);
+    }
 }
