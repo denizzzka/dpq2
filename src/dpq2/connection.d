@@ -243,14 +243,6 @@ class ConnectionException : Dpq2Exception
     }
 }
 
-class Dpq2Exception : Exception
-{
-    this(string msg, string file, size_t line)
-    {
-        super(msg, file, line);
-    }
-}
-
 void _integration_test( string connParam )
 {
     assert( PQlibVersion() >= 9_0100 );
