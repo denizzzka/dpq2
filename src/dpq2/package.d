@@ -41,4 +41,5 @@ public
     import dpq2.answer;
     import dpq2.connection;
     import dpq2.query;
+    import dpq2.oids;
 }

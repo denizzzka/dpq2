@@ -2,8 +2,8 @@
 
 @trusted:
 
-public import derelict.pq.pq;
-public import dpq2.answer;
+import dpq2;
+
 import std.conv: to;
 import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;

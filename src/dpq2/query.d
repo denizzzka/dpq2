@@ -2,8 +2,7 @@
 
 @trusted:
 
-public import dpq2.connection;
-import dpq2.answer: Notify;
+import dpq2;
 
 enum ValueFormat : ubyte {
     TEXT,

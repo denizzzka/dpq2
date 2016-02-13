@@ -2,14 +2,11 @@
 
 @trusted:
 
-public import dpq2.query;
 public import dpq2.types.to_d_types;
 public import dpq2.types.to_bson;
 public import dpq2.oids;
 
-public import derelict.pq.pq;
-
-import derelict.pq.pq;
+import dpq2;
 
 import core.vararg;
 import std.string: toStringz, fromStringz;

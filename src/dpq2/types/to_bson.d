@@ -1,7 +1,6 @@
 ﻿module dpq2.types.to_bson;
 
-import dpq2.answer;
-import dpq2.oids;
+import dpq2;
 
 import vibe.data.bson;
 import std.uuid;
