@@ -69,7 +69,7 @@ package class BaseConnection
     }
 
 	/// Connect to DB in a nonblocking manner
-    void connectNonblockingStart()
+    void connectStart()
     {
         assert( !readyForQuery );
 
