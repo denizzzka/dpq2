@@ -148,7 +148,7 @@ package class BaseConnection
         socket_t socket = to!socket_t(r);
         socket_t duplicate = to!socket_t(dup(socket));
 
-        return new Socket(duplicate, AddressFamily.INET);
+        return new Socket(duplicate, AddressFamily.INET); //TODO: It is need to handle INET6 AddressFamily?
     }
 
     string errorMessage() const nothrow
