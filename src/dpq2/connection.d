@@ -31,19 +31,13 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 package class BaseConnection
 {
     string connString; /// Database connection parameters
-    
     package PGconn* conn;
-    private
+    private enum ConsumeResult
     {
-        bool readyForQuery = false; // connection started and not disconnect() was called
-
-        enum ConsumeResult
-        {
-            PQ_CONSUME_ERROR,
-            PQ_CONSUME_OK
-        }
+        PQ_CONSUME_ERROR,
+        PQ_CONSUME_OK
     }
-    
+
     @property bool nonBlocking()
     {
         return PQisnonblocking(conn) == 1;
@@ -58,7 +52,7 @@ package class BaseConnection
 	/// Connect to DB
     void connect()
     {
-        assert( !readyForQuery );
+        assert(!conn);
         
         conn = PQconnectdb(toStringz(connString));
         
@@ -66,8 +60,6 @@ package class BaseConnection
         
         if( !nonBlocking && status != CONNECTION_OK )
             throw new ConnectionException(this, __FILE__, __LINE__);
-        
-        readyForQuery = true;
     }
 
 	/// Connect to DB in a nonblocking manner
@@ -79,8 +71,6 @@ package class BaseConnection
 
         if( status == CONNECTION_BAD )
             throw new ConnectionException(this, __FILE__, __LINE__);
-
-        readyForQuery = true;
     }
 
     void resetStart()
@@ -91,14 +81,14 @@ package class BaseConnection
 
     PostgresPollingStatusType poll() nothrow
     {
-        assert( readyForQuery );
+        assert(conn);
 
         return PQconnectPoll(conn);
     }
 
     PostgresPollingStatusType resetPoll() nothrow
     {
-        assert( readyForQuery );
+        assert(conn);
 
         return PQresetPoll(conn);
     }
@@ -111,17 +101,13 @@ package class BaseConnection
 	/// Disconnect from DB
     void disconnect() nothrow
     {
-        if( readyForQuery )
-        {
-            readyForQuery = false;
-            PQfinish( conn );
-            // TODO: remove readyForQuery and just use conn = null as flag
-        }
+        PQfinish( conn );
+        conn = null;
     }
 
     void consumeInput()
     {
-        assert( readyForQuery );
+        assert(conn);
 
         const size_t r = PQconsumeInput( conn );
         if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnectionException(this, __FILE__, __LINE__);
@@ -129,7 +115,7 @@ package class BaseConnection
     
     package bool flush()
     {
-        assert( readyForQuery );
+        assert(conn);
 
         auto r = PQflush(conn);
         if( r == -1 ) throw new ConnectionException(this, __FILE__, __LINE__);
@@ -167,7 +153,7 @@ package class BaseConnection
      */
     PQnoticeProcessor setNoticeProcessor(PQnoticeProcessor proc, void* arg) nothrow
     {
-        assert( readyForQuery );
+        assert(conn);
 
         return PQsetNoticeProcessor(conn, proc, arg);
     }
@@ -197,14 +183,14 @@ package class BaseConnection
 
     bool isBusy() nothrow
     {
-        assert( readyForQuery );
+        assert(conn);
 
         return PQisBusy(conn) == 1;
     }
 
     string parameterStatus(string paramName)
     {
-        assert( readyForQuery );
+        assert(conn);
 
         auto res = PQparameterStatus(conn, cast(char*) toStringz(paramName)); //TODO: need report to derelict pq
 
@@ -216,7 +202,7 @@ package class BaseConnection
 
     string escapeLiteral(string msg)
     {
-        assert( readyForQuery );
+        assert(conn);
 
         auto buf = PQescapeLiteral(conn, msg.toStringz, msg.length);
 
@@ -232,7 +218,7 @@ package class BaseConnection
 
     string host() const nothrow
     {
-        assert( readyForQuery );
+        assert(conn);
 
         return to!string(PQhost(cast(PGconn*) conn).fromStringz); //TODO: need report to derelict pq
     }
