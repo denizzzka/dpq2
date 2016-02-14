@@ -140,7 +140,12 @@ package class BaseConnection
     {
         import core.sys.posix.unistd: dup;
 
-        socket_t socket = to!socket_t(PQsocket(conn)); // TODO: need report to derelict pq?
+        auto r = PQsocket(conn);
+
+        if(r == -1)
+            throw new ConnectionException(this, __FILE__, __LINE__);
+
+        socket_t socket = to!socket_t(r);
         socket_t duplicate = to!socket_t(dup(socket));
 
         return new Socket(duplicate, AddressFamily.INET);
