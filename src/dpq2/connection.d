@@ -145,8 +145,8 @@ package class BaseConnection
         if(r == -1)
             throw new ConnectionException(this, __FILE__, __LINE__);
 
-        socket_t socket = to!socket_t(r);
-        socket_t duplicate = to!socket_t(dup(socket));
+        socket_t socket = cast(socket_t) r;
+        socket_t duplicate = cast(socket_t) dup(socket);
 
         return new Socket(duplicate, AddressFamily.INET); //TODO: It is need to handle INET6 AddressFamily?
     }
