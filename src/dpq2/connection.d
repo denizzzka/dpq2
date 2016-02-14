@@ -9,6 +9,7 @@ import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import std.range;
 import std.stdio: File;
+import std.socket;
 import core.exception;
 
 /*
@@ -134,12 +135,14 @@ package class BaseConnection
         if( r == -1 ) throw new ConnectionException(this, __FILE__, __LINE__);
         return r == 0;
     }
-    
-    package size_t socket()
+
+    Socket socket() nothrow
     {
-        auto r = PQsocket( conn );
-        assert( r >= 0 );
-        return r;
+        import core.sys.posix.unistd: dup;
+
+        auto socket = cast(socket_t) PQsocket(conn);
+
+        return new Socket(cast(socket_t) dup(socket), AddressFamily.INET);
     }
 
     string errorMessage() const nothrow
