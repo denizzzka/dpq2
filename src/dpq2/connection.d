@@ -228,7 +228,7 @@ package class BaseConnection
         return to!string(PQhost(cast(PGconn*) conn).fromStringz); //TODO: need report to derelict pq
     }
 
-    void trace(File stream)
+    void trace(ref File stream)
     {
         PQtrace(conn, stream.getFP);
     }
