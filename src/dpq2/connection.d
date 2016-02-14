@@ -8,6 +8,7 @@ import std.conv: to;
 import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import std.range;
+import std.stdio: File;
 import core.exception;
 
 /*
@@ -225,6 +226,16 @@ package class BaseConnection
         assert( readyForQuery );
 
         return to!string(PQhost(cast(PGconn*) conn).fromStringz); //TODO: need report to derelict pq
+    }
+
+    void trace(File stream)
+    {
+        PQtrace(conn, stream.getFP);
+    }
+
+    void untrace()
+    {
+        PQuntrace(conn);
     }
 }
 
