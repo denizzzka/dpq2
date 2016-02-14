@@ -82,7 +82,7 @@ immutable class Result
         return new immutable Answer(result);
     }
 
-    string toString()
+    debug string toString()
     {
         import std.ascii: newline;
 
@@ -201,10 +201,16 @@ immutable class Answer : Result
         );
     }
 
-    @property
-    debug string toString()
+    debug override string toString()
     {
-        return "Rows: "~to!string(length)~" Columns: "~to!string(columnCount);
+        import std.ascii: newline;
+
+        string res;
+
+        foreach(row; rangify(this))
+            res ~= row.toString~newline;
+
+        return super.toString~newline~res;
     }
 
     @property
@@ -332,10 +338,14 @@ immutable struct Row
     /// Returns column count
     @property size_t length() { return answer.columnCount(); }
     
-    @property
     debug string toString()
     {
-        return "Columns: "~to!string(length);
+        string res;
+
+        foreach(val; rangify(this))
+            res ~= dpq2.answer.toString(val)~"\t";
+
+        return res;
     }
 }
 
@@ -370,6 +380,11 @@ struct Value // TODO: better to make it immutable, but Nullable don't allow use 
 
         return immutable Array(this);
     }
+}
+
+debug string toString(immutable (Nullable!Value) v)
+{
+    return v.isNull ? "NULL" : v.toBson.toString;
 }
 
 private struct ArrayHeader_net // network byte order
@@ -727,10 +742,7 @@ void _integration_test( string connParam )
         assert(count == 7);
     }
 
-    {
-        import std.stdio;
-        writeln((cast(immutable Result) r).toString);
-    }
+    assert(r.toString.length > 40);
 
     destroy(r);
 
