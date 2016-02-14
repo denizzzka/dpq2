@@ -71,8 +71,6 @@ package class BaseConnection
 	/// Connect to DB in a nonblocking manner
     void connectStart()
     {
-        assert( !readyForQuery );
-
         conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
 
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
