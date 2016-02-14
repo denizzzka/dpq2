@@ -81,6 +81,15 @@ immutable class Result
     {
         return new immutable Answer(result);
     }
+
+    string toString()
+    {
+        import std.ascii: newline;
+
+        string err = resultErrorMessage();
+
+        return statusString()~(err.length != 0 ? newline~err : "");
+    }
 }
 
 /// Contains result of query with valid data answer
@@ -716,6 +725,11 @@ void _integration_test( string connParam )
                 count++;
 
         assert(count == 7);
+    }
+
+    {
+        import std.stdio;
+        writeln((cast(immutable Result) r).toString);
     }
 
     destroy(r);
