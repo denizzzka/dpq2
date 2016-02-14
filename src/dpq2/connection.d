@@ -136,13 +136,14 @@ package class BaseConnection
         return r == 0;
     }
 
-    Socket socket() nothrow
+    Socket socket()
     {
         import core.sys.posix.unistd: dup;
 
-        auto socket = cast(socket_t) PQsocket(conn);
+        socket_t socket = to!socket_t(PQsocket(conn));
+        socket_t duplicate = to!socket_t(dup(socket));
 
-        return new Socket(cast(socket_t) dup(socket), AddressFamily.INET);
+        return new Socket(duplicate, AddressFamily.INET);
     }
 
     string errorMessage() const nothrow
