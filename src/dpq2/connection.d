@@ -32,11 +32,6 @@ package class BaseConnection
 {
     string connString; /// Database connection parameters
     package PGconn* conn;
-    private enum ConsumeResult
-    {
-        PQ_CONSUME_ERROR,
-        PQ_CONSUME_OK
-    }
 
     @property bool nonBlocking()
     {
@@ -110,7 +105,7 @@ package class BaseConnection
         assert(conn);
 
         const size_t r = PQconsumeInput( conn );
-        if( r != ConsumeResult.PQ_CONSUME_OK ) throw new ConnectionException(this, __FILE__, __LINE__);
+        if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
     
     package bool flush()
@@ -125,6 +120,7 @@ package class BaseConnection
     Socket socket()
     {
         import core.sys.posix.unistd: dup;
+        import std.experimental.logger;
 
         auto r = PQsocket(conn);
 
@@ -133,6 +129,10 @@ package class BaseConnection
 
         socket_t socket = cast(socket_t) r;
         socket_t duplicate = cast(socket_t) dup(socket);
+
+        trace("r=", r);
+        trace("socket=", socket);
+        trace("dup=", duplicate);
 
         return new Socket(duplicate, AddressFamily.UNSPEC);
     }
