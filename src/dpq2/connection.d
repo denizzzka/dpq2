@@ -186,6 +186,8 @@ package class BaseConnection
         return PQsetSingleRowMode(conn) == 1;
     }
 
+
+
     bool isBusy() nothrow
     {
         assert(conn);
@@ -236,6 +238,42 @@ package class BaseConnection
     void untrace()
     {
         PQuntrace(conn);
+    }
+}
+
+/// Doing canceling queries in progress
+class Cancellation
+{
+    private PGcancel* cancel;
+
+    this(Connection c)
+    {
+        cancel = PQgetCancel(c.conn);
+
+        if(cancel is null)
+            throw new ConnectionException(c, __FILE__, __LINE__);
+    }
+
+    ~this()
+    {
+        PQfreeCancel(cancel);
+    }
+
+    void doCancel()
+    {
+        char[256] errbuf;
+        auto res = PQcancel(cancel, errbuf.ptr, errbuf.length);
+
+        if(res != 1)
+            throw new CancellationException(to!string(errbuf.ptr.fromStringz), __FILE__, __LINE__);
+    }
+}
+
+class CancellationException : Exception
+{
+    this(string msg, string file, size_t line)
+    {
+        super(msg, file, line);
     }
 }
 
