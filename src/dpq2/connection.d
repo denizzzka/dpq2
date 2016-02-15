@@ -33,7 +33,7 @@ package class BaseConnection
     string connString; /// Database connection parameters
     package PGconn* conn;
 
-    @property bool nonBlocking()
+    @property bool isNonBlocking()
     {
         return PQisnonblocking(conn) == 1;
     }
@@ -53,7 +53,7 @@ package class BaseConnection
         
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
         
-        if( !nonBlocking && status != CONNECTION_OK )
+        if( !isNonBlocking && status != CONNECTION_OK )
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
