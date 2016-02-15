@@ -186,7 +186,11 @@ package class BaseConnection
         return PQsetSingleRowMode(conn) == 1;
     }
 
-
+    void cancel()
+    {
+        auto c = new Cancellation(this);
+        c.doCancel;
+    }
 
     bool isBusy() nothrow
     {
@@ -246,7 +250,7 @@ class Cancellation
 {
     private PGcancel* cancel;
 
-    this(Connection c)
+    this(BaseConnection c)
     {
         cancel = PQgetCancel(c.conn);
 
