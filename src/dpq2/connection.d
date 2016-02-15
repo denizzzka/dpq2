@@ -181,6 +181,11 @@ package class BaseConnection
         return new immutable ResultContainer(r);
     }
 
+    bool setSingleRowMode()
+    {
+        return PQsetSingleRowMode(conn) == 1;
+    }
+
     bool isBusy() nothrow
     {
         assert(conn);
