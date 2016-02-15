@@ -268,7 +268,7 @@ class Cancellation
     }
 }
 
-class CancellationException : Exception
+class CancellationException : Dpq2Exception
 {
     this(string msg, string file, size_t line)
     {
