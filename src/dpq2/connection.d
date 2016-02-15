@@ -120,7 +120,6 @@ package class BaseConnection
     Socket socket()
     {
         import core.sys.posix.unistd: dup;
-        import std.experimental.logger;
 
         auto r = PQsocket(conn);
 
@@ -129,10 +128,6 @@ package class BaseConnection
 
         socket_t socket = cast(socket_t) r;
         socket_t duplicate = cast(socket_t) dup(socket);
-
-        trace("r=", r);
-        trace("socket=", socket);
-        trace("dup=", duplicate);
 
         return new Socket(duplicate, AddressFamily.UNSPEC);
     }
