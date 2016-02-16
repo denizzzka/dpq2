@@ -1,4 +1,4 @@
-﻿module dpq2.answer;
+﻿module dpq2.result;
 
 @trusted:
 
@@ -343,7 +343,7 @@ immutable struct Row
         string res;
 
         foreach(val; rangify(this))
-            res ~= dpq2.answer.toString(val)~"\t";
+            res ~= dpq2.result.toString(val)~"\t";
 
         return res;
     }

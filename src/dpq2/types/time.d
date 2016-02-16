@@ -6,7 +6,7 @@
 */
 module dpq2.types.time;
 
-import dpq2.answer;
+import dpq2.result;
 import dpq2.oids;
 
 import std.datetime;

@@ -187,7 +187,7 @@ import std.bitmanip: bigEndianToNative;
 
 package string rawValueToNumeric(in ubyte[] v)
 {
-    import dpq2.answer: AnswerException, ExceptionType;
+    import dpq2.result: AnswerException, ExceptionType;
 
     struct NumericVar_net // network byte order
     {
