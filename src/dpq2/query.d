@@ -168,6 +168,20 @@ final class Connection: BaseConnection
         return new immutable Result(container);
     }
 
+    void prepare(string statementName, string sqlStatement, size_t nParams)
+    {
+        auto a = prepareArgs( p );
+        size_t r = PQsendPrepare(
+                conn,
+                cast(char*)toStringz(statementName), //TODO: need report to derelict pq
+                cast(char*)toStringz(sqlStatement), //TODO: need report to derelict pq
+                to!int(nParams),
+                null
+            );
+
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
     /// Waiting for completion of reading or writing
     /// Return: timeout not occured
     bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
