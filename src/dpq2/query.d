@@ -280,7 +280,7 @@ void _integration_test( string connParam )
 
         conn.sendQueryPrepared(p);
 
-        conn.waitEndOf(WaitType.READ);
+        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
         conn.consumeInput();
 
         immutable(Result)[] res;
