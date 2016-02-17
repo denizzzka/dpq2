@@ -81,16 +81,16 @@ final class Connection: BaseConnection
     {
         auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
-                    conn,
-                    cast(const char*)toStringz( p.sqlCommand ),
-                    cast(int)p.args.length,
-                    a.types.ptr,
-                    a.values.ptr,
-                    cast(int*)a.lengths.ptr,
-                    cast(int*)a.formats.ptr,
-                    cast(int)p.resultFormat                    
-                    );
-                    
+                conn,
+                cast(const char*)toStringz(p.sqlCommand),
+                cast(int)p.args.length,
+                a.types.ptr,
+                a.values.ptr,
+                cast(int*)a.lengths.ptr,
+                cast(int*)a.formats.ptr,
+                cast(int)p.resultFormat
+            );
+
         if( !r ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
@@ -111,7 +111,7 @@ final class Connection: BaseConnection
     }
     
     // For PQxxxParams need especially prepared arguments
-    private PreparedArgs* prepareArgs(ref const QueryParams p)
+    private static PreparedArgs* prepareArgs(in QueryParams p) pure
     {
         PreparedArgs* a = new PreparedArgs;
         a.types = new Oid[p.args.length];
@@ -128,6 +128,22 @@ final class Connection: BaseConnection
         }
         
         return a;
+    }
+
+    immutable(Result) prepare(string statementName, string sqlStatement, size_t nParams)
+    {
+        PGresult* pgResult = PQprepare(
+                conn,
+                cast(char*)toStringz(statementName), //TODO: need report to derelict pq
+                cast(char*)toStringz(sqlStatement), //TODO: need report to derelict pq
+                to!int(nParams),
+                null
+            );
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Result(container);
     }
 }
 
@@ -173,6 +189,10 @@ void _integration_test( string connParam )
         assert( a.columnFormat(2) == ValueFormat.BINARY );
 
         destroy(a);
+    }
+
+    {
+        auto r = conn.prepare("prepared statement", "SELECT $1::text", 1);
     }
 
     conn.disconnect();
