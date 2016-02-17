@@ -14,6 +14,8 @@ import std.bitmanip: bigEndianToNative;
 import std.math;
 import core.stdc.time: time_t;
 
+pure:
+
 /// Returns value data as native Date
 @property Date binaryValueAs(T)(in Value v)
 if( is( T == Date ) )

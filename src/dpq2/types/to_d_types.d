@@ -138,7 +138,7 @@ if( is( T == bool ) )
 }
 
 /// Returns Vibe.d's Json
-@property Json binaryValueAs(T)(in Value v) // FIXME ref is need
+@property Json binaryValueAs(T)(in Value v)
 if( is( T == Json ) )
 {
     Json res;

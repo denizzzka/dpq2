@@ -356,7 +356,7 @@ struct Value // TODO: better to make it immutable, but Nullable don't allow use 
     package OidType oidType;
     package ubyte[] value;
 
-    this(ubyte[] value, in OidType t, in ValueFormat f = ValueFormat.BINARY)
+    this(ubyte[] value, in OidType t, in ValueFormat f = ValueFormat.BINARY) pure
     {
         this.value = value;
         format = f;
