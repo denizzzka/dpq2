@@ -24,7 +24,7 @@ if( is( T == Date ) )
         throwTypeComplaint(v.oidType, "Date", __FILE__, __LINE__);
 
     if(!(v.value.length == uint.sizeof))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
 
     int jd = bigEndianToNative!uint(v.value.ptr[0..uint.sizeof]);
@@ -42,7 +42,7 @@ if( is( T == TimeOfDay ) )
         throwTypeComplaint(v.oidType, "time without time zone", __FILE__, __LINE__);
 
     if(!(v.value.length == TimeADT.sizeof))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
 
     return time2tm(bigEndianToNative!TimeADT(v.value.ptr[0..TimeADT.sizeof]));
@@ -56,7 +56,7 @@ if( is( T == TimeStampWithoutTZ ) )
         throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
 
     if(!(v.value.length == long.sizeof))
-        throw new AnswerException(ExceptionType.SIZE_MISMATCH,
+        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
     return rawTimeStamp2nativeTime(bigEndianToNative!long(v.value.ptr[0..long.sizeof]));

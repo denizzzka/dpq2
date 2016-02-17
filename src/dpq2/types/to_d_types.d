@@ -28,16 +28,16 @@ alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
 {
-    throw new AnswerException(
-            ExceptionType.NOT_IMPLEMENTED,
+    throw new AnswerConvException(
+            ConvExceptionType.NOT_IMPLEMENTED,
             "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
             file, line
         );
 }
 
 private alias VF = ValueFormat;
-private alias AE = AnswerException;
-private alias ET = ExceptionType;
+private alias AE = AnswerConvException;
+private alias ET = ConvExceptionType;
 
 /// Returns cell value as native string type from text or binary formatted field
 @property string as(T)(in Value v) pure

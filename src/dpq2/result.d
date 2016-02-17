@@ -14,6 +14,7 @@ import std.exception: enforceEx;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.typecons: Nullable;
+import std.conv: ConvException;
 
 /// Result table's cell coordinates 
 private struct Coords
@@ -373,7 +374,7 @@ struct Value // TODO: better to make it immutable, but Nullable don't allow use 
     immutable (Array) asArray() immutable
     {
         if(!isSupportedArray)
-            throw new AnswerException(ExceptionType.NOT_ARRAY,
+            throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
                 "Format of the column is "~to!string(oidType)~", isn't supported array",
                 __FILE__, __LINE__
             );
@@ -415,8 +416,8 @@ package struct ArrayProperties
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
         if(!(nDims > 0))
-            throw new AnswerException(ExceptionType.SMALL_DIMENSIONS_NUM,
-                "Dimensions number is too small, it must be positive value",
+            throw new AnswerException(ExceptionType.FATAL_ERROR,
+                "Array dimensions number is too small "~to!string(nDims)~", it must be positive value",
                 __FILE__, __LINE__
             );
 
@@ -467,7 +468,7 @@ immutable struct Array
     this(immutable Value cell)
     {
         if(!(cell.format == ValueFormat.BINARY))
-            throw new AnswerException(ExceptionType.NOT_BINARY,
+            throw new AnswerConvException(ConvExceptionType.NOT_BINARY,
                 msg_NOT_BINARY, __FILE__, __LINE__);
 
         ap = cast(immutable) ArrayProperties(cell);
@@ -612,24 +613,40 @@ immutable msg_NOT_BINARY = "Format of the column is not binary";
 enum ExceptionType
 {
     UNDEFINED_FIXME, /// Undefined, please report if you came across this error
-    COLUMN_NOT_FOUND, /// Column is not found
-    OUT_OF_RANGE,
-    NOT_ARRAY, /// Format of the column isn't array
-    NOT_BINARY, /// Format of the column isn't binary
-    NOT_TEXT, /// Format of the column isn't text string
-    NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
-    SMALL_DIMENSIONS_NUM,
-    SIZE_MISMATCH,
+    FATAL_ERROR,
     EMPTY_QUERY,
-    FATAL_ERROR
+    COLUMN_NOT_FOUND, /// Column is not found
+    OUT_OF_RANGE
 }
 
 /// Exception
 class AnswerException : Dpq2Exception
 {    
-    ExceptionType type; /// Exception type
+    const ExceptionType type; /// Exception type
     
     this(ExceptionType t, string msg, string file, size_t line) pure
+    {
+        type = t;
+        super(msg, file, line);
+    }
+}
+
+/// Conversion exception types
+enum ConvExceptionType
+{
+    UNDEFINED_FIXME, /// Undefined, please report if you came across this error
+    NOT_ARRAY, /// Format of the column isn't array
+    NOT_BINARY, /// Format of the column isn't binary
+    NOT_TEXT, /// Format of the column isn't text string
+    NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
+    SIZE_MISMATCH /// Result value size is not matched to the received Postgres value
+}
+
+class AnswerConvException : ConvException
+{
+    const ConvExceptionType type; /// Exception type
+
+    this(ConvExceptionType t, string msg, string file, size_t line) pure
     {
         type = t;
         super(msg, file, line);
@@ -668,7 +685,7 @@ void _integration_test( string connParam )
     p.resultFormat = ValueFormat.BINARY;
     p.sqlCommand = "SELECT "~
         "-32761::smallint, "~
-        "-2147483646::integer, "~
+        "-2147483646::integer as integer_value, "~
         "'first line\nsecond line'::text, "~
         "array[[[1,  2, 3], "~
                "[4,  5, 6]], "~
@@ -743,6 +760,19 @@ void _integration_test( string connParam )
     }
 
     assert(r.toString.length > 40);
+
+    {
+        bool exceptionFlag = false;
+
+        try r[0]["integer_value"].as!PGtext;
+        catch(AnswerConvException e)
+        {
+            exceptionFlag = true;
+            assert(e.msg.length > 5); // error message check
+        }
+        finally
+            assert(exceptionFlag);
+    }
 
     destroy(r);
 
