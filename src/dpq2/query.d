@@ -3,6 +3,7 @@
 @trusted:
 
 import dpq2;
+import core.time: Duration;
 
 enum ValueFormat : ubyte {
     TEXT,
@@ -167,9 +168,9 @@ final class Connection: BaseConnection
         return new immutable Result(container);
     }
 
-    // wait for result from server
-    private import core.time: Duration;
-    private size_t waitForReading(Duration timeout = Duration.zero)
+    /// Waiting for completion of reading or writing
+    /// Return: timeout not occured
+    bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
     {
         import std.socket;
 
@@ -177,12 +178,49 @@ final class Connection: BaseConnection
         auto set = new SocketSet;
         set.add(socket);
 
-        auto sockNum = Socket.select(set, null, set, timeout);
+        while(true)
+        {
+            if(status() == CONNECTION_BAD)
+                throw new ConnectionException(this, __FILE__, __LINE__);
 
-        enforce(sockNum >= 0);
+            if(poll() == PGRES_POLLING_OK)
+            {
+                return true;
+            }
+            else
+            {
+                size_t sockNum;
 
-        return sockNum;
+                with(WaitType)
+                final switch(type)
+                {
+                    case READ:
+                        sockNum = Socket.select(set, null, set, timeout);
+                        break;
+
+                    case WRITE:
+                        sockNum = Socket.select(null, set, set, timeout);
+                        break;
+
+                    case READ_WRITE:
+                        sockNum = Socket.select(set, set, set, timeout);
+                        break;
+                }
+
+                enforce(sockNum >= 0);
+                if(sockNum == 0) return false; // timeout is occurred
+
+                continue;
+            }
+        }
     }
+}
+
+enum WaitType
+{
+    READ,
+    WRITE,
+    READ_WRITE
 }
 
 void _integration_test( string connParam )
@@ -242,7 +280,7 @@ void _integration_test( string connParam )
 
         conn.sendQueryPrepared(p);
 
-        conn.waitForReading();
+        conn.waitEndOf(WaitType.READ);
         conn.consumeInput();
 
         immutable(Result)[] res;
