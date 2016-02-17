@@ -45,8 +45,8 @@ if(is(T == string))
 {
     if(v.format == VF.BINARY)
     {
-        if(!(v.oidType == OidType.Text || v.oidType == OidType.Numeric))
-            throwTypeComplaint(v.oidType, "string or numeric", __FILE__, __LINE__);
+        if(!(v.oidType == OidType.Text || v.oidType == OidType.Numeric || v.oidType == OidType.Json))
+            throwTypeComplaint(v.oidType, "string, numeric or json", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
             return rawValueToNumeric(v.value);
@@ -239,6 +239,9 @@ public void _integration_test( string connParam )
 
         // json
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+
+        // json as string
+        C!string("{\"float_value\": 123.456}", "json", "'{\"float_value\": 123.456}'");
 
         //C!PGjson(Json(["integer": Json(123), "float": Json(123.456), "text_string": Json("This is a text string")]), "jsonb",
             //"'{\"integer\": 123, \"float\": 123.456,\"text_string\": \"This is a text string\"}'");
