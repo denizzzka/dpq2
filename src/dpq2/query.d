@@ -15,6 +15,9 @@ struct QueryParams
     string sqlCommand; /// SQL command
     QueryArg[] args; /// SQL command arguments
     ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
+
+    @property string preparedStatementName() const { return sqlCommand; }
+    @property void preparedStatementName(string s){ sqlCommand = s; }
 }
 
 /// Query argument
@@ -73,7 +76,7 @@ final class Connection: BaseConnection
     void sendQuery( string SQLcmd )
     {
         const size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
-        if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
@@ -91,7 +94,25 @@ final class Connection: BaseConnection
                 cast(int)p.resultFormat
             );
 
-        if( !r ) throw new ConnectionException(this, __FILE__, __LINE__);
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
+    /// Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)
+    void sendQueryPrepared(in QueryParams p)
+    {
+        auto a = prepareArgs(p);
+
+        size_t r = PQsendQueryPrepared( //TODO: need report to derelict pq
+                conn,
+                cast(char*)toStringz(p.preparedStatementName),
+                to!int(p.args.length),
+                cast(char**)a.values.ptr,
+                cast(int*)a.lengths.ptr,
+                cast(int*)a.formats.ptr,
+                to!int(p.resultFormat)
+            );
+
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
     /// Returns null if no notifies was received
@@ -145,6 +166,23 @@ final class Connection: BaseConnection
 
         return new immutable Result(container);
     }
+
+    // wait for result from server
+    private import core.time: Duration;
+    private size_t waitForReading(Duration timeout = Duration.zero)
+    {
+        import std.socket;
+
+        auto socket = socket();
+        auto set = new SocketSet;
+        set.add(socket);
+
+        auto sockNum = Socket.select(set, null, set, timeout);
+
+        enforce(sockNum >= 0);
+
+        return sockNum;
+    }
 }
 
 void _integration_test( string connParam )
@@ -192,7 +230,32 @@ void _integration_test( string connParam )
     }
 
     {
-        auto r = conn.prepare("prepared statement", "SELECT $1::text", 1);
+        // checking sendQueryPrepared
+        auto s = conn.prepare("prepared statement", "SELECT $1::text, $2::integer", 1);
+        assert(s.status == PGRES_COMMAND_OK);
+
+        QueryParams p;
+        p.preparedStatementName = "prepared statement";
+        p.args.length = 2;
+        p.args[0].value = "abc";
+        p.args[1].value = "123456";
+
+        conn.sendQueryPrepared(p);
+
+        conn.waitForReading();
+        conn.consumeInput();
+
+        immutable(Result)[] res;
+
+        while(true)
+        {
+            auto r = conn.getResult();
+            if(r is null) break;
+            res ~= r;
+        }
+
+        assert(res[0].getAnswer[0][0].as!PGtext);
+        assert(res[0].getAnswer[0][1].as!PGinteger);
     }
 
     conn.disconnect();
