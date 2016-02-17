@@ -152,6 +152,7 @@ final class Connection: BaseConnection
         return a;
     }
 
+    /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
     immutable(Result) prepare(string statementName, string sqlStatement, size_t nParams)
     {
         PGresult* pgResult = PQprepare(
@@ -168,9 +169,9 @@ final class Connection: BaseConnection
         return new immutable Result(container);
     }
 
-    void prepare(string statementName, string sqlStatement, size_t nParams)
+    /// Sends a request to create a prepared statement with the given parameters, without waiting for completion.
+    void sendPrepare(string statementName, string sqlStatement, size_t nParams)
     {
-        auto a = prepareArgs( p );
         size_t r = PQsendPrepare(
                 conn,
                 cast(char*)toStringz(statementName), //TODO: need report to derelict pq
@@ -281,13 +282,34 @@ void _integration_test( string connParam )
         destroy(a);
     }
 
+    // checking prepared statements
     {
-        // checking sendQueryPrepared
-        auto s = conn.prepare("prepared statement", "SELECT $1::text, $2::integer", 1);
+        // uses PQprepare:
+        auto s = conn.prepare("prepared statement 1", "SELECT $1::integer", 1);
         assert(s.status == PGRES_COMMAND_OK);
+    }
+    {
+        // uses PQsendPrepare:
+        conn.sendPrepare("prepared statement 2", "SELECT $1::text, $2::integer", 1);
 
+        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
+        conn.consumeInput();
+
+        immutable(Result)[] res;
+
+        while(true)
+        {
+            auto r = conn.getResult();
+            if(r is null) break;
+            res ~= r;
+        }
+
+        assert(res.length == 1);
+        assert(res[0].status == PGRES_COMMAND_OK);
+    }
+    {
         QueryParams p;
-        p.preparedStatementName = "prepared statement";
+        p.preparedStatementName = "prepared statement 2";
         p.args.length = 2;
         p.args[0].value = "abc";
         p.args[1].value = "123456";
@@ -306,8 +328,9 @@ void _integration_test( string connParam )
             res ~= r;
         }
 
-        assert(res[0].getAnswer[0][0].as!PGtext);
-        assert(res[0].getAnswer[0][1].as!PGinteger);
+        assert(res.length == 1);
+        assert(res[0].getAnswer[0][0].as!PGtext == "abc");
+        assert(res[0].getAnswer[0][1].as!PGinteger == 123456);
     }
 
     conn.disconnect();
