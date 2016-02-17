@@ -607,8 +607,6 @@ class Notify
     }
 }
 
-immutable msg_NOT_BINARY = "Format of the column is not binary";
-
 /// Exception types
 enum ExceptionType
 {
@@ -630,6 +628,8 @@ class AnswerException : Dpq2Exception
         super(msg, file, line);
     }
 }
+
+package immutable msg_NOT_BINARY = "Format of the column is not binary";
 
 /// Conversion exception types
 enum ConvExceptionType
