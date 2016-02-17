@@ -26,7 +26,7 @@ alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp_without_time_zone = TimeStampWithoutTZ; /// Both date and time (no time zone)
 alias PGjson =          Json; /// json or jsonb
 
-package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line)
+package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
 {
     throw new AnswerException(
             ExceptionType.NOT_IMPLEMENTED,
@@ -40,7 +40,7 @@ private alias AE = AnswerException;
 private alias ET = ExceptionType;
 
 /// Returns cell value as native string type from text or binary formatted field
-@property string as(T)(in Value v)
+@property string as(T)(in Value v) pure
 if(is(T == string))
 {
     if(v.format == VF.BINARY)
@@ -68,7 +68,7 @@ if(!is(T == string))
 
 package:
 
-@property string valueAsString(in Value v)
+@property string valueAsString(in Value v) pure
 {
     return to!string( cast(const(char[])) v.value );
 }

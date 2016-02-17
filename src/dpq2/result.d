@@ -629,7 +629,7 @@ class AnswerException : Dpq2Exception
 {    
     ExceptionType type; /// Exception type
     
-    this(ExceptionType t, string msg, string file, size_t line)
+    this(ExceptionType t, string msg, string file, size_t line) pure
     {
         type = t;
         super(msg, file, line);

@@ -185,7 +185,7 @@ import std.conv: to;
 import std.string: fromStringz;
 import std.bitmanip: bigEndianToNative;
 
-package string rawValueToNumeric(in ubyte[] v)
+package string rawValueToNumeric(in ubyte[] v) pure
 {
     import dpq2.result: AnswerException, ExceptionType;
 
