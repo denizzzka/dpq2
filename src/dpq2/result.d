@@ -508,7 +508,12 @@ immutable struct Array
             this.elementIsNULL = elementIsNULL.idup;
         }
     }
-    
+
+    size_t length()
+    {
+        return dimsSize[0];
+    }
+
     /// Returns Value struct by index
     immutable (Nullable!Value) opIndex(int n)
     {
