@@ -1,19 +1,19 @@
 ﻿module dpq2;
 
-debug import std.stdio: write, writeln;
+debug import std.experimental.logger;
 
 shared static this()
 {
     debug
     {
-        write("DerelictPQ loading... ");
+        trace("DerelictPQ loading...");
     }
 
     DerelictPQ.load();
 
     debug
     {
-        writeln("DerelictPQ loading finished");
+        trace("...DerelictPQ loading finished");
     }
 }
 
@@ -21,7 +21,7 @@ shared static ~this()
 {
     debug
     {
-        write("DerelictPQ unloading... ");
+        trace("DerelictPQ unloading...");
     }
     
     import core.memory: GC;
@@ -30,7 +30,7 @@ shared static ~this()
     
     debug
     {
-        writeln("DerelictPQ unloading finished");
+        trace("DerelictPQ unloading finished");
     }
 }
 
