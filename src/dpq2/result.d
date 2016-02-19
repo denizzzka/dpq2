@@ -208,6 +208,11 @@ immutable class Answer : Result
 
         string res;
 
+        foreach(columnNum; 0 .. columnCount)
+            res ~= columnName(columnCount)~"\t";
+
+        res ~= newline;
+
         foreach(row; rangify(this))
             res ~= row.toString~newline;
 
