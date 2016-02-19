@@ -208,8 +208,8 @@ immutable class Answer : Result
 
         string res;
 
-        foreach(columnNum; 0 .. columnCount)
-            res ~= columnName(columnCount)~"\t";
+        foreach(n; 0 .. columnCount)
+            res ~= columnName(n)~"\t";
 
         res ~= newline;
 
