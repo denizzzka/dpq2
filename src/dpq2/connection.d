@@ -215,11 +215,27 @@ package class BaseConnection
         if(buf is null)
             throw new ConnectionException(this, __FILE__, __LINE__);
 
-        const char[] res = buf.fromStringz;
+        string res = buf.fromStringz.to!string;
 
         PQfreemem(buf);
 
-        return to!string(res);
+        return res;
+    }
+
+    string escapeIdentifier(string msg)
+    {
+        assert(conn);
+
+        auto buf = PQescapeIdentifier(conn, msg.toStringz, msg.length);
+
+        if(buf is null)
+            throw new ConnectionException(this, __FILE__, __LINE__);
+
+        string res = buf.fromStringz.to!string;
+
+        PQfreemem(buf);
+
+        return res;
     }
 
     string host() const nothrow
@@ -319,5 +335,15 @@ void _integration_test( string connParam )
         }
         finally
             assert(exceptionFlag);
+    }
+
+    {
+        auto c = new BaseConnection;
+        c.connString = connParam;
+
+        c.connect();
+
+        assert(c.escapeLiteral("abc'def") == "'abc''def'");
+        assert(c.escapeIdentifier("abc'def") == "\"abc'def\"");
     }
 }
