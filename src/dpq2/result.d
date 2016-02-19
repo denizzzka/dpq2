@@ -409,7 +409,6 @@ private struct Dim_net // network byte order
 struct ArrayProperties
 {
     OidType OID;
-    int nDims; /// Number of dimensions
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
     package size_t dataOffset;
@@ -417,7 +416,7 @@ struct ArrayProperties
     this(in Value cell)
     {
         const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
-        nDims = bigEndianToNative!int(h.ndims);
+        int nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
         if(nDims < 0)
@@ -551,7 +550,7 @@ immutable struct Array
         // Variadic args parsing
         auto args = new int[ _arguments.length ];
 
-        if(!(nDims == args.length))
+        if(!(dimsSize.length == args.length))
             throw new AnswerException(
                 ExceptionType.OUT_OF_RANGE,
                 "Mismatched dimensions number in arguments and server reply",

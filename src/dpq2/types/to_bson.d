@@ -28,6 +28,9 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: re
 {
     const ap = ArrayProperties(cell);
 
+    // empty array
+    if(ap.dimsSize.length == 0) return Bson.emptyArray;
+
     size_t curr_offset = ap.dataOffset;
 
     Bson recursive(size_t dimNum)
@@ -37,7 +40,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: re
 
         foreach(elemNum; 0..dimSize)
         {
-            if(dimNum < ap.nDims - 1)
+            if(dimNum < ap.dimsSize.length - 1)
             {
                 res[elemNum] = recursive(dimNum + 1);
             }
@@ -236,6 +239,8 @@ void _integration_test( string connParam )
                 Bson([Bson([Bson("1")]),Bson([Bson("22")]),Bson([Bson("333")])]),
                 Bson([Bson([Bson("4")]),Bson([Bson(null)]),Bson([Bson("6")])])
             ]), "text[]", "'{{{1},{22},{333}},{{4},{null},{6}}}'");
+
+        C(Bson.emptyArray, "text[]", "'{}'");
 
         C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
 
