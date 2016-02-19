@@ -508,13 +508,11 @@ immutable struct Array
         }
     }
 
-    /// Use only for one-dimensional arrays
+    /// Returns number of elements in array
+    /// Useful for one-dimensional arrays
     @property size_t length()
     {
-        if(dimsSize.length == 0)
-            return 0;
-        else
-            return dimsSize[0];
+        return nElems;
     }
 
     /// Returns Value struct by index
@@ -740,6 +738,7 @@ void _integration_test( string connParam )
         assert( r[0]["empty_array"].asArray.dimsSize.length == 0 );
         assert( r[0]["empty_array"].asArray.length == 0 );
         assert( r[0]["text_array"].asArray.length == 4 );
+        assert( r[0]["test_array"].asArray.length == 18 );
 
         {
             bool isNullFlag = false;
