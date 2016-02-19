@@ -406,13 +406,13 @@ private struct Dim_net // network byte order
     ubyte[4] lbound; // unknown
 }
 
-package struct ArrayProperties
+struct ArrayProperties
 {
     OidType OID;
     int nDims; /// Number of dimensions
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
-    size_t dataOffset;
+    package size_t dataOffset;
 
     this(in Value cell)
     {
