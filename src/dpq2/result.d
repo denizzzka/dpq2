@@ -427,16 +427,15 @@ struct ArrayProperties
 
         dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
 
-        auto ds = new int[ nDims ];
+        dimsSize = new int[nDims];
 
         // Recognize dimensions of array
-        int n_elems = 1;
         for( auto i = 0; i < nDims; ++i )
         {
             Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
 
-            int dim_size = bigEndianToNative!int( d.dim_size );
-            int lbound = bigEndianToNative!int(d.lbound);
+            const dim_size = bigEndianToNative!int( d.dim_size );
+            const lbound = bigEndianToNative!int(d.lbound);
 
             if(!(dim_size > 0))
                 throw new AnswerException(ExceptionType.FATAL_ERROR,
@@ -451,12 +450,13 @@ struct ArrayProperties
                     __FILE__, __LINE__
                 );
 
-            ds[i] = dim_size;
-            n_elems *= dim_size;
-        }
+            dimsSize[i] = dim_size;
 
-        nElems = n_elems;
-        dimsSize = ds;
+            if(i == 0) // first dimension
+                nElems = dim_size;
+            else
+                nElems *= dim_size;
+        }
     }
 }
 
@@ -706,7 +706,8 @@ void _integration_test( string connParam )
                "[16,17,18]]]::integer[] as test_array, "~
         "NULL,"~
         "array[11,22,NULL,44]::integer[] as small_array, "~
-        "array['1','23',NULL,'789A']::text[] as text_array";
+        "array['1','23',NULL,'789A']::text[] as text_array, "~
+        "array[]::text[] as empty_array";
 
     auto r = conn.exec( p );
 
@@ -730,6 +731,8 @@ void _integration_test( string connParam )
         assert( r[0]["text_array"].asArray[2].isNull );
         assert( r.columnName(3) == "test_array" );
         assert( r[0].columnName(3) == "test_array" );
+        assert( r[0]["empty_array"].asArray.nElems == 0 );
+        assert( r[0]["empty_array"].asArray.dimsSize.length == 0 );
 
         {
             bool isNullFlag = false;
@@ -765,7 +768,7 @@ void _integration_test( string connParam )
             foreach(elem; rangify(row))
                 count++;
 
-        assert(count == 7);
+        assert(count == 8);
     }
 
     assert(r.toString.length > 40);
