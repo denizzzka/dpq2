@@ -508,9 +508,13 @@ immutable struct Array
         }
     }
 
-    size_t length()
+    /// Use only for one-dimensional arrays
+    @property size_t length()
     {
-        return dimsSize[0];
+        if(dimsSize.length == 0)
+            return 0;
+        else
+            return dimsSize[0];
     }
 
     /// Returns Value struct by index
@@ -733,6 +737,8 @@ void _integration_test( string connParam )
         assert( r[0].columnName(3) == "test_array" );
         assert( r[0]["empty_array"].asArray.nElems == 0 );
         assert( r[0]["empty_array"].asArray.dimsSize.length == 0 );
+        assert( r[0]["empty_array"].asArray.length == 0 );
+        assert( r[0]["text_array"].asArray.length == 4 );
 
         {
             bool isNullFlag = false;
