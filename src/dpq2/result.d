@@ -420,9 +420,9 @@ struct ArrayProperties
         nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
-        if(!(nDims > 0))
+        if(nDims < 0)
             throw new AnswerException(ExceptionType.FATAL_ERROR,
-                "Array dimensions number is too small "~to!string(nDims)~", it must be positive value",
+                "Array dimensions number is too small ("~to!string(nDims)~"), it must be more than zero",
                 __FILE__, __LINE__
             );
 
