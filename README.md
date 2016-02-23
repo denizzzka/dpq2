@@ -41,11 +41,12 @@ Example
 
 import dpq2;
 import std.stdio: writeln;
+import std.getopt;
 
-void main()
+void main(string[] args)
 {
     Connection conn = new Connection;
-    conn.connString = "dbname=postgres user=postgres";
+    getopt(args, "conninfo", &conn.connString);
     conn.connect();
 
     // Only text query result can be obtained by this call:
@@ -106,9 +107,10 @@ void main()
 ```
 ####Compile and run:
 ```
-Text query result by name: 2016-02-10 22:48:07.827245
+Running ./dpq2_example --conninfo=dbname=postgres
+Text query result by name: 2016-02-23 15:22:29.024757
 Text query result by index: 456.78
-bson: "2016-02-10 22:48:07.827245"
+bson: "2016-02-23 15:22:29.024757"
 bson: "abc"
 bson: "123"
 bson: "456.78"
