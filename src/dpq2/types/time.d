@@ -167,11 +167,11 @@ version(Have_Int64_TimeStamp)
 }
 else
 {
-    private alias double Timestamp;
-    private alias double TimestampTz;
-    private alias double TimeADT;
-    private alias double TimeOffset;
-    private alias double fsec_t;    /* fractional seconds (in seconds) */
+    private alias Timestamp = double;
+    private alias TimestampTz = double;
+    private alias TimeADT = double;
+    private alias TimeOffset = double;
+    private alias fsec_t = double;    /* fractional seconds (in seconds) */
     
     void TMODULO(T)(ref double t, ref T q, double u)
         if(is(T == double) || is(T == int))
