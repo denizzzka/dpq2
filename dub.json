@@ -12,7 +12,7 @@
 		"derelict-pq": "==2.0.0",
 		"vibe-d:data": "~>0.7.27-rc.2"
 	},
-	"targetType": "none",
+	"targetType": "library",
 	"configurations": [
 		{
 			"name": "static",
@@ -20,6 +20,26 @@
 		},
 		{
 			"name": "dynamic"
+		}
+	],
+	"subPackages": [
+		{
+			"name": "integration_tests",
+			"targetType": "executable",
+			"dependencies":
+			{
+				"dpq2": "*"
+			},
+			"sourcePath": "integration_tests"
+		},
+		{
+			"name": "example",
+			"targetType": "executable",
+			"dependencies":
+			{
+				"dpq2": "*"
+			},
+			"sourcePath": "example"
 		}
 	]
 }

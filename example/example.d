@@ -2,11 +2,12 @@
 
 import dpq2;
 import std.stdio: writeln;
+import std.getopt;
 
-void main()
+void main(string[] args)
 {
     Connection conn = new Connection;
-    conn.connString = "dbname=postgres user=postgres";
+    getopt(args, "conninfo", &conn.connString);
     conn.connect();
 
     // Only text query result can be obtained by this call:
