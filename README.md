@@ -134,9 +134,3 @@ column name: 'array_field', bson: ["first","second",null]
 column name: 'multi_array', bson: [[1,2,3],[4,5,6]]
 column name: 'json_value', bson: {"text_str":"text string","float_value":123.456}
 ```
-
-TODO
-----
-
-* PostGIS binary data support
-* Binary arguments types
