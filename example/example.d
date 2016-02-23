@@ -63,5 +63,5 @@ void main(string[] args)
         writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].toBson);
     }
 
-    //version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
+    version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
