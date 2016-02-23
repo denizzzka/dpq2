@@ -35,6 +35,22 @@ struct QueryArg
         else
             valueBin = cast(ubyte[])( s ~ '\0' );
     }
+
+    /// can return null value for SQL NULL value
+    @property string value()
+    {
+        return to!string((cast(char*) valueBin).fromStringz);
+    }
+}
+
+unittest
+{
+    immutable s = "test string";
+
+    QueryArg q;
+    q.value = s;
+
+    assert(q.value == s);
 }
 
 /// Connection
