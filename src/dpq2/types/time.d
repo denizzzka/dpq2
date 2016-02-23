@@ -243,7 +243,7 @@ struct pg_tm
     string      tm_zone;
 }
 
-alias long pg_time_t;
+alias pg_time_t = long;
 
 immutable ulong SECS_PER_DAY = 86400;
 immutable ulong POSTGRES_EPOCH_JDATE = 2451545;
