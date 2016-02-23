@@ -19,16 +19,16 @@ before_script:
 
 script:
   - dub test
-
+  -
   - dub add-local .
   - dub add-local integration_tests
   - dub add-local example
-
+  -
   - dub run dpq2-integration_tests --build=unittest-cov -- --conninfo="dbname=postgres"
-
+  -
   - if [ ${DC} = "dmd" ]; then dub run dscanner -- -s; fi
 #  - if [ ${DC} = "dmd" ]; then dub run dscanner -- -S; fi #disabled due to assertion failure in dsymbol
-
+  -
   - dub build dpq2 --build=release
   - dub run dpq2-example --build=release
 
