@@ -17,7 +17,7 @@ before_install:
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
-script: .test.sh "dbname=postgres"
+script: ./.test.sh "dbname=postgres"
 
 after_success:
   - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
