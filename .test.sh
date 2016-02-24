@@ -3,9 +3,12 @@ set -ev
 
 dub test
 
-dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${1}"
-
-if [ "$DC" == "dmd" ]; then dub run dscanner -- -s; fi
-#if [ "$DC" == "dmd" ]; then dub run dscanner -- -S; fi #disabled due to assertion failure in dsymbol
-
-if [ "$DC" == "dmd" ]; then dub run dpq2:example --build=release -- --conninfo="${1}"; fi
+if [ "$DC" == "dmd" ]
+then
+    dub run dscanner -- -s
+    #dub run dscanner -- -S #disabled due to assertion failure in dsymbol
+    dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${1}"
+    dub run dpq2:example --build=release -- --conninfo="${1}"
+else
+    dub run dpq2:integration_tests --build=unittest -- --conninfo="${1}"
+fi
