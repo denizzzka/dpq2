@@ -17,6 +17,14 @@ struct QueryParams
     QueryArg[] args; /// SQL command arguments
     ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
 
+    @property void argsFromArray(string[] arr)
+    {
+        args.length = arr.length;
+
+        foreach(i, ref a; args)
+            a.value = arr[i];
+    }
+
     @property string preparedStatementName() const { return sqlCommand; }
     @property void preparedStatementName(string s){ sqlCommand = s; }
 }
@@ -326,9 +334,7 @@ void _integration_test( string connParam )
     {
         QueryParams p;
         p.preparedStatementName = "prepared statement 2";
-        p.args.length = 2;
-        p.args[0].value = "abc";
-        p.args[1].value = "123456";
+        p.argsFromArray = ["abc", "123456"];
 
         conn.sendQueryPrepared(p);
 
