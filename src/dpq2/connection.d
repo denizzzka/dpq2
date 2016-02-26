@@ -284,14 +284,14 @@ unittest
     connStringCheck("dbname=postgres user=postgres");
 
     {
-        bool flag = false;
+        bool raised = false;
 
         try
             connStringCheck("wrong conninfo string");
         catch(ConnectionException e)
-            flag = true;
+            raised = true;
 
-        assert(flag);
+        assert(raised);
     }
 }
 
