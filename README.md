@@ -75,13 +75,13 @@ void main(string[] args)
         "$4::integer[] as multi_array, "~
         "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'::json as json_value";
     
-    p.args.length = 4;
-    
-    p.args[0].value = "-1234.56789012345";
-    p.args[1].value = "first line\nsecond line";
-    p.args[2].value = null;
-    p.args[3].value = "{{1, 2, 3}, {4, 5, 6}}";
-    
+    p.argsFromArray = [
+        "-1234.56789012345",
+        "first line\nsecond line",
+        null,
+        "{{1, 2, 3}, {4, 5, 6}}"
+    ];
+
     auto r = conn.exec(p);
     
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
