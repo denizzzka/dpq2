@@ -63,7 +63,7 @@ unittest
 
 /// Connection
 // Inheritance used here for separation of query code from connection code
-final class Connection: BaseConnection
+class Connection: BaseConnection
 {
     /// Perform SQL query to DB
     immutable (Answer) exec( string SQLcmd )
