@@ -30,7 +30,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
-/// BaseConnection
+/// Connection
 class Connection
 {
     //string connString; /// Database connection parameters
