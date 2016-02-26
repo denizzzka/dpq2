@@ -254,6 +254,45 @@ package class BaseConnection
     {
         PQuntrace(conn);
     }
+
+    static void connStringCheck(string connString)
+    {
+        char* errmsg = null;
+        PQconninfoOption* r = PQconninfoParse(cast(char*) connString.toStringz, &errmsg); //TODO: need report to derelict pq
+
+        if(r is null)
+        {
+            enforceEx!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
+        }
+        else
+        {
+            PQconninfoFree(r);
+        }
+
+        if(errmsg !is null)
+        {
+            string s = errmsg.fromStringz.to!string;
+            PQfreemem(cast(void*) errmsg);
+
+            throw new ConnectionException(s, __FILE__, __LINE__);
+        }
+    }
+}
+
+unittest
+{
+    BaseConnection.connStringCheck("dbname=postgres user=postgres");
+
+    {
+        bool flag = false;
+
+        try
+            BaseConnection.connStringCheck("wrong conninfo string");
+        catch(ConnectionException e)
+            flag = true;
+
+        assert(flag);
+    }
 }
 
 /// Doing canceling queries in progress
@@ -295,13 +334,14 @@ class CancellationException : Dpq2Exception
 /// Connection exception
 class ConnectionException : Dpq2Exception
 {
-    private const BaseConnection conn;
-
     this(in BaseConnection c, string file, size_t line)
     {
-        conn = c;
+        super(c.errorMessage(), file, line);
+    }
 
-        super(conn.errorMessage(), file, line);
+    this(string msg, string file, size_t line)
+    {
+        super(msg, file, line);
     }
 }
 
