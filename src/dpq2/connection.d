@@ -254,40 +254,40 @@ package class BaseConnection
     {
         PQuntrace(conn);
     }
+}
 
-    static void connStringCheck(string connString)
+void connStringCheck(string connString)
+{
+    char* errmsg = null;
+    PQconninfoOption* r = PQconninfoParse(cast(char*) connString.toStringz, &errmsg); //TODO: need report to derelict pq
+
+    if(r is null)
     {
-        char* errmsg = null;
-        PQconninfoOption* r = PQconninfoParse(cast(char*) connString.toStringz, &errmsg); //TODO: need report to derelict pq
+        enforceEx!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
+    }
+    else
+    {
+        PQconninfoFree(r);
+    }
 
-        if(r is null)
-        {
-            enforceEx!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
-        }
-        else
-        {
-            PQconninfoFree(r);
-        }
+    if(errmsg !is null)
+    {
+        string s = errmsg.fromStringz.to!string;
+        PQfreemem(cast(void*) errmsg);
 
-        if(errmsg !is null)
-        {
-            string s = errmsg.fromStringz.to!string;
-            PQfreemem(cast(void*) errmsg);
-
-            throw new ConnectionException(s, __FILE__, __LINE__);
-        }
+        throw new ConnectionException(s, __FILE__, __LINE__);
     }
 }
 
 unittest
 {
-    BaseConnection.connStringCheck("dbname=postgres user=postgres");
+    connStringCheck("dbname=postgres user=postgres");
 
     {
         bool flag = false;
 
         try
-            BaseConnection.connStringCheck("wrong conninfo string");
+            connStringCheck("wrong conninfo string");
         catch(ConnectionException e)
             flag = true;
 
