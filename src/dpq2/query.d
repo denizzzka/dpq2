@@ -61,9 +61,6 @@ unittest
     assert(q.value == s);
 }
 
-/// Connection
-// Inheritance used here for separation of query code from connection code
-//class Connection: BaseConnection
 mixin template Queries()
 {
     /// Perform SQL query to DB
