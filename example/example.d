@@ -6,9 +6,10 @@ import std.getopt;
 
 void main(string[] args)
 {
-    Connection conn = new Connection;
-    getopt(args, "conninfo", &conn.connString);
-    conn.connect();
+    string connInfo;
+    getopt(args, "conninfo", &connInfo);
+
+    Connection conn = new Connection(connInfo);
 
     // Only text query result can be obtained by this call:
     auto answer = conn.exec(
