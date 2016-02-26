@@ -33,7 +33,7 @@ struct QueryParams
 struct QueryArg
 {
     Oid type = 0;
-    private ubyte[] valueBin;
+    package ubyte[] valueBin;
     
     /// s can be null for SQL NULL value
     @property void value( string s )
@@ -63,7 +63,8 @@ unittest
 
 /// Connection
 // Inheritance used here for separation of query code from connection code
-class Connection: BaseConnection
+//class Connection: BaseConnection
+mixin template Queries()
 {
     /// Perform SQL query to DB
     immutable (Answer) exec( string SQLcmd )
@@ -264,9 +265,7 @@ enum WaitType
 
 void _integration_test( string connParam )
 {
-    auto conn = new Connection;
-	conn.connString = connParam;
-    conn.connect();
+    auto conn = new Connection(connParam);
 
     {    
         string sql_query =
@@ -355,7 +354,8 @@ void _integration_test( string connParam )
         assert(res[0].getAnswer[0][1].as!PGinteger == 123456);
     }
 
-    conn.disconnect();
+    import std.socket;
+    conn.socket.shutdown(SocketShutdown.BOTH); // breaks connection
 
     {
         bool exceptionFlag = false;

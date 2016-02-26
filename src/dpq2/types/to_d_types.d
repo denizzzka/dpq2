@@ -164,9 +164,7 @@ if( is( T == Json ) )
 
 public void _integration_test( string connParam )
 {
-    auto conn = new Connection;
-	conn.connString = connParam;
-    conn.connect();
+    auto conn = new Connection(connParam);
 
     QueryParams params;
     params.resultFormat = ValueFormat.BINARY;

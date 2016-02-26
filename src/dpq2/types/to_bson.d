@@ -165,9 +165,7 @@ void _integration_test( string connParam )
     import std.uuid;
     import std.datetime: SysTime, DateTime, UTC;
 
-    auto conn = new Connection;
-	conn.connString = connParam;
-    conn.connect();
+    auto conn = new Connection(connParam);
 
     // text answer tests
     {

@@ -28,10 +28,45 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
 /// BaseConnection
-package class BaseConnection
+package class Connection
 {
-    string connString; /// Database connection parameters
+    //string connString; /// Database connection parameters
     package PGconn* conn;
+
+    invariant
+    {
+        assert(conn !is null);
+    }
+
+    this(string S = "connect")(string connString)
+    if(S == "connect")
+    {
+        conn = PQconnectdb(toStringz(connString));
+
+        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+
+        if(status != CONNECTION_OK)
+            throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
+	/// Connect to DB in a nonblocking manner
+    this(string S)(string connString)
+    if(S == "connectStart")
+    {
+        conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
+
+        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+
+        if( status == CONNECTION_BAD )
+            throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
+    ~this()
+    {
+        PQfinish( conn );
+    }
+
+    mixin Queries;
 
     @property bool isNonBlocking()
     {
@@ -41,30 +76,6 @@ package class BaseConnection
     private void setNonBlocking( bool state )
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
-            throw new ConnectionException(this, __FILE__, __LINE__);
-    }
-    
-	/// Connect to DB
-    void connect()
-    {
-        assert(!conn);
-        
-        conn = PQconnectdb(toStringz(connString));
-        
-        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
-        
-        if( !isNonBlocking && status != CONNECTION_OK )
-            throw new ConnectionException(this, __FILE__, __LINE__);
-    }
-
-	/// Connect to DB in a nonblocking manner
-    void connectStart()
-    {
-        conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
-
-        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
-
-        if( status == CONNECTION_BAD )
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
@@ -91,13 +102,6 @@ package class BaseConnection
     ConnStatusType status() nothrow
     {
         return PQstatus(conn);
-    }
-
-	/// Disconnect from DB
-    void disconnect() nothrow
-    {
-        PQfinish( conn );
-        conn = null;
     }
 
     void consumeInput()
@@ -135,11 +139,6 @@ package class BaseConnection
     string errorMessage() const nothrow
     {
         return to!string(PQerrorMessage(cast(PGconn*) conn)); //TODO: need report to derelict pq
-    }
-
-    ~this()
-    {
-        disconnect();
     }
 
     /**
@@ -300,7 +299,7 @@ class Cancellation
 {
     private PGcancel* cancel;
 
-    this(BaseConnection c)
+    this(Connection c)
     {
         cancel = PQgetCancel(c.conn);
 
@@ -334,7 +333,7 @@ class CancellationException : Dpq2Exception
 /// Connection exception
 class ConnectionException : Dpq2Exception
 {
-    this(in BaseConnection c, string file, size_t line)
+    this(in Connection c, string file, size_t line)
     {
         super(c.errorMessage(), file, line);
     }
@@ -350,24 +349,16 @@ void _integration_test( string connParam )
     assert( PQlibVersion() >= 9_0100 );
 
     {
-        auto c = new BaseConnection;
-        c.connString = connParam;
-
-        c.connect();
-        c.disconnect();
-
-        c.connect();
-        c.disconnect();
+        auto c = new Connection(connParam);
 
         destroy(c);
     }
 
     {
         bool exceptionFlag = false;
-        auto c = new BaseConnection;
-        c.connString = "!!!some incorrect connection string!!!";
 
-        try c.connect();
+        try
+            auto c = new Connection("!!!some incorrect connection string!!!");
         catch(ConnectionException e)
         {
             exceptionFlag = true;
@@ -378,10 +369,7 @@ void _integration_test( string connParam )
     }
 
     {
-        auto c = new BaseConnection;
-        c.connString = connParam;
-
-        c.connect();
+        auto c = new Connection(connParam);
 
         assert(c.escapeLiteral("abc'def") == "'abc''def'");
         assert(c.escapeIdentifier("abc'def") == "\"abc'def\"");

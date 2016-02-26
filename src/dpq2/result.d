@@ -669,9 +669,7 @@ void _integration_test( string connParam )
 {
     import core.exception: AssertError;
 
-    auto conn = new Connection;
-	conn.connString = connParam;
-    conn.connect();
+    auto conn = new Connection(connParam);
 
     {
         string sql_query =
