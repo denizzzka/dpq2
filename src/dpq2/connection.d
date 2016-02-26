@@ -27,6 +27,9 @@ int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
+/// dumb flag for Connection ctor parametrization
+struct ConnectionStart {};
+
 /// BaseConnection
 package class Connection
 {
@@ -38,8 +41,7 @@ package class Connection
         assert(conn !is null);
     }
 
-    this(string S = "connect")(string connString)
-    if(S == "connect")
+    this(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
 
@@ -50,8 +52,7 @@ package class Connection
     }
 
 	/// Connect to DB in a nonblocking manner
-    this(string S)(string connString)
-    if(S == "connectStart")
+    this(ConnectionStart _unused, string connString)
     {
         conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
 
@@ -358,7 +359,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try
-            auto c = new Connection("!!!some incorrect connection string!!!");
+            auto c = new Connection(ConnectionStart(), "!!!some incorrect connection string!!!");
         catch(ConnectionException e)
         {
             exceptionFlag = true;
