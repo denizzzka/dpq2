@@ -31,7 +31,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 struct ConnectionStart {};
 
 /// BaseConnection
-package class Connection
+class Connection
 {
     //string connString; /// Database connection parameters
     package PGconn* conn;
@@ -52,7 +52,7 @@ package class Connection
     }
 
 	/// Connect to DB in a nonblocking manner
-    this(ConnectionStart _unused, string connString)
+    this(ConnectionStart, string connString)
     {
         conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
 
