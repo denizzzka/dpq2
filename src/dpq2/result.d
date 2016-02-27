@@ -800,10 +800,10 @@ void _integration_test( string connParam )
         {
             exceptionFlag = true;
             assert(e.msg.length > 20); // error message check
+
+            version(LDC) destroy(e); // before Derelict unloads its bindings (prevents SIGSEGV)
         }
         finally
             assert(exceptionFlag);
     }
-
-    version(LDC) destroy(conn); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
