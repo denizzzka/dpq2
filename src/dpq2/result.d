@@ -78,6 +78,12 @@ immutable class Result
         return to!string( PQresultErrorMessage(result) );
     }
 
+    @property
+    private string resultErrorField(int fieldcode)
+    {
+        return to!string( PQresultErrorField(cast(PGresult*)result, fieldcode) ); // FIXME: result should be a const
+    }
+
     immutable(Answer) getAnswer()
     {
         return new immutable Answer(result);
@@ -207,12 +213,6 @@ immutable class Answer : Result
             res ~= row.toString~newline;
 
         return super.toString~newline~res;
-    }
-
-    @property
-    private string resultErrorField(int fieldcode)
-    {
-        return to!string( PQresultErrorField(cast(PGresult*)result, fieldcode) ); // FIXME: result should be a const
     }
 
     private void assertCol( const size_t c )
