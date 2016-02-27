@@ -111,18 +111,8 @@ immutable class Answer : Result
             case PGRES_TUPLES_OK:
                 break;
 
-            case PGRES_EMPTY_QUERY:
-                throw new AnswerException(ExceptionType.EMPTY_QUERY,
-                    "Empty query", __FILE__, __LINE__);
-
-            case PGRES_FATAL_ERROR:
-                throw new AnswerException(ExceptionType.FATAL_ERROR,
-                    resultErrorMessage, __FILE__, __LINE__);
-
             default:
-                throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
-                    "Please report if you came across this error! status="~to!string(status)~": "~statusString~"\r\n"~
-                    resultErrorMessage, __FILE__, __LINE__);
+                throw new AnswerCreationException(this, __FILE__, __LINE__);
         }
     }
 
@@ -445,7 +435,7 @@ struct ArrayProperties
 
             // FIXME: What is lbound in postgresql array reply?
             if(!(lbound == 1))
-                throw new AnswerException(ExceptionType.UNDEFINED_FIXME,
+                throw new AnswerException(ExceptionType.FATAL_ERROR,
                     "Please report if you came across this error! lbound=="~to!string(lbound),
                     __FILE__, __LINE__
                 );
@@ -619,21 +609,34 @@ class Notify
     }
 }
 
-/// Exception types
+/// Answer creation exception
+/// Useful for analyze error data
+class AnswerCreationException : Dpq2Exception
+{
+    immutable(Result) result;
+    alias result this;
+
+    this(immutable(Result) result, string file, size_t line)
+    {
+        this.result = result;
+
+        super(result.resultErrorMessage(), file, line);
+    }
+}
+
+/// Answer exception types
 enum ExceptionType
 {
-    UNDEFINED_FIXME, /// Undefined, please report if you came across this error
     FATAL_ERROR,
-    EMPTY_QUERY,
     COLUMN_NOT_FOUND, /// Column is not found
     OUT_OF_RANGE
 }
 
 /// Exception
 class AnswerException : Dpq2Exception
-{    
+{
     const ExceptionType type; /// Exception type
-    
+
     this(ExceptionType t, string msg, string file, size_t line) pure
     {
         type = t;
@@ -646,7 +649,6 @@ package immutable msg_NOT_BINARY = "Format of the column is not binary";
 /// Conversion exception types
 enum ConvExceptionType
 {
-    UNDEFINED_FIXME, /// Undefined, please report if you came across this error
     NOT_ARRAY, /// Format of the column isn't array
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
@@ -796,7 +798,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try conn.exec("WRONG SQL QUERY");
-        catch(AnswerException e)
+        catch(AnswerCreationException e)
         {
             exceptionFlag = true;
             assert(e.msg.length > 20); // error message check
