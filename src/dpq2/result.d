@@ -79,7 +79,7 @@ immutable class Result
     }
 
     @property
-    private string resultErrorField(int fieldcode)
+    string resultErrorField(int fieldcode)
     {
         return to!string( PQresultErrorField(cast(PGresult*)result, fieldcode) ); // FIXME: result should be a const
     }
