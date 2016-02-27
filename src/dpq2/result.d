@@ -792,8 +792,6 @@ void _integration_test( string connParam )
             assert(exceptionFlag);
     }
 
-    destroy(r);
-
     {
         bool exceptionFlag = false;
 
@@ -806,4 +804,6 @@ void _integration_test( string connParam )
         finally
             assert(exceptionFlag);
     }
+
+    version(LDC) destroy(conn); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
