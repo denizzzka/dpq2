@@ -507,6 +507,13 @@ immutable struct Array
 
     /// Returns Value struct by index
     /// Useful for one-dimensional arrays
+    immutable (Nullable!Value) opIndex(size_t n)
+    {
+        return opIndex(n.to!int);
+    }
+
+    /// Returns Value struct by index
+    /// Useful for one-dimensional arrays
     immutable (Nullable!Value) opIndex(int n)
     {
         return getValue(n);
