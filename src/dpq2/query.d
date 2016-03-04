@@ -17,7 +17,7 @@ struct QueryParams
     QueryArg[] args; /// SQL command arguments
     ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
 
-    @property void argsFromArray(string[] arr)
+    @property void argsFromArray(in string[] arr)
     {
         args.length = arr.length;
 
@@ -36,7 +36,7 @@ struct QueryArg
     package ubyte[] valueBin;
     
     /// s can be null for SQL NULL value
-    @property void value( string s )
+    @property void value(in string s)
     {
         if( s == null )
             valueBin = null;
