@@ -254,6 +254,12 @@ class Connection
     {
         PQuntrace(conn);
     }
+
+    void setClientEncoding(string encoding)
+    {
+        if(PQsetClientEncoding(conn, cast(char*) encoding.toStringz) != 0) //TODO: need report to derelict pq
+            throw new ConnectionException(this, __FILE__, __LINE__);
+    }
 }
 
 void connStringCheck(string connString)
@@ -374,5 +380,6 @@ void _integration_test( string connParam )
 
         assert(c.escapeLiteral("abc'def") == "'abc''def'");
         assert(c.escapeIdentifier("abc'def") == "\"abc'def\"");
+        c.setClientEncoding("UTF8");
     }
 }
