@@ -380,6 +380,8 @@ void _integration_test( string connParam )
 
         assert(c.escapeLiteral("abc'def") == "'abc''def'");
         assert(c.escapeIdentifier("abc'def") == "\"abc'def\"");
-        c.setClientEncoding("UTF8");
+
+        c.setClientEncoding("WIN866");
+        assert(c.exec("show client_encoding")[0][0].as!string == "WIN866");
     }
 }
