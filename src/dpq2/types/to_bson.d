@@ -1,5 +1,7 @@
 ﻿module dpq2.types.to_bson;
 
+@trusted:
+
 import dpq2;
 
 import vibe.data.bson;

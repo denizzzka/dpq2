@@ -1,5 +1,7 @@
 ﻿module dpq2.types.to_d_types;
 
+@trusted:
+
 import dpq2;
 
 import dpq2.types.numeric: rawValueToNumeric;
