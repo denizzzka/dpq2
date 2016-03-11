@@ -122,22 +122,22 @@ class Connection
         return r == 0;
     }
 
-    socket_t posixSocket()
+    int posixSocket()
     {
-        import core.sys.posix.unistd: dup;
-
-        auto r = PQsocket(conn);
+        int r = PQsocket(conn);
 
         if(r == -1)
             throw new ConnectionException(this, __FILE__, __LINE__);
 
-        socket_t socket = cast(socket_t) r;
-        return cast(socket_t) dup(socket);
+        return r;
     }
 
     Socket socket()
     {
-        return new Socket(posixSocket, AddressFamily.UNSPEC);
+        import core.sys.posix.unistd: dup;
+
+        socket_t s = cast(socket_t) dup(cast(socket_t) posixSocket);
+        return new Socket(s, AddressFamily.UNSPEC);
     }
 
     string errorMessage() const nothrow
