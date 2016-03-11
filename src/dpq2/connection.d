@@ -122,7 +122,7 @@ class Connection
         return r == 0;
     }
 
-    Socket socket()
+    socket_t posixSocket()
     {
         import core.sys.posix.unistd: dup;
 
@@ -132,9 +132,12 @@ class Connection
             throw new ConnectionException(this, __FILE__, __LINE__);
 
         socket_t socket = cast(socket_t) r;
-        socket_t duplicate = cast(socket_t) dup(socket);
+        return cast(socket_t) dup(socket);
+    }
 
-        return new Socket(duplicate, AddressFamily.UNSPEC);
+    Socket socket()
+    {
+        return new Socket(posixSocket, AddressFamily.UNSPEC);
     }
 
     string errorMessage() const nothrow
