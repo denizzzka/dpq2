@@ -1,6 +1,8 @@
 ﻿module dpq2.query;
 
-@trusted:
+@safe:
+
+public import dpq2.args;
 
 import dpq2;
 import core.time: Duration;
@@ -8,57 +10,6 @@ import core.time: Duration;
 enum ValueFormat : ubyte {
     TEXT,
     BINARY
-}
-
-/// Query parameters
-struct QueryParams
-{
-    string sqlCommand; /// SQL command
-    QueryArg[] args; /// SQL command arguments
-    ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
-
-    @property void argsFromArray(in string[] arr)
-    {
-        args.length = arr.length;
-
-        foreach(i, ref a; args)
-            a.value = arr[i];
-    }
-
-    @property string preparedStatementName() const { return sqlCommand; }
-    @property void preparedStatementName(string s){ sqlCommand = s; }
-}
-
-/// Query argument
-struct QueryArg
-{
-    Oid type = 0;
-    package ubyte[] valueBin;
-    
-    /// s can be null for SQL NULL value
-    @property void value(in string s)
-    {
-        if( s == null )
-            valueBin = null;
-        else
-            valueBin = cast(ubyte[])( s ~ '\0' );
-    }
-
-    /// can return null value for SQL NULL value
-    @property string value()
-    {
-        return to!string((cast(char*) valueBin).fromStringz);
-    }
-}
-
-unittest
-{
-    immutable s = "test string";
-
-    QueryArg q;
-    q.value = s;
-
-    assert(q.value == s);
 }
 
 mixin template Queries()
@@ -260,7 +211,7 @@ enum WaitType
     READ_WRITE
 }
 
-void _integration_test( string connParam )
+void _integration_test( string connParam ) @trusted
 {
     auto conn = new Connection(connParam);
 
