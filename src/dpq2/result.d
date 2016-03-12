@@ -13,7 +13,6 @@ import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
-import std.typecons: Nullable;
 import std.conv: ConvException;
 
 /// Result table's cell coordinates 
@@ -296,25 +295,20 @@ immutable struct Row
         return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
     }
 
-    immutable (Nullable!Value) opIndex(in size_t col)
+    immutable (Value) opIndex(in size_t col)
     {
         answer.assertCoords( Coords( row, col ) );
 
         auto v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
         auto s = size( col );
 
-        Nullable!Value r;
-
-        if(!isNULL(col))
-        {
-            // it is legal to cast here because immutable value will be returned
-            r = Value(cast(ubyte[]) v[0..s], answer.OID(col), answer.columnFormat(col));
-        }
+        // it is legal to cast here because immutable value will be returned
+        Value r = Value(cast(ubyte[]) v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
 
         return cast(immutable) r;
     }
     
-    immutable (Nullable!Value) opIndex(in string column)
+    immutable (Value) opIndex(in string column)
     {
         return opIndex(columnNum(column));
     }
@@ -345,18 +339,34 @@ immutable struct Row
     }
 }
 
-/// Link to the cell of the answer table
-struct Value // TODO: better to make it immutable, but Nullable don't allow use it with const or immutable
+/// Answer table cell data
+struct Value // TODO: try to make this struct immutable
 {
-    package ValueFormat format;
-    package OidType oidType;
-    package ubyte[] value;
+    bool isNull = true;
+    OidType oidType;
 
-    this(ubyte[] value, in OidType t, in ValueFormat f = ValueFormat.BINARY) pure
+    package ValueFormat format;
+    package ubyte[] data;
+
+    this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
     {
-        this.value = value;
-        format = f;
-        oidType = t;
+        this.data = data;
+        this.format = format;
+        this.oidType = oidType;
+        this.isNull = isNull;
+    }
+
+    @property inout (Value) get() inout // TODO: remove it, old Nullable compatibility
+    {
+        return this;
+    }
+
+    @property
+    inout (ubyte[]) value() pure inout // TODO: rename it to "data"
+    {
+        assert(!isNull, "Attempt to read NULL value");
+
+        return data;
     }
 
     @property
@@ -378,7 +388,7 @@ struct Value // TODO: better to make it immutable, but Nullable don't allow use 
     }
 }
 
-debug string toString(immutable (Nullable!Value) v)
+debug string toString(immutable Value v)
 {
     return v.isNull ? "NULL" : v.toBson.toString;
 }
@@ -507,31 +517,26 @@ immutable struct Array
 
     /// Returns Value struct by index
     /// Useful for one-dimensional arrays
-    immutable (Nullable!Value) opIndex(size_t n)
+    immutable (Value) opIndex(size_t n)
     {
         return opIndex(n.to!int);
     }
 
     /// Returns Value struct by index
     /// Useful for one-dimensional arrays
-    immutable (Nullable!Value) opIndex(int n)
+    immutable (Value) opIndex(int n)
     {
         return getValue(n);
     }
     
     /// Returns Value struct
     /// Useful for multidimensional arrays
-    immutable (Nullable!Value) getValue( ... )
+    immutable (Value) getValue( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
         
-        Nullable!Value r;
-
-        if(!elementIsNULL[n])
-        {
-            // it is legal to cast here because immutable value will be returned
-            r = Value(cast(ubyte[]) elements[n], OID);
-        }
+        // it is legal to cast here because immutable value will be returned
+        Value r = Value(cast(ubyte[]) elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
 
         return cast(immutable) r;
     }
@@ -714,7 +719,7 @@ void _integration_test( string connParam )
               
               "[[13,14,NULL], "~
                "[16,17,18]]]::integer[] as test_array, "~
-        "NULL,"~
+        "NULL::smallint,"~
         "array[11,22,NULL,44]::integer[] as small_array, "~
         "array['1','23',NULL,'789A']::text[] as text_array, "~
         "array[]::text[] as empty_array";
@@ -747,10 +752,22 @@ void _integration_test( string connParam )
         assert( r[0]["text_array"].asArray.length == 4 );
         assert( r[0]["test_array"].asArray.length == 18 );
 
+        // Access to NULL cell
         {
             bool isNullFlag = false;
             try
                 cast(void) r[0][4].as!PGsmallint;
+            catch(AssertError)
+                isNullFlag = true;
+            finally
+                assert(isNullFlag);
+        }
+
+        // Access to NULL array element
+        {
+            bool isNullFlag = false;
+            try
+                cast(void) r[0]["small_array"].asArray[2].as!PGinteger;
             catch(AssertError)
                 isNullFlag = true;
             finally

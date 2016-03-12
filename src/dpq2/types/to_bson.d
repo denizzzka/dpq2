@@ -9,21 +9,19 @@ import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
 
 @property
-Bson toBson(immutable (Nullable!Value) v, immutable TimeZone tz = null)
-{
-    if(v.isNull)
-        return Bson(null);
-    else
-        return toBson(v.get, tz);
-}
-
-@property
 Bson toBson(in Value v, immutable TimeZone tz = null)
 {
-    if(v.isSupportedArray)
-        return arrayValueToBson(v, tz);
+    if(v.isNull)
+    {
+        return Bson(null);
+    }
     else
-        return rawValueToBson(v, tz);
+    {
+        if(v.isSupportedArray)
+            return arrayValueToBson(v, tz);
+        else
+            return rawValueToBson(v, tz);
+    }
 }
 
 private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: ref Value should be used
@@ -62,7 +60,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: re
                 }
                 else
                 {
-                    auto v = Value(cast(ubyte[]) cell.value[curr_offset .. curr_offset + size], ap.OID);
+                    auto v = Value(cast(ubyte[]) cell.value[curr_offset .. curr_offset + size], ap.OID, false);
                     b = v.toBson(tz);
                 }
 
@@ -196,7 +194,7 @@ void _integration_test( string connParam )
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
             auto answer = conn.exec(params);
 
-            immutable (Nullable!Value) v = answer[0][0];
+            immutable Value v = answer[0][0];
             Bson bsonRes = toBson(v, UTC());
 
             if(v.isNull || !v.isSupportedArray) // standalone

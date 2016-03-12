@@ -149,7 +149,7 @@ if( is( T == Json ) )
     {
         case OidType.Json:
             // represent value as text and parse it into Json
-            auto t = Value(cast(ubyte[]) v.value, OidType.Text);
+            auto t = Value(cast(ubyte[]) v.value, OidType.Text, false);
             res = parseJsonString(t.as!PGtext);
             break;
 
