@@ -356,11 +356,6 @@ struct Value // TODO: try to make this struct immutable
         this.isNull = isNull;
     }
 
-    @property inout (Value) get() inout // TODO: remove it, old Nullable compatibility
-    {
-        return this;
-    }
-
     @property
     inout (ubyte[]) value() pure inout // TODO: rename it to "data"
     {
