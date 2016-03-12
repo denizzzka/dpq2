@@ -3,6 +3,7 @@
 @trusted:
 
 import dpq2;
+import vibe.data.bson;
 
 /// Query parameters
 struct QueryParams
@@ -38,10 +39,28 @@ struct QueryArg
             valueBin = cast(ubyte[])( s ~ '\0' );
     }
 
-    /// can return null value for SQL NULL value
+    /// Can return null value for SQL NULL value
     @property string value()
     {
         return to!string((cast(char*) valueBin).fromStringz);
+    }
+
+    /// Accepts Bson array as Postgres array argument
+    @property void value(in Bson b)
+    {
+        if(b.isNull)
+        {
+            valueBin = null;
+        }
+        else
+        {
+            assert(b.type == Bson.Type.array, "Bson value should be array type");
+
+            foreach(elem; b)
+            {
+
+            }
+        }
     }
 }
 
@@ -53,4 +72,16 @@ unittest
     q.value = s;
 
     assert(q.value == s);
+}
+
+private OidType convType(Bson.Type bt)
+{
+    switch(bt)
+    {
+        case Bson.Type.string:
+            return OidType.Text;
+
+        default:
+            assert(false, "Can't convert Bson type "~bt.to!string~" to Oid type");
+    }
 }
