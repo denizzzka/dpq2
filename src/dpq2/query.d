@@ -237,7 +237,7 @@ void _integration_test( string connParam ) @trusted
 
         import dpq2.types.from_d_types;
 
-        QueryArg[4] args;
+        Value[4] args;
         args[0] = toValue("абвгд");
         args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
         args[2] = toValue("123");

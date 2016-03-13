@@ -10,7 +10,7 @@ import dpq2.types.from_d_types;
 struct QueryParams
 {
     string sqlCommand; /// SQL command
-    QueryArg[] args; /// SQL command arguments
+    Value[] args; /// SQL command arguments
     ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
 
     @property void argsFromArray(in string[] arr)
@@ -25,15 +25,12 @@ struct QueryParams
     @property void preparedStatementName(string s){ sqlCommand = s; }
 }
 
-alias QueryArg = Value; // TODO: remove it
-
 unittest
 {
-    immutable s = "test string";
+    string s = "test string";
+    Value v = toValue(s);
 
-    QueryArg q = toValue(s);
-
-    assert(q.as!string == s);
+    assert(v.as!string == s);
 }
 
 private OidType convType(Bson.Type bt)
