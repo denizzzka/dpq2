@@ -24,45 +24,7 @@ struct QueryParams
     @property void preparedStatementName(string s){ sqlCommand = s; }
 }
 
-/// Query argument
-struct QueryArg
-{
-    Oid type = 0;
-    package ubyte[] valueBin;
-    
-    /// s can be null for SQL NULL value
-    @property void value(in string s)
-    {
-        if( s == null )
-            valueBin = null;
-        else
-            valueBin = cast(ubyte[])( s ~ '\0' );
-    }
-
-    /// Can return null value for SQL NULL value
-    @property string value()
-    {
-        return to!string((cast(char*) valueBin).fromStringz);
-    }
-
-    /// Accepts Bson array as Postgres array argument
-    @property void value(in Bson b)
-    {
-        if(b.isNull)
-        {
-            valueBin = null;
-        }
-        else
-        {
-            assert(b.type == Bson.Type.array, "Bson value should be array type");
-
-            foreach(elem; b)
-            {
-
-            }
-        }
-    }
-}
+alias QueryArg = Value; // TODO: remove it
 
 unittest
 {

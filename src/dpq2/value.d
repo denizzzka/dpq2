@@ -30,6 +30,14 @@ struct Value
     }
 
     @property
+    void value(string s) pure // TODO: temporary, remove it
+    {
+        import dpq2.types.from_d_types;
+
+        this = toValue(s);
+    }
+
+    @property
     bool isSupportedArray() const
     {
         return dpq2.oids.isSupportedArray(oidType);

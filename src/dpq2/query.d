@@ -111,10 +111,10 @@ mixin template Queries()
         
         for( int i = 0; i < p.args.length; ++i )
         {
-            a.types[i] = p.args[i].type;
-            a.formats[i] = ValueFormat.TEXT;
-            a.values[i] = p.args[i].valueBin.ptr;
-            a.lengths[i] = p.args[i].valueBin.length;
+            a.types[i] = p.args[i].oidType;
+            a.formats[i] = p.args[i].format;
+            a.values[i] = p.args[i].data.ptr;
+            a.lengths[i] = p.args[i].data.length;
         }
         
         return a;

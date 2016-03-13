@@ -30,7 +30,7 @@ unittest
     }
 }
 
-Value toValue(T)(T v) @trusted
+public Value toValue(T)(T v) @trusted // FIXME: must be a package access modifier
 if(is(T == string))
 {
     ubyte[] buf = cast(ubyte[]) v;
