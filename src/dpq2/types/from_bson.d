@@ -36,7 +36,7 @@ Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
         default:
             throw new AnswerConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column ("~v.type.to!(immutable(char)[])~") doesn't supported by Bson converter",
+                    "Format of the column ("~v.type.to!(immutable(char)[])~") doesn't supported by Bson to Value converter",
                     __FILE__, __LINE__
                 );
     }
