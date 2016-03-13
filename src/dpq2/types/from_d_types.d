@@ -1,6 +1,6 @@
 module dpq2.types.from_d_types;
 
-@trusted:
+@safe:
 package:
 
 import dpq2;
@@ -30,7 +30,7 @@ unittest
     }
 }
 
-Value toValue(T)(T v)
+Value toValue(T)(T v) @trusted
 if(is(T == string))
 {
     ubyte[] buf = cast(ubyte[]) v;
