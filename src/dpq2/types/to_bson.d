@@ -192,7 +192,7 @@ void _integration_test( string connParam )
         void testIt(Bson bsonValue, string pgType, string pgValue)
         {
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
-            auto answer = conn.exec(params);
+            auto answer = conn.execParams(params);
 
             immutable Value v = answer[0][0];
             Bson bsonRes = toBson(v, UTC());

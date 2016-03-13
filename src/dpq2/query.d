@@ -21,7 +21,7 @@ mixin template Queries()
     }
     
     /// Perform SQL query to DB
-    immutable (Answer) exec(ref QueryParams p)
+    immutable (Answer) execParams(ref QueryParams p)
     {
         auto pgResult = PQexecParams (
                 conn,
@@ -48,7 +48,7 @@ mixin template Queries()
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQuery(ref QueryParams p)
+    void sendQueryParams(ref QueryParams p)
     {
         size_t r = PQsendQueryParams (
                 conn,
@@ -209,7 +209,7 @@ void _integration_test( string connParam ) @trusted
         p.sqlCommand = sql_query;
         p.args = args[];
 
-        auto a = conn.exec( p );
+        auto a = conn.execParams( p );
 
         assert( a.columnFormat(0) == ValueFormat.BINARY );
         assert( a.columnFormat(1) == ValueFormat.BINARY );

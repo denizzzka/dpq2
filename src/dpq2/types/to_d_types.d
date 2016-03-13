@@ -175,7 +175,7 @@ public void _integration_test( string connParam )
         void testIt(T)(T nativeValue, string pgType, string pgValue)
         {
             params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as d_type_test_value";
-            auto answer = conn.exec(params);
+            auto answer = conn.execParams(params);
             immutable Value v = answer[0][0];
             auto result = v.as!T;
 

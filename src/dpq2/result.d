@@ -688,7 +688,7 @@ void _integration_test( string connParam )
         "array['1','23',NULL,'789A']::text[] as text_array, "~
         "array[]::text[] as empty_array";
 
-    auto r = conn.exec( p );
+    auto r = conn.execParams(p);
 
     {
         assert( r[0].isNULL(4) );
@@ -749,7 +749,7 @@ void _integration_test( string connParam )
     assert( conn.getResult() is null ); // removes null answer at the end
 
     // Async query test 2
-    conn.sendQuery( p );
+    conn.sendQueryParams(p);
     while( conn.getResult() !is null ){}
     assert( conn.getResult() is null ); // removes null answer at the end
 
