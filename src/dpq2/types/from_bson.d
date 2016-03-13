@@ -30,6 +30,10 @@ Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
             ret = v.get!double.toValue;
             break;
 
+        case Bson.Type.string:
+            ret = v.get!(immutable(char)[]).toValue;
+            break;
+
         default:
             throw new AnswerConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
@@ -43,8 +47,17 @@ Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
 
 unittest
 {
-    Value v1 = bsonToValue(Bson(123));
-    Value v2 = (123).toValue;
+    {
+        Value v1 = bsonToValue(Bson(123));
+        Value v2 = (123).toValue;
 
-    assert(v1.as!int == v2.as!int);
+        assert(v1.as!int == v2.as!int);
+    }
+
+    {
+        Value v1 = bsonToValue(Bson("Test string"));
+        Value v2 = ("Test string").toValue;
+
+        assert(v1.as!string == v2.as!string);
+    }
 }
