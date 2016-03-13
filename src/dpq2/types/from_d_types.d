@@ -30,10 +30,26 @@ unittest
     }
 }
 
+Value toValue(T)(T v)
+if(is(T == string))
+{
+    ubyte[] buf = cast(ubyte[]) v;
+    return Value(buf, v.detectOidType, false, ValueFormat.BINARY);
+}
+
+unittest
+{
+    Value v = toValue("Test string");
+
+    assert(v.oidType == OidType.Text);
+    assert(v.as!string == "Test string");
+}
+
 private OidType detectOidType(T)(T v)
 {
     with(OidType)
     {
+        static if(is(T == string)){ return Text; } else
         static if(is(T == short)){ return Int2; } else
         static if(is(T == int)){ return Int4; } else
         static if(is(T == long)){ return Int8; } else

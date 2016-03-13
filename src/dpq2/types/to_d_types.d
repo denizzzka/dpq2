@@ -72,7 +72,7 @@ package:
 
 @property string valueAsString(in Value v) pure
 {
-    return to!string( cast(const(char[])) v.value );
+    return (cast(const(char[])) v.value).to!string;
 }
 
 /// Returns value as bytes from binary formatted field
