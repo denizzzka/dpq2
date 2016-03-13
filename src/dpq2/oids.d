@@ -7,6 +7,8 @@
 
 module dpq2.oids;
 
+@safe:
+
 import derelict.pq.pq: Oid;
 
 package OidType oid2oidType(Oid oid) pure

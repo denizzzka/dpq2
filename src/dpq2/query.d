@@ -7,11 +7,6 @@ public import dpq2.args;
 import dpq2;
 import core.time: Duration;
 
-enum ValueFormat : ubyte {
-    TEXT,
-    BINARY
-}
-
 mixin template Queries()
 {
     /// Perform SQL query to DB

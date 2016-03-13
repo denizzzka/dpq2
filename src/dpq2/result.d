@@ -5,6 +5,7 @@
 public import dpq2.types.to_d_types;
 public import dpq2.types.to_bson;
 public import dpq2.oids;
+public import dpq2.value;
 
 import dpq2;
 
@@ -339,48 +340,16 @@ immutable struct Row
     }
 }
 
-/// Answer table cell data
-struct Value // TODO: try to make this struct immutable
+@property
+immutable (Array) asArray(immutable(Value) v)
 {
-    bool isNull = true;
-    OidType oidType;
+    if(!v.isSupportedArray)
+        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
+            "Format of the column is "~to!string(v.oidType)~", isn't supported array",
+            __FILE__, __LINE__
+        );
 
-    package ValueFormat format;
-    package ubyte[] data;
-
-    this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
-    {
-        this.data = data;
-        this.format = format;
-        this.oidType = oidType;
-        this.isNull = isNull;
-    }
-
-    @property
-    inout (ubyte[]) value() pure inout // TODO: rename it to "data"
-    {
-        assert(!isNull, "Attempt to read NULL value");
-
-        return data;
-    }
-
-    @property
-    bool isSupportedArray() const
-    {
-        return dpq2.oids.isSupportedArray(oidType);
-    }
-
-    @property
-    immutable (Array) asArray() immutable
-    {
-        if(!isSupportedArray)
-            throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
-                "Format of the column is "~to!string(oidType)~", isn't supported array",
-                __FILE__, __LINE__
-            );
-
-        return immutable Array(this);
-    }
+    return immutable Array(v);
 }
 
 debug string toString(immutable Value v)
