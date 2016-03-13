@@ -51,7 +51,7 @@ if(is(T == string))
             throwTypeComplaint(v.oidType, "string, numeric or json", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
-            return rawValueToNumeric(v.value);
+            return rawValueToNumeric(v.data);
     }
 
     return valueAsString(v);
@@ -72,7 +72,7 @@ package:
 
 @property string valueAsString(in Value v) pure
 {
-    return (cast(const(char[])) v.value).to!string;
+    return (cast(const(char[])) v.data).to!string;
 }
 
 /// Returns value as bytes from binary formatted field
@@ -82,7 +82,7 @@ if( is( T == const(ubyte[]) ) )
     if(!(v.oidType == OidType.ByteArray))
         throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
 
-    return v.value;
+    return v.data;
 }
 
 /// Returns cell value as native integer or decimal values
@@ -99,13 +99,13 @@ if( isNumeric!(T) )
         if(!isNativeFloat(v.oidType))
             throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
 
-    if(!(v.value.length == T.sizeof))
+    if(!(v.data.length == T.sizeof))
         throw new AE(ET.SIZE_MISMATCH,
-            to!string(v.oidType)~" length ("~to!string(v.value.length)~") isn't equal to native D type "~
+            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
                 to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
             __FILE__, __LINE__);
 
-    ubyte[T.sizeof] s = v.value[0..T.sizeof];
+    ubyte[T.sizeof] s = v.data[0..T.sizeof];
     return bigEndianToNative!(T)(s);
 }
 
@@ -116,12 +116,12 @@ if( is( T == UUID ) )
     if(!(v.oidType == OidType.UUID))
         throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
 
-    if(!(v.value.length == 16))
+    if(!(v.data.length == 16))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
 
     UUID r;
-    r.data = v.value;
+    r.data = v.data;
     return r;
 }
 
@@ -132,11 +132,11 @@ if( is( T == bool ) )
     if(!(v.oidType == OidType.Bool))
         throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
 
-    if(!(v.value.length == 1))
+    if(!(v.data.length == 1))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
 
-    return v.value[0] != 0;
+    return v.data[0] != 0;
 }
 
 /// Returns Vibe.d's Json
@@ -149,7 +149,7 @@ if( is( T == Json ) )
     {
         case OidType.Json:
             // represent value as text and parse it into Json
-            auto t = Value(cast(ubyte[]) v.value, OidType.Text, false);
+            auto t = Value(cast(ubyte[]) v.data, OidType.Text, false);
             res = parseJsonString(t.as!PGtext);
             break;
 

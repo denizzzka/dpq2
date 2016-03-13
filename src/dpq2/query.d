@@ -113,8 +113,12 @@ mixin template Queries()
         {
             a.types[i] = p.args[i].oidType;
             a.formats[i] = p.args[i].format;
-            a.values[i] = p.args[i].data.ptr;
-            a.lengths[i] = p.args[i].data.length;
+
+            if(!p.args[i].isNull)
+            {
+                a.lengths[i] = p.args[i].data.length;
+                a.values[i] = p.args[i].data.ptr;
+            }
         }
         
         return a;
@@ -229,12 +233,15 @@ void _integration_test( string connParam ) @trusted
 
     {
         const string sql_query =
-        "select $1::text, $2::integer, $3::text";
+        "select $1::text, $2::integer, $3::text, $4";
 
-        QueryArg[3] args;
-        args[0].value = "абвгд";
-        args[1].value = null;
-        args[2].value = "123";
+        import dpq2.types.from_d_types;
+
+        QueryArg[4] args;
+        args[0] = toValue("абвгд");
+        args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
+        args[2] = toValue("123");
+        args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
 
         QueryParams p;
         p.sqlCommand = sql_query;
@@ -242,8 +249,15 @@ void _integration_test( string connParam ) @trusted
 
         auto a = conn.exec( p );
 
+        assert( a.columnFormat(0) == ValueFormat.BINARY );
         assert( a.columnFormat(1) == ValueFormat.BINARY );
         assert( a.columnFormat(2) == ValueFormat.BINARY );
+        assert( a.columnFormat(3) == ValueFormat.BINARY );
+
+        assert( a.OID(0) == OidType.Text );
+        assert( a.OID(1) == OidType.Int4 );
+        assert( a.OID(2) == OidType.Text );
+        assert( a.OID(3) == OidType.Int8 );
 
         destroy(a);
     }

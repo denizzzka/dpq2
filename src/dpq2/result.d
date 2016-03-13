@@ -152,7 +152,7 @@ immutable class Answer : Result
     {
         assertCol( colNum );
 
-        return oid2oidType(PQftype(result, to!int(colNum)));
+        return PQftype(result, to!int(colNum)).oid2oidType;
     }
 
     @property bool isSupportedArray( const size_t colNum )
@@ -379,7 +379,7 @@ struct ArrayProperties
 
     this(in Value cell)
     {
-        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.value.ptr;
+        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
         int nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
@@ -451,7 +451,7 @@ immutable struct Array
             for(uint i = 0; i < nElems; ++i )
             {
                 ubyte[int.sizeof] size_net; // network byte order
-                size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
                 uint size = bigEndianToNative!uint( size_net );
                 if( size == size.max ) // NULL magic number
                 {
@@ -463,7 +463,7 @@ immutable struct Array
                     elementIsNULL[i] = false;
                 }
                 curr_offset += size_net.sizeof;
-                elements[i] = cell.value[curr_offset .. curr_offset + size];
+                elements[i] = cell.data[curr_offset .. curr_offset + size];
                 curr_offset += size;
             }
 

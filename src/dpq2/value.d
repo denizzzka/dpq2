@@ -8,33 +8,32 @@ import dpq2.oids;
 struct Value
 {
     bool isNull = true;
-    OidType oidType;
+    OidType oidType = OidType.Undefined;
 
     package ValueFormat format;
-    package ubyte[] data;
+    private ubyte[] _data;
 
     this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
     {
-        this.data = data;
+        this._data = data;
         this.format = format;
         this.oidType = oidType;
         this.isNull = isNull;
     }
 
-    @property
-    inout (ubyte[]) value() pure inout // TODO: rename it to "data"
+    /// Null Value constructor
+    this(in ValueFormat format, in OidType oidType) pure
     {
-        assert(!isNull, "Attempt to read NULL value");
-
-        return data;
+        this.format = format;
+        this.oidType = oidType;
     }
 
     @property
-    void value(string s) pure // TODO: temporary, remove it
+    inout (ubyte[]) data() pure inout
     {
-        import dpq2.types.from_d_types;
+        assert(!isNull, "Attempt to read NULL value");
 
-        this = toValue(s);
+        return _data;
     }
 
     @property

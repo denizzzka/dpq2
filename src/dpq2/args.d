@@ -4,6 +4,7 @@
 
 import dpq2;
 import vibe.data.bson;
+import dpq2.types.from_d_types;
 
 /// Query parameters
 struct QueryParams
@@ -17,7 +18,7 @@ struct QueryParams
         args.length = arr.length;
 
         foreach(i, ref a; args)
-            a.value = arr[i];
+            a = toValue(arr[i]);
     }
 
     @property string preparedStatementName() const { return sqlCommand; }
@@ -30,10 +31,9 @@ unittest
 {
     immutable s = "test string";
 
-    QueryArg q;
-    q.value = s;
+    QueryArg q = toValue(s);
 
-    assert(q.value == s);
+    assert(q.as!string == s);
 }
 
 private OidType convType(Bson.Type bt)

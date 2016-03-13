@@ -78,6 +78,8 @@ bool isSupportedArray(OidType t) pure
 
 enum OidType : Oid
 {
+    Undefined = 0,
+
     Bool = 16,
     ByteArray = 17,
     Char = 18,

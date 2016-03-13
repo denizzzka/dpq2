@@ -47,7 +47,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: re
             else
             {
                 ubyte[int.sizeof] size_net; // network byte order
-                size_net[] = cell.value[ curr_offset .. curr_offset + size_net.sizeof ];
+                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
                 uint size = bigEndianToNative!uint( size_net );
 
                 curr_offset += size_net.sizeof;
@@ -60,7 +60,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: re
                 }
                 else
                 {
-                    auto v = Value(cast(ubyte[]) cell.value[curr_offset .. curr_offset + size], ap.OID, false);
+                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
                     b = v.toBson(tz);
                 }
 
@@ -121,7 +121,7 @@ private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             break;
 
         case Numeric:
-            res = Bson(rawValueToNumeric(v.value));
+            res = Bson(rawValueToNumeric(v.data));
             break;
 
         case Text:
@@ -129,7 +129,7 @@ private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             break;
 
         case ByteArray:
-            auto b = BsonBinData(BsonBinData.Type.userDefined, v.value.idup);
+            auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
             res = Bson(b);
             break;
 

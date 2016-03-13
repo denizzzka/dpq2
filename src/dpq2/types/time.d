@@ -23,11 +23,11 @@ if( is( T == Date ) )
     if(!(v.oidType == OidType.Date))
         throwTypeComplaint(v.oidType, "Date", __FILE__, __LINE__);
 
-    if(!(v.value.length == uint.sizeof))
+    if(!(v.data.length == uint.sizeof))
         throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
 
-    int jd = bigEndianToNative!uint(v.value.ptr[0..uint.sizeof]);
+    int jd = bigEndianToNative!uint(v.data.ptr[0..uint.sizeof]);
     int year, month, day;
     j2date(jd, year, month, day);
 
@@ -41,11 +41,11 @@ if( is( T == TimeOfDay ) )
     if(!(v.oidType == OidType.Time))
         throwTypeComplaint(v.oidType, "time without time zone", __FILE__, __LINE__);
 
-    if(!(v.value.length == TimeADT.sizeof))
+    if(!(v.data.length == TimeADT.sizeof))
         throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
 
-    return time2tm(bigEndianToNative!TimeADT(v.value.ptr[0..TimeADT.sizeof]));
+    return time2tm(bigEndianToNative!TimeADT(v.data.ptr[0..TimeADT.sizeof]));
 }
 
 /// Returns value timestamp without time zone as TimeStampWithoutTZ
@@ -55,11 +55,11 @@ if( is( T == TimeStampWithoutTZ ) )
     if(!(v.oidType == OidType.TimeStamp))
         throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
 
-    if(!(v.value.length == long.sizeof))
+    if(!(v.data.length == long.sizeof))
         throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2nativeTime(bigEndianToNative!long(v.value.ptr[0..long.sizeof]));
+    return rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
 }
 
 struct TimeStampWithoutTZ
