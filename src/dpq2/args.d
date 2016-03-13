@@ -76,12 +76,6 @@ struct QueryParams
     }
 
     /// ditto
-    int paramResultFormat() pure
-    {
-        return resultFormat.to!int;
-    }
-
-    /// ditto
     const(Oid)* paramTypes() pure
     {
         prepareArgs();

@@ -31,7 +31,7 @@ mixin template Queries()
                 cast(const(ubyte)**) p.paramValues, //TODO: need report to derelict pq
                 cast(int*) p.paramLengths, //TODO: need report to derelict pq
                 cast(int*) p.paramFormats, //TODO: need report to derelict pq
-                p.paramResultFormat
+                p.resultFormat
         );
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
@@ -58,7 +58,7 @@ mixin template Queries()
                 cast(const(ubyte)**) p.paramValues, //TODO: need report to derelict pq
                 cast(int*) p.paramLengths, //TODO: need report to derelict pq
                 cast(int*) p.paramFormats, //TODO: need report to derelict pq
-                p.paramResultFormat
+                p.resultFormat
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
@@ -74,7 +74,7 @@ mixin template Queries()
                 cast(char**) p.paramValues, //TODO: need report to derelict pq
                 cast(int*) p.paramLengths, //TODO: need report to derelict pq
                 cast(int*) p.paramFormats, //TODO: need report to derelict pq
-                p.paramResultFormat
+                p.resultFormat
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
