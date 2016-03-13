@@ -3,7 +3,6 @@ module dpq2.value;
 @safe:
 
 import dpq2.oids;
-import dpq2.result: Array;
 
 /// Minimal Postgres value
 struct Value
