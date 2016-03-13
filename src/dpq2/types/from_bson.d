@@ -1,9 +1,8 @@
 module dpq2.types.from_bson;
 
 @trusted:
-package:
 
-import dpq2.types.from_d_types;
+import dpq2;
 import vibe.data.bson;
 
 /// Default type will be used for NULL values

@@ -235,8 +235,6 @@ void _integration_test( string connParam ) @trusted
         const string sql_query =
         "select $1::text, $2::integer, $3::text, $4";
 
-        import dpq2.types.from_d_types;
-
         Value[4] args;
         args[0] = toValue("абвгд");
         args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value

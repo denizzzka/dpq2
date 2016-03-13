@@ -2,9 +2,10 @@
 
 @trusted:
 
+public import dpq2.types.from_d_types;
+public import dpq2.types.from_bson;
+
 import dpq2;
-import vibe.data.bson;
-import dpq2.types.from_d_types;
 
 /// Query parameters
 struct QueryParams
@@ -31,16 +32,4 @@ unittest
     Value v = toValue(s);
 
     assert(v.as!string == s);
-}
-
-private OidType convType(Bson.Type bt)
-{
-    switch(bt)
-    {
-        case Bson.Type.string:
-            return OidType.Text;
-
-        default:
-            assert(false, "Can't convert Bson type "~bt.to!string~" to Oid type");
-    }
 }

@@ -1,7 +1,6 @@
 module dpq2.types.from_d_types;
 
 @safe:
-package:
 
 import dpq2;
 import std.bitmanip: nativeToBigEndian;
@@ -30,7 +29,7 @@ unittest
     }
 }
 
-public Value toValue(T)(T v) @trusted // FIXME: must be a package access modifier
+Value toValue(T)(T v) @trusted
 if(is(T == string))
 {
     ubyte[] buf = cast(ubyte[]) v;
