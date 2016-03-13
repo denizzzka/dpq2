@@ -87,38 +87,6 @@ mixin template Queries()
         auto n = PQnotifies(conn);
         return n is null ? null : new Notify( n );
     }
-    
-    private struct PreparedArgs // TODO: remove it and use QueryArgs instead
-    {
-        Oid[] types;
-        size_t[] formats;
-        size_t[] lengths;
-        const(ubyte)*[] values;
-    }
-    
-    // For PQxxxParams need especially prepared arguments
-    private static PreparedArgs* prepareArgs(in QueryParams p) pure
-    {
-        PreparedArgs* a = new PreparedArgs;
-        a.types = new Oid[p.args.length];
-        a.formats = new size_t[p.args.length];
-        a.lengths = new size_t[p.args.length];
-        a.values = new const(ubyte)*[p.args.length];
-        
-        for( int i = 0; i < p.args.length; ++i )
-        {
-            a.types[i] = p.args[i].oidType;
-            a.formats[i] = p.args[i].format;
-
-            if(!p.args[i].isNull)
-            {
-                a.lengths[i] = p.args[i].data.length;
-                a.values[i] = p.args[i].data.ptr;
-            }
-        }
-        
-        return a;
-    }
 
     /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
     immutable(Result) prepare(string statementName, string sqlStatement, size_t nParams)
