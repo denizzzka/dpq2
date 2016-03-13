@@ -14,12 +14,14 @@ struct QueryParams
     Value[] args; /// SQL command arguments
     ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
 
+    /// Useful for simple text-only query params
+    /// Postgres infers a data type for the parameter in the same way it would do for an untyped literal string.
     @property void argsFromArray(in string[] arr)
     {
         args.length = arr.length;
 
         foreach(i, ref a; args)
-            a = toValue(arr[i]);
+            a = toValue(arr[i], ValueFormat.TEXT);
     }
 
     @property string preparedStatementName() const { return sqlCommand; }
@@ -59,6 +61,12 @@ struct QueryParams
     const(char)* command() pure const
     {
         return cast(const(char)*) sqlCommand.toStringz;
+    }
+
+    /// ditto
+    const(char)* stmtName() pure const
+    {
+        return command();
     }
 
     /// ditto

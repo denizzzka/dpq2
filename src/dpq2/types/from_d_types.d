@@ -29,11 +29,11 @@ unittest
     }
 }
 
-Value toValue(T)(T v) @trusted
+Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T == string))
 {
     ubyte[] buf = cast(ubyte[]) v;
-    return Value(buf, v.detectOidType, false, ValueFormat.BINARY);
+    return Value(buf, v.detectOidType, false, valueFormat);
 }
 
 unittest

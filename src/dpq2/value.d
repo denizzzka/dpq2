@@ -43,7 +43,7 @@ struct Value
     }
 }
 
-enum ValueFormat : ubyte {
+enum ValueFormat : ubyte { // TODO: move to int
     TEXT,
     BINARY
 }

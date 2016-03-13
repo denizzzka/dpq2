@@ -48,36 +48,33 @@ mixin template Queries()
     }
     
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQuery( in QueryParams p )
+    void sendQuery(ref QueryParams p)
     {
-        auto a = prepareArgs( p );
         size_t r = PQsendQueryParams (
                 conn,
-                cast(const char*)toStringz(p.sqlCommand),
-                cast(int)p.args.length,
-                a.types.ptr,
-                a.values.ptr,
-                cast(int*)a.lengths.ptr,
-                cast(int*)a.formats.ptr,
-                cast(int)p.resultFormat
+                p.command,
+                p.nParams,
+                cast(uint*) p.paramTypes, //TODO: need report to derelict pq
+                cast(const(ubyte)**) p.paramValues, //TODO: need report to derelict pq
+                cast(int*) p.paramLengths, //TODO: need report to derelict pq
+                cast(int*) p.paramFormats, //TODO: need report to derelict pq
+                p.paramResultFormat
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
     /// Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)
-    void sendQueryPrepared(in QueryParams p)
+    void sendQueryPrepared(ref QueryParams p)
     {
-        auto a = prepareArgs(p);
-
-        size_t r = PQsendQueryPrepared( //TODO: need report to derelict pq
+        size_t r = PQsendQueryPrepared(
                 conn,
-                cast(char*)toStringz(p.preparedStatementName),
-                to!int(p.args.length),
-                cast(char**)a.values.ptr,
-                cast(int*)a.lengths.ptr,
-                cast(int*)a.formats.ptr,
-                to!int(p.resultFormat)
+                cast(char*) p.stmtName, //TODO: need report to derelict pq
+                p.nParams,
+                cast(char**) p.paramValues, //TODO: need report to derelict pq
+                cast(int*) p.paramLengths, //TODO: need report to derelict pq
+                cast(int*) p.paramFormats, //TODO: need report to derelict pq
+                p.paramResultFormat
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
