@@ -243,6 +243,7 @@ public void _integration_test( string connParam )
         // json as string
         C!string("{\"float_value\": 123.456}", "json", "'{\"float_value\": 123.456}'");
 
+        // jsonb
         //C!PGjson(Json(["integer": Json(123), "float": Json(123.456), "text_string": Json("This is a text string")]), "jsonb",
             //"'{\"integer\": 123, \"float\": 123.456,\"text_string\": \"This is a text string\"}'");
     }
