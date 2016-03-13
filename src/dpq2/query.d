@@ -27,10 +27,10 @@ mixin template Queries()
                 conn,
                 p.command,
                 p.nParams,
-                p.paramTypes,
-                p.paramValues,
-                p.paramLengths,
-                p.paramFormats,
+                cast(uint*) p.paramTypes, //TODO: need report to derelict pq
+                cast(const(ubyte)**) p.paramValues, //TODO: need report to derelict pq
+                cast(int*) p.paramLengths, //TODO: need report to derelict pq
+                cast(int*) p.paramFormats, //TODO: need report to derelict pq
                 p.paramResultFormat
         );
 

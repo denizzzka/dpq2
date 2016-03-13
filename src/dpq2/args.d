@@ -74,28 +74,28 @@ struct QueryParams
     }
 
     /// ditto
-    Oid* paramTypes() pure
+    const(Oid)* paramTypes() pure
     {
         prepareArgs();
         return oids.ptr;
     }
 
     /// ditto
-    const(ubyte)** paramValues() pure
+    const(ubyte*)* paramValues() pure
     {
         prepareArgs();
         return values.ptr;
     }
 
     /// ditto
-    int* paramLengths() pure
+    const(int)* paramLengths() pure
     {
         prepareArgs();
         return lengths.ptr;
     }
 
     /// ditto
-    int* paramFormats() pure
+    const(int)* paramFormats() pure
     {
         prepareArgs();
         return formats.ptr;
