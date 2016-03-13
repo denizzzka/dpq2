@@ -21,18 +21,17 @@ mixin template Queries()
     }
     
     /// Perform SQL query to DB
-    immutable (Answer) exec(in QueryParams p)
+    immutable (Answer) exec(ref QueryParams p)
     {
-        auto a = prepareArgs( p );
         auto pgResult = PQexecParams (
                 conn,
-                cast(const char*)toStringz( p.sqlCommand ),
-                cast(int)p.args.length,
-                a.types.ptr,
-                a.values.ptr,
-                cast(int*)a.lengths.ptr,
-                cast(int*)a.formats.ptr,
-                cast(int)p.resultFormat
+                p.command,
+                p.nParams,
+                p.paramTypes,
+                p.paramValues,
+                p.paramLengths,
+                p.paramFormats,
+                p.paramResultFormat
         );
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
@@ -92,7 +91,7 @@ mixin template Queries()
         return n is null ? null : new Notify( n );
     }
     
-    private struct PreparedArgs
+    private struct PreparedArgs // TODO: remove it and use QueryArgs instead
     {
         Oid[] types;
         size_t[] formats;
