@@ -31,7 +31,10 @@ struct Value
     @property
     inout (ubyte[]) data() pure inout
     {
-        assert(!isNull, "Attempt to read NULL value");
+        import std.exception;
+        import core.exception;
+
+        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
 
         return _data;
     }
@@ -49,6 +52,23 @@ struct Value
 
         return toBson(this).toString~"::"~oidType.to!string;
     }
+}
+
+@trusted unittest
+{
+    import dpq2.types.to_d_types;
+    import core.exception: AssertError;
+
+    Value v = Value(ValueFormat.BINARY, OidType.Int4);
+
+    bool exceptionFlag = false;
+
+    try
+        cast(void) v.as!int;
+    catch(AssertError e)
+        exceptionFlag = true;
+
+    assert(exceptionFlag);
 }
 
 enum ValueFormat : int {
