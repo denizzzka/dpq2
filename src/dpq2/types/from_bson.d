@@ -33,10 +33,14 @@ Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
             ret = v.get!(immutable(char)[]).toValue;
             break;
 
+        case Bson.Type.array:
+            ret = bsonArrayToValue(v);
+            break;
+
         default:
             throw new AnswerConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column ("~v.type.to!(immutable(char)[])~") doesn't supported by Bson to Value converter",
+                    "Format "~v.type.to!(immutable(char)[])~" doesn't supported by Bson to Value converter",
                     __FILE__, __LINE__
                 );
     }
@@ -58,5 +62,48 @@ unittest
         Value v2 = ("Test string").toValue;
 
         assert(v1.as!string == v2.as!string);
+    }
+}
+
+private Value bsonArrayToValue(ref Bson v)
+{
+    ArrayProperties ap;
+
+    ArrayHeader_net h;
+
+    Value ret;
+
+    return ret;
+}
+
+private OidType oidType2arrayType(OidType type)
+{
+    with(OidType)
+    switch(type)
+    {
+        case Text:
+            return TextArray;
+
+        case Int2:
+            return Int2Array;
+
+        case Int4:
+            return Int4Array;
+
+        case Int8:
+            return Int8Array;
+
+        case Float4:
+            return Float4Array;
+
+        case Float8:
+            return Float8Array;
+
+        default:
+            throw new AnswerConvException(
+                    ConvExceptionType.NOT_IMPLEMENTED,
+                    "Format "~type.to!(immutable(char)[])~" doesn't supported by Bson array to Value converter",
+                    __FILE__, __LINE__
+                );
     }
 }

@@ -9,7 +9,7 @@ import std.traits: isNumeric;
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    return Value(v.nativeToBigEndian.dup, v.detectOidType, false, ValueFormat.BINARY);
+    return Value(v.nativeToBigEndian.dup, detectOidType!T, false, ValueFormat.BINARY);
 }
 
 unittest
@@ -33,7 +33,7 @@ Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T == string))
 {
     ubyte[] buf = cast(ubyte[]) v;
-    return Value(buf, v.detectOidType, false, valueFormat);
+    return Value(buf, detectOidType!T, false, valueFormat);
 }
 
 unittest
@@ -44,7 +44,7 @@ unittest
     assert(v.as!string == "Test string");
 }
 
-private OidType detectOidType(T)(T v)
+private OidType detectOidType(T)()
 {
     with(OidType)
     {
