@@ -4,6 +4,7 @@ module dpq2.types.from_bson;
 
 import dpq2;
 import vibe.data.bson;
+import std.bitmanip: nativeToBigEndian;
 
 /// Default type will be used for NULL values
 Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
@@ -66,9 +67,6 @@ unittest
 
     {
         Value v = bsonToValue(Bson.emptyArray);
-
-        import std.stdio;
-        writeln(v);
     }
 }
 
@@ -89,45 +87,97 @@ private Value bsonArrayToValue(ref Bson bsonArr)
     {
         if(bElem.type != Bson.Type.null_ && ap.OID == OidType.Unknown)
         {
-            ap.OID = bsonToValue(bElem).oidType.oidType2arrayType;
+            ap.OID = bsonToValue(bElem).oidType;
             break;
         }
     }
 
-    // TODO: type detection check
+    if(ap.OID == OidType.Unknown)
+        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Array type unknown", __FILE__, __LINE__);
 
-    Value[] values;
+    ubyte[int.sizeof] nullValue() pure
+    {
+        return [0xff, 0xff, 0xff, 0xff]; //NULL magic number
+    }
+
+    ubyte[] rawValue(Value v) pure
+    {
+        if(v.isNull)
+        {
+            return nullValue().dup;
+        }
+        else
+        {
+            return v._data.length.to!uint.nativeToBigEndian ~ v._data;
+        }
+    }
+
+    ubyte[][] values;
 
     // Fill array
     foreach(bElem; bsonArr)
     {
         if(bElem.type == Bson.Type.null_)
         {
-            // Add NULL value to array
-            values ~= Value(ValueFormat.BINARY, ap.OID);
+            values ~= nullValue();
         }
         else
         {
             Value v = bsonToValue(bElem);
 
-            if(ap.OID != v.oidType.oidType2arrayType)
+            if(ap.OID != v.oidType)
                 throw new AnswerConvException(
                         ConvExceptionType.NOT_ARRAY,
-                        "Bson (which used for creating array of type "~ap.OID.to!string~") also contains value of type "~v.oidType.to!string,
+                        "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
                         __FILE__, __LINE__
                     );
 
-            values ~= v;
+            values ~= rawValue(v);
         }
 
         ap.nElems++;
     }
 
+    ap.dimsSize.length = 1;
+    ap.dimsSize[0] = values.length.to!int;
+
     ArrayHeader_net h;
+    h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
+    h.OID = nativeToBigEndian(cast(Oid) ap.OID);
 
-    Value ret;
+    Dim_net dim;
+    dim.dim_size = nativeToBigEndian(ap.dimsSize[0]);
+    dim.lbound = nativeToBigEndian(1);
 
-    return ret;
+    ubyte[] r;
+    r ~= (cast(ubyte*) &h)[0 .. h.sizeof];
+    r ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
+
+    foreach(ref v; values)
+    {
+        r ~= v;
+    }
+
+    import std.stdio;
+    writeln(ap);
+    writeln(h);
+    writeln(dim);
+    writeln(values);
+    writeln(r);
+
+    return Value(r, ap.OID.oidType2arrayType, false, ValueFormat.BINARY);
+}
+
+unittest
+{
+    Bson bsonArray = Bson(
+        [Bson(123)]//, Bson(456), Bson(null)]
+    );
+
+    Value v = bsonToValue(bsonArray);
+
+    import std.stdio;
+    writeln(v);
 }
 
 private OidType oidType2arrayType(OidType type)

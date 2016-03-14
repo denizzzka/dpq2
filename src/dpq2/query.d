@@ -199,14 +199,15 @@ void _integration_test( string connParam ) @trusted
         import vibe.data.bson: Bson;
 
         const string sql_query =
-        "select $1::text, $2::integer, $3::text, $4, $5::integer[]";
+        "select $1::text, $2::integer, $3::text, $4, $5::integer[], $6 as arr";
 
-        Value[5] args;
+        Value[6] args;
         args[0] = toValue("абвгд");
         args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
         args[2] = toValue("123");
         args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
         args[4] = bsonToValue(Bson.emptyArray);
+        args[5] = bsonToValue(Bson([Bson(123), Bson(456)]));
 
         QueryParams p;
         p.sqlCommand = sql_query;
@@ -214,17 +215,17 @@ void _integration_test( string connParam ) @trusted
 
         auto a = conn.execParams( p );
 
-        assert( a.columnFormat(0) == ValueFormat.BINARY );
-        assert( a.columnFormat(1) == ValueFormat.BINARY );
-        assert( a.columnFormat(2) == ValueFormat.BINARY );
-        assert( a.columnFormat(3) == ValueFormat.BINARY );
-        assert( a.columnFormat(4) == ValueFormat.BINARY );
+        foreach(i; 0 .. args.length)
+            assert(a.columnFormat(i) == ValueFormat.BINARY);
+
+        import std.stdio; writeln(a);
 
         assert( a.OID(0) == OidType.Text );
         assert( a.OID(1) == OidType.Int4 );
         assert( a.OID(2) == OidType.Text );
         assert( a.OID(3) == OidType.Int8 );
         assert( a.OID(4) == OidType.Int4Array );
+        assert( a.OID(5) == OidType.Int4Array );
     }
 
     // checking prepared statements

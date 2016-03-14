@@ -13,6 +13,8 @@ import derelict.pq.pq: Oid;
 
 package OidType oid2oidType(Oid oid) pure
 {
+    static assert(Oid.sizeof == OidType.sizeof);
+
     return cast(OidType)(oid);
 }
 

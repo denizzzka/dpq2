@@ -11,7 +11,7 @@ struct Value
     OidType oidType = OidType.Undefined;
 
     package ValueFormat format;
-    private ubyte[] _data;
+    package ubyte[] _data;
 
     this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
     {

@@ -364,7 +364,7 @@ package struct ArrayHeader_net // network byte order
     ubyte[4] OID; // element type OID
 }
 
-private struct Dim_net // network byte order
+package struct Dim_net // network byte order
 {
     ubyte[4] dim_size; // number of elements in dimension
     ubyte[4] lbound; // unknown
@@ -398,7 +398,7 @@ struct ArrayProperties
         {
             Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
 
-            const dim_size = bigEndianToNative!int( d.dim_size );
+            const dim_size = bigEndianToNative!int(d.dim_size);
             const lbound = bigEndianToNative!int(d.lbound);
 
             if(!(dim_size > 0))
