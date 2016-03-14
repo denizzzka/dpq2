@@ -207,7 +207,7 @@ void _integration_test( string connParam ) @trusted
         args[2] = toValue("123");
         args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
         args[4] = bsonToValue(Bson.emptyArray);
-        args[5] = bsonToValue(Bson([Bson(123), Bson(456)]));
+        args[5] = bsonToValue(Bson([Bson(null), Bson(123), Bson(456)]));
 
         QueryParams p;
         p.sqlCommand = sql_query;
@@ -224,6 +224,9 @@ void _integration_test( string connParam ) @trusted
         assert( a.OID(3) == OidType.Int8 );
         assert( a.OID(4) == OidType.Int4Array );
         assert( a.OID(5) == OidType.Int4Array );
+
+        // binary args array test
+        assert( a[0][5].toBson == Bson([Bson(null), Bson(123), Bson(456)]) );
     }
 
     // checking prepared statements
