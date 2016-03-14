@@ -164,11 +164,13 @@ private Value bsonArrayToValue(ref Bson bsonArr)
 unittest
 {
     Bson bsonArray = Bson(
-        [Bson(123), Bson(155), Bson(null)]
+        [Bson(123), Bson(155), Bson(null), Bson(0), Bson(null)]
     );
 
     Value v = bsonToValue(bsonArray);
+
     assert(v.isSupportedArray);
+    assert(v.toBson == bsonArray);
 }
 
 private OidType oidType2arrayType(OidType type)
