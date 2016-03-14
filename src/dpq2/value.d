@@ -40,7 +40,7 @@ struct Value
     }
 
     @property
-    bool isSupportedArray() const // TODO: rename to isArray
+    bool isSupportedArray() const
     {
         return dpq2.oids.isSupportedArray(oidType);
     }
