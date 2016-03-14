@@ -24,7 +24,7 @@ Bson toBson(in Value v, immutable TimeZone tz = null)
     }
 }
 
-private Bson arrayValueToBson(in Value cell, immutable TimeZone tz) // FIXME: ref Value should be used
+private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
 {
     const ap = ArrayProperties(cell);
 
