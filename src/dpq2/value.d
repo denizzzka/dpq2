@@ -42,7 +42,7 @@ struct Value
         return dpq2.oids.isSupportedArray(oidType);
     }
 
-    string toString() const @trusted
+    debug string toString() const @trusted
     {
         import dpq2.types.to_bson;
         import std.conv: to;

@@ -44,7 +44,7 @@ void main(string[] args)
         "{{1, 2, 3}, {4, 5, 6}}"
     ];
 
-    auto r = conn.exec(p);
+    auto r = conn.execParams(p);
     
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
     writeln( "1: ", r[0][1].as!PGtext );
