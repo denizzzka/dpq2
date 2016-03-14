@@ -95,16 +95,17 @@ private Value bsonArrayToValue(ref Bson bsonArr)
     if(ap.OID == OidType.Unknown)
         throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Array type unknown", __FILE__, __LINE__);
 
-    ubyte[int.sizeof] nullValue() pure
+    ubyte[] nullValue() pure
     {
-        return [0xff, 0xff, 0xff, 0xff]; //NULL magic number
+        ubyte[] ret = [0xff, 0xff, 0xff, 0xff]; //NULL magic number
+        return ret;
     }
 
     ubyte[] rawValue(Value v) pure
     {
         if(v.isNull)
         {
-            return nullValue().dup;
+            return nullValue();
         }
         else
         {
