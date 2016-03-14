@@ -41,6 +41,14 @@ struct Value
     {
         return dpq2.oids.isSupportedArray(oidType);
     }
+
+    string toString() const @trusted
+    {
+        import dpq2.types.to_bson;
+        import std.conv: to;
+
+        return toBson(this).toString~"::"~oidType.to!string;
+    }
 }
 
 enum ValueFormat : int {

@@ -196,14 +196,17 @@ void _integration_test( string connParam ) @trusted
     }
 
     {
-        const string sql_query =
-        "select $1::text, $2::integer, $3::text, $4";
+        import vibe.data.bson: Bson;
 
-        Value[4] args;
+        const string sql_query =
+        "select $1::text, $2::integer, $3::text, $4, $5::integer[]";
+
+        Value[5] args;
         args[0] = toValue("абвгд");
         args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
         args[2] = toValue("123");
         args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
+        args[4] = bsonToValue(Bson.emptyArray);
 
         QueryParams p;
         p.sqlCommand = sql_query;
@@ -215,13 +218,13 @@ void _integration_test( string connParam ) @trusted
         assert( a.columnFormat(1) == ValueFormat.BINARY );
         assert( a.columnFormat(2) == ValueFormat.BINARY );
         assert( a.columnFormat(3) == ValueFormat.BINARY );
+        assert( a.columnFormat(4) == ValueFormat.BINARY );
 
         assert( a.OID(0) == OidType.Text );
         assert( a.OID(1) == OidType.Int4 );
         assert( a.OID(2) == OidType.Text );
         assert( a.OID(3) == OidType.Int8 );
-
-        destroy(a);
+        assert( a.OID(4) == OidType.Int4Array );
     }
 
     // checking prepared statements

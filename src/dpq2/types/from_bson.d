@@ -63,15 +63,23 @@ unittest
 
         assert(v1.as!string == v2.as!string);
     }
+
+    {
+        Value v = bsonToValue(Bson.emptyArray);
+
+        import std.stdio;
+        writeln(v);
+    }
 }
 
 private Value bsonArrayToValue(ref Bson bsonArr)
 {
     if(bsonArr.length == 0)
     {
-        // return Value ValueFormat.TEXT zero sized array
-        // ValueFormat.TEXT because type of array isn't known
-        assert(true);
+        // Empty array
+        // ValueFormat.TEXT because type of array isn't known -
+        // this gives an opportunity to detect type of array by Postgres
+        return Value(ValueFormat.TEXT, OidType.Unknown);
     }
 
     ArrayProperties ap;

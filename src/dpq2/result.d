@@ -205,7 +205,7 @@ immutable class Answer : Result
         string res;
 
         foreach(n; 0 .. columnCount)
-            res ~= columnName(n)~"\t";
+            res ~= columnName(n)~"::"~OID(n).to!string~"\t";
 
         res ~= newline;
 
