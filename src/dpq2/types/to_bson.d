@@ -152,7 +152,7 @@ private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
         default:
             throw new AnswerConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Bson converter",
+                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Value to Bson converter",
                     __FILE__, __LINE__
                 );
     }

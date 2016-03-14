@@ -143,11 +143,11 @@ private Value bsonArrayToValue(ref Bson bsonArr)
 
     ArrayHeader_net h;
     h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
-    h.OID = nativeToBigEndian(cast(Oid) ap.OID);
+    h.OID = nativeToBigEndian(ap.OID.to!Oid);
 
     Dim_net dim;
     dim.dim_size = nativeToBigEndian(ap.dimsSize[0]);
-    dim.lbound = nativeToBigEndian(1);
+    dim.lbound = nativeToBigEndian!int(1);
 
     ubyte[] r;
     r ~= (cast(ubyte*) &h)[0 .. h.sizeof];
@@ -158,26 +158,17 @@ private Value bsonArrayToValue(ref Bson bsonArr)
         r ~= v;
     }
 
-    import std.stdio;
-    writeln(ap);
-    writeln(h);
-    writeln(dim);
-    writeln(values);
-    writeln(r);
-
     return Value(r, ap.OID.oidType2arrayType, false, ValueFormat.BINARY);
 }
 
 unittest
 {
     Bson bsonArray = Bson(
-        [Bson(123)]//, Bson(456), Bson(null)]
+        [Bson(123), Bson(155), Bson(null)]
     );
 
     Value v = bsonToValue(bsonArray);
-
-    import std.stdio;
-    writeln(v);
+    assert(v.isSupportedArray);
 }
 
 private OidType oidType2arrayType(OidType type)

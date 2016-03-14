@@ -218,8 +218,6 @@ void _integration_test( string connParam ) @trusted
         foreach(i; 0 .. args.length)
             assert(a.columnFormat(i) == ValueFormat.BINARY);
 
-        import std.stdio; writeln(a);
-
         assert( a.OID(0) == OidType.Text );
         assert( a.OID(1) == OidType.Int4 );
         assert( a.OID(2) == OidType.Text );
