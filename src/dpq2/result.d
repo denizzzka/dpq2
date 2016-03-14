@@ -372,7 +372,7 @@ private struct Dim_net // network byte order
 
 struct ArrayProperties
 {
-    OidType OID;
+    OidType OID = OidType.Unknown;
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
     package size_t dataOffset;
@@ -448,7 +448,7 @@ immutable struct Array
 
             size_t curr_offset = ap.dataOffset;
 
-            for(uint i = 0; i < nElems; ++i )
+            for(uint i = 0; i < nElems; ++i)
             {
                 ubyte[int.sizeof] size_net; // network byte order
                 size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
@@ -625,7 +625,7 @@ package immutable msg_NOT_BINARY = "Format of the column is not binary";
 /// Conversion exception types
 enum ConvExceptionType
 {
-    NOT_ARRAY, /// Format of the column isn't array
+    NOT_ARRAY, /// Format of the value isn't array
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
     NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)

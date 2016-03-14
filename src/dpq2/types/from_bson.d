@@ -14,7 +14,7 @@ Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
     switch(v.type)
     {
         case null_:
-            ret = Value(null, defaultType, true, ValueFormat.BINARY);
+            ret = Value(ValueFormat.BINARY, defaultType);
             break;
 
         case int_:
@@ -65,9 +65,55 @@ unittest
     }
 }
 
-private Value bsonArrayToValue(ref Bson v)
+private Value bsonArrayToValue(ref Bson bsonArr)
 {
+    if(bsonArr.length == 0)
+    {
+        // return Value ValueFormat.TEXT zero sized array
+        // ValueFormat.TEXT because type of array isn't known
+        assert(true);
+    }
+
     ArrayProperties ap;
+
+    // Detect array type
+    foreach(bElem; bsonArr)
+    {
+        if(bElem.type != Bson.Type.null_ && ap.OID == OidType.Unknown)
+        {
+            ap.OID = bsonToValue(bElem).oidType.oidType2arrayType;
+            break;
+        }
+    }
+
+    // TODO: type detection check
+
+    Value[] values;
+
+    // Fill array
+    foreach(bElem; bsonArr)
+    {
+        if(bElem.type == Bson.Type.null_)
+        {
+            // Add NULL value to array
+            values ~= Value(ValueFormat.BINARY, ap.OID);
+        }
+        else
+        {
+            Value v = bsonToValue(bElem);
+
+            if(ap.OID != v.oidType.oidType2arrayType)
+                throw new AnswerConvException(
+                        ConvExceptionType.NOT_ARRAY,
+                        "Bson (which used for creating array of type "~ap.OID.to!string~") also contains value of type "~v.oidType.to!string,
+                        __FILE__, __LINE__
+                    );
+
+            values ~= v;
+        }
+
+        ap.nElems++;
+    }
 
     ArrayHeader_net h;
 
@@ -100,7 +146,7 @@ private OidType oidType2arrayType(OidType type)
             return Float8Array;
 
         default:
-            throw new AnswerConvException(
+            throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
                     ConvExceptionType.NOT_IMPLEMENTED,
                     "Format "~type.to!(immutable(char)[])~" doesn't supported by Bson array to Value converter",
                     __FILE__, __LINE__
