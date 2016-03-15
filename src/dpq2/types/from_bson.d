@@ -105,7 +105,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
     }
 
     ArrayProperties ap;
-    ubyte[][] rawValues;
+    ubyte[] rawValues;
 
     void recursive(ref Bson bsonArr, int dimension)
     {
@@ -175,10 +175,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
         ret ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
     }
 
-    foreach(ref v; rawValues)
-    {
-        ret ~= v;
-    }
+    ret ~= rawValues;
 
     return Value(ret, ap.OID.oidType2arrayType, false, ValueFormat.BINARY);
 }
