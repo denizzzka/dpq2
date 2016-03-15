@@ -78,14 +78,6 @@ unittest
 
 Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 {
-    if(bsonArr.length == 0)
-    {
-        // Special case: empty array
-        // ValueFormat.TEXT because type of array isn't known -
-        // this gives an opportunity to detect type of array by Postgres
-        return Value(ValueFormat.TEXT, OidType.Unknown);
-    }
-
     ubyte[] nullValue() pure
     {
         ubyte[] ret = [0xff, 0xff, 0xff, 0xff]; //NULL magic number
