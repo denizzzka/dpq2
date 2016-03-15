@@ -14,7 +14,7 @@ make convenient use PostgreSQL from D.
 Features
 --------
 
-* Text string arguments list support
+* Text string arguments support
 * Binary arguments support (including multi-dimensional arrays)
 * Both text and binary formats of result support
 * Immutable result for simplify multithreading
