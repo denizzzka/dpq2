@@ -156,8 +156,8 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
     h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
     h.OID = nativeToBigEndian(ap.OID.to!Oid);
 
-    ubyte[] r; // TODO: rename to ret
-    r ~= (cast(ubyte*) &h)[0 .. h.sizeof];
+    ubyte[] ret;
+    ret ~= (cast(ubyte*) &h)[0 .. h.sizeof];
 
     foreach(i; 0 .. ap.dimsSize.length)
     {
@@ -165,15 +165,15 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
         dim.dim_size = nativeToBigEndian(ap.dimsSize[i]);
         dim.lbound = nativeToBigEndian!int(1);
 
-        r ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
+        ret ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
     }
 
     foreach(ref v; rawValues)
     {
-        r ~= v;
+        ret ~= v;
     }
 
-    return Value(r, ap.OID.oidType2arrayType, false, ValueFormat.BINARY);
+    return Value(ret, ap.OID.oidType2arrayType, false, ValueFormat.BINARY);
 }
 
 unittest
