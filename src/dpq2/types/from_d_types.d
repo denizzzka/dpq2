@@ -47,11 +47,31 @@ unittest
     assert(v.as!string == "Test string");
 }
 
+@property Value toValue(T)(T v) @trusted
+if(is(T == bool))
+{
+    ubyte[] buf;
+    buf.length = 1;
+    buf[0] = (v ? 1 : 0);
+
+    return Value(buf, detectOidType!T, false, ValueFormat.BINARY);
+}
+
+unittest
+{
+    Value t = toValue(true);
+    Value f = toValue(false);
+
+    assert(t.as!bool == true);
+    assert(f.as!bool == false);
+}
+
 private OidType detectOidType(T)()
 {
     with(OidType)
     {
         static if(is(T == string)){ return Text; } else
+        static if(is(T == bool)){ return Bool; } else
         static if(is(T == short)){ return Int2; } else
         static if(is(T == int)){ return Int4; } else
         static if(is(T == long)){ return Int8; } else

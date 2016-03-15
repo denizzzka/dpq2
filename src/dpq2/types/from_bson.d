@@ -28,6 +28,10 @@ Value bsonValueToValue(Bson v)
             ret = Value(ValueFormat.BINARY, OidType.Unknown);
             break;
 
+        case bool_:
+            ret = v.get!bool.toValue;
+            break;
+
         case int_:
             ret = v.get!int.toValue;
             break;
@@ -69,6 +73,14 @@ unittest
         Value v2 = ("Test string").toValue;
 
         assert(v1.as!string == v2.as!string);
+    }
+
+    {
+        Value t = bsonToValue(Bson(true));
+        Value f = bsonToValue(Bson(false));
+
+        assert(t.as!bool == true);
+        assert(f.as!bool == false);
     }
 }
 
@@ -221,6 +233,9 @@ OidType oidType2arrayType(OidType type)
     {
         case Text:
             return TextArray;
+
+        case Bool:
+            return BoolArray;
 
         case Int2:
             return Int2Array;
