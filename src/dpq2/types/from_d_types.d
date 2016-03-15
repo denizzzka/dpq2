@@ -32,7 +32,7 @@ unittest
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T == string))
 {
-    if(valueFormat == ValueFormat.TEXT) v = v~'\0';
+    if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
 
     ubyte[] buf = cast(ubyte[]) v;
 
