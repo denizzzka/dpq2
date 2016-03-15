@@ -89,13 +89,13 @@ mixin template Queries()
     }
 
     /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
-    immutable(Result) prepare(string statementName, string sqlStatement, size_t nParams)
+    immutable(Result) prepare(string statementName, string sqlStatement)
     {
         PGresult* pgResult = PQprepare(
                 conn,
                 cast(char*)toStringz(statementName), //TODO: need report to derelict pq
                 cast(char*)toStringz(sqlStatement), //TODO: need report to derelict pq
-                to!int(nParams),
+                0,
                 null
             );
 
@@ -106,13 +106,13 @@ mixin template Queries()
     }
 
     /// Sends a request to create a prepared statement with the given parameters, without waiting for completion.
-    void sendPrepare(string statementName, string sqlStatement, size_t nParams)
+    void sendPrepare(string statementName, string sqlStatement)
     {
         size_t r = PQsendPrepare(
                 conn,
                 cast(char*)toStringz(statementName), //TODO: need report to derelict pq
                 cast(char*)toStringz(sqlStatement), //TODO: need report to derelict pq
-                to!int(nParams),
+                0,
                 null
             );
 
@@ -238,12 +238,12 @@ void _integration_test( string connParam ) @trusted
     // checking prepared statements
     {
         // uses PQprepare:
-        auto s = conn.prepare("prepared statement 1", "SELECT $1::integer", 1);
+        auto s = conn.prepare("prepared statement 1", "SELECT $1::integer");
         assert(s.status == PGRES_COMMAND_OK);
     }
     {
         // uses PQsendPrepare:
-        conn.sendPrepare("prepared statement 2", "SELECT $1::text, $2::integer", 1);
+        conn.sendPrepare("prepared statement 2", "SELECT $1::text, $2::integer");
 
         conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
         conn.consumeInput();
