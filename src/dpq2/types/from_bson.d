@@ -6,8 +6,18 @@ import dpq2;
 import vibe.data.bson;
 import std.bitmanip: nativeToBigEndian;
 
-/// Default type will be used for NULL values
-Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
+/// Default type will be used for NULL value and for array without detected type
+Value bsonToValue(Bson v, OidType defaultType = OidType.Unknown)
+{
+    if(v.type == Bson.Type.array)
+        return bsonArrayToValue(v, defaultType);
+    else
+        return bsonValueToValue(v, defaultType);
+}
+
+private:
+
+Value bsonValueToValue(Bson v, OidType defaultType)
 {
     Value ret;
 
@@ -32,10 +42,6 @@ Value bsonToValue(Bson v, OidType defaultType = OidType.Text)
 
         case Bson.Type.string:
             ret = v.get!(immutable(char)[]).toValue;
-            break;
-
-        case Bson.Type.array:
-            ret = bsonArrayToValue(v);
             break;
 
         default:
@@ -70,30 +76,15 @@ unittest
     }
 }
 
-private Value bsonArrayToValue(ref Bson bsonArr)
+Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 {
     if(bsonArr.length == 0)
     {
-        // Empty array
+        // Special case: empty array
         // ValueFormat.TEXT because type of array isn't known -
         // this gives an opportunity to detect type of array by Postgres
         return Value(ValueFormat.TEXT, OidType.Unknown);
     }
-
-    ArrayProperties ap;
-
-    // Detect array type
-    foreach(bElem; bsonArr)
-    {
-        if(bElem.type != Bson.Type.null_ && ap.OID == OidType.Unknown)
-        {
-            ap.OID = bsonToValue(bElem).oidType;
-            break;
-        }
-    }
-
-    if(ap.OID == OidType.Unknown)
-        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Array type unknown", __FILE__, __LINE__);
 
     ubyte[] nullValue() pure
     {
@@ -113,34 +104,53 @@ private Value bsonArrayToValue(ref Bson bsonArr)
         }
     }
 
-    ubyte[][] values;
+    ArrayProperties ap;
+    ubyte[][] rawValues;
 
-    // Fill array
-    foreach(bElem; bsonArr)
+    void recursive(ref Bson bsonArr, int dimension)
     {
-        if(bElem.type == Bson.Type.null_)
+        if(dimension > ap.dimsSize.length)
+            ap.dimsSize ~= bsonArr.length.to!int;
+
+        foreach(bElem; bsonArr)
         {
-            values ~= nullValue();
+            ap.nElems++;
+
+            switch(bElem.type)
+            {
+                case Bson.Type.array:
+                    recursive(bElem, dimension + 1);
+                    break;
+
+                case Bson.Type.null_:
+                    rawValues ~= nullValue();
+                    break;
+
+                default:
+                    Value v = bsonValueToValue(bElem, defaultType);
+
+                    if(ap.OID == OidType.Unknown)
+                    {
+                        ap.OID = v.oidType;
+                    }
+                    else
+                    {
+                        if(ap.OID != v.oidType)
+                            throw new AnswerConvException(
+                                    ConvExceptionType.NOT_ARRAY,
+                                    "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
+                                    __FILE__, __LINE__
+                                );                    
+                    }
+
+                    rawValues ~= rawValue(v);
+            }
         }
-        else
-        {
-            Value v = bsonToValue(bElem);
-
-            if(ap.OID != v.oidType)
-                throw new AnswerConvException(
-                        ConvExceptionType.NOT_ARRAY,
-                        "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
-                        __FILE__, __LINE__
-                    );
-
-            values ~= rawValue(v);
-        }
-
-        ap.nElems++;
     }
 
-    ap.dimsSize.length = 1;
-    ap.dimsSize[0] = values.length.to!int;
+    recursive(bsonArr, 1);
+
+    if(ap.OID == OidType.Unknown) ap.OID = defaultType;
 
     ArrayHeader_net h;
     h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
@@ -154,7 +164,7 @@ private Value bsonArrayToValue(ref Bson bsonArr)
     r ~= (cast(ubyte*) &h)[0 .. h.sizeof];
     r ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
 
-    foreach(ref v; values)
+    foreach(ref v; rawValues)
     {
         r ~= v;
     }
@@ -164,17 +174,31 @@ private Value bsonArrayToValue(ref Bson bsonArr)
 
 unittest
 {
-    Bson bsonArray = Bson(
-        [Bson(123), Bson(155), Bson(null), Bson(0), Bson(null)]
-    );
+    {
+        Bson bsonArray = Bson(
+            [Bson(123), Bson(155), Bson(null), Bson(0), Bson(null)]
+        );
 
-    Value v = bsonToValue(bsonArray);
+        Value v = bsonToValue(bsonArray);
 
-    assert(v.isSupportedArray);
-    assert(v.toBson == bsonArray);
+        assert(v.isSupportedArray);
+        assert(v.toBson == bsonArray);
+    }
+
+    {
+        Bson bsonArray = Bson([
+            Bson([Bson(123), Bson(155), Bson(null)]),
+            Bson([Bson(0), Bson(null), Bson(155)])
+        ]);
+
+        //~ Value v = bsonToValue(bsonArray);
+
+        //~ assert(v.isSupportedArray);
+        //~ assert(v.toBson == bsonArray);
+    }
 }
 
-private OidType oidType2arrayType(OidType type)
+OidType oidType2arrayType(OidType type)
 {
     with(OidType)
     switch(type)
