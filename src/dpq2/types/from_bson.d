@@ -109,8 +109,15 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 
     void recursive(ref Bson bsonArr, int dimension)
     {
-        if(dimension > ap.dimsSize.length)
+        if(dimension == ap.dimsSize.length)
+        {
             ap.dimsSize ~= bsonArr.length.to!int;
+        }
+        else
+        {
+            if(ap.dimsSize[dimension] != bsonArr.length)
+                throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);                    
+        }
 
         foreach(bElem; bsonArr)
         {
@@ -148,7 +155,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
         }
     }
 
-    recursive(bsonArr, 1);
+    recursive(bsonArr, 0);
 
     if(ap.OID == OidType.Unknown) ap.OID = defaultType;
 
@@ -199,6 +206,25 @@ unittest
 
         assert(v.isSupportedArray);
         assert(v.toBson == bsonArray);
+    }
+
+    {
+        Bson bsonArray = Bson([
+            Bson([Bson(123), Bson(155)]),
+            Bson([Bson(0)])
+        ]);
+
+        bool exceptionFlag = false;
+
+        try
+            bsonToValue(bsonArray);
+        catch(AnswerConvException e)
+        {
+            if(e.type == ConvExceptionType.NOT_ARRAY)
+                exceptionFlag = true;
+        }
+
+        assert(exceptionFlag);
     }
 }
 
