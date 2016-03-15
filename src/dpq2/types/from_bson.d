@@ -145,8 +145,8 @@ Value bsonArrayToValue(ref Bson bsonArr)
 
     recursive(bsonArr, 0);
 
-    if(ap.OID == OidType.Unknown)
-        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Unknown array type", __FILE__, __LINE__);
+    // If array empty or contains only NULL values this allows to read it using ::text cast
+    if(ap.OID == OidType.Unknown) ap.OID = OidType.Text;
 
     ArrayHeader_net h;
     h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
