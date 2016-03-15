@@ -199,21 +199,20 @@ void _integration_test( string connParam ) @trusted
         import vibe.data.bson: Bson;
 
         const string sql_query =
-        "select $1::text, $2::integer, $3::text, $4, $5::integer[], $6 as arr";
+        "select $1::text, $2::integer, $3::text, $4, $5::integer[]";
 
-        Value[6] args;
+        Value[5] args;
         args[0] = toValue("абвгд");
         args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
         args[2] = toValue("123");
         args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
-        args[4] = bsonToValue(Bson.emptyArray);
 
         Bson binArray = Bson([
             Bson([Bson(null), Bson(123), Bson(456)]),
             Bson([Bson(0), Bson(789), Bson(null)])
         ]);
 
-        args[5] = bsonToValue(binArray);
+        args[4] = bsonToValue(binArray);
 
         QueryParams p;
         p.sqlCommand = sql_query;
@@ -229,10 +228,9 @@ void _integration_test( string connParam ) @trusted
         assert( a.OID(2) == OidType.Text );
         assert( a.OID(3) == OidType.Int8 );
         assert( a.OID(4) == OidType.Int4Array );
-        assert( a.OID(5) == OidType.Int4Array );
 
         // binary args array test
-        assert( a[0][5].toBson == binArray );
+        assert( a[0][4].toBson == binArray );
     }
 
     // checking prepared statements

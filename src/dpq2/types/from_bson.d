@@ -7,17 +7,17 @@ import vibe.data.bson;
 import std.bitmanip: nativeToBigEndian;
 
 /// Default type will be used for NULL value and for array without detected type
-@property Value bsonToValue(Bson v, OidType defaultType = OidType.Unknown)
+@property Value bsonToValue(Bson v)
 {
     if(v.type == Bson.Type.array)
-        return bsonArrayToValue(v, defaultType);
+        return bsonArrayToValue(v);
     else
-        return bsonValueToValue(v, defaultType);
+        return bsonValueToValue(v);
 }
 
 private:
 
-Value bsonValueToValue(Bson v, OidType defaultType)
+Value bsonValueToValue(Bson v)
 {
     Value ret;
 
@@ -25,7 +25,7 @@ Value bsonValueToValue(Bson v, OidType defaultType)
     switch(v.type)
     {
         case null_:
-            ret = Value(ValueFormat.BINARY, defaultType);
+            ret = Value(ValueFormat.BINARY, OidType.Unknown);
             break;
 
         case int_:
@@ -70,13 +70,9 @@ unittest
 
         assert(v1.as!string == v2.as!string);
     }
-
-    {
-        Value v = bsonToValue(Bson.emptyArray);
-    }
 }
 
-Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
+Value bsonArrayToValue(ref Bson bsonArr)
 {
     ubyte[] nullValue() pure
     {
@@ -126,7 +122,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
                     break;
 
                 default:
-                    Value v = bsonValueToValue(bElem, defaultType);
+                    Value v = bsonValueToValue(bElem);
 
                     if(ap.OID == OidType.Unknown)
                     {
@@ -149,7 +145,8 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 
     recursive(bsonArr, 0);
 
-    if(ap.OID == OidType.Unknown) ap.OID = defaultType;
+    if(ap.OID == OidType.Unknown)
+        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Unknown array type", __FILE__, __LINE__);
 
     ArrayHeader_net h;
     h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
