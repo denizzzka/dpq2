@@ -116,7 +116,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
         else
         {
             if(ap.dimsSize[dimension] != bsonArr.length)
-                throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);                    
+                throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);
         }
 
         foreach(bElem; bsonArr)
