@@ -7,7 +7,7 @@ import vibe.data.bson;
 import std.bitmanip: nativeToBigEndian;
 
 /// Default type will be used for NULL value and for array without detected type
-Value bsonToValue(Bson v, OidType defaultType = OidType.Unknown)
+@property Value bsonToValue(Bson v, OidType defaultType = OidType.Unknown)
 {
     if(v.type == Bson.Type.array)
         return bsonArrayToValue(v, defaultType);

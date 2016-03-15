@@ -50,7 +50,7 @@ struct Value
         import dpq2.types.to_bson;
         import std.conv: to;
 
-        return toBson(this).toString~"::"~oidType.to!string;
+        return toBson(this).toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
 }
 

@@ -6,7 +6,7 @@ import dpq2;
 import std.bitmanip: nativeToBigEndian;
 import std.traits: isNumeric;
 
-Value toValue(T)(T v)
+@property Value toValue(T)(T v)
 if(isNumeric!(T))
 {
     return Value(v.nativeToBigEndian.dup, detectOidType!T, false, ValueFormat.BINARY);
@@ -29,7 +29,7 @@ unittest
     }
 }
 
-Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
+@property Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T == string))
 {
     if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
