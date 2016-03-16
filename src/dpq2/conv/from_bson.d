@@ -1,4 +1,4 @@
-module dpq2.types.from_bson;
+module dpq2.conv.from_bson;
 
 @trusted:
 

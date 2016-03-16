@@ -4,7 +4,7 @@
 *   Copyright: © 2014 DSoftOut
 *   Authors: NCrashed <ncrashed@gmail.com>
 */
-module dpq2.types.time;
+module dpq2.conv.time;
 
 import dpq2.result;
 import dpq2.oids;

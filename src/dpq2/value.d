@@ -47,7 +47,7 @@ struct Value
 
     debug string toString() const @trusted
     {
-        import dpq2.types.to_bson;
+        import dpq2.conv.to_bson;
         import std.conv: to;
 
         return toBson(this).toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
@@ -56,7 +56,7 @@ struct Value
 
 @trusted unittest
 {
-    import dpq2.types.to_d_types;
+    import dpq2.conv.to_d_types;
     import core.exception: AssertError;
 
     Value v = Value(ValueFormat.BINARY, OidType.Int4);

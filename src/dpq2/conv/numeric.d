@@ -4,7 +4,7 @@
 *   Copyright: © 2014 DSoftOut
 *   Authors: NCrashed <ncrashed@gmail.com>
 */
-module dpq2.types.numeric;
+module dpq2.conv.numeric;
 
 private pure // inner representation from libpq sources
 {

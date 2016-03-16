@@ -1,4 +1,4 @@
-module dpq2.types.from_d_types;
+module dpq2.conv.from_d_types;
 
 @safe:
 

@@ -2,8 +2,8 @@
 
 @trusted:
 
-public import dpq2.types.to_d_types;
-public import dpq2.types.to_bson;
+public import dpq2.conv.to_d_types;
+public import dpq2.conv.to_bson;
 public import dpq2.oids;
 public import dpq2.value;
 

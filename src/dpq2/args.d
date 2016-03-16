@@ -2,8 +2,8 @@
 
 @safe:
 
-public import dpq2.types.from_d_types;
-public import dpq2.types.from_bson;
+public import dpq2.conv.from_d_types;
+public import dpq2.conv.from_bson;
 
 import dpq2;
 

@@ -1,11 +1,11 @@
-﻿module dpq2.types.to_d_types;
+﻿module dpq2.conv.to_d_types;
 
 @trusted:
 
 import dpq2;
 
-import dpq2.types.numeric: rawValueToNumeric;
-import dpq2.types.time: binaryValueAs, TimeStampWithoutTZ;
+import dpq2.conv.numeric: rawValueToNumeric;
+import dpq2.conv.time: binaryValueAs, TimeStampWithoutTZ;
 
 import vibe.data.json: Json, parseJsonString;
 import std.traits;
