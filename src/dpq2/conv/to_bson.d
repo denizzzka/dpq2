@@ -3,13 +3,12 @@
 @trusted:
 
 import dpq2;
-
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
 
-@property
-Bson toBson(in Value v, immutable TimeZone tz = null)
+@property Bson as(T)(in Value v, immutable TimeZone tz = null)
+if(is(T == Bson))
 {
     if(v.isNull)
     {
@@ -24,7 +23,9 @@ Bson toBson(in Value v, immutable TimeZone tz = null)
     }
 }
 
-private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
+private:
+
+Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
 {
     const ap = ArrayProperties(cell);
 
@@ -61,7 +62,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
                 else
                 {
                     auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
-                    b = v.toBson(tz);
+                    b = v.as!Bson(tz);
                 }
 
                 curr_offset += size;
@@ -75,7 +76,7 @@ private Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
     return recursive(0);
 }
 
-private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
+Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 {
     if(v.format == ValueFormat.TEXT)
     {
@@ -160,7 +161,7 @@ private Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
     return res;
 }
 
-void _integration_test( string connParam )
+public void _integration_test( string connParam )
 {
     import std.uuid;
     import std.datetime: SysTime, DateTime, UTC;
@@ -178,10 +179,10 @@ void _integration_test( string connParam )
 
         auto r = a[0]; // first row
 
-        assert(r["int_num_value"].toBson == Bson("123"));
-        assert(r["text_value"].toBson == Bson("text string"));
-        assert(r["json_numeric_value"].toBson == Bson(123.456));
-        assert(r["json_text_value"].toBson == Bson("json_value_string"));
+        assert(r["int_num_value"].as!Bson == Bson("123"));
+        assert(r["text_value"].as!Bson == Bson("text string"));
+        assert(r["json_numeric_value"].as!Bson == Bson(123.456));
+        assert(r["json_text_value"].as!Bson == Bson("json_value_string"));
     }
 
     // binary answer tests
@@ -195,7 +196,7 @@ void _integration_test( string connParam )
             auto answer = conn.execParams(params);
 
             immutable Value v = answer[0][0];
-            Bson bsonRes = toBson(v, UTC());
+            Bson bsonRes = v.as!Bson(UTC());
 
             if(v.isNull || !v.isSupportedArray) // standalone
             {
@@ -246,12 +247,12 @@ void _integration_test( string connParam )
     }
 }
 
-private Bson Uuid2Bson(in UUID uuid)
+Bson Uuid2Bson(in UUID uuid)
 {
     return Bson(BsonBinData(BsonBinData.Type.uuid, uuid.data.idup));
 }
 
-private UUID Bson2Uuid(in Bson bson)
+UUID Bson2Uuid(in Bson bson)
 {
     const ubyte[16] b = bson.get!BsonBinData().rawData;
 

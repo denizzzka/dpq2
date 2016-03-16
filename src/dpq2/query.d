@@ -230,7 +230,7 @@ void _integration_test( string connParam ) @trusted
         assert( a.OID(4) == OidType.Int4Array );
 
         // binary args array test
-        assert( a[0][4].toBson == binArray );
+        assert( a[0][4].as!Bson == binArray );
     }
 
     // checking prepared statements

@@ -47,10 +47,11 @@ struct Value
 
     debug string toString() const @trusted
     {
+        import vibe.data.bson: Bson;
         import dpq2.conv.to_bson;
         import std.conv: to;
 
-        return toBson(this).toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
+        return this.as!Bson.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
 }
 

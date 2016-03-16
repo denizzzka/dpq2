@@ -191,7 +191,7 @@ unittest
         Value v = bsonToValue(bsonArray);
 
         assert(v.isSupportedArray);
-        assert(v.toBson == bsonArray);
+        assert(v.as!Bson == bsonArray);
     }
 
     {
@@ -203,7 +203,7 @@ unittest
         Value v = bsonToValue(bsonArray);
 
         assert(v.isSupportedArray);
-        assert(v.toBson == bsonArray);
+        assert(v.as!Bson == bsonArray);
     }
 
     {

@@ -8,9 +8,11 @@ import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStampWithoutTZ;
 
 import vibe.data.json: Json, parseJsonString;
+import vibe.data.bson: Bson;
 import std.traits;
 import std.uuid;
 import std.datetime;
+import std.traits: isScalarType;
 
 // Supported PostgreSQL binary types
 alias PGboolean =       bool; /// boolean
@@ -59,7 +61,7 @@ if(is(T == string))
 
 /// Returns value as D type value from binary formatted field
 @property T as(T)(in Value v)
-if(!is(T == string))
+if(!is(T == string) && !is(T == Bson))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,

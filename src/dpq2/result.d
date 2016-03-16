@@ -354,7 +354,7 @@ immutable (Array) asArray(immutable(Value) v)
 
 debug string toString(immutable Value v)
 {
-    return v.isNull ? "NULL" : v.toBson.toString;
+    return v.isNull ? "NULL" : v.as!Bson.toString;
 }
 
 package struct ArrayHeader_net // network byte order
