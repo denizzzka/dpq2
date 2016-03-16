@@ -95,6 +95,46 @@ OidType detectOidTypeFromNative(T)()
     }
 }
 
+OidType oidType2appropriateArrayType(OidType type)
+{
+    with(OidType)
+    switch(type)
+    {
+        case Text:
+            return TextArray;
+
+        case Bool:
+            return BoolArray;
+
+        case Int2:
+            return Int2Array;
+
+        case Int4:
+            return Int4Array;
+
+        case Int8:
+            return Int8Array;
+
+        case Float4:
+            return Float4Array;
+
+        case Float8:
+            return Float8Array;
+
+        default:
+        {
+            import dpq2.result: AnswerConvException, ConvExceptionType;
+            import std.conv: to;
+
+            throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
+                    ConvExceptionType.NOT_IMPLEMENTED,
+                    "Format "~type.to!(immutable(char)[])~" doesn't supported by array to Value converter",
+                    __FILE__, __LINE__
+                );
+        }
+    }
+}
+
 enum OidType : Oid
 {
     Undefined = 0,

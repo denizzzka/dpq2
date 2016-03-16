@@ -178,7 +178,7 @@ Value bsonArrayToValue(ref Bson bsonArr)
 
     ret ~= rawValues;
 
-    return Value(ret, ap.OID.oidType2arrayType, false, ValueFormat.BINARY);
+    return Value(ret, ap.OID.oidType2appropriateArrayType, false, ValueFormat.BINARY);
 }
 
 unittest
@@ -223,40 +223,5 @@ unittest
         }
 
         assert(exceptionFlag);
-    }
-}
-
-OidType oidType2arrayType(OidType type)
-{
-    with(OidType)
-    switch(type)
-    {
-        case Text:
-            return TextArray;
-
-        case Bool:
-            return BoolArray;
-
-        case Int2:
-            return Int2Array;
-
-        case Int4:
-            return Int4Array;
-
-        case Int8:
-            return Int8Array;
-
-        case Float4:
-            return Float4Array;
-
-        case Float8:
-            return Float8Array;
-
-        default:
-            throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
-                    ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format "~type.to!(immutable(char)[])~" doesn't supported by Bson array to Value converter",
-                    __FILE__, __LINE__
-                );
     }
 }
