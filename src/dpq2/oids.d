@@ -8,6 +8,7 @@
 module dpq2.oids;
 
 @safe:
+package:
 
 import derelict.pq.pq: Oid;
 
@@ -76,6 +77,22 @@ bool isSupportedArray(OidType t) pure
     }
 
     return false;
+}
+
+OidType detectOidTypeFromNative(T)()
+{
+    with(OidType)
+    {
+        static if(is(T == string)){ return Text; } else
+        static if(is(T == bool)){ return Bool; } else
+        static if(is(T == short)){ return Int2; } else
+        static if(is(T == int)){ return Int4; } else
+        static if(is(T == long)){ return Int8; } else
+        static if(is(T == float)){ return Float4; } else
+        static if(is(T == double)){ return Float8; } else
+
+        static assert(false, "Unsupported D type: "~T.stringof);
+    }
 }
 
 enum OidType : Oid
