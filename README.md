@@ -45,6 +45,7 @@ Example
 import dpq2;
 import std.stdio: writeln;
 import std.getopt;
+import vibe.data.bson;
 
 void main(string[] args)
 {
@@ -66,7 +67,7 @@ void main(string[] args)
     auto firstRow = answer[0];
     foreach(cell; rangify(firstRow))
     {
-        writeln("bson: ", cell.toBson);
+        writeln("bson: ", cell.as!Bson);
     }
 
     // Separated arguments query with binary result:
@@ -86,7 +87,7 @@ void main(string[] args)
         "{{1, 2, 3}, {4, 5, 6}}"
     ];
 
-    auto r = conn.exec(p);
+    auto r = conn.execParams(p);
     
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
     writeln( "1: ", r[0][1].as!PGtext );
@@ -98,12 +99,12 @@ void main(string[] args)
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
     writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
-    writeln( "5.2 Bson: ", r[0]["json_value"].toBson);
+    writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 
     // It is possible to read values of unknown type using BSON:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].toBson);
+        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].as!Bson);
     }
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
