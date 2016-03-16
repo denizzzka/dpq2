@@ -12,6 +12,26 @@ if(isNumeric!(T))
     return Value(v.nativeToBigEndian.dup, detectOidType!T, false, ValueFormat.BINARY);
 }
 
+@property Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
+if(is(T == string))
+{
+    if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
+
+    ubyte[] buf = cast(ubyte[]) v;
+
+    return Value(buf, detectOidType!T, false, valueFormat);
+}
+
+@property Value toValue(T)(T v) @trusted
+if(is(T == bool))
+{
+    ubyte[] buf;
+    buf.length = 1;
+    buf[0] = (v ? 1 : 0);
+
+    return Value(buf, detectOidType!T, false, ValueFormat.BINARY);
+}
+
 unittest
 {
     {
@@ -27,43 +47,21 @@ unittest
         assert(v.oidType == OidType.Float8);
         assert(v.as!double == -123.456);
     }
-}
 
-@property Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
-if(is(T == string))
-{
-    if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
+    {
+        Value v = toValue("Test string");
 
-    ubyte[] buf = cast(ubyte[]) v;
+        assert(v.oidType == OidType.Text);
+        assert(v.as!string == "Test string");
+    }
 
-    return Value(buf, detectOidType!T, false, valueFormat);
-}
+    {
+        Value t = toValue(true);
+        Value f = toValue(false);
 
-unittest
-{
-    Value v = toValue("Test string");
-
-    assert(v.oidType == OidType.Text);
-    assert(v.as!string == "Test string");
-}
-
-@property Value toValue(T)(T v) @trusted
-if(is(T == bool))
-{
-    ubyte[] buf;
-    buf.length = 1;
-    buf[0] = (v ? 1 : 0);
-
-    return Value(buf, detectOidType!T, false, ValueFormat.BINARY);
-}
-
-unittest
-{
-    Value t = toValue(true);
-    Value f = toValue(false);
-
-    assert(t.as!bool == true);
-    assert(f.as!bool == false);
+        assert(t.as!bool == true);
+        assert(f.as!bool == false);
+    }
 }
 
 private OidType detectOidType(T)()
