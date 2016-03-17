@@ -378,7 +378,7 @@ package struct Dim_net // network byte order
 
 struct ArrayProperties
 {
-    OidType OID = OidType.Unknown;
+    OidType OID = OidType.Undefined;
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
     package size_t dataOffset;

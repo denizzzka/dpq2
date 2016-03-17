@@ -129,7 +129,7 @@ OidType oidType2appropriateArrayType(OidType type)
 
             throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format "~type.to!(immutable(char)[])~" doesn't supported by array to Value converter",
+                    "Array type for type "~type.to!(immutable(char)[])~" isn't defined",
                     __FILE__, __LINE__
                 );
         }
