@@ -16,7 +16,7 @@ if(is(T == Bson))
     }
     else
     {
-        if(v.isSupportedArray)
+        if(v.isSupportedArray && ValueFormat.BINARY)
             return arrayValueToBson(v, tz);
         else
             return rawValueToBson(v, tz);

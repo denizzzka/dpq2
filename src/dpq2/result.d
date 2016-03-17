@@ -343,9 +343,15 @@ immutable struct Row
 @property
 immutable (Array) asArray(immutable(Value) v)
 {
+    if(v.format == ValueFormat.TEXT)
+        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
+            "Value internal format is text",
+            __FILE__, __LINE__
+        );
+
     if(!v.isSupportedArray)
         throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
-            "Format of the column is "~to!string(v.oidType)~", isn't supported array",
+            "Format of the value is "~to!string(v.oidType)~", isn't supported array",
             __FILE__, __LINE__
         );
 
@@ -385,7 +391,7 @@ struct ArrayProperties
 
         if(nDims < 0)
             throw new AnswerException(ExceptionType.FATAL_ERROR,
-                "Array dimensions number is too small ("~to!string(nDims)~"), it must be more than zero",
+                "Array dimensions number is negative ("~to!string(nDims)~")",
                 __FILE__, __LINE__
             );
 
@@ -401,9 +407,9 @@ struct ArrayProperties
             const dim_size = bigEndianToNative!int(d.dim_size);
             const lbound = bigEndianToNative!int(d.lbound);
 
-            if(!(dim_size > 0))
+            if(dim_size < 0)
                 throw new AnswerException(ExceptionType.FATAL_ERROR,
-                    "Dimension size isn't positive ("~to!string(dim_size)~")",
+                    "Dimension size is negative ("~to!string(dim_size)~")",
                     __FILE__, __LINE__
                 );
 

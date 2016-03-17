@@ -8,16 +8,17 @@
 module dpq2.oids;
 
 @safe:
-package:
 
-import derelict.pq.pq: Oid;
-
-package OidType oid2oidType(Oid oid) pure
+OidType oid2oidType(Oid oid) pure
 {
     static assert(Oid.sizeof == OidType.sizeof);
 
     return cast(OidType)(oid);
 }
+
+package:
+
+import derelict.pq.pq: Oid;
 
 bool isNativeInteger(OidType t) pure
 {
