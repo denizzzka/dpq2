@@ -96,43 +96,61 @@ OidType detectOidTypeFromNative(T)()
     }
 }
 
-OidType oidType2appropriateArrayType(OidType type)
+OidType oidConvTo(string s)(OidType type)
 {
-    with(OidType)
-    switch(type)
+    foreach(ref a; appropriateArrOid)
     {
-        case Text:
-            return TextArray;
-
-        case Bool:
-            return BoolArray;
-
-        case Int2:
-            return Int2Array;
-
-        case Int4:
-            return Int4Array;
-
-        case Int8:
-            return Int8Array;
-
-        case Float4:
-            return Float4Array;
-
-        case Float8:
-            return Float8Array;
-
-        default:
+        static if(s == "array")
         {
-            import dpq2.result: AnswerConvException, ConvExceptionType;
-            import std.conv: to;
-
-            throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
-                    ConvExceptionType.NOT_IMPLEMENTED,
-                    "Array type for type "~type.to!(immutable(char)[])~" isn't defined",
-                    __FILE__, __LINE__
-                );
+            if(a.value == type)
+                return a.array;
         }
+        else
+        static if(s == "element")
+        {
+            if(a.array == type)
+                return a.value;
+        }
+        else
+        static assert(false, "Wrong oidConvTo type "~s);
+    }
+
+    import dpq2.result: AnswerConvException, ConvExceptionType;
+    import std.conv: to;
+
+    throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
+            ConvExceptionType.NOT_IMPLEMENTED,
+            "Conv to "~s~" for type "~type.to!string~" isn't defined",
+            __FILE__, __LINE__
+        );
+}
+
+private struct AppropriateArrOid
+{
+    OidType value;
+    OidType array;
+}
+
+private immutable AppropriateArrOid[] appropriateArrOid;
+
+shared static this()
+{
+    alias A = AppropriateArrOid;
+
+    with(OidType)
+    {
+        immutable AppropriateArrOid[] a =
+        [
+            A(Text, TextArray),
+            A(Bool, BoolArray),
+            A(Int2, Int2Array),
+            A(Int4, Int4Array),
+            A(Int8, Int8Array),
+            A(Float4, Float4Array),
+            A(Float8, Float8Array)
+        ];
+
+        appropriateArrOid = a;
     }
 }
 

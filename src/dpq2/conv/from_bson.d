@@ -177,7 +177,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 
     ret ~= rawValues;
 
-    return Value(ret, ap.OID.oidType2appropriateArrayType, false, ValueFormat.BINARY);
+    return Value(ret, ap.OID.oidConvTo!"array", false, ValueFormat.BINARY);
 }
 
 unittest
