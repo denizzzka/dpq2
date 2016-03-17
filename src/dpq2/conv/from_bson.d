@@ -134,7 +134,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
                     break;
 
                 default:
-                    Value v = bsonValueToValue(bElem, defaultType);
+                    Value v = bsonValueToValue(bElem, OidType.Undefined);
 
                     if(ap.OID == OidType.Undefined)
                     {
@@ -157,7 +157,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 
     recursive(bsonArr, 0);
 
-    if(ap.OID == OidType.Undefined) ap.OID = defaultType;
+    if(ap.OID == OidType.Undefined) ap.OID = defaultType.oidConvTo!"element";
 
     ArrayHeader_net h;
     h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
