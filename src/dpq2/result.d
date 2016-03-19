@@ -1,7 +1,5 @@
 ﻿module dpq2.result;
 
-@trusted: // TODO: use @safe instead
-
 public import dpq2.conv.to_d_types;
 public import dpq2.conv.to_bson;
 public import dpq2.oids;
@@ -619,7 +617,7 @@ class AnswerException : Dpq2Exception
 {
     const ExceptionType type; /// Exception type
 
-    this(ExceptionType t, string msg, string file, size_t line) pure
+    this(ExceptionType t, string msg, string file, size_t line) pure @safe
     {
         type = t;
         super(msg, file, line);
@@ -642,7 +640,7 @@ class AnswerConvException : ConvException
 {
     const ConvExceptionType type; /// Exception type
 
-    this(ConvExceptionType t, string msg, string file, size_t line) pure
+    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
     {
         type = t;
         super(msg, file, line);
