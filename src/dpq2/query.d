@@ -1,7 +1,5 @@
 ﻿module dpq2.query;
 
-@safe:
-
 public import dpq2.args;
 
 import dpq2;
