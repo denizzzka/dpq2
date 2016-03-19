@@ -129,8 +129,6 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
     return res;
 }
 
-pure:
-
 // Here is used names from the original Postgresql source
 
 void j2date(int jd, out int year, out int month, out int day)
