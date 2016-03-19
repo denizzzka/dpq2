@@ -1,7 +1,5 @@
 ﻿module dpq2.connection;
 
-@trusted:
-
 import dpq2;
 
 import std.conv: to;
