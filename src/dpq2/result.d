@@ -1,6 +1,6 @@
 ﻿module dpq2.result;
 
-@trusted:
+@trusted: // TODO: use @safe instead
 
 public import dpq2.conv.to_d_types;
 public import dpq2.conv.to_bson;
