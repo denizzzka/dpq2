@@ -1,6 +1,6 @@
 ﻿module dpq2.conv.to_d_types;
 
-@trusted:
+@safe:
 
 import dpq2;
 
@@ -44,7 +44,7 @@ private alias AE = AnswerConvException;
 private alias ET = ConvExceptionType;
 
 /// Returns cell value as native string type from text or binary formatted field
-@property string as(T)(in Value v) pure
+@property string as(T)(in Value v) pure @trusted
 if(is(T == string))
 {
     if(v.format == VF.BINARY)
@@ -142,7 +142,7 @@ if( is( T == bool ) )
 }
 
 /// Returns Vibe.d's Json
-@property Json binaryValueAs(T)(in Value v)
+@property Json binaryValueAs(T)(in Value v) @trusted
 if( is( T == Json ) )
 {
     Json res;
@@ -151,8 +151,8 @@ if( is( T == Json ) )
     {
         case OidType.Json:
             // represent value as text and parse it into Json
-            auto t = Value(cast(ubyte[]) v.data, OidType.Text, false);
-            res = parseJsonString(t.as!PGtext);
+            string t = v.valueAsString;
+            res = parseJsonString(t);
             break;
 
         case OidType.Jsonb:
@@ -166,7 +166,7 @@ if( is( T == Json ) )
     return res;
 }
 
-public void _integration_test( string connParam )
+public void _integration_test( string connParam ) @system
 {
     auto conn = new Connection(connParam);
 

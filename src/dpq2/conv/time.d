@@ -6,6 +6,8 @@
 */
 module dpq2.conv.time;
 
+@safe:
+
 import dpq2.result;
 import dpq2.oids;
 
@@ -17,7 +19,7 @@ import core.stdc.time: time_t;
 pure:
 
 /// Returns value data as native Date
-@property Date binaryValueAs(T)(in Value v)
+@property Date binaryValueAs(T)(in Value v) @trusted
 if( is( T == Date ) )
 {
     if(!(v.oidType == OidType.Date))
@@ -35,7 +37,7 @@ if( is( T == Date ) )
 }
 
 /// Returns value time without time zone as native TimeOfDay
-@property TimeOfDay binaryValueAs(T)(in Value v)
+@property TimeOfDay binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeOfDay ) )
 {
     if(!(v.oidType == OidType.Time))
@@ -49,7 +51,7 @@ if( is( T == TimeOfDay ) )
 }
 
 /// Returns value timestamp without time zone as TimeStampWithoutTZ
-@property TimeStampWithoutTZ binaryValueAs(T)(in Value v)
+@property TimeStampWithoutTZ binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeStampWithoutTZ ) )
 {
     if(!(v.oidType == OidType.TimeStamp))
@@ -59,7 +61,9 @@ if( is( T == TimeStampWithoutTZ ) )
         throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
+    return rawTimeStamp2nativeTime(
+        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
+    );
 }
 
 struct TimeStampWithoutTZ
