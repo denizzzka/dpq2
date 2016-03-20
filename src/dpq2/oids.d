@@ -16,7 +16,65 @@ OidType oid2oidType(Oid oid) pure
     return cast(OidType)(oid);
 }
 
+OidType oidConvTo(string s)(OidType type)
+{
+    foreach(ref a; appropriateArrOid)
+    {
+        static if(s == "array")
+        {
+            if(a.value == type)
+                return a.array;
+        }
+        else
+        static if(s == "element")
+        {
+            if(a.array == type)
+                return a.value;
+        }
+        else
+        static assert(false, "Wrong oidConvTo type "~s);
+    }
+
+    import dpq2.result: AnswerConvException, ConvExceptionType;
+    import std.conv: to;
+
+    throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
+            ConvExceptionType.NOT_IMPLEMENTED,
+            "Conv to "~s~" for type "~type.to!string~" isn't defined",
+            __FILE__, __LINE__
+        );
+}
+
 package:
+
+private struct AppropriateArrOid
+{
+    OidType value;
+    OidType array;
+}
+
+private immutable AppropriateArrOid[] appropriateArrOid;
+
+shared static this()
+{
+    alias A = AppropriateArrOid;
+
+    with(OidType)
+    {
+        immutable AppropriateArrOid[] a =
+        [
+            A(Text, TextArray),
+            A(Bool, BoolArray),
+            A(Int2, Int2Array),
+            A(Int4, Int4Array),
+            A(Int8, Int8Array),
+            A(Float4, Float4Array),
+            A(Float8, Float8Array)
+        ];
+
+        appropriateArrOid = a;
+    }
+}
 
 import derelict.pq.pq: Oid;
 
@@ -93,64 +151,6 @@ OidType detectOidTypeFromNative(T)()
         static if(is(T == double)){ return Float8; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
-    }
-}
-
-OidType oidConvTo(string s)(OidType type)
-{
-    foreach(ref a; appropriateArrOid)
-    {
-        static if(s == "array")
-        {
-            if(a.value == type)
-                return a.array;
-        }
-        else
-        static if(s == "element")
-        {
-            if(a.array == type)
-                return a.value;
-        }
-        else
-        static assert(false, "Wrong oidConvTo type "~s);
-    }
-
-    import dpq2.result: AnswerConvException, ConvExceptionType;
-    import std.conv: to;
-
-    throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
-            ConvExceptionType.NOT_IMPLEMENTED,
-            "Conv to "~s~" for type "~type.to!string~" isn't defined",
-            __FILE__, __LINE__
-        );
-}
-
-private struct AppropriateArrOid
-{
-    OidType value;
-    OidType array;
-}
-
-private immutable AppropriateArrOid[] appropriateArrOid;
-
-shared static this()
-{
-    alias A = AppropriateArrOid;
-
-    with(OidType)
-    {
-        immutable AppropriateArrOid[] a =
-        [
-            A(Text, TextArray),
-            A(Bool, BoolArray),
-            A(Int2, Int2Array),
-            A(Int4, Int4Array),
-            A(Int8, Int8Array),
-            A(Float4, Float4Array),
-            A(Float8, Float8Array)
-        ];
-
-        appropriateArrOid = a;
     }
 }
 
