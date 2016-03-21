@@ -19,8 +19,9 @@ mixin template Queries()
     }
     
     /// Perform SQL query to DB
-    immutable (Answer) execParams(ref QueryParams p)
+    immutable (Answer) execParams(in ref QueryParams qp)
     {
+        auto p = InternalQueryParams(qp);
         auto pgResult = PQexecParams (
                 conn,
                 p.command,
@@ -44,10 +45,11 @@ mixin template Queries()
         const size_t r = PQsendQuery( conn, toStringz(SQLcmd) );
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
-    
+
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQueryParams(ref QueryParams p)
+    void sendQueryParams(in ref QueryParams qp)
     {
+        auto p = InternalQueryParams(qp);
         size_t r = PQsendQueryParams (
                 conn,
                 p.command,
@@ -63,8 +65,9 @@ mixin template Queries()
     }
 
     /// Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)
-    void sendQueryPrepared(ref QueryParams p)
+    void sendQueryPrepared(in ref QueryParams qp)
     {
+        auto p = InternalQueryParams(qp);
         size_t r = PQsendQueryPrepared(
                 conn,
                 cast(char*) p.stmtName, //TODO: need report to derelict pq

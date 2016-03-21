@@ -26,41 +26,49 @@ struct QueryParams
 
     @property string preparedStatementName() const { return sqlCommand; }
     @property void preparedStatementName(string s){ sqlCommand = s; }
+}
 
+/// Used as parameters by PQexecParams-like functions
+package struct InternalQueryParams
+{
     private
     {
+        const(string)* sqlCommand;
         Oid[] oids;
         int[] formats;
         int[] lengths;
         const(ubyte)*[] values;
     }
 
-    private void prepareArgs() pure
+    ValueFormat resultFormat;
+
+    this(in ref QueryParams qp) pure
     {
-        oids = new Oid[args.length];
-        formats = new int[args.length];
-        lengths = new int[args.length];
-        values = new const(ubyte)* [args.length];
+        sqlCommand = &qp.sqlCommand;
+        resultFormat = qp.resultFormat;
 
-        for(int i = 0; i < args.length; ++i)
+        oids = new Oid[qp.args.length];
+        formats = new int[qp.args.length];
+        lengths = new int[qp.args.length];
+        values = new const(ubyte)* [qp.args.length];
+
+        for(int i = 0; i < qp.args.length; ++i)
         {
-            oids[i] = args[i].oidType;
-            formats[i] = args[i].format;
+            oids[i] = qp.args[i].oidType;
+            formats[i] = qp.args[i].format;
 
-            if(!args[i].isNull)
+            if(!qp.args[i].isNull)
             {
-                lengths[i] = args[i].data.length.to!int;
-                values[i] = args[i].data.ptr;
+                lengths[i] = qp.args[i].data.length.to!int;
+                values[i] = qp.args[i].data.ptr;
             }
         }
     }
 
-    package:
-
-    /// used by PQexecParams-like functions
+    /// Values used by PQexecParams-like functions
     const(char)* command() pure const
     {
-        return cast(const(char)*) sqlCommand.toStringz;
+        return cast(const(char)*) (*sqlCommand).toStringz;
     }
 
     /// ditto
@@ -72,34 +80,30 @@ struct QueryParams
     /// ditto
     int nParams() pure const
     {
-        return args.length.to!int;
+        return values.length.to!int;
     }
 
     /// ditto
     const(Oid)* paramTypes() pure
     {
-        prepareArgs();
         return oids.ptr;
     }
 
     /// ditto
     const(ubyte*)* paramValues() pure
     {
-        prepareArgs();
         return values.ptr;
     }
 
     /// ditto
     const(int)* paramLengths() pure
     {
-        prepareArgs();
         return lengths.ptr;
     }
 
     /// ditto
     const(int)* paramFormats() pure
     {
-        prepareArgs();
         return formats.ptr;
     }
 }
