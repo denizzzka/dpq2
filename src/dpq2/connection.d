@@ -182,6 +182,13 @@ class Connection
         return PQsetSingleRowMode(conn) == 1;
     }
 
+    /**
+     If the cancellation is effective, the current command will
+     terminate early and return an error result (exception). If the
+     cancellation fails (say, because the server was already done
+     processing the command), then there will be no visible result at
+     all.
+    */
     void cancel()
     {
         auto c = new Cancellation(this);
@@ -320,6 +327,14 @@ class Cancellation
         PQfreeCancel(cancel);
     }
 
+    /**
+     Successful dispatch is no guarantee that the request will have any
+     effect, however. If the cancellation is effective, the current
+     command will terminate early and return an error result
+     (exception). If the cancellation fails (say, because the server
+     was already done processing the command), then there will be no
+     visible result at all.
+    */
     void doCancel()
     {
         char[256] errbuf;
