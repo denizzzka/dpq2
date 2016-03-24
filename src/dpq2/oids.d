@@ -9,7 +9,7 @@ module dpq2.oids;
 
 @safe:
 
-OidType oid2oidType(Oid oid) pure
+@property OidType oid2oidType(Oid oid) pure
 {
     static assert(Oid.sizeof == OidType.sizeof);
 

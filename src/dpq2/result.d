@@ -196,6 +196,27 @@ immutable class Answer : Result
         );
     }
 
+    /**
+     Returns the number of parameters of a prepared statement.
+     This function is only useful when inspecting the result of describePrepared.
+     For other types of queries it will return zero.
+    */
+    uint nParams()
+    {
+        return PQnparams(cast(PGresult*) result); //TODO: need report to derelict pq
+    }
+
+    /**
+     Returns the data type of the indicated statement parameter.
+     Parameter numbers start at 0.
+     This function is only useful when inspecting the result of describePrepared.
+     For other types of queries it will return zero.
+    */
+    OidType paramType(uint paramNum)
+    {
+        return PQparamtype(cast(PGresult*) result, paramNum).oid2oidType; //TODO: need report to derelict pq
+    }
+
     debug override string toString()
     {
         import std.ascii: newline;

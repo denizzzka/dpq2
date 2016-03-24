@@ -120,14 +120,14 @@ mixin template Queries()
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-    immutable(Result) describePrepared(string statementName)
+    immutable(Answer) describePrepared(string statementName)
     {
         PGresult* pgResult = PQdescribePrepared(conn, cast(char*)toStringz(statementName)); //TODO: need report to derelict pq
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
         auto container = createResultContainer(cast(immutable) pgResult);
 
-        return new immutable Result(container);
+        return new immutable Answer(container);
     }
 
     /// Waiting for completion of reading or writing
@@ -271,7 +271,11 @@ void _integration_test( string connParam ) @trusted
     }
     {
         // check prepared arg types and result types
-        auto r = conn.describePrepared("prepared statement 2");
+        auto a = conn.describePrepared("prepared statement 2");
+
+        assert(a.nParams == 2);
+        assert(a.paramType(0) == OidType.Text);
+        assert(a.paramType(1) == OidType.Int4);
     }
     {
         QueryParams p;
