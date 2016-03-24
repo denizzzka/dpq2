@@ -120,6 +120,16 @@ mixin template Queries()
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
+    immutable(Result) describePrepared(string statementName)
+    {
+        PGresult* pgResult = PQdescribePrepared(conn, cast(char*)toStringz(statementName)); //TODO: need report to derelict pq
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Result(container);
+    }
+
     /// Waiting for completion of reading or writing
     /// Return: timeout not occured
     bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
@@ -258,6 +268,10 @@ void _integration_test( string connParam ) @trusted
 
         assert(res.length == 1);
         assert(res[0].status == PGRES_COMMAND_OK);
+    }
+    {
+        // check prepared arg types and result types
+        auto r = conn.describePrepared("prepared statement 2");
     }
     {
         QueryParams p;
