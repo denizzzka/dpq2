@@ -212,9 +212,9 @@ immutable class Answer : Result
      This function is only useful when inspecting the result of describePrepared.
      For other types of queries it will return zero.
     */
-    OidType paramType(uint paramNum)
+    OidType paramType(T)(T paramNum)
     {
-        return PQparamtype(cast(PGresult*) result, paramNum).oid2oidType; //TODO: need report to derelict pq
+        return PQparamtype(cast(PGresult*) result, paramNum.to!uint).oid2oidType; //TODO: need report to derelict pq
     }
 
     debug override string toString()
