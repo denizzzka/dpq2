@@ -124,6 +124,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             break;
 
         case Text:
+        case FixedString:
             res = Bson(v.valueAsString);
             break;
 
@@ -221,6 +222,7 @@ public void _integration_test( string connParam )
         C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
         C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
         C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
+        C(Bson("12345 "), "char(6)", "'12345'");
         C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
 
         C(Bson(BsonBinData(
