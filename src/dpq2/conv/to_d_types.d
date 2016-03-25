@@ -49,8 +49,13 @@ if(is(T == string))
 {
     if(v.format == VF.BINARY)
     {
-        if(!(v.oidType == OidType.Text || v.oidType == OidType.Numeric || v.oidType == OidType.Json))
-            throwTypeComplaint(v.oidType, "string, numeric or json", __FILE__, __LINE__);
+        if(!(
+            v.oidType == OidType.Text ||
+            v.oidType == OidType.FixedString ||
+            v.oidType == OidType.Numeric ||
+            v.oidType == OidType.Json
+        ))
+            throwTypeComplaint(v.oidType, "Text, FixedString, Numeric or Json", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
             return rawValueToNumeric(v.data);
@@ -195,6 +200,7 @@ public void _integration_test( string connParam ) @system
         C!PGreal(-12.3456f, "real", "-12.3456");
         C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
+        C!PGtext("12345 ", "char(6)", "'12345'");
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
