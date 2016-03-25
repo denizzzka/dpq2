@@ -26,6 +26,11 @@ Value bsonValueToValue(Bson v, OidType defaultType)
             ret = Value(ValueFormat.BINARY, defaultType);
             break;
 
+        case Bson.Type.object:
+            ret = v.toJson.toString.toValue;
+            ret.oidType = OidType.Json;
+            break;
+
         case bool_:
             ret = v.get!bool.toValue;
             break;
