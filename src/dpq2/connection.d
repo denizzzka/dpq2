@@ -132,9 +132,9 @@ class Connection
 
     Socket socket()
     {
-        import core.sys.posix.unistd: dup;
+        static import core.sys.posix.unistd;
 
-        socket_t s = cast(socket_t) dup(cast(socket_t) posixSocket);
+        socket_t s = cast(socket_t) core.sys.posix.unistd.dup(cast(socket_t) posixSocket);
         return new Socket(s, AddressFamily.UNSPEC);
     }
 
