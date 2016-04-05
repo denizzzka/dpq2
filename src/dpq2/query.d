@@ -136,7 +136,7 @@ mixin template Queries()
     {
         import std.socket;
 
-        auto socket = socket();
+        auto socket = this.socket();
         auto set = new SocketSet;
         set.add(socket);
 
