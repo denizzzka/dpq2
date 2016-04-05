@@ -16,8 +16,8 @@ Features
 
 * Text string arguments support
 * Binary arguments support (including multi-dimensional arrays)
-* Both text and binary formats of result support
-* Immutable result for simplify multithreading
+* Both text and binary formats of query result support
+* Immutable query result for simplify multithreading
 * Async queries support
 * Reading of the text query results to native D text types
 * Representation of the binary query results to native D types
