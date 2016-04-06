@@ -379,6 +379,8 @@ immutable (Array) asArray(immutable(Value) v)
 
 debug string toString(immutable Value v)
 {
+    import vibe.data.bson: Bson;
+
     return v.isNull ? "NULL" : v.as!Bson.toString;
 }
 

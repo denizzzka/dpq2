@@ -10,6 +10,7 @@ module dpq2.conv.time;
 
 import dpq2.result;
 import dpq2.oids;
+import dpq2.conv.to_d_types: throwTypeComplaint;
 
 import std.datetime;
 import std.bitmanip: bigEndianToNative;
