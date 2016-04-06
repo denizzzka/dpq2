@@ -17,23 +17,6 @@ shared static this()
     }
 }
 
-shared static ~this()
-{
-    debug
-    {
-        trace("DerelictPQ unloading...");
-    }
-
-    import core.memory: GC;
-    GC.collect();
-    DerelictPQ.unload();
-
-    debug
-    {
-        trace("DerelictPQ unloading finished");
-    }
-}
-
 /// Base for all dpq2 exceptions classes
 class Dpq2Exception : Exception
 {
