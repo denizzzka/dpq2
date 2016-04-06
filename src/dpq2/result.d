@@ -12,7 +12,7 @@ import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
-import std.conv: ConvException;
+import std.conv: to, ConvException;
 
 /// Result table's cell coordinates 
 private struct Coords
