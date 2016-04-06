@@ -3,7 +3,7 @@
 public import dpq2.args;
 
 import dpq2;
-import core.time: Duration;
+import core.time: Duration, dur;
 import std.exception: enforce;
 
 mixin template Queries()
