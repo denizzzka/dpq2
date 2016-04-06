@@ -13,6 +13,8 @@ import std.traits;
 import std.uuid;
 import std.datetime;
 import std.traits: isScalarType;
+import std.bitmanip: bigEndianToNative;
+import std.conv: to;
 
 // Supported PostgreSQL binary types
 alias PGboolean =       bool; /// boolean

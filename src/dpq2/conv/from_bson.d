@@ -3,6 +3,7 @@ module dpq2.conv.from_bson;
 import dpq2;
 import vibe.data.bson;
 import std.bitmanip: nativeToBigEndian;
+import std.conv: to;
 
 /// Default type will be used for NULL value and for array without detected type
 @property Value bsonToValue(Bson v, OidType defaultType = OidType.Undefined)

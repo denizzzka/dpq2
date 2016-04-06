@@ -6,6 +6,8 @@ public import dpq2.conv.from_d_types;
 public import dpq2.conv.from_bson;
 
 import dpq2;
+import std.conv: to;
+import std.string: toStringz;
 
 /// Query parameters
 struct QueryParams

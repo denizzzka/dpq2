@@ -4,11 +4,12 @@ import dpq2;
 
 import std.conv: to;
 import std.string: toStringz, fromStringz;
-import std.exception: enforceEx;
+import std.exception: enforce, enforceEx;
 import std.range;
 import std.stdio: File;
 import std.socket;
 import core.exception;
+import core.time: Duration;
 
 /*
  * Bugs: On Unix connection is not thread safe.

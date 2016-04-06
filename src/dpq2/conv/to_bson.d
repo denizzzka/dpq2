@@ -4,6 +4,7 @@ import dpq2;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
+import std.bitmanip: bigEndianToNative;
 
 @property Bson as(T)(in Value v, immutable TimeZone tz = null)
 if(is(T == Bson))

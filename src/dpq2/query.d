@@ -4,6 +4,7 @@ public import dpq2.args;
 
 import dpq2;
 import core.time: Duration;
+import std.exception: enforce;
 
 mixin template Queries()
 {
