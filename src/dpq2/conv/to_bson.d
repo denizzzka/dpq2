@@ -1,10 +1,12 @@
 ﻿module dpq2.conv.to_bson;
 
 import dpq2;
+import dpq2.conv.to_d_types;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
 import std.bitmanip: bigEndianToNative;
+import std.conv: to;
 
 @property Bson as(T)(in Value v, immutable TimeZone tz = null)
 if(is(T == Bson))
