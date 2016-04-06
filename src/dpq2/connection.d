@@ -132,9 +132,17 @@ class Connection
 
     Socket socket()
     {
-        static import core.sys.posix.unistd;
+        version(Posix)
+        {
+            import core.sys.posix.unistd: dup;
 
-        socket_t s = cast(socket_t) core.sys.posix.unistd.dup(cast(socket_t) posixSocket);
+            socket_t s = cast(socket_t) dup(cast(socket_t) posixSocket);
+        }
+        else version(Windows)
+        {
+            assert(false, "FIXME: implement socket duplication");
+        }
+
         return new Socket(s, AddressFamily.UNSPEC);
     }
 
