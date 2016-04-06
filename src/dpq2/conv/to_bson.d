@@ -1,7 +1,7 @@
 ﻿module dpq2.conv.to_bson;
 
 import dpq2;
-import dpq2.conv.to_d_types;
+import dpq2.conv.to_d_types: binaryValueAs, valueAsString, rawValueToNumeric;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
