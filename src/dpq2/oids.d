@@ -143,6 +143,7 @@ OidType detectOidTypeFromNative(T)()
     with(OidType)
     {
         static if(is(T == string)){ return Text; } else
+        static if(is(T == ubyte[])){ return ByteArray; } else
         static if(is(T == bool)){ return Bool; } else
         static if(is(T == short)){ return Int2; } else
         static if(is(T == int)){ return Int4; } else

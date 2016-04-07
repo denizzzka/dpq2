@@ -22,6 +22,12 @@ if(is(T == string))
     return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
 }
 
+@property Value toValue(T)(T v)
+if(is(T == ubyte[]))
+{
+    return Value(v, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+}
+
 @property Value toValue(T)(T v) @trusted
 if(is(T == bool))
 {
@@ -53,6 +59,14 @@ unittest
 
         assert(v.oidType == OidType.Text);
         assert(v.as!string == "Test string");
+    }
+
+    {
+        ubyte[] buf = [0, 1, 2, 3, 4, 5];
+        Value v = toValue(buf.dup);
+
+        assert(v.oidType == OidType.ByteArray);
+        assert(v.as!(const ubyte[]) == buf);
     }
 
     {

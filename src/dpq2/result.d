@@ -319,6 +319,9 @@ immutable struct Row
     {
         answer.assertCoords( Coords( row, col ) );
 
+        // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
+        // One should not modify the data it points to, and one must explicitly copy the data into other
+        // storage if it is to be used past the lifetime of the PGresult structure itself.
         auto v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
         auto s = size( col );
 

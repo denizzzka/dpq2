@@ -13,6 +13,12 @@ struct Value
     package ValueFormat format;
     package ubyte[] _data;
 
+    // FIXME:
+    // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
+    // One should not modify the data it points to, and one must explicitly copy the data into other
+    // storage if it is to be used past the lifetime of the PGresult structure itself.
+    // Thus, it is need to store reference to Answer here to ensure that result is still available.
+
     this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
     {
         this._data = data;
