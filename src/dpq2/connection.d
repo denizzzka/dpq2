@@ -138,13 +138,12 @@ class Connection
             import core.sys.posix.unistd: dup;
 
             socket_t s = cast(socket_t) dup(cast(socket_t) posixSocket);
+            return new Socket(s, AddressFamily.UNSPEC);
         }
         else version(Windows)
         {
             assert(false, "FIXME: implement socket duplication");
         }
-
-        return new Socket(s, AddressFamily.UNSPEC);
     }
 
     string errorMessage() const nothrow
