@@ -79,7 +79,7 @@ immutable class Result
     @property
     string resultErrorField(int fieldcode)
     {
-        return to!string( PQresultErrorField(cast(PGresult*)result, fieldcode) ); //TODO: need report to derelict, result should be a const
+        return PQresultErrorField(result, fieldcode).to!string;
     }
 
     immutable(Answer) getAnswer()
@@ -175,7 +175,7 @@ immutable class Answer : Result
     /// Returns column name by field number
     string columnName( in size_t colNum )
     {
-        const char* s = PQfname(cast(PGresult*) result, to!int(colNum)); // FIXME: result should be a const
+        const char* s = PQfname(result, colNum.to!int);
 
         if( s == null )
             throw new AnswerException(
@@ -203,7 +203,7 @@ immutable class Answer : Result
     */
     uint nParams()
     {
-        return PQnparams(cast(PGresult*) result); //TODO: need report to derelict pq
+        return PQnparams(result);
     }
 
     /**
@@ -214,7 +214,7 @@ immutable class Answer : Result
     */
     OidType paramType(T)(T paramNum)
     {
-        return PQparamtype(cast(PGresult*) result, paramNum.to!uint).oid2oidType; //TODO: need report to derelict pq
+        return PQparamtype(result, paramNum.to!uint).oid2oidType;
     }
 
     debug override string toString()
