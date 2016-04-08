@@ -27,10 +27,10 @@ mixin template Queries()
                 conn,
                 p.command,
                 p.nParams,
-                cast(uint*) p.paramTypes, //TODO: need report to derelict pq
-                cast(const(ubyte)**) p.paramValues, //TODO: need report to derelict pq
-                cast(int*) p.paramLengths, //TODO: need report to derelict pq
-                cast(int*) p.paramFormats, //TODO: need report to derelict pq
+                p.paramTypes,
+                p.paramValues,
+                p.paramLengths,
+                p.paramFormats,
                 p.resultFormat
         );
 
@@ -55,10 +55,10 @@ mixin template Queries()
                 conn,
                 p.command,
                 p.nParams,
-                cast(uint*) p.paramTypes, //TODO: need report to derelict pq
-                cast(const(ubyte)**) p.paramValues, //TODO: need report to derelict pq
-                cast(int*) p.paramLengths, //TODO: need report to derelict pq
-                cast(int*) p.paramFormats, //TODO: need report to derelict pq
+                p.paramTypes,
+                p.paramValues,
+                p.paramLengths,
+                p.paramFormats,
                 p.resultFormat
             );
 
@@ -71,11 +71,11 @@ mixin template Queries()
         auto p = InternalQueryParams(qp);
         size_t r = PQsendQueryPrepared(
                 conn,
-                cast(char*) p.stmtName, //TODO: need report to derelict pq
+                p.stmtName,
                 p.nParams,
-                cast(char**) p.paramValues, //TODO: need report to derelict pq
-                cast(int*) p.paramLengths, //TODO: need report to derelict pq
-                cast(int*) p.paramFormats, //TODO: need report to derelict pq
+                p.paramValues,
+                p.paramLengths,
+                p.paramFormats,
                 p.resultFormat
             );
 
@@ -95,8 +95,8 @@ mixin template Queries()
     {
         PGresult* pgResult = PQprepare(
                 conn,
-                cast(char*)toStringz(statementName), //TODO: need report to derelict pq
-                cast(char*)toStringz(sqlStatement), //TODO: need report to derelict pq
+                toStringz(statementName),
+                toStringz(sqlStatement),
                 0,
                 null
             );
@@ -112,8 +112,8 @@ mixin template Queries()
     {
         size_t r = PQsendPrepare(
                 conn,
-                cast(char*)toStringz(statementName), //TODO: need report to derelict pq
-                cast(char*)toStringz(sqlStatement), //TODO: need report to derelict pq
+                toStringz(statementName),
+                toStringz(sqlStatement),
                 0,
                 null
             );
@@ -123,7 +123,7 @@ mixin template Queries()
 
     immutable(Answer) describePrepared(string statementName)
     {
-        PGresult* pgResult = PQdescribePrepared(conn, cast(char*)toStringz(statementName)); //TODO: need report to derelict pq
+        PGresult* pgResult = PQdescribePrepared(conn, toStringz(statementName));
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
         auto container = createResultContainer(cast(immutable) pgResult);
