@@ -53,7 +53,7 @@ class Connection
 	/// Connect to DB in a nonblocking manner
     this(ConnectionStart, string connString)
     {
-        conn = PQconnectStart(cast(char*) toStringz(connString)); // TODO: wrong DerelictPQ args
+        conn = PQconnectStart(toStringz(connString));
 
         enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 
@@ -148,7 +148,7 @@ class Connection
 
     string errorMessage() const nothrow
     {
-        return to!string(PQerrorMessage(cast(PGconn*) conn)); //TODO: need report to derelict pq
+        return PQerrorMessage(conn).to!string;
     }
 
     /**
@@ -214,7 +214,7 @@ class Connection
     {
         assert(conn);
 
-        auto res = PQparameterStatus(conn, cast(char*) toStringz(paramName)); //TODO: need report to derelict pq
+        auto res = PQparameterStatus(conn, toStringz(paramName));
 
         if(res is null)
             throw new ConnectionException(this, __FILE__, __LINE__);
@@ -258,7 +258,7 @@ class Connection
     {
         assert(conn);
 
-        return to!string(PQhost(cast(PGconn*) conn).fromStringz); //TODO: need report to derelict pq
+        return PQhost(conn).fromStringz.to!string;
     }
 
     void trace(ref File stream)
@@ -273,7 +273,7 @@ class Connection
 
     void setClientEncoding(string encoding)
     {
-        if(PQsetClientEncoding(conn, cast(char*) encoding.toStringz) != 0) //TODO: need report to derelict pq
+        if(PQsetClientEncoding(conn, encoding.toStringz) != 0)
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 }
@@ -281,7 +281,7 @@ class Connection
 void connStringCheck(string connString)
 {
     char* errmsg = null;
-    PQconninfoOption* r = PQconninfoParse(cast(char*) connString.toStringz, &errmsg); //TODO: need report to derelict pq
+    PQconninfoOption* r = PQconninfoParse(connString.toStringz, &errmsg);
 
     if(r is null)
     {
