@@ -286,7 +286,7 @@ void _integration_test( string connParam ) @trusted
         assert(a.paramType(1) == OidType.Int4);
     }
     {
-        // check sendDescribePrepared
+        // async check prepared arg types and result types
         conn.sendDescribePrepared("prepared statement 2");
 
         conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
