@@ -131,6 +131,13 @@ mixin template Queries()
         return new immutable Answer(container);
     }
 
+    void sendDescribePrepared(string statementName)
+    {
+        size_t r = PQsendDescribePrepared(conn, statementName.toStringz);
+
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
     /// Waiting for completion of reading or writing
     /// Return: timeout not occured
     bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
@@ -273,6 +280,31 @@ void _integration_test( string connParam ) @trusted
     {
         // check prepared arg types and result types
         auto a = conn.describePrepared("prepared statement 2");
+
+        assert(a.nParams == 2);
+        assert(a.paramType(0) == OidType.Text);
+        assert(a.paramType(1) == OidType.Int4);
+    }
+    {
+        // check sendDescribePrepared
+        conn.sendDescribePrepared("prepared statement 2");
+
+        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
+        conn.consumeInput();
+
+        immutable(Result)[] res;
+
+        while(true)
+        {
+            auto r = conn.getResult();
+            if(r is null) break;
+            res ~= r;
+        }
+
+        assert(res.length == 1);
+        assert(res[0].status == PGRES_COMMAND_OK);
+
+        auto a = res[0].getAnswer;
 
         assert(a.nParams == 2);
         assert(a.paramType(0) == OidType.Text);
