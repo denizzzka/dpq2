@@ -186,6 +186,14 @@ immutable class Answer : Result
 
         return to!string(fromStringz(s));
     }
+    
+    /// Returns true if the column exists, false if not
+    bool columnExists( string columnName )
+    {    
+        size_t n = PQfnumber(result, toStringz(columnName));
+
+        return( n != -1 );
+    }    
 
     /// Returns row of cells
     immutable (Row) opIndex(in size_t row)
@@ -697,6 +705,8 @@ void _integration_test( string connParam )
         assert( e[2].isNULL(0) );
         assert( e.columnNum( "field_name" ) == 1 );
         assert( e[1]["field_name"].as!PGtext == "def" );
+        assert(e.columnExists("field_name"));
+        assert(!e.columnExists("foo"));
     }
 
     QueryParams p;
