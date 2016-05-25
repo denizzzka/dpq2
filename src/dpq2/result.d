@@ -186,14 +186,14 @@ immutable class Answer : Result
 
         return to!string(fromStringz(s));
     }
-    
+
     /// Returns true if the column exists, false if not
     bool columnExists( string columnName )
     {    
-        size_t n = PQfnumber(result, toStringz(columnName));
+        size_t n = PQfnumber(result, columnName.toStringz);
 
-        return( n != -1 );
-    }    
+        return n != -1;
+    }
 
     /// Returns row of cells
     immutable (Row) opIndex(in size_t row)
