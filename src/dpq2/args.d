@@ -62,7 +62,7 @@ package struct InternalQueryParams
             if(!qp.args[i].isNull)
             {
                 lengths[i] = qp.args[i].data.length.to!int;
-                values[i] = qp.args[i].data.ptr;
+                values[i] = &qp.args[i].data[0];
             }
         }
     }
@@ -88,24 +88,36 @@ package struct InternalQueryParams
     /// ditto
     const(Oid)* paramTypes() pure
     {
-        return oids.ptr;
+        if(oids.length == 0)
+            return null;
+        else
+            return &oids[0];
     }
 
     /// ditto
     const(ubyte*)* paramValues() pure
     {
-        return values.ptr;
+        if(values.length == 0)
+            return null;
+        else
+            return &values[0];
     }
 
     /// ditto
     const(int)* paramLengths() pure
     {
-        return lengths.ptr;
+        if(lengths.length == 0)
+            return null;
+        else
+            return &lengths[0];
     }
 
     /// ditto
     const(int)* paramFormats() pure
     {
-        return formats.ptr;
+        if(formats.length == 0)
+            return null;
+        else
+            return &formats[0];
     }
 }
