@@ -1,6 +1,7 @@
 module dpq2.conv.from_bson;
 
 import dpq2;
+import dpq2.exception;
 import vibe.data.bson;
 import std.bitmanip: nativeToBigEndian;
 import std.conv: to;

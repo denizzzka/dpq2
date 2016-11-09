@@ -1,6 +1,7 @@
-﻿module dpq2.connection;
+module dpq2.connection;
 
 import dpq2;
+import dpq2.exception;
 
 import std.conv: to;
 import std.string: toStringz, fromStringz;

@@ -6,6 +6,7 @@ import dpq2;
 
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStampWithoutTZ;
+import dpq2.exception;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;

@@ -6,13 +6,14 @@ public import dpq2.oids;
 public import dpq2.value;
 
 import dpq2;
+import dpq2.exception;
 
 import core.vararg;
 import std.string: toStringz, fromStringz;
 import std.exception: enforceEx;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
-import std.conv: to, ConvException;
+import std.conv: to;
 
 /// Result table's cell coordinates 
 private struct Coords
@@ -659,27 +660,6 @@ class AnswerException : Dpq2Exception
 }
 
 package immutable msg_NOT_BINARY = "Format of the column is not binary";
-
-/// Conversion exception types
-enum ConvExceptionType
-{
-    NOT_ARRAY, /// Format of the value isn't array
-    NOT_BINARY, /// Format of the column isn't binary
-    NOT_TEXT, /// Format of the column isn't text string
-    NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
-    SIZE_MISMATCH /// Result value size is not matched to the received Postgres value
-}
-
-class AnswerConvException : ConvException
-{
-    const ConvExceptionType type; /// Exception type
-
-    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
-    {
-        type = t;
-        super(msg, file, line);
-    }
-}
 
 void _integration_test( string connParam )
 {

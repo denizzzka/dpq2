@@ -35,7 +35,7 @@ OidType oidConvTo(string s)(OidType type)
         static assert(false, "Wrong oidConvTo type "~s);
     }
 
-    import dpq2.result: AnswerConvException, ConvExceptionType;
+    import dpq2.exception: AnswerConvException, ConvExceptionType;
     import std.conv: to;
 
     throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
