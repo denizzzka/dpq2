@@ -62,7 +62,11 @@ package struct InternalQueryParams
             if(!qp.args[i].isNull)
             {
                 lengths[i] = qp.args[i].data.length.to!int;
-                values[i] = &qp.args[i].data[0];
+
+                if(qp.args[i].data.length == 0)
+                    values[i] = null;
+                else
+                    values[i] = &qp.args[i].data[0];
             }
         }
     }
