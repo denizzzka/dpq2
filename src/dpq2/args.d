@@ -63,7 +63,11 @@ package struct InternalQueryParams
             {
                 lengths[i] = qp.args[i].data.length.to!int;
 
-                if(qp.args[i].data.length != 0)
+                immutable ubyte[] zeroLengthArg = [123]; // fake value, isn't unused as argument
+
+                if(qp.args[i].data.length == 0)
+                    values[i] = &zeroLengthArg[0];
+                else
                     values[i] = &qp.args[i].data[0];
             }
         }

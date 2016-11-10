@@ -252,6 +252,20 @@ void _integration_test( string connParam ) @trusted
         assert( a[0][4].as!Bson == binArray );
     }
 
+    {
+        // Bug #52: empty text argument
+        QueryParams p;
+        Value v = toValue("");
+
+        p.sqlCommand = "SELECT $1";
+        p.args = [v];
+
+        auto a = conn.execParams(p);
+
+        assert( !a[0][0].isNull );
+        assert( a[0][0].as!string == "" );
+    }
+
     // checking prepared statements
     {
         // uses PQprepare:
