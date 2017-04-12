@@ -44,7 +44,7 @@ package struct InternalQueryParams
 
     ValueFormat resultFormat;
 
-    this(in ref QueryParams qp) pure
+    this(in QueryParams* qp) pure
     {
         sqlCommand = &qp.sqlCommand;
         resultFormat = qp.resultFormat;

@@ -136,8 +136,7 @@ if( is( T == UUID ) )
 }
 
 /// Returns boolean as native bool value
-@property bool binaryValueAs(T)(in Value v)
-if( is( T == bool ) )
+@property bool binaryValueAs(T : bool)(in Value v)
 {
     if(!(v.oidType == OidType.Bool))
         throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);

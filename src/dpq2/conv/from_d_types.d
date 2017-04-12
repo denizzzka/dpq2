@@ -28,8 +28,7 @@ if(is(T == ubyte[]))
     return Value(v, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
-@property Value toValue(T)(T v) @trusted
-if(is(T == bool))
+@property Value toValue(T : bool)(T v) @trusted
 {
     ubyte[] buf;
     buf.length = 1;
