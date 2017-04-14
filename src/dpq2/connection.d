@@ -69,7 +69,7 @@ class Connection
 
     mixin Queries;
 
-    @property bool isNonBlocking()
+    bool isNonBlocking()
     {
         return PQisnonblocking(conn) == 1;
     }

@@ -34,7 +34,6 @@ struct Value
         this.oidType = oidType;
     }
 
-    @property
     inout (ubyte[]) data() pure inout
     {
         import std.exception;
@@ -45,7 +44,6 @@ struct Value
         return _data;
     }
 
-    @property
     bool isSupportedArray() const
     {
         return dpq2.oids.isSupportedArray(oidType);
