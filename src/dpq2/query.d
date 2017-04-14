@@ -18,11 +18,11 @@ mixin template Queries()
 
         return new immutable Answer(container);
     }
-    
+
     /// Perform SQL query to DB
     immutable (Answer) execParams(in ref QueryParams qp)
     {
-        auto p = InternalQueryParams(qp);
+        auto p = InternalQueryParams(&qp);
         auto pgResult = PQexecParams (
                 conn,
                 p.command,
@@ -50,7 +50,7 @@ mixin template Queries()
     /// Submits a command and separate parameters to the server without waiting for the result(s)
     void sendQueryParams(in ref QueryParams qp)
     {
-        auto p = InternalQueryParams(qp);
+        auto p = InternalQueryParams(&qp);
         size_t r = PQsendQueryParams (
                 conn,
                 p.command,
@@ -68,7 +68,7 @@ mixin template Queries()
     /// Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)
     void sendQueryPrepared(in ref QueryParams qp)
     {
-        auto p = InternalQueryParams(qp);
+        auto p = InternalQueryParams(&qp);
         size_t r = PQsendQueryPrepared(
                 conn,
                 p.stmtName,
