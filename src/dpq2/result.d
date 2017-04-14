@@ -59,25 +59,21 @@ immutable class Result
         result = r;
     }
 
-    @property
     ExecStatusType status() nothrow
     {
         return PQresultStatus(result);
     }
 
-    @property
     string statusString()
     {
         return to!string(fromStringz(PQresStatus(status)));
     }
 
-    @property
     string resultErrorMessage()
     {
         return to!string( PQresultErrorMessage(result) );
     }
 
-    @property
     string resultErrorField(int fieldcode)
     {
         return PQresultErrorField(result, fieldcode).to!string;
@@ -128,16 +124,16 @@ immutable class Answer : Result
      * not free the result directly. It will be freed when the associated 
      * PGresult handle is passed to PQclear.
      */
-    @property string cmdStatus()
+    string cmdStatus()
     {
         return to!string( PQcmdStatus(result) );
     }
 
     /// Returns row count
-    @property size_t length() nothrow { return PQntuples(result); }
+    size_t length() nothrow { return PQntuples(result); }
 
     /// Returns column count
-    @property size_t columnCount() nothrow { return PQnfields(result); }
+    size_t columnCount() nothrow { return PQnfields(result); }
 
     /// Returns column format
     ValueFormat columnFormat( const size_t colNum )
@@ -147,14 +143,14 @@ immutable class Answer : Result
     }
     
     /// Returns column Oid
-    @property OidType OID( size_t colNum )
+    OidType OID( size_t colNum )
     {
         assertCol( colNum );
 
         return PQftype(result, to!int(colNum)).oid2oidType;
     }
 
-    @property bool isSupportedArray( const size_t colNum )
+    bool isSupportedArray( const size_t colNum )
     {
         assertCol(colNum);
 
@@ -284,9 +280,9 @@ auto rangify(T)(T obj)
             obj = o;
         }
 
-        @property auto front(){ return obj[curr]; }
-        @property void popFront(){ ++curr; }
-        @property bool empty(){ return curr >= obj.length; }
+        auto front(){ return obj[curr]; }
+        void popFront(){ ++curr; }
+        bool empty(){ return curr >= obj.length; }
     }
 
     return Rangify!(T)(obj);
@@ -307,7 +303,6 @@ immutable struct Row
     }
     
     /// Returns cell size
-    @property
     size_t size( const size_t col )
     {
         answer.assertCol(col);
@@ -315,8 +310,7 @@ immutable struct Row
     }
     
     /// Value NULL checking
-    /// Do not confuse it with Nullable's isNull property
-    @property
+    /// Do not confuse it with Nullable's isNull method
     bool isNULL( const size_t col )
     {
         answer.assertCol(col);
@@ -358,7 +352,7 @@ immutable struct Row
     }
 
     /// Returns column count
-    @property size_t length() { return answer.columnCount(); }
+    size_t length() { return answer.columnCount(); }
     
     debug string toString()
     {
@@ -371,7 +365,6 @@ immutable struct Row
     }
 }
 
-@property
 immutable (Array) asArray(immutable(Value) v)
 {
     if(v.format == ValueFormat.TEXT)
@@ -513,7 +506,7 @@ immutable struct Array
 
     /// Returns number of elements in array
     /// Useful for one-dimensional arrays
-    @property size_t length()
+    size_t length()
     {
         return nElems;
     }
@@ -610,13 +603,13 @@ class Notify
     }
 
     /// Returns notification condition name
-    @property string name() { return to!string( n.relname ); }
+    string name() { return to!string( n.relname ); }
 
     /// Returns notification parameter
-    @property string extra() { return to!string( n.extra ); }
+    string extra() { return to!string( n.extra ); }
 
     /// Returns process ID of notifying server process
-    @property size_t pid() { return n.be_pid; }
+    size_t pid() { return n.be_pid; }
 
     nothrow invariant() 
     {
