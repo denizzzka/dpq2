@@ -21,7 +21,7 @@ import core.stdc.time: time_t;
 pure:
 
 /// Returns value data as native Date
-@property Date binaryValueAs(T)(in Value v) @trusted
+Date binaryValueAs(T)(in Value v) @trusted
 if( is( T == Date ) )
 {
     if(!(v.oidType == OidType.Date))
@@ -39,7 +39,7 @@ if( is( T == Date ) )
 }
 
 /// Returns value time without time zone as native TimeOfDay
-@property TimeOfDay binaryValueAs(T)(in Value v) @trusted
+TimeOfDay binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeOfDay ) )
 {
     if(!(v.oidType == OidType.Time))
@@ -53,7 +53,7 @@ if( is( T == TimeOfDay ) )
 }
 
 /// Returns value timestamp without time zone as TimeStampWithoutTZ
-@property TimeStampWithoutTZ binaryValueAs(T)(in Value v) @trusted
+TimeStampWithoutTZ binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeStampWithoutTZ ) )
 {
     if(!(v.oidType == OidType.TimeStamp))

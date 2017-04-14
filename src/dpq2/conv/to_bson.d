@@ -9,7 +9,7 @@ import std.datetime: SysTime, dur, TimeZone;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 
-@property Bson as(T)(in Value v, immutable TimeZone tz = null)
+Bson as(T)(in Value v, immutable TimeZone tz = null)
 if(is(T == Bson))
 {
     if(v.isNull)

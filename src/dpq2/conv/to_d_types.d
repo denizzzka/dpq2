@@ -47,7 +47,7 @@ private alias AE = AnswerConvException;
 private alias ET = ConvExceptionType;
 
 /// Returns cell value as native string type from text or binary formatted field
-@property string as(T)(in Value v) pure @trusted
+string as(T)(in Value v) pure @trusted
 if(is(T == string))
 {
     if(v.format == VF.BINARY)
@@ -68,7 +68,7 @@ if(is(T == string))
 }
 
 /// Returns value as D type value from binary formatted field
-@property T as(T)(in Value v)
+T as(T)(in Value v)
 if(!is(T == string) && !is(T == Bson))
 {
     if(!(v.format == VF.BINARY))
@@ -80,13 +80,13 @@ if(!is(T == string) && !is(T == Bson))
 
 package:
 
-@property string valueAsString(in Value v) pure
+string valueAsString(in Value v) pure
 {
     return (cast(const(char[])) v.data).to!string;
 }
 
 /// Returns value as bytes from binary formatted field
-@property T binaryValueAs(T)(in Value v)
+T binaryValueAs(T)(in Value v)
 if( is( T == const(ubyte[]) ) )
 {
     if(!(v.oidType == OidType.ByteArray))
@@ -98,7 +98,7 @@ if( is( T == const(ubyte[]) ) )
 /// Returns cell value as native integer or decimal values
 ///
 /// Postgres type "numeric" is oversized and not supported by now
-@property T binaryValueAs(T)(in Value v)
+T binaryValueAs(T)(in Value v)
 if( isNumeric!(T) )
 {
     static if(isIntegral!(T))
@@ -120,7 +120,7 @@ if( isNumeric!(T) )
 }
 
 /// Returns UUID as native UUID value
-@property UUID binaryValueAs(T)(in Value v)
+UUID binaryValueAs(T)(in Value v)
 if( is( T == UUID ) )
 {
     if(!(v.oidType == OidType.UUID))
@@ -136,7 +136,7 @@ if( is( T == UUID ) )
 }
 
 /// Returns boolean as native bool value
-@property bool binaryValueAs(T : bool)(in Value v)
+bool binaryValueAs(T : bool)(in Value v)
 {
     if(!(v.oidType == OidType.Bool))
         throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
@@ -149,7 +149,7 @@ if( is( T == UUID ) )
 }
 
 /// Returns Vibe.d's Json
-@property Json binaryValueAs(T)(in Value v) @trusted
+Json binaryValueAs(T)(in Value v) @trusted
 if( is( T == Json ) )
 {
     Json res;

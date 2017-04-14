@@ -7,7 +7,7 @@ import std.bitmanip: nativeToBigEndian;
 import std.conv: to;
 
 /// Default type will be used for NULL value and for array without detected type
-@property Value bsonToValue(Bson v, OidType defaultType = OidType.Undefined)
+Value bsonToValue(Bson v, OidType defaultType = OidType.Undefined)
 {
     if(v.type == Bson.Type.array)
         return bsonArrayToValue(v, defaultType);

@@ -6,13 +6,13 @@ import dpq2;
 import std.bitmanip: nativeToBigEndian;
 import std.traits: isNumeric;
 
-@property Value toValue(T)(T v)
+Value toValue(T)(T v)
 if(isNumeric!(T))
 {
     return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
-@property Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
+Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T == string))
 {
     if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
@@ -22,13 +22,13 @@ if(is(T == string))
     return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
 }
 
-@property Value toValue(T)(T v)
+Value toValue(T)(T v)
 if(is(T == ubyte[]))
 {
     return Value(v, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
-@property Value toValue(T : bool)(T v) @trusted
+Value toValue(T : bool)(T v) @trusted
 {
     ubyte[] buf;
     buf.length = 1;
