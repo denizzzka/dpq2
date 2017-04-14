@@ -327,7 +327,7 @@ void _integration_test( string connParam ) @trusted
     {
         QueryParams p;
         p.preparedStatementName = "prepared statement 2";
-        p.argsFromArray = ["abc", "123456"];
+        p.args = ["abc", "123456"];
 
         conn.sendQueryPrepared(p);
 
