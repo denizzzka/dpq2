@@ -110,7 +110,8 @@ void main(string[] args)
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
 ```
-####Compile and run:
+
+Compile and run:
 ```
 Running ./dpq2_example --conninfo=dbname=postgres
 Text query result by name: 2016-02-23 15:22:29.024757
