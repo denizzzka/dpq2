@@ -152,6 +152,8 @@ bool binaryValueAs(T : bool)(in Value v)
 Json binaryValueAs(T)(in Value v) @trusted
 if( is( T == Json ) )
 {
+    import dpq2.conv.jsonb: jsonbValueToJson;
+
     Json res;
 
     switch(v.oidType)
@@ -163,8 +165,8 @@ if( is( T == Json ) )
             break;
 
         case OidType.Jsonb:
-            assert(false, "Is not implemented");
-            //break;
+            res = v.jsonbValueToJson;
+            break;
 
         default:
             throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
@@ -254,7 +256,7 @@ public void _integration_test( string connParam ) @system
         C!string("{\"float_value\": 123.456}", "json", "'{\"float_value\": 123.456}'");
 
         // jsonb
-        //C!PGjson(Json(["integer": Json(123), "float": Json(123.456), "text_string": Json("This is a text string")]), "jsonb",
-            //"'{\"integer\": 123, \"float\": 123.456,\"text_string\": \"This is a text string\"}'");
+        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string"), "abc": Json(["key": Json("value")])]), "jsonb",
+            "'{\"float_value\": 123.456, \"text_str\": \"text string\", \"abc\": {\"key\": \"value\"}}'");
     }
 }

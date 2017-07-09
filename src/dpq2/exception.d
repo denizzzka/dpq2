@@ -18,7 +18,8 @@ enum ConvExceptionType
     NOT_BINARY, /// Format of the column isn't binary
     NOT_TEXT, /// Format of the column isn't text string
     NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
-    SIZE_MISMATCH /// Result value size is not matched to the received Postgres value
+    SIZE_MISMATCH, /// Result value size is not matched to the received Postgres value
+    CORRUPTED_JSONB, /// Corrupted JSONB value
 }
 
 class AnswerConvException : ConvException
