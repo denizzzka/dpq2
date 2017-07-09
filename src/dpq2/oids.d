@@ -129,7 +129,7 @@ bool isSupportedArray(OidType t) pure
         case NumericArray:
         case UUIDArray:
         case JsonArray:
-        //case JsonbArray:
+        case JsonbArray:
             return true;
         default:
             break;
