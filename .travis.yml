@@ -7,6 +7,11 @@ d:
   #- gdc
   - ldc
 
+env:
+  - VIBE_VERSION='--version=0.7.31'
+  - VIBE_VERSION='--version=0.8.0'
+  - VIBE_VERSION=''
+
 addons:
   postgresql: 9.6
 
@@ -17,6 +22,7 @@ before_install:
   - dub fetch doveralls
 
 before_script:
+  - dub fetch vibe-d $VIBE_VERSION
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script: ./.test.sh "dbname=postgres"
