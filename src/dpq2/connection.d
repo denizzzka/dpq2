@@ -33,7 +33,6 @@ struct ConnectionStart {};
 /// Connection
 class Connection
 {
-    //string connString; /// Database connection parameters
     package PGconn* conn;
 
     invariant
