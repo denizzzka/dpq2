@@ -753,8 +753,13 @@ void _integration_test( string connParam )
     }
 
     // Notifies test
-    conn.exec( "listen test_notify; notify test_notify" );
-    assert( conn.getNextNotify.name == "test_notify" );
+    {
+        conn.exec( "listen test_notify; notify test_notify, 'test payload'" );
+        auto notify = conn.getNextNotify;
+
+        assert( notify.name == "test_notify" );
+        assert( notify.extra == "test payload" );
+    }
     
     // Async query test 1
     conn.sendQuery( "select 123; select 456; select 789" );
