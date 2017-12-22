@@ -71,16 +71,21 @@ if( is( T == TimeStampWithoutTZ ) )
 struct TimeStampWithoutTZ
 {
     DateTime dateTime;
-    FracSec fracSec; /// fractional seconds
+    Duration fracSec; /// fractional seconds
+
+    invariant()
+    {
+        assert(fracSec >= Duration.zero);
+    }
 
     static max()
     {
-        return TimeStampWithoutTZ(DateTime.max, FracSec.from!"hnsecs"(long.max));
+        return TimeStampWithoutTZ(DateTime.max, long.max.hnsecs);
     }
 
     static min()
     {
-        return TimeStampWithoutTZ(DateTime.min, FracSec.zero);
+        return TimeStampWithoutTZ(DateTime.min, Duration.zero);
     }
 }
 
@@ -121,11 +126,11 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 
     version(Have_Int64_TimeStamp)
     {
-        res.fracSec = FracSec.from!"usecs"(ts);
+        res.fracSec = dur!"usecs"(ts);
     }
     else
     {
-        res.fracSec = FracSec.from!"usecs"((cast(long)(ts * 10e6)));
+        res.fracSec = dur!"usecs"((cast(long)(ts * 10e6)));
     }
 
     return res;

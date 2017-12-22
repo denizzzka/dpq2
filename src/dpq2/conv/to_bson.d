@@ -144,7 +144,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
         case TimeStamp:
             auto ts = v.binaryValueAs!PGtimestamp_without_time_zone;
             auto time = BsonDate(SysTime(ts.dateTime, tz));
-            auto usecs = ts.fracSec.usecs;
+            auto usecs = ts.fracSec.total!"usecs";
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
             break;
 
