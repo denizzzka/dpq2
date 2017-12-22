@@ -76,6 +76,7 @@ struct TimeStampWithoutTZ
     invariant()
     {
         assert(fracSec >= Duration.zero);
+        assert(fracSec < 1.seconds);
     }
 
     static max()

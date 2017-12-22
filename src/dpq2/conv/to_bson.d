@@ -144,7 +144,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
         case TimeStamp:
             auto ts = v.binaryValueAs!PGtimestamp_without_time_zone;
             auto time = BsonDate(SysTime(ts.dateTime, tz));
-            auto usecs = ts.fracSec.total!"usecs";
+            long usecs = ts.fracSec.total!"usecs";
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
             break;
 
@@ -246,7 +246,7 @@ public void _integration_test( string connParam )
 
         C(Bson.emptyArray, "text[]", "'{}'");
 
-        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
 
         C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
 
