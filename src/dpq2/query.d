@@ -197,6 +197,7 @@ void _integration_test( string connParam ) @trusted
 {
     auto conn = new Connection(connParam);
 
+    // Text type arguments testing
     {    
         string sql_query =
         "select now() as time, 'abc'::text as string, 123, 456.78\n"~
@@ -214,6 +215,7 @@ void _integration_test( string connParam ) @trusted
         assert( a.columnFormat(2) == ValueFormat.TEXT );
     }
 
+    // Binary type arguments testing
     {
         import vibe.data.bson: Bson;
 
