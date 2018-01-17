@@ -138,7 +138,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             break;
 
         case UUID:
-            res = Uuid2Bson(v.binaryValueAs!PGuuid);
+            res = Bson(v.binaryValueAs!PGuuid);
             break;
 
         case TimeStamp:
@@ -236,7 +236,7 @@ public void _integration_test( string connParam )
                 )),
                 "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
 
-        C(Uuid2Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
+        C(Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
                 "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
 
         C(Bson([
@@ -252,28 +252,4 @@ public void _integration_test( string connParam )
 
         C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "jsonb", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
     }
-}
-
-Bson Uuid2Bson(in UUID uuid)
-{
-    return Bson(BsonBinData(BsonBinData.Type.uuid, uuid.data.idup));
-}
-
-UUID Bson2Uuid(in Bson bson)
-{
-    const ubyte[16] b = bson.get!BsonBinData().rawData;
-
-    return UUID(b);
-}
-
-unittest
-{
-    auto srcUuid = UUID("00010203-0405-0607-0809-0a0b0c0d0e0f");
-
-    auto b = Uuid2Bson(srcUuid);
-    auto u = Bson2Uuid(b);
-
-    assert(b.type == Bson.Type.binData);
-    assert(b.get!BsonBinData().type == BsonBinData.Type.uuid);
-    assert(u == srcUuid);
 }
