@@ -660,6 +660,7 @@ void _integration_test( string connParam )
 
     auto conn = new Connection(connParam);
 
+    // Text type results testing
     {
         string sql_query =
         "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
@@ -682,6 +683,7 @@ void _integration_test( string connParam )
         assert(!e.columnExists("foo"));
     }
 
+    // Binary type arguments testing:
     QueryParams p;
     p.resultFormat = ValueFormat.BINARY;
     p.sqlCommand = "SELECT "~
@@ -782,8 +784,6 @@ void _integration_test( string connParam )
 
         assert(count == 8);
     }
-
-    //assert(r.toString.length > 40);
 
     {
         bool exceptionFlag = false;
