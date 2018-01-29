@@ -117,6 +117,26 @@ mixin template Queries()
         return new immutable Result(container);
     }
 
+    /// Submits a request to execute a prepared statement with given parameters, and waits for completion.
+    immutable(Answer) execPrepared(in ref QueryParams qp)
+    {
+        auto p = InternalQueryParams(&qp);
+        auto pgResult = PQexecPrepared(
+                conn,
+                p.stmtName,
+                p.nParams,
+                cast(const(char*)*)p.paramValues,
+                p.paramLengths,
+                p.paramFormats,
+                p.resultFormat
+            );
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
+    }
+
     /// Sends a request to create a prepared statement with the given parameters, without waiting for completion.
     void sendPrepare(string statementName, string sqlStatement)
     {
