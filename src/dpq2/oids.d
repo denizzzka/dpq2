@@ -100,7 +100,11 @@ shared static this()
             A(Int4, Int4Array),
             A(Int8, Int8Array),
             A(Float4, Float4Array),
-            A(Float8, Float8Array)
+            A(Float8, Float8Array),
+            A(Date, DateArray),
+            A(Time, TimeArray),
+            A(TimeStampWithZone, TimeStampWithZoneArray),
+            A(TimeStamp, TimeStampArray)
         ];
 
         appropriateArrOid = a;
@@ -140,16 +144,24 @@ bool isSupportedArray(OidType t) pure
 
 OidType detectOidTypeFromNative(T)()
 {
+    import std.datetime.date : StdDate = Date, TimeOfDay;
+    import std.datetime.systime : SysTime;
+    import std.traits : Unqual;
+
     with(OidType)
     {
-        static if(is(T == string)){ return Text; } else
-        static if(is(T == ubyte[])){ return ByteArray; } else
-        static if(is(T == bool)){ return Bool; } else
-        static if(is(T == short)){ return Int2; } else
-        static if(is(T == int)){ return Int4; } else
-        static if(is(T == long)){ return Int8; } else
-        static if(is(T == float)){ return Float4; } else
-        static if(is(T == double)){ return Float8; } else
+        static if(is(Unqual!T == string)){ return Text; } else
+        static if(is(Unqual!T == ubyte[])){ return ByteArray; } else
+        static if(is(Unqual!T == bool)){ return Bool; } else
+        static if(is(Unqual!T == short)){ return Int2; } else
+        static if(is(Unqual!T == int)){ return Int4; } else
+        static if(is(Unqual!T == long)){ return Int8; } else
+        static if(is(Unqual!T == float)){ return Float4; } else
+        static if(is(Unqual!T == double)){ return Float8; } else
+        static if(is(Unqual!T == StdDate)){ return Date; } else
+        static if(is(Unqual!T == TimeOfDay)){ return Time; } else
+        static if(is(Unqual!T == SysTime)){ return TimeStampWithZone; } else
+        static if(is(Unqual!T == TimeStampWithoutTZ)){ return TimeStamp; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
@@ -285,7 +297,7 @@ enum OidType : Oid
     TimeStampWithZoneArray = 1185,
     TimeIntervalArray = 1187,
     NumericArray = 1231,
-    TimeWithZoneArray = 1270, 
+    TimeWithZoneArray = 1270,
     FixedBitStringArray = 1561,
     VariableBitStringArray = 1563,
     RefCursorArray = 2201,
