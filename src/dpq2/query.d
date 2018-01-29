@@ -101,14 +101,14 @@ mixin template Queries()
     }
 
     /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
-    immutable(Result) prepare(string statementName, string sqlStatement)
+    immutable(Result) prepare(string statementName, string sqlStatement, const(Oid)[] oids...)
     {
         PGresult* pgResult = PQprepare(
                 conn,
                 toStringz(statementName),
                 toStringz(sqlStatement),
-                0,
-                null
+                oids.length.to!int,
+                oids.ptr
             );
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
