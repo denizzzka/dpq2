@@ -254,11 +254,32 @@ class Connection
         return res;
     }
 
+    string dbName() const nothrow
+    {
+        assert(conn);
+
+        return PQdb(conn).fromStringz.to!string;
+    }
+
     string host() const nothrow
     {
         assert(conn);
 
         return PQhost(conn).fromStringz.to!string;
+    }
+
+    int protocolVersion() const nothrow
+    {
+        assert(conn);
+
+        return PQprotocolVersion(conn);
+    }
+
+    int serverVersion() const nothrow
+    {
+        assert(conn);
+
+        return PQserverVersion(conn);
     }
 
     void trace(ref File stream)
