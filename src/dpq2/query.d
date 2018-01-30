@@ -91,7 +91,7 @@ mixin template Queries()
     }
 
     /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
-    immutable(Result) prepare(string statementName, string sqlStatement, const(Oid)[] oids...)
+    immutable(Result) prepare(string statementName, string sqlStatement, in Oid[] oids = null)
     {
         PGresult* pgResult = PQprepare(
                 conn,
@@ -128,14 +128,14 @@ mixin template Queries()
     }
 
     /// Sends a request to create a prepared statement with the given parameters, without waiting for completion.
-    void sendPrepare(string statementName, string sqlStatement)
+    void sendPrepare(string statementName, string sqlStatement, in Oid[] oids = null)
     {
         size_t r = PQsendPrepare(
                 conn,
                 toStringz(statementName),
                 toStringz(sqlStatement),
-                0,
-                null
+                oids.length.to!int,
+                cast(Oid*)oids.ptr //const should be accepted here, see https://github.com/DerelictOrg/DerelictPQ/issues/21
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
