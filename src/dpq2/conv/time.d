@@ -201,8 +201,8 @@ if (is(T == TimeStampWithoutTZ) || (is(T == SysTime)))
 
 void j2date(int jd, out int year, out int month, out int day)
 {
-    enum POSTGRES_EPOCH_JDATE = 2451545;
     enum MONTHS_PER_YEAR = 12;
+    enum POSTGRES_EPOCH_JDATE = 2_451_545;
 
     jd += POSTGRES_EPOCH_JDATE;
 
@@ -315,17 +315,10 @@ struct pg_tm
 
 alias pg_time_t = long;
 
-immutable ulong SECS_PER_DAY = 86400;
-immutable ulong POSTGRES_EPOCH_JDATE = 2451545;
-immutable ulong UNIX_EPOCH_JDATE     = 2440588;
-
-immutable ulong USECS_PER_DAY    = 86_400_000_000;
-immutable ulong USECS_PER_HOUR   = 3_600_000_000;
-immutable ulong USECS_PER_MINUTE = 60_000_000;
-immutable ulong USECS_PER_SEC    = 1_000_000;
-
-immutable ulong SECS_PER_HOUR   = 3600;
-immutable ulong SECS_PER_MINUTE = 60;
+enum USECS_PER_DAY       = 86_400_000_000UL;
+enum USECS_PER_HOUR      = 3_600_000_000UL;
+enum USECS_PER_MINUTE    = 60_000_000UL;
+enum USECS_PER_SEC       = 1_000_000UL;
 
 /**
 * timestamp2tm() - Convert timestamp data type to POSIX time structure.
