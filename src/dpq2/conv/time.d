@@ -15,7 +15,7 @@ import dpq2.exception;
 
 import core.time;
 import std.datetime.date : Date, DateTime, TimeOfDay;
-import std.datetime.systime : SysTime, UTC;
+import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
 import core.stdc.time: time_t;
@@ -86,11 +86,11 @@ if( is( T == SysTime ) )
 
 /++
     Structure to represent PostgreSQL's Timestamp without time zone type.
-    Basically it works just like SysTime but allways assumed to be in UTC.
+    It is assumed to be in Local Time.
 +/
 struct TimeStampWithoutTZ
 {
-    DateTime dateTime;
+    DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
 
     invariant()
@@ -112,16 +112,15 @@ struct TimeStampWithoutTZ
         return TimeStampWithoutTZ(DateTime.min, Duration.zero);
     }
 
-    /// Converts the value to SysTime
-    T opCast(T)() const
-    if (is(T == SysTime))
+    /// Converts the value to SysTime with possibility to set the time zone it's in
+    SysTime toSysTime(immutable TimeZone tz = LocalTime()) const
     {
-        return SysTime(dateTime, fracSec, UTC());
+        return SysTime(dateTime, fracSec, tz);
     }
 
     /++
         Creates timestamp without timezone from SysTime.
-        It removes the TimeZone from SysTime in the way that resulting timestamp has the same value as a source timestamp in it's time zone.
+        It takes the resulting date and time from the SysTime and drops the time zone information.
     +/
     static TimeStampWithoutTZ fromSysTime(in SysTime time)
     {
@@ -133,18 +132,36 @@ struct TimeStampWithoutTZ
 
     unittest
     {
-        import std.datetime.systime : Clock;
-        import std.datetime.timezone : LocalTime, UTC;
+        {
+            import std.datetime.systime : Clock;
 
-        auto t = Clock.currTime; // TZ = local time
-        auto ts = TimeStampWithoutTZ.fromSysTime(t); // Should be same as local time
-        auto uts = cast(SysTime)ts; // TZ = UTC (but raw time value is still the same, just shifted to other TZ)
+            auto t = Clock.currTime; // TZ = local time
+            auto ts = TimeStampWithoutTZ.fromSysTime(t);
+            auto uts = ts.toSysTime; // TZ = local time
 
-        assert(t.timezone.name == LocalTime().name);
-        assert(uts.timezone.name == UTC().name);
-        assert(t.hour == ts.dateTime.hour);
-        assert(ts.dateTime.hour == uts.hour);
-        assert(t.hour == uts.hour);
+            assert(t.timezone.name == LocalTime().name);
+            assert(uts.timezone.name == LocalTime().name);
+            assert(t.hour == ts.dateTime.hour);
+            assert(ts.dateTime.hour == uts.hour);
+            assert(t.hour == uts.hour);
+
+            t = Clock.currTime(UTC()); // TZ = UTC
+            ts = TimeStampWithoutTZ.fromSysTime(t);
+            uts = ts.toSysTime; // TZ = local time
+
+            assert(t.hour == ts.dateTime.hour);
+            assert(ts.dateTime.hour == uts.hour);
+            assert(t.hour == uts.hour);
+        }
+        {
+            auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+            assert(t.dateTime.hour == 14);
+        }
+        {
+            // check timezone is dropped
+            auto t = TimeStampWithoutTZ.fromSysTime(SysTime.fromISOExtString("2017-11-13T14:29:17.075678+02"));
+            assert(t.dateTime.hour == 14);
+        }
     }
 }
 
