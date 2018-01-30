@@ -9,24 +9,14 @@ import std.exception: enforce;
 mixin template Queries()
 {
     /// Perform SQL query to DB
-    immutable (Answer) exec( string SQLcmd, ValueFormat resultFormat = ValueFormat.TEXT )
+    immutable (Answer) exec( string SQLcmd )
     {
-        if (resultFormat == ValueFormat.TEXT)
-        {
-            auto pgResult = PQexec(conn, toStringz( SQLcmd ));
-            // is guaranteed by libpq that the result will not be changed until it will not be destroyed
-            auto container = createResultContainer(cast(immutable) pgResult);
+        auto pgResult = PQexec(conn, toStringz( SQLcmd ));
 
-            return new immutable Answer(container);
-        }
-        else
-        {
-            QueryParams qp;
-            qp.sqlCommand = SQLcmd;
-            qp.resultFormat = resultFormat;
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
 
-            return execParams(qp);
-        }
+        return new immutable Answer(container);
     }
 
     /// Perform SQL query to DB
