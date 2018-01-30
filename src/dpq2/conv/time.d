@@ -95,8 +95,9 @@ struct TimeStampWithoutTZ
 
     invariant()
     {
-        assert(fracSec >= Duration.zero);
-        assert(fracSec < 1.seconds);
+        import std.conv : to;
+        assert(fracSec >= Duration.zero, fracSec.to!string);
+        assert(fracSec < 1.seconds, fracSec.to!string);
     }
 
     /// Returns the TimeStampWithoutTZ farthest in the future which is representable by TimeStampWithoutTZ.

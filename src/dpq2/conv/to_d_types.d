@@ -31,6 +31,7 @@ alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp_without_time_zone = TimeStampWithoutTZ; /// Both date and time (no time zone)
+alias PGtimestamp_with_time_zone = SysTime; /// Both date and time with time zone
 alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
@@ -178,6 +179,7 @@ if( is( T == Json ) )
 public void _integration_test( string connParam ) @system
 {
     auto conn = new Connection(connParam);
+    conn.exec("set timezone to 0"); // to return times in UTC and so make the test reproducible in databases with other TZ
 
     QueryParams params;
     params.resultFormat = ValueFormat.BINARY;
@@ -185,13 +187,38 @@ public void _integration_test( string connParam ) @system
     {
         void testIt(T)(T nativeValue, string pgType, string pgValue)
         {
-            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as d_type_test_value";
+            import std.algorithm : strip;
+            import std.format : format;
+            import std.string : representation;
+
+            // test string to native conversion
+            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue, pgType);
+            params.args = null;
             auto answer = conn.execParams(params);
             immutable Value v = answer[0][0];
             auto result = v.as!T;
 
-            assert(result == nativeValue, "Received unexpected value\nreceived pgType="~to!string(v.oidType)~"\nexpected nativeType="~to!string(typeid(T))~
-                "\nsent pgValue="~pgValue~"\nexpected nativeValue="~to!string(nativeValue)~"\nresult="~to!string(result));
+            assert(result == nativeValue,
+                format("Received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+                v.oidType, typeid(T), pgValue, nativeValue, result)
+            );
+
+            //TODO: Implement toValue for all tested types and remove the condition
+            static if (!is(T == UUID) && !is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStampWithoutTZ))
+            {
+                // test binary to text conversion
+                params.sqlCommand = "SELECT $1::text";
+                params.args = [nativeValue.toValue];
+                auto answer2 = conn.execParams(params);
+                auto v2 = answer2[0][0];
+                auto textResult = v2.as!string;
+
+                assert(textResult == pgValue.strip('\''),
+                    format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
+                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
+                );
+            }
+            else pragma(msg, T, " Is not tested in integration tests!");
         }
 
         alias C = testIt; // "C" means "case"
@@ -204,7 +231,7 @@ public void _integration_test( string connParam ) @system
         C!PGreal(-12.3456f, "real", "-12.3456");
         C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
-        C!PGtext("12345 ", "char(6)", "'12345'");
+        C!PGtext("12345 ", "char(6)", "'12345 '");
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
@@ -243,20 +270,21 @@ public void _integration_test( string connParam ) @system
             C!PGnumeric(s, "numeric", s);
 
         // date and time testing
-        C!PGdate(Date(2016, 01, 8), "date", "'January 8, 2016'");
+        C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.max, "timestamp without time zone", "'infinity'");
         C!PGtimestamp_without_time_zone(TimeStampWithoutTZ.min, "timestamp without time zone", "'-infinity'");
+        C!PGtimestamp_with_time_zone(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), new immutable SimpleTimeZone(2.dur!"hours")), "timestamp with time zone", "'1997-12-17 05:37:16.000012+00'");
 
         // json
-        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
 
         // json as string
-        C!string("{\"float_value\": 123.456}", "json", "'{\"float_value\": 123.456}'");
+        C!string(`{"float_value": 123.456}`, "json", `'{"float_value": 123.456}'`);
 
         // jsonb
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string"), "abc": Json(["key": Json("value")])]), "jsonb",
-            "'{\"float_value\": 123.456, \"text_str\": \"text string\", \"abc\": {\"key\": \"value\"}}'");
+            `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
     }
 }

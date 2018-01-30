@@ -138,47 +138,47 @@ unittest
     }
 
     {
-        // Date: '2018-1-15' -> [0, 0, 25, 189]
+        // Date: '2018-1-15'
         auto d = Date(2018, 1, 15);
         auto v = toValue(d);
 
-        assert(v.data == [0, 0, 25, 189]);
+        assert(v.oidType == OidType.Date);
         assert(v.as!Date == d);
     }
 
     {
-        // Date: '2000-1-1' -> [0, 0, 0, 0]
+        // Date: '2000-1-1'
         auto d = Date(2000, 1, 1);
         auto v = toValue(d);
 
-        assert(v.data == [0, 0, 0, 0]);
+        assert(v.oidType == OidType.Date);
         assert(v.as!Date == d);
     }
 
     {
-        // Date: '0010-2-20' -> [255, 244, 233, 2]
+        // Date: '0010-2-20'
         auto d = Date(10, 2, 20);
         auto v = toValue(d);
 
-        assert(v.data == [255, 244, 233, 2]);
+        assert(v.oidType == OidType.Date);
         assert(v.as!Date == d);
     }
 
     {
-        // TimeOfDay: '14:29:17' -> [0, 0, 0, 12, 36, 204, 169, 64]
+        // TimeOfDay: '14:29:17'
         auto tod = TimeOfDay(14, 29, 17);
         auto v = toValue(tod);
 
-        assert(v.data == [0, 0, 0, 12, 36, 204, 169, 64]);
+        assert(v.oidType == OidType.Time);
         assert(v.as!TimeOfDay == tod);
     }
 
     {
-        // SysTime: '2017-11-13T14:29:17.075678Z' -> [0, 2, 0, 220, 221, 47, 16, 222]
+        // SysTime: '2017-11-13T14:29:17.075678Z'
         auto t = SysTime.fromISOExtString("2017-11-13T14:29:17.075678Z");
         auto v = toValue(t);
 
-        assert(v.data == [0, 2, 0, 220, 221, 47, 16, 222]);
+        assert(v.oidType == OidType.TimeStampWithZone);
         assert(v.as!SysTime == t);
     }
 
@@ -186,11 +186,11 @@ unittest
         import core.time : usecs;
         import std.datetime.date : DateTime;
 
-        // TimeStampWithoutTZ: '2017-11-13 14:29:17.075678' -> [0, 2, 0, 220, 221, 47, 16, 222]
+        // TimeStampWithoutTZ: '2017-11-13 14:29:17.075678'
         auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
         auto v = toValue(t);
 
-        assert(v.data == [0, 2, 0, 220, 221, 47, 16, 222]);
+        assert(v.oidType == OidType.TimeStamp);
         assert(v.as!TimeStampWithoutTZ == t);
     }
 }
