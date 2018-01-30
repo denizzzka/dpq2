@@ -20,6 +20,24 @@ import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
 import core.stdc.time: time_t;
 
+/// Returns value timestamp with time zone as SysTime
+SysTime binaryValueAs(T)(in Value v) @trusted
+if( is( T == SysTime ) )
+{
+    if(!(v.oidType == OidType.TimeStampWithZone))
+        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
+
+    if(!(v.data.length == long.sizeof))
+        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
+
+    return rawTimeStamp2nativeTime(
+        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
+    ).toSysTime(UTC());
+}
+
+pure:
+
 /// Returns value data as native Date
 Date binaryValueAs(T)(in Value v) @trusted
 if( is( T == Date ) )
@@ -63,23 +81,7 @@ if( is( T == TimeStampWithoutTZ ) )
         throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2nativeTime!T(
-        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
-    );
-}
-
-/// Returns value timestamp with time zone as SysTime
-SysTime binaryValueAs(T)(in Value v) @trusted
-if( is( T == SysTime ) )
-{
-    if(!(v.oidType == OidType.TimeStampWithZone))
-        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
-
-    if(!(v.data.length == long.sizeof))
-        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
-
-    return rawTimeStamp2nativeTime!T(
+    return rawTimeStamp2nativeTime(
         bigEndianToNative!long(v.data.ptr[0..long.sizeof])
     );
 }
@@ -169,13 +171,12 @@ package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 
 private:
 
-T rawTimeStamp2nativeTime(T)(long raw)
-if (is(T == TimeStampWithoutTZ) || (is(T == SysTime)))
+TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
 {
     version(Have_Int64_TimeStamp)
     {
-        if(raw >= time_t.max) return T.max;
-        if(raw <= time_t.min) return T.min;
+        if(raw >= time_t.max) return TimeStampWithoutTZ.max;
+        if(raw <= time_t.min) return TimeStampWithoutTZ.min;
     }
 
     pg_tm tm;
@@ -187,11 +188,10 @@ if (is(T == TimeStampWithoutTZ) || (is(T == SysTime)))
             __FILE__, __LINE__
         );
 
-    return raw_pg_tm2nativeTime!T(tm, ts);
+    return raw_pg_tm2nativeTime(tm, ts);
 }
 
-T raw_pg_tm2nativeTime(T)(pg_tm tm, fsec_t ts)
-if (is(T == TimeStampWithoutTZ) || (is(T == SysTime)))
+TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 {
     auto dateTime = DateTime(
             tm.tm_year,
@@ -211,8 +211,7 @@ if (is(T == TimeStampWithoutTZ) || (is(T == SysTime)))
         auto fracSec = dur!"usecs"((cast(long)(ts * 10e6)));
     }
 
-    static if (is(T == TimeStampWithoutTZ)) return TimeStampWithoutTZ(dateTime, fracSec);
-    else return SysTime(dateTime, fracSec, UTC());
+    return TimeStampWithoutTZ(dateTime, fracSec);
 }
 
 // Here is used names from the original Postgresql source
