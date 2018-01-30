@@ -293,6 +293,12 @@ void _integration_test( string connParam ) @trusted
         // uses PQprepare:
         auto s = conn.prepare("prepared statement 1", "SELECT $1::integer");
         assert(s.status == PGRES_COMMAND_OK);
+
+        QueryParams p;
+        p.preparedStatementName = "prepared statement 1";
+        p.args = [42.toValue];
+        auto r = conn.execPrepared(p);
+        assert (r[0][0].as!int == 42);
     }
     {
         // uses PQsendPrepare:
