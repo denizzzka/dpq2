@@ -148,20 +148,22 @@ OidType detectOidTypeFromNative(T)()
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
 
+    alias UT = Unqual!T;
+
     with(OidType)
     {
-        static if(is(Unqual!T == string)){ return Text; } else
-        static if(is(Unqual!T == ubyte[])){ return ByteArray; } else
-        static if(is(Unqual!T == bool)){ return Bool; } else
-        static if(is(Unqual!T == short)){ return Int2; } else
-        static if(is(Unqual!T == int)){ return Int4; } else
-        static if(is(Unqual!T == long)){ return Int8; } else
-        static if(is(Unqual!T == float)){ return Float4; } else
-        static if(is(Unqual!T == double)){ return Float8; } else
-        static if(is(Unqual!T == StdDate)){ return Date; } else
-        static if(is(Unqual!T == TimeOfDay)){ return Time; } else
-        static if(is(Unqual!T == SysTime)){ return TimeStampWithZone; } else
-        static if(is(Unqual!T == TimeStampWithoutTZ)){ return TimeStamp; } else
+        static if(is(UT == string)){ return Text; } else
+        static if(is(UT == ubyte[])){ return ByteArray; } else
+        static if(is(UT == bool)){ return Bool; } else
+        static if(is(UT == short)){ return Int2; } else
+        static if(is(UT == int)){ return Int4; } else
+        static if(is(UT == long)){ return Int8; } else
+        static if(is(UT == float)){ return Float4; } else
+        static if(is(UT == double)){ return Float8; } else
+        static if(is(UT == StdDate)){ return Date; } else
+        static if(is(UT == TimeOfDay)){ return Time; } else
+        static if(is(UT == SysTime)){ return TimeStampWithZone; } else
+        static if(is(UT == TimeStampWithoutTZ)){ return TimeStamp; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
@@ -192,46 +194,46 @@ enum OidType : Oid
     AttributeCatalog = 75,
     ProcCatalog = 81,
     ClassCatalog = 83,
-    
+
     Json = 114,
     Jsonb = 3802,
     Xml = 142,
     NodeTree = 194,
     StorageManager = 210,
-    
+
     Point = 600,
     LineSegment = 601,
     Path = 602,
     Box = 603,
     Polygon = 604,
     Line = 628,
-    
+
     Float4 = 700,
     Float8 = 701,
     AbsTime = 702,
     RelTime = 703,
     Interval = 704,
     Unknown = 705,
-    
+
     Circle = 718,
     Money = 790,
     MacAddress = 829,
     HostAddress = 869,
     NetworkAddress = 650,
-    
+
     FixedString = 1042,
     VariableString = 1043,
-    
+
     Date = 1082,
     Time = 1083,
     TimeStamp = 1114,
     TimeStampWithZone = 1184,
     TimeInterval = 1186,
     TimeWithZone = 1266,
-    
+
     FixedBitString = 1560,
     VariableBitString = 1562,
-    
+
     Numeric = 1700,
     RefCursor = 1790,
     RegProcWithArgs = 2202,
@@ -239,7 +241,7 @@ enum OidType : Oid
     RegOperatorWithArgs = 2204,
     RegClass = 2205,
     RegType = 2206,
-    
+
     UUID = 2950,
     TSVector = 3614,
     GTSVector = 3642,
@@ -247,14 +249,14 @@ enum OidType : Oid
     RegConfig = 3734,
     RegDictionary = 3769,
     TXidSnapshot = 2970,
-    
+
     Int4Range = 3904,
     NumRange = 3906,
     TimeStampRange = 3908,
     TimeStampWithZoneRange = 3910,
     DateRange = 3912,
     Int8Range = 3926,
-    
+
     // Arrays
     XmlArray = 143,
     JsonArray = 3807,
@@ -319,7 +321,7 @@ enum OidType : Oid
     TimeStampWithZoneRangeArray = 3911,
     DateRangeArray = 3913,
     Int8RangeArray = 3927,
-    
+
     // Pseudo types
     Record = 2249,
     RecordArray = 2287,
