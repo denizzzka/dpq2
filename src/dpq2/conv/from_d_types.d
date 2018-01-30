@@ -71,7 +71,9 @@ if (is(Unqual!T == TimeOfDay))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
-    return toValue(cast(SysTime)v); // works similarly to SysTime, but TZ is not used for conversion
+    auto val = toValue(cast(SysTime)v); // works similarly to SysTime, but TZ is not used for conversion
+    val.oidType = OidType.TimeStamp;
+    return val;
 }
 
 /// Constructs Value from SysTime
@@ -178,5 +180,17 @@ unittest
 
         assert(v.data == [0, 2, 0, 220, 221, 47, 16, 222]);
         assert(v.as!SysTime == t);
+    }
+
+    {
+        import core.time : usecs;
+        import std.datetime.date : DateTime;
+
+        // TimeStampWithoutTZ: '2017-11-13 14:29:17.075678' -> [0, 2, 0, 220, 221, 47, 16, 222]
+        auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+        auto v = toValue(t);
+
+        assert(v.data == [0, 2, 0, 220, 221, 47, 16, 222]);
+        assert(v.as!TimeStampWithoutTZ == t);
     }
 }

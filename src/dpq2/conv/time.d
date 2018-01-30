@@ -1,6 +1,6 @@
 ﻿/**
 *   PostgreSQL time types binary format.
-*   
+*
 *   Copyright: © 2014 DSoftOut
 *   Authors: NCrashed <ncrashed@gmail.com>
 */
@@ -84,6 +84,10 @@ if( is( T == SysTime ) )
     );
 }
 
+/++
+    Structure to represent PostgreSQL's Timestamp without time zone type.
+    Basically it works just like SysTime but allways assumed to be in UTC.
++/
 struct TimeStampWithoutTZ
 {
     DateTime dateTime;
@@ -95,19 +99,51 @@ struct TimeStampWithoutTZ
         assert(fracSec < 1.seconds);
     }
 
+    /// Returns the TimeStampWithoutTZ farthest in the future which is representable by TimeStampWithoutTZ.
     static max()
     {
         return TimeStampWithoutTZ(DateTime.max, long.max.hnsecs);
     }
 
+    /// Returns the TimeStampWithoutTZ farthest in the past which is representable by TimeStampWithoutTZ.
     static min()
     {
         return TimeStampWithoutTZ(DateTime.min, Duration.zero);
     }
 
-    SysTime opCast()
+    /// Converts the value to SysTime
+    T opCast(T)() const
+    if (is(T == SysTime))
     {
         return SysTime(dateTime, fracSec, UTC());
+    }
+
+    /++
+        Creates timestamp without timezone from SysTime.
+        It removes the TimeZone from SysTime in the way that resulting timestamp has the same value as a source timestamp in it's time zone.
+    +/
+    static TimeStampWithoutTZ fromSysTime(in SysTime time)
+    {
+        return TimeStampWithoutTZ(
+            DateTime(time.year, time.month, time.day, time.hour, time.minute, time.second),
+            time.fracSecs
+        );
+    }
+
+    unittest
+    {
+        import std.datetime.systime : Clock;
+        import std.datetime.timezone : LocalTime, UTC;
+
+        auto t = Clock.currTime; // TZ = local time
+        auto ts = TimeStampWithoutTZ.fromSysTime(t); // Should be same as local time
+        auto uts = cast(SysTime)ts; // TZ = UTC (but raw time value is still the same, just shifted to other TZ)
+
+        assert(t.timezone.name == LocalTime().name);
+        assert(uts.timezone.name == UTC().name);
+        assert(t.hour == ts.dateTime.hour);
+        assert(ts.dateTime.hour == uts.hour);
+        assert(t.hour == uts.hour);
     }
 }
 
@@ -192,7 +228,7 @@ version(Have_Int64_TimeStamp)
     private alias long TimeADT;
     private alias long TimeOffset;
     private alias int  fsec_t;      /* fractional seconds (in microseconds) */
-    
+
     void TMODULO(ref long t, ref long q, double u)
     {
         q = cast(long)(t / u);
@@ -206,15 +242,15 @@ else
     private alias TimeADT = double;
     private alias TimeOffset = double;
     private alias fsec_t = double;    /* fractional seconds (in seconds) */
-    
+
     void TMODULO(T)(ref double t, ref T q, double u)
         if(is(T == double) || is(T == int))
     {
         q = cast(T)((t < 0) ? ceil(t / u) : floor(t / u));
         if (q != 0) t -= rint(q * u);
     }
-    
-    double TIMEROUND(double j) 
+
+    double TIMEROUND(double j)
     {
         enum TIME_PREC_INV = 10000000000.0;
         return rint((cast(double) j) * TIME_PREC_INV) / TIME_PREC_INV;
