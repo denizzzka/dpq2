@@ -401,7 +401,13 @@ void _integration_test( string connParam )
     assert( PQlibVersion() >= 9_0100 );
 
     {
+        debug import std.experimental.logger;
+
         auto c = new Connection(connParam);
+
+        trace("DB name: ", c.dbName());
+        trace("Protocol version: ", c.protocolVersion());
+        trace("Server version: ", c.serverVersion());
 
         destroy(c);
     }
