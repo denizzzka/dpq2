@@ -404,10 +404,16 @@ void _integration_test( string connParam )
         debug import std.experimental.logger;
 
         auto c = new Connection(connParam);
+        auto dbname = c.dbName();
+        auto pver = c.protocolVersion();
+        auto sver = c.serverVersion();
 
-        trace("DB name: ", c.dbName());
-        trace("Protocol version: ", c.protocolVersion());
-        trace("Server version: ", c.serverVersion());
+        debug
+        {
+            trace("DB name: ", dbname);
+            trace("Protocol version: ", pver);
+            trace("Server version: ", sver);
+        }
 
         destroy(c);
     }
