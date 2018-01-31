@@ -115,7 +115,7 @@ struct TimeStampWithoutTZ
     }
 
     /// Converts the value to SysTime with possibility to set the time zone it's in
-    SysTime toSysTime(immutable TimeZone tz = LocalTime()) const
+    SysTime toSysTime(immutable TimeZone tz) const
     {
         return SysTime(dateTime, fracSec, tz);
     }
