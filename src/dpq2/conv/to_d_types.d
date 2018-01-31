@@ -31,7 +31,6 @@ alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp_without_time_zone = TimeStampWithoutTZ; /// Both date and time (no time zone)
-alias PGtimestamp_with_time_zone = SysTime; /// Both date and time with time zone
 alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
