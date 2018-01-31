@@ -95,6 +95,8 @@ struct TimeStampWithoutTZ
     DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
 
+    alias dateTime this;
+
     invariant()
     {
         import std.conv : to;
@@ -132,6 +134,17 @@ struct TimeStampWithoutTZ
         );
     }
 
+    /++
+        Creates timestamp without timezone from DateTime.
+    +/
+    static TimeStampWithoutTZ fromDateTime(in DateTime time)
+    {
+        return TimeStampWithoutTZ(
+            DateTime(time.year, time.month, time.day, time.hour, time.minute, time.second),
+            Duration.zero
+        );
+    }
+
     unittest
     {
         {
@@ -139,7 +152,7 @@ struct TimeStampWithoutTZ
 
             auto t = Clock.currTime; // TZ = local time
             auto ts = TimeStampWithoutTZ.fromSysTime(t);
-            auto uts = ts.toSysTime; // TZ = local time
+            auto uts = ts.toSysTime(LocalTime()); // TZ = local time
 
             assert(t.timezone.name == LocalTime().name);
             assert(uts.timezone.name == LocalTime().name);
@@ -149,7 +162,7 @@ struct TimeStampWithoutTZ
 
             t = Clock.currTime(UTC()); // TZ = UTC
             ts = TimeStampWithoutTZ.fromSysTime(t);
-            uts = ts.toSysTime; // TZ = local time
+            uts = ts.toSysTime(LocalTime()); // TZ = local time
 
             assert(t.hour == ts.dateTime.hour);
             assert(ts.dateTime.hour == uts.hour);
@@ -163,6 +176,12 @@ struct TimeStampWithoutTZ
             // check timezone is dropped
             auto t = TimeStampWithoutTZ.fromSysTime(SysTime.fromISOExtString("2017-11-13T14:29:17.075678+02"));
             assert(t.dateTime.hour == 14);
+        }
+        {
+            auto dt = DateTime(2017, 11, 13, 14, 29, 17);
+            auto t = TimeStampWithoutTZ(dt, 75_678.usecs);
+
+            assert(t == dt); // test the implicit conversion to DateTime
         }
     }
 }
