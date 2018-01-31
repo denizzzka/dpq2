@@ -287,7 +287,7 @@ public void _integration_test( string connParam ) @system
 
         // append LocalTime offset (SysTime.toISOExtString in LocalTime doesn't append the TZ offset)
         auto splitRes = LocalTime().utcOffsetAt(sysTime.stdTime).split!("hours", "minutes");
-        sysTimeText ~= splitRes.hours > 0 ? "+" : "-";
+        sysTimeText ~= splitRes.hours >= 0 ? "+" : "-";
         sysTimeText ~= format!"%02d"(abs(splitRes.hours));
         if (splitRes.minutes > 0) sysTimeText ~= format!":%02d"(abs(splitRes.minutes));
 
