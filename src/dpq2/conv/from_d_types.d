@@ -67,11 +67,11 @@ if (is(Unqual!T == TimeOfDay))
     return Value(nativeToBigEndian(ms).dup, OidType.Time, false);
 }
 
-/// Constructs Value from TimeStampWithoutTZ with possibility to set timezone it's
-Value toValue(T)(T v, immutable TimeZone tz = LocalTime())
+/// Constructs Value from TimeStampWithoutTZ
+Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
-    auto us = (v.toSysTime(tz) - SysTime(POSTGRES_EPOCH_DATE, tz)).total!"usecs";
+    auto us = (v.toSysTime(UTC()) - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
 }
 
