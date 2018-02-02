@@ -254,11 +254,32 @@ class Connection
         return res;
     }
 
+    string dbName() const nothrow
+    {
+        assert(conn);
+
+        return PQdb(conn).fromStringz.to!string;
+    }
+
     string host() const nothrow
     {
         assert(conn);
 
         return PQhost(conn).fromStringz.to!string;
+    }
+
+    int protocolVersion() const nothrow
+    {
+        assert(conn);
+
+        return PQprotocolVersion(conn);
+    }
+
+    int serverVersion() const nothrow
+    {
+        assert(conn);
+
+        return PQserverVersion(conn);
     }
 
     void trace(ref File stream)
@@ -380,7 +401,19 @@ void _integration_test( string connParam )
     assert( PQlibVersion() >= 9_0100 );
 
     {
+        debug import std.experimental.logger;
+
         auto c = new Connection(connParam);
+        auto dbname = c.dbName();
+        auto pver = c.protocolVersion();
+        auto sver = c.serverVersion();
+
+        debug
+        {
+            trace("DB name: ", dbname);
+            trace("Protocol version: ", pver);
+            trace("Server version: ", sver);
+        }
 
         destroy(c);
     }
