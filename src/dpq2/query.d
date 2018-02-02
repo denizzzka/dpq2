@@ -91,14 +91,14 @@ mixin template Queries()
     }
 
     /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
-    immutable(Result) prepare(string statementName, string sqlStatement)
+    immutable(Result) prepare(string statementName, string sqlStatement, in Oid[] oids = null)
     {
         PGresult* pgResult = PQprepare(
                 conn,
                 toStringz(statementName),
                 toStringz(sqlStatement),
-                0,
-                null
+                oids.length.to!int,
+                oids.ptr
             );
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
@@ -107,15 +107,35 @@ mixin template Queries()
         return new immutable Result(container);
     }
 
+    /// Submits a request to execute a prepared statement with given parameters, and waits for completion.
+    immutable(Answer) execPrepared(in ref QueryParams qp)
+    {
+        auto p = InternalQueryParams(&qp);
+        auto pgResult = PQexecPrepared(
+                conn,
+                p.stmtName,
+                p.nParams,
+                cast(const(char*)*)p.paramValues,
+                p.paramLengths,
+                p.paramFormats,
+                p.resultFormat
+            );
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
+    }
+
     /// Sends a request to create a prepared statement with the given parameters, without waiting for completion.
-    void sendPrepare(string statementName, string sqlStatement)
+    void sendPrepare(string statementName, string sqlStatement, in Oid[] oids = null)
     {
         size_t r = PQsendPrepare(
                 conn,
                 toStringz(statementName),
                 toStringz(sqlStatement),
-                0,
-                null
+                oids.length.to!int,
+                cast(Oid*)oids.ptr //const should be accepted here, see https://github.com/DerelictOrg/DerelictPQ/issues/21
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
@@ -273,6 +293,12 @@ void _integration_test( string connParam ) @trusted
         // uses PQprepare:
         auto s = conn.prepare("prepared statement 1", "SELECT $1::integer");
         assert(s.status == PGRES_COMMAND_OK);
+
+        QueryParams p;
+        p.preparedStatementName = "prepared statement 1";
+        p.args = [42.toValue];
+        auto r = conn.execPrepared(p);
+        assert (r[0][0].as!int == 42);
     }
     {
         // uses PQsendPrepare:
