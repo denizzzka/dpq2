@@ -31,9 +31,8 @@ if( is( T == SysTime ) )
         throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2nativeTime(
-        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
-    ).toSysTime(UTC());
+    auto t = rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
+    return SysTime(t.dateTime, t.fracSec, UTC());
 }
 
 pure:
@@ -88,7 +87,9 @@ if( is( T == TimeStampWithoutTZ ) )
 
 /++
     Structure to represent PostgreSQL's Timestamp without time zone type.
-    It is assumed to be in Local Time.
+    Conversions between timestamp without time zone and timestamp with time zone normally assume that
+    the timestamp without time zone value should be taken or given as timezone local time.
+    A different time zone can be specified for the conversion using AT TIME ZONE.
 +/
 struct TimeStampWithoutTZ
 {
@@ -116,65 +117,10 @@ struct TimeStampWithoutTZ
         return TimeStampWithoutTZ(DateTime.min, Duration.zero);
     }
 
-    /// Converts the value to SysTime with possibility to set the time zone it's in
-    SysTime toSysTime(immutable TimeZone tz) const
-    {
-        return SysTime(dateTime, fracSec, tz);
-    }
-
-    /++
-        Creates timestamp without timezone from SysTime.
-        It takes the resulting date and time from the SysTime and drops the time zone information.
-    +/
-    static TimeStampWithoutTZ fromSysTime(in SysTime time)
-    {
-        return TimeStampWithoutTZ(
-            DateTime(time.year, time.month, time.day, time.hour, time.minute, time.second),
-            time.fracSecs
-        );
-    }
-
-    /++
-        Creates timestamp without timezone from DateTime.
-    +/
-    static TimeStampWithoutTZ fromDateTime(in DateTime time)
-    {
-        return TimeStampWithoutTZ(
-            DateTime(time.year, time.month, time.day, time.hour, time.minute, time.second),
-            Duration.zero
-        );
-    }
-
     unittest
     {
         {
-            import std.datetime.systime : Clock;
-
-            auto t = Clock.currTime; // TZ = local time
-            auto ts = TimeStampWithoutTZ.fromSysTime(t);
-            auto uts = ts.toSysTime(LocalTime()); // TZ = local time
-
-            assert(t.timezone.name == LocalTime().name);
-            assert(uts.timezone.name == LocalTime().name);
-            assert(t.hour == ts.dateTime.hour);
-            assert(ts.dateTime.hour == uts.hour);
-            assert(t.hour == uts.hour);
-
-            t = Clock.currTime(UTC()); // TZ = UTC
-            ts = TimeStampWithoutTZ.fromSysTime(t);
-            uts = ts.toSysTime(LocalTime()); // TZ = local time
-
-            assert(t.hour == ts.dateTime.hour);
-            assert(ts.dateTime.hour == uts.hour);
-            assert(t.hour == uts.hour);
-        }
-        {
             auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
-            assert(t.dateTime.hour == 14);
-        }
-        {
-            // check timezone is dropped
-            auto t = TimeStampWithoutTZ.fromSysTime(SysTime.fromISOExtString("2017-11-13T14:29:17.075678+02"));
             assert(t.dateTime.hour == 14);
         }
         {

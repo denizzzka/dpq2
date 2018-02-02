@@ -71,7 +71,7 @@ if (is(Unqual!T == TimeOfDay))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
-    auto us = (v.toSysTime(UTC()) - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
+    auto us = (SysTime(v.dateTime, v.fracSec, UTC()) - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
 }
 
