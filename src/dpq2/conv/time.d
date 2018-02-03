@@ -86,10 +86,7 @@ if( is( T == TimeStampWithoutTZ ) )
 }
 
 /++
-    Structure to represent PostgreSQL's Timestamp without time zone type.
-    Conversions between timestamp without time zone and timestamp with time zone normally assume that
-    the timestamp without time zone value should be taken or given as timezone local time.
-    A different time zone can be specified for the conversion using AT TIME ZONE.
+    Structure to represent PostgreSQL Timestamp with/without time zone
 +/
 struct TimeStampWithoutTZ
 {
