@@ -101,6 +101,7 @@ struct TimeStampWithoutTZ
     invariant()
     {
         import std.conv : to;
+
         assert(fracSec >= Duration.zero, fracSec.to!string);
         assert(fracSec < 1.seconds, fracSec.to!string);
     }
@@ -239,8 +240,16 @@ else
     }
 }
 
-TimeOfDay time2tm(TimeADT time)
+TimeOfDay time2tm(TimeADT time) pure
 {
+    /*
+        TODO: Have_Int64_TimeStamp should be removed from dpq2 due to
+        commit "Remove now-dead code for !HAVE_INT64_TIMESTAMP." in
+        Postgres code committed on 24 Feb 2017 b9d092c962ea3262930e3c31a8c3d79b66ce9d43
+
+        Discussion: https://postgr.es/m/26788.1487455319@sss.pgh.pa.us
+    */
+
     version(Have_Int64_TimeStamp)
     {
         immutable long USECS_PER_HOUR  = 3600000000;

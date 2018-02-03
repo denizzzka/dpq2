@@ -13,10 +13,12 @@ import std.typecons : Nullable;
 
 /// Converts Nullable!T to Value
 Value toValue(T)(T v)
-    if (is(T == Nullable!R, R))
+if (is(T == Nullable!R, R))
 {
-    if (v.isNull) return Value(null, detectOidTypeFromNative!(TemplateArgsOf!T[0]), true);
-    return toValue(v.get);
+    if (v.isNull)
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
+    else
+        return toValue(v.get);
 }
 
 Value toValue(T)(T v)
@@ -56,6 +58,7 @@ Value toValue(T)(T v)
 if (is(Unqual!T == Date))
 {
     auto days = cast(int)(v - POSTGRES_EPOCH_DATE).total!"days";
+
     return Value(nativeToBigEndian(days).dup, OidType.Date, false);
 }
 
@@ -63,7 +66,8 @@ if (is(Unqual!T == Date))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeOfDay))
 {
-    long ms = (v.second + v.minute*60L + v.hour*3_600L)*1_000_000;
+    long ms = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
+
     return Value(nativeToBigEndian(ms).dup, OidType.Time, false);
 }
 
