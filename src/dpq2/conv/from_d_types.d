@@ -57,7 +57,9 @@ if (!is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if (is(Unqual!T == Date))
 {
-    auto days = cast(int)(v - POSTGRES_EPOCH_DATE).total!"days";
+    import std.conv: to;
+
+    auto days = (v - POSTGRES_EPOCH_DATE).total!"days".to!int;
 
     return Value(nativeToBigEndian(days).dup, OidType.Date, false);
 }
