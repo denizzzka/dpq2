@@ -238,7 +238,7 @@ else
     }
 }
 
-TimeOfDay time2tm(TimeADT time) pure
+TimeOfDay time2tm(TimeADT time)
 {
     /*
         TODO: Have_Int64_TimeStamp should be removed from dpq2 due to
