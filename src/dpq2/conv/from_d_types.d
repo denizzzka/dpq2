@@ -66,16 +66,18 @@ if (is(Unqual!T == Date))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeOfDay))
 {
-    long ms = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
+    long us = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
 
-    return Value(nativeToBigEndian(ms).dup, OidType.Time, false);
+    return Value(nativeToBigEndian(us).dup, OidType.Time, false);
 }
 
 /// Constructs Value from TimeStampWithoutTZ
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
-    auto us = (SysTime(v.dateTime, v.fracSec, UTC()) - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
+    long j = v.dateTime.julianDay - POSTGRES_EPOCH_DATE.julianDay; // FIXME: use POSTGRES_EPOCH_JDATE here
+    long us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
+
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
 }
 
