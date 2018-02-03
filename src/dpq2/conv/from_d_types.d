@@ -83,7 +83,8 @@ if (is(Unqual!T == TimeStampWithoutTZ))
 Value toValue(T)(T v)
 if (is(Unqual!T == SysTime))
 {
-    auto us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
+    long us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
+
     return Value(nativeToBigEndian(us).dup, OidType.TimeStampWithZone, false);
 }
 
