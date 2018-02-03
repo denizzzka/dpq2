@@ -182,7 +182,8 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 void j2date(int jd, out int year, out int month, out int day)
 {
     enum MONTHS_PER_YEAR = 12;
-    enum POSTGRES_EPOCH_JDATE = 2_451_545;
+    enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
+    static assert(POSTGRES_EPOCH_JDATE == 2_451_545);
 
     jd += POSTGRES_EPOCH_JDATE;
 
