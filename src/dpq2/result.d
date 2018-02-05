@@ -370,13 +370,13 @@ immutable struct Row
 immutable (Array) asArray(immutable(Value) v)
 {
     if(v.format == ValueFormat.TEXT)
-        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
+        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
             "Value internal format is text",
             __FILE__, __LINE__
         );
 
     if(!v.isSupportedArray)
-        throw new AnswerConvException(ConvExceptionType.NOT_ARRAY,
+        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
             "Format of the value is "~to!string(v.oidType)~", isn't supported array",
             __FILE__, __LINE__
         );
@@ -470,7 +470,7 @@ immutable struct Array
     this(immutable Value cell)
     {
         if(!(cell.format == ValueFormat.BINARY))
-            throw new AnswerConvException(ConvExceptionType.NOT_BINARY,
+            throw new ValueConvException(ConvExceptionType.NOT_BINARY,
                 msg_NOT_BINARY, __FILE__, __LINE__);
 
         ap = cast(immutable) ArrayProperties(cell);
@@ -791,7 +791,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try r[0]["integer_value"].as!PGtext;
-        catch(AnswerConvException e)
+        catch(ValueConvException e)
         {
             exceptionFlag = true;
             assert(e.msg.length > 5); // error message check

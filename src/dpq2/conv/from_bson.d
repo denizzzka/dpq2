@@ -2,7 +2,6 @@ module dpq2.conv.from_bson;
 
 import dpq2.value;
 import dpq2.oids;
-import dpq2.exception;
 import dpq2.result: ArrayProperties, ArrayHeader_net, Dim_net;
 import dpq2.conv.from_d_types;
 import dpq2.conv.to_d_types;
@@ -58,7 +57,7 @@ Value bsonValueToValue(Bson v, OidType defaultType)
             break;
 
         default:
-            throw new AnswerConvException(
+            throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
                     "Format "~v.type.to!(immutable(char)[])~" doesn't supported by Bson to Value converter",
                     __FILE__, __LINE__
@@ -125,7 +124,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
         else
         {
             if(ap.dimsSize[dimension] != bsonArr.length)
-                throw new AnswerConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);
+                throw new ValueConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);
         }
 
         foreach(bElem; bsonArr)
@@ -152,7 +151,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
                     else
                     {
                         if(ap.OID != v.oidType)
-                            throw new AnswerConvException(
+                            throw new ValueConvException(
                                     ConvExceptionType.NOT_ARRAY,
                                     "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
                                     __FILE__, __LINE__
@@ -226,7 +225,7 @@ unittest
 
         try
             bsonToValue(bsonArray);
-        catch(AnswerConvException e)
+        catch(ValueConvException e)
         {
             if(e.type == ConvExceptionType.NOT_ARRAY)
                 exceptionFlag = true;

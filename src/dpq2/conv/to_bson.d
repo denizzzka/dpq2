@@ -1,9 +1,8 @@
 module dpq2.conv.to_bson;
 
-import dpq2.value: Value, ValueFormat;
+import dpq2.value;
 import dpq2.oids: OidType;
 import dpq2.result: ArrayProperties;
-import dpq2.exception;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import vibe.data.bson;
@@ -158,7 +157,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             break;
 
         default:
-            throw new AnswerConvException(
+            throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
                     "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Value to Bson converter",
                     __FILE__, __LINE__
