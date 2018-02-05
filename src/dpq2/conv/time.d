@@ -92,6 +92,13 @@ if( is( T == TimeStampWithoutTZ ) )
     );
 }
 
+/// Returns value timestamp without time zone as DateTime (it drops the fracSecs from the database value)
+DateTime binaryValueAs(T)(in Value v) @trusted
+if( is( T == DateTime ) )
+{
+    return v.binaryValueAs!TimeStampWithoutTZ.dateTime;
+}
+
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/

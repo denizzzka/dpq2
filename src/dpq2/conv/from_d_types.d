@@ -6,7 +6,7 @@ import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStampWithoutTZ;
 import dpq2.oids : detectOidTypeFromNative, OidType;
 import dpq2.value : Value, ValueFormat;
 import std.bitmanip: nativeToBigEndian;
-import std.datetime.date : Date, TimeOfDay;
+import std.datetime.date : Date, DateTime, TimeOfDay;
 import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
 import std.traits: isNumeric, TemplateArgsOf, Unqual;
 import std.typecons : Nullable;
@@ -78,9 +78,20 @@ Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
     long j = v.dateTime.julianDay - POSTGRES_EPOCH_DATE.julianDay; // FIXME: use POSTGRES_EPOCH_JDATE here
+    if (v.hour < 12) j += 1; // fix before/after noon values difference
     long us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
 
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
+}
+
+/++
+    Constructs Value from DateTime
+    It uses Timestamp without TZ as a resulting PG type
++/
+Value toValue(T)(T v)
+if (is(Unqual!T == DateTime))
+{
+    return TimeStampWithoutTZ(v).toValue;
 }
 
 /++
@@ -160,6 +171,14 @@ unittest
     }
 
     {
+        auto d = immutable Date(2018, 1, 15);
+        auto v = toValue(d);
+
+        assert(v.oidType == OidType.Date);
+        assert(v.as!Date == d);
+    }
+
+    {
         // Date: '2000-1-1'
         auto d = Date(2000, 1, 1);
         auto v = toValue(d);
@@ -175,6 +194,15 @@ unittest
 
         assert(v.oidType == OidType.Date);
         assert(v.as!Date == d);
+    }
+
+    {
+        // DateTime
+        auto d = const DateTime(2018, 2, 20, 1, 2, 3);
+        auto v = toValue(d);
+
+        assert(v.oidType == OidType.TimeStamp);
+        assert(v.as!DateTime == d);
     }
 
     {
