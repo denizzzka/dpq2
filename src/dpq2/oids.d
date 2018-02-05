@@ -128,8 +128,10 @@ bool isSupportedArray(OidType t) pure
         case Float4Array:
         case Float8Array:
         case TimeStampArray:
+        case TimeStampWithZoneArray:
         case DateArray:
         case TimeArray:
+        case TimeWithZoneArray:
         case NumericArray:
         case UUIDArray:
         case JsonArray:
