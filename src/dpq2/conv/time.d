@@ -20,7 +20,14 @@ import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
 import core.stdc.time: time_t;
 
-/// Returns value timestamp with time zone as SysTime
+/++
+    Returns value timestamp with time zone as SysTime
+    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
+    It means that PG value will have 10 times lower precision.
+    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
+
+    Because of these differences, it can happen that database value will not fit to the SysTime range of values.
++/
 SysTime binaryValueAs(T)(in Value v) @trusted
 if( is( T == SysTime ) )
 {
