@@ -1,6 +1,6 @@
 ﻿/**
 *   PostgreSQL time types binary format.
-*   
+*
 *   Copyright: © 2014 DSoftOut
 *   Authors: NCrashed <ncrashed@gmail.com>
 */
@@ -9,14 +9,38 @@ module dpq2.conv.time;
 @safe:
 
 import dpq2.result;
-import dpq2.oids;
+import dpq2.oids : OidType;
 import dpq2.conv.to_d_types: throwTypeComplaint;
 import dpq2.exception;
 
-import std.datetime;
-import std.bitmanip: bigEndianToNative;
+import core.time;
+import std.datetime.date : Date, DateTime, TimeOfDay;
+import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
+import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
 import core.stdc.time: time_t;
+
+/++
+    Returns value timestamp with time zone as SysTime
+    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
+    It means that PG value will have 10 times lower precision.
+    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
+
+    Because of these differences, it can happen that database value will not fit to the SysTime range of values.
++/
+SysTime binaryValueAs(T)(in Value v) @trusted
+if( is( T == SysTime ) )
+{
+    if(!(v.oidType == OidType.TimeStampWithZone))
+        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
+
+    if(!(v.data.length == long.sizeof))
+        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
+
+    auto t = rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
+    return SysTime(t.dateTime, t.fracSec, UTC());
+}
 
 pure:
 
@@ -68,27 +92,59 @@ if( is( T == TimeStampWithoutTZ ) )
     );
 }
 
+/// Returns value timestamp without time zone as DateTime (it drops the fracSecs from the database value)
+DateTime binaryValueAs(T)(in Value v) @trusted
+if( is( T == DateTime ) )
+{
+    return v.binaryValueAs!TimeStampWithoutTZ.dateTime;
+}
+
+/++
+    Structure to represent PostgreSQL Timestamp with/without time zone
++/
 struct TimeStampWithoutTZ
 {
-    DateTime dateTime;
+    DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
+
+    alias dateTime this;
 
     invariant()
     {
-        assert(fracSec >= Duration.zero);
-        assert(fracSec < 1.seconds);
+        import std.conv : to;
+
+        assert(fracSec >= Duration.zero, fracSec.to!string);
+        assert(fracSec < 1.seconds, fracSec.to!string);
     }
 
+    /// Returns the TimeStampWithoutTZ farthest in the future which is representable by TimeStampWithoutTZ.
     static max()
     {
         return TimeStampWithoutTZ(DateTime.max, long.max.hnsecs);
     }
 
+    /// Returns the TimeStampWithoutTZ farthest in the past which is representable by TimeStampWithoutTZ.
     static min()
     {
         return TimeStampWithoutTZ(DateTime.min, Duration.zero);
     }
+
+    unittest
+    {
+        {
+            auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+            assert(t.dateTime.hour == 14);
+        }
+        {
+            auto dt = DateTime(2017, 11, 13, 14, 29, 17);
+            auto t = TimeStampWithoutTZ(dt, 75_678.usecs);
+
+            assert(t == dt); // test the implicit conversion to DateTime
+        }
+    }
 }
+
+package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 
 private:
 
@@ -114,9 +170,7 @@ TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
 
 TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 {
-    TimeStampWithoutTZ res;
-
-    res.dateTime = DateTime(
+    auto dateTime = DateTime(
             tm.tm_year,
             tm.tm_mon,
             tm.tm_mday,
@@ -127,22 +181,23 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 
     version(Have_Int64_TimeStamp)
     {
-        res.fracSec = dur!"usecs"(ts);
+        auto fracSec = dur!"usecs"(ts);
     }
     else
     {
-        res.fracSec = dur!"usecs"((cast(long)(ts * 10e6)));
+        auto fracSec = dur!"usecs"((cast(long)(ts * 10e6)));
     }
 
-    return res;
+    return TimeStampWithoutTZ(dateTime, fracSec);
 }
 
 // Here is used names from the original Postgresql source
 
 void j2date(int jd, out int year, out int month, out int day)
 {
-    enum POSTGRES_EPOCH_JDATE = 2451545;
     enum MONTHS_PER_YEAR = 12;
+    enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
+    static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
 
     jd += POSTGRES_EPOCH_JDATE;
 
@@ -168,7 +223,7 @@ version(Have_Int64_TimeStamp)
     private alias long TimeADT;
     private alias long TimeOffset;
     private alias int  fsec_t;      /* fractional seconds (in microseconds) */
-    
+
     void TMODULO(ref long t, ref long q, double u)
     {
         q = cast(long)(t / u);
@@ -182,15 +237,15 @@ else
     private alias TimeADT = double;
     private alias TimeOffset = double;
     private alias fsec_t = double;    /* fractional seconds (in seconds) */
-    
+
     void TMODULO(T)(ref double t, ref T q, double u)
         if(is(T == double) || is(T == int))
     {
         q = cast(T)((t < 0) ? ceil(t / u) : floor(t / u));
         if (q != 0) t -= rint(q * u);
     }
-    
-    double TIMEROUND(double j) 
+
+    double TIMEROUND(double j)
     {
         enum TIME_PREC_INV = 10000000000.0;
         return rint((cast(double) j) * TIME_PREC_INV) / TIME_PREC_INV;
@@ -199,6 +254,14 @@ else
 
 TimeOfDay time2tm(TimeADT time)
 {
+    /*
+        TODO: Have_Int64_TimeStamp should be removed from dpq2 due to
+        commit "Remove now-dead code for !HAVE_INT64_TIMESTAMP." in
+        Postgres code committed on 24 Feb 2017 b9d092c962ea3262930e3c31a8c3d79b66ce9d43
+
+        Discussion: https://postgr.es/m/26788.1487455319@sss.pgh.pa.us
+    */
+
     version(Have_Int64_TimeStamp)
     {
         immutable long USECS_PER_HOUR  = 3600000000;
@@ -255,17 +318,10 @@ struct pg_tm
 
 alias pg_time_t = long;
 
-immutable ulong SECS_PER_DAY = 86400;
-immutable ulong POSTGRES_EPOCH_JDATE = 2451545;
-immutable ulong UNIX_EPOCH_JDATE     = 2440588;
-
-immutable ulong USECS_PER_DAY    = 86_400_000_000;
-immutable ulong USECS_PER_HOUR   = 3_600_000_000;
-immutable ulong USECS_PER_MINUTE = 60_000_000;
-immutable ulong USECS_PER_SEC    = 1_000_000;
-
-immutable ulong SECS_PER_HOUR   = 3600;
-immutable ulong SECS_PER_MINUTE = 60;
+enum USECS_PER_DAY       = 86_400_000_000UL;
+enum USECS_PER_HOUR      = 3_600_000_000UL;
+enum USECS_PER_MINUTE    = 60_000_000UL;
+enum USECS_PER_SEC       = 1_000_000UL;
 
 /**
 * timestamp2tm() - Convert timestamp data type to POSIX time structure.

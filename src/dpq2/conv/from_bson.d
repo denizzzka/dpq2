@@ -1,7 +1,11 @@
 module dpq2.conv.from_bson;
 
-import dpq2;
+import dpq2.value;
+import dpq2.oids;
 import dpq2.exception;
+import dpq2.result: ArrayProperties, ArrayHeader_net, Dim_net;
+import dpq2.conv.from_d_types;
+import dpq2.conv.to_d_types;
 import vibe.data.bson;
 import std.bitmanip: nativeToBigEndian;
 import std.conv: to;
@@ -187,6 +191,8 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
 
 unittest
 {
+    import dpq2.conv.to_bson;
+
     {
         Bson bsonArray = Bson(
             [Bson(123), Bson(155), Bson(null), Bson(0), Bson(null)]
