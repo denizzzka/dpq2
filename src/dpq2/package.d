@@ -3,19 +3,25 @@
 import derelict.pq.pq;
 debug import std.experimental.logger;
 
-shared static this()
+static __gshared bool __initialized;
+
+static this()
 {
-    debug
-    {
-        trace("DerelictPQ loading...");
-    }
+    import std.concurrency : initOnce;
+    initOnce!__initialized({
+        debug
+        {
+            trace("DerelictPQ loading...");
+        }
 
-    DerelictPQ.load();
+        DerelictPQ.load();
 
-    debug
-    {
-        trace("...DerelictPQ loading finished");
-    }
+        debug
+        {
+            trace("...DerelictPQ loading finished");
+        }
+        return true;
+    }());
 }
 
 public
