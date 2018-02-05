@@ -83,7 +83,12 @@ if (is(Unqual!T == TimeStampWithoutTZ))
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
 }
 
-/// Constructs Value from SysTime
+/++
+    Constructs Value from SysTime
+    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
+    It means that PG value will have 10 times lower precision.
+    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
++/
 Value toValue(T)(T v)
 if (is(Unqual!T == SysTime))
 {
