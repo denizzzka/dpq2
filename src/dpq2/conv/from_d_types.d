@@ -78,7 +78,7 @@ if (is(Unqual!T == TimeOfDay))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
-    long j = v.dateTime.modJulianDay - POSTGRES_EPOCH_DATE.modJulianDay; // FIXME: use POSTGRES_EPOCH_JDATE here
+    long j = v.dateTime.modJulianDay - POSTGRES_EPOCH_DATE.modJulianDay;
     long us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
 
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
@@ -161,14 +161,13 @@ unittest
         assert(nv.oidType == OidType.Bool);
     }
 
-    //FIXME: Not working currently
-    // {
-    //     import std.datetime : DateTime;
-    //     Value v = toValue(Nullable!TimeStampWithoutTZ(TimeStampWithoutTZ(DateTime(2017, 1, 2))));
+    {
+        import std.datetime : DateTime;
+        Value v = toValue(Nullable!TimeStampWithoutTZ(TimeStampWithoutTZ(DateTime(2017, 1, 2))));
 
-    //     assert(v.isNull);
-    //     assert(v.oidType == OidType.TimeStamp);
-    // }
+        assert(!v.isNull);
+        assert(v.oidType == OidType.TimeStamp);
+    }
 
     {
         // Date: '2018-1-15'
