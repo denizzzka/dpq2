@@ -2,7 +2,7 @@
 
 @safe:
 
-import dpq2.value: Value, ValueFormat;
+import dpq2.value;
 import dpq2.oids: OidType, isNativeInteger, isNativeFloat;
 import dpq2.connection: Connection;
 import dpq2.query: QueryParams;
@@ -10,7 +10,6 @@ import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStampWithoutTZ;
-import dpq2.exception;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;
@@ -39,7 +38,7 @@ alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
 {
-    throw new AnswerConvException(
+    throw new ValueConvException(
             ConvExceptionType.NOT_IMPLEMENTED,
             "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
             file, line
@@ -47,7 +46,7 @@ package void throwTypeComplaint(OidType receivedType, string expectedType, strin
 }
 
 private alias VF = ValueFormat;
-private alias AE = AnswerConvException;
+private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
 /// Returns cell value as native string type from text or binary formatted field

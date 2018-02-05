@@ -187,7 +187,7 @@ import std.bitmanip: bigEndianToNative;
 
 package string rawValueToNumeric(in ubyte[] v) pure
 {
-    import dpq2.result: AnswerConvException, ConvExceptionType;
+    import dpq2.result: ValueConvException, ConvExceptionType;
 
     struct NumericVar_net // network byte order
     {
@@ -198,7 +198,7 @@ package string rawValueToNumeric(in ubyte[] v) pure
     }
 
     if(!(v.length >= NumericVar_net.sizeof))
-        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length ("~to!string(v.length)~") less than it is possible for numeric type",
             __FILE__, __LINE__);
 

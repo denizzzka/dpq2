@@ -11,7 +11,6 @@ module dpq2.conv.time;
 import dpq2.result;
 import dpq2.oids : OidType;
 import dpq2.conv.to_d_types: throwTypeComplaint;
-import dpq2.exception;
 
 import core.time;
 import std.datetime.date : Date, DateTime, TimeOfDay;
@@ -35,7 +34,7 @@ if( is( T == SysTime ) )
         throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
 
     if(!(v.data.length == long.sizeof))
-        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
 
     auto t = rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
@@ -52,7 +51,7 @@ if( is( T == Date ) )
         throwTypeComplaint(v.oidType, "Date", __FILE__, __LINE__);
 
     if(!(v.data.length == uint.sizeof))
-        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
 
     int jd = bigEndianToNative!uint(v.data.ptr[0..uint.sizeof]);
@@ -70,7 +69,7 @@ if( is( T == TimeOfDay ) )
         throwTypeComplaint(v.oidType, "time without time zone", __FILE__, __LINE__);
 
     if(!(v.data.length == TimeADT.sizeof))
-        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
 
     return time2tm(bigEndianToNative!TimeADT(v.data.ptr[0..TimeADT.sizeof]));
@@ -84,7 +83,7 @@ if( is( T == TimeStampWithoutTZ ) )
         throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
 
     if(!(v.data.length == long.sizeof))
-        throw new AnswerConvException(ConvExceptionType.SIZE_MISMATCH,
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
     return rawTimeStamp2nativeTime(

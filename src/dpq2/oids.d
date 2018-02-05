@@ -9,14 +9,14 @@ module dpq2.oids;
 
 @safe:
 
-OidType oid2oidType(Oid oid) pure
+package OidType oid2oidType(Oid oid) pure
 {
     static assert(Oid.sizeof == OidType.sizeof);
 
     return cast(OidType)(oid);
 }
 
-OidType oidConvTo(string s)(OidType type)
+package OidType oidConvTo(string s)(OidType type)
 {
     foreach(ref a; appropriateArrOid)
     {
@@ -35,10 +35,10 @@ OidType oidConvTo(string s)(OidType type)
         static assert(false, "Wrong oidConvTo type "~s);
     }
 
-    import dpq2.exception: AnswerConvException, ConvExceptionType;
+    import dpq2.value: ValueConvException, ConvExceptionType;
     import std.conv: to;
 
-    throw new AnswerConvException( // TODO: rename it to ValueConvException and move to value.d
+    throw new ValueConvException(
             ConvExceptionType.NOT_IMPLEMENTED,
             "Conv to "~s~" for type "~type.to!string~" isn't defined",
             __FILE__, __LINE__
