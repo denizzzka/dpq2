@@ -149,6 +149,7 @@ OidType detectOidTypeFromNative(T)()
     import std.datetime.date : StdDate = Date, TimeOfDay;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
+    import dpq2.conv.time: TimeStampWithoutTZ;
 
     alias UT = Unqual!T;
 

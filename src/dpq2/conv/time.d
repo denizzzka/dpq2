@@ -9,7 +9,7 @@ module dpq2.conv.time;
 @safe:
 
 import dpq2.result;
-import dpq2.oids : detectOidTypeFromNative, OidType;
+import dpq2.oids : OidType;
 import dpq2.conv.to_d_types: throwTypeComplaint;
 import dpq2.exception;
 

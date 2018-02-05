@@ -5,7 +5,8 @@
 public import dpq2.conv.from_d_types;
 public import dpq2.conv.from_bson;
 
-import dpq2;
+import dpq2.value;
+import dpq2.oids: Oid;
 import std.conv: to;
 import std.string: toStringz;
 

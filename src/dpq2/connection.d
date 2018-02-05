@@ -1,8 +1,11 @@
 module dpq2.connection;
 
-import dpq2;
+import dpq2.query;
+import dpq2.args: QueryParams;
+import dpq2.result;
 import dpq2.exception;
 
+import derelict.pq.pq;
 import std.conv: to;
 import std.string: toStringz, fromStringz;
 import std.exception: enforce, enforceEx;

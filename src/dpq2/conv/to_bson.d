@@ -1,8 +1,11 @@
 module dpq2.conv.to_bson;
 
-import dpq2;
+import dpq2.value: Value, ValueFormat;
+import dpq2.oids: OidType;
+import dpq2.result: ArrayProperties;
 import dpq2.exception;
-import dpq2.conv.to_d_types: binaryValueAs, valueAsString, rawValueToNumeric;
+import dpq2.conv.to_d_types;
+import dpq2.conv.numeric: rawValueToNumeric;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone;
@@ -167,6 +170,8 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 
 public void _integration_test( string connParam )
 {
+    import dpq2.connection: Connection;
+    import dpq2.args: QueryParams;
     import std.uuid;
     import std.datetime: SysTime, DateTime, UTC;
 

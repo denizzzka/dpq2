@@ -2,8 +2,9 @@ module dpq2.conv.jsonb;
 
 @safe:
 
-import dpq2;
 import vibe.data.json;
+import dpq2.value: Value;
+import dpq2.oids: OidType;
 import dpq2.exception;
 
 package:

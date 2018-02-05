@@ -2,7 +2,11 @@
 
 public import dpq2.args;
 
-import dpq2;
+import dpq2.connection: Connection, ConnectionException;
+import dpq2.result: Result;
+import dpq2.value;
+import dpq2.oids: OidType;
+import derelict.pq.pq;
 import core.time: Duration, dur;
 import std.exception: enforce;
 
@@ -195,6 +199,9 @@ enum WaitType
 
 void _integration_test( string connParam ) @trusted
 {
+    import dpq2.conv.to_d_types; 
+    import dpq2.conv.to_bson;
+
     auto conn = new Connection(connParam);
 
     // Text type arguments testing

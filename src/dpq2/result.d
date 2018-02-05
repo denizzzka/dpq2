@@ -5,8 +5,10 @@ public import dpq2.conv.to_bson;
 public import dpq2.oids;
 public import dpq2.value;
 
-import dpq2;
+import dpq2.connection: Connection;
+import dpq2.args: QueryParams;
 import dpq2.exception;
+import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz, fromStringz;
