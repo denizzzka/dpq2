@@ -161,6 +161,14 @@ unittest
     }
 
     {
+        import std.datetime : DateTime;
+        Value v = toValue(Nullable!TimeStampWithoutTZ(TimeStampWithoutTZ(DateTime(2017, 1, 2))));
+
+        assert(v.isNull);
+        assert(v.oidType == OidType.TimeStamp);
+    }
+
+    {
         // Date: '2018-1-15'
         auto d = Date(2018, 1, 15);
         auto v = toValue(d);
