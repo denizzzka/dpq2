@@ -9,14 +9,14 @@ module dpq2.oids;
 
 @safe:
 
-OidType oid2oidType(Oid oid) pure
+package OidType oid2oidType(Oid oid) pure
 {
     static assert(Oid.sizeof == OidType.sizeof);
 
     return cast(OidType)(oid);
 }
 
-OidType oidConvTo(string s)(OidType type)
+package OidType oidConvTo(string s)(OidType type)
 {
     foreach(ref a; appropriateArrOid)
     {
