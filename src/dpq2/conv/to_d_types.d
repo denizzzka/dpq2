@@ -191,7 +191,6 @@ public void _integration_test( string connParam ) @system
         void testIt(T)(T nativeValue, string pgType, string pgValue)
         {
             import std.algorithm : strip;
-            import std.format : format;
             import std.string : representation;
 
             // test string to native conversion

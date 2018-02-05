@@ -86,10 +86,7 @@ if( is( T == TimeStampWithoutTZ ) )
 }
 
 /++
-    Structure to represent PostgreSQL's Timestamp without time zone type.
-    Conversions between timestamp without time zone and timestamp with time zone normally assume that
-    the timestamp without time zone value should be taken or given as timezone local time.
-    A different time zone can be specified for the conversion using AT TIME ZONE.
+    Structure to represent PostgreSQL Timestamp with/without time zone
 +/
 struct TimeStampWithoutTZ
 {
@@ -101,6 +98,7 @@ struct TimeStampWithoutTZ
     invariant()
     {
         import std.conv : to;
+
         assert(fracSec >= Duration.zero, fracSec.to!string);
         assert(fracSec < 1.seconds, fracSec.to!string);
     }
@@ -184,7 +182,8 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 void j2date(int jd, out int year, out int month, out int day)
 {
     enum MONTHS_PER_YEAR = 12;
-    enum POSTGRES_EPOCH_JDATE = 2_451_545;
+    enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
+    static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
 
     jd += POSTGRES_EPOCH_JDATE;
 
@@ -241,6 +240,14 @@ else
 
 TimeOfDay time2tm(TimeADT time)
 {
+    /*
+        TODO: Have_Int64_TimeStamp should be removed from dpq2 due to
+        commit "Remove now-dead code for !HAVE_INT64_TIMESTAMP." in
+        Postgres code committed on 24 Feb 2017 b9d092c962ea3262930e3c31a8c3d79b66ce9d43
+
+        Discussion: https://postgr.es/m/26788.1487455319@sss.pgh.pa.us
+    */
+
     version(Have_Int64_TimeStamp)
     {
         immutable long USECS_PER_HOUR  = 3600000000;
