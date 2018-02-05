@@ -216,6 +216,19 @@ unittest
     }
 
     {
+        // Date: max (overflow)
+        auto d = Date.max;
+        auto v = toValue(d);
+
+        import std.stdio;
+        writeln(d);
+        writeln(v.as!Date);
+
+        assert(v.oidType == OidType.Date);
+        assert(v.as!Date == d);
+    }
+
+    {
         // DateTime
         auto d = const DateTime(2018, 2, 20, 1, 2, 3);
         auto v = toValue(d);
