@@ -109,7 +109,7 @@ shared static this()
 
 import derelict.pq.pq: Oid;
 
-bool isSupportedArray(OidType t) pure
+bool isSupportedArray(OidType t) pure nothrow @nogc
 {
     with(OidType)
     switch(t)
@@ -155,7 +155,8 @@ OidType detectOidTypeFromNative(T)()
     }
 }
 
-enum OidType : Oid
+/// Enum of Oid types defined in PG
+public enum OidType : Oid
 {
     Undefined = 0,
 

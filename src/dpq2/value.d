@@ -7,10 +7,14 @@ import dpq2.oids;
 /// Minimal Postgres value
 struct Value
 {
-    bool isNull = true;
-    OidType oidType = OidType.Undefined;
+    private
+    {
+        bool _isNull = true;
+        OidType _oidType = OidType.Undefined;
 
-    package ValueFormat format;
+        ValueFormat _format;
+    }
+
     package ubyte[] _data;
 
     // FIXME:
@@ -22,16 +26,48 @@ struct Value
     this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
     {
         this._data = data;
-        this.format = format;
-        this.oidType = oidType;
-        this.isNull = isNull;
+        this._format = format;
+        this._oidType = oidType;
+        this._isNull = isNull;
     }
 
     /// Null Value constructor
     this(in ValueFormat format, in OidType oidType) pure
     {
-        this.format = format;
-        this.oidType = oidType;
+        this._format = format;
+        this._oidType = oidType;
+    }
+
+    @safe const pure nothrow @nogc
+    {
+        /// Indicates if the value is NULL
+        bool isNull()
+        {
+            return _isNull;
+        }
+
+        /// Indicates if the value is supported array type
+        bool isSupportedArray()
+        {
+            return dpq2.oids.isSupportedArray(oidType);
+        }
+
+        /// Returns OidType of the value
+        OidType oidType()
+        {
+            return _oidType;
+        }
+
+        /// Returns ValueFormat representation (text or binary)
+        ValueFormat format()
+        {
+            return _format;
+        }
+    }
+
+    package void oidType(OidType type) @safe pure nothrow @nogc
+    {
+        _oidType = type;
     }
 
     inout (ubyte[]) data() pure inout
@@ -42,11 +78,6 @@ struct Value
         enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
 
         return _data;
-    }
-
-    bool isSupportedArray() const
-    {
-        return dpq2.oids.isSupportedArray(oidType);
     }
 
     debug string toString() const @trusted
