@@ -77,8 +77,7 @@ if (is(Unqual!T == TimeOfDay))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeStampWithoutTZ))
 {
-    long j = v.dateTime.julianDay - POSTGRES_EPOCH_DATE.julianDay; // FIXME: use POSTGRES_EPOCH_JDATE here
-    if (v.hour < 12) j += 1; // fix before/after noon values difference
+    long j = v.dateTime.modJulianDay - POSTGRES_EPOCH_DATE.modJulianDay; // FIXME: use POSTGRES_EPOCH_JDATE here
     long us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
 
     return Value(nativeToBigEndian(us).dup, OidType.TimeStamp, false);
