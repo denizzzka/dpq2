@@ -58,9 +58,19 @@ if (!is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if (is(Unqual!T == Date))
 {
-    import std.conv: to;
+    import std.conv: to, ConvOverflowException;
+    import dpq2.value;
 
-    auto days = (v - POSTGRES_EPOCH_DATE).total!"days".to!int;
+    int days;
+
+    try
+        days = (v - POSTGRES_EPOCH_DATE).total!"days".to!int;
+    catch(ConvOverflowException e)
+        throw new ValueConvException(
+                ConvExceptionType.DATE_VALUE_OVERFLOW,
+                "Date value isn't fits to Postgres binary Date",
+                __FILE__, __LINE__
+            );
 
     return Value(nativeToBigEndian(days).dup, OidType.Date, false);
 }
