@@ -37,7 +37,7 @@ if( is( T == SysTime ) )
         throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
 
-    auto t = rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
+    auto t = rawTimeStamp2nativeTime!TimeStampWithTZ(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
     return SysTime(t.dateTime, t.fracSec, UTC());
 }
 
@@ -86,7 +86,7 @@ if( is( T == TimeStamp ) )
         throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2nativeTime(
+    return rawTimeStamp2nativeTime!TimeStamp(
         bigEndianToNative!long(v.data.ptr[0..long.sizeof])
     );
 }
@@ -101,7 +101,7 @@ if( is( T == DateTime ) )
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
-struct TimeStamp
+private struct TTimeStamp(bool WithTZ)
 {
     DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
@@ -143,16 +143,20 @@ struct TimeStamp
     }
 }
 
+alias TimeStamp = TTimeStamp!false;
+alias TimeStampWithTZ = TTimeStamp!false;
+
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
 static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
 
 private:
 
-TimeStamp rawTimeStamp2nativeTime(long raw)
+T rawTimeStamp2nativeTime(T)(long raw)
+if(is(T == TimeStamp) || is(T == TimeStampWithTZ))
 {
-    if(raw >= time_t.max) return TimeStamp.max;
-    if(raw <= time_t.min) return TimeStamp.min;
+    if(raw >= time_t.max) return T.max;
+    if(raw <= time_t.min) return T.min;
 
     pg_tm tm;
     fsec_t ts;
