@@ -33,7 +33,6 @@ alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
-alias PGtimestamp_without_time_zone = TimeStamp; /// Both date and time (no time zone)
 alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
@@ -278,9 +277,9 @@ public void _integration_test( string connParam ) @system
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
-        C!PGtimestamp_without_time_zone(TimeStamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
-        C!PGtimestamp_without_time_zone(TimeStamp.max, "timestamp without time zone", "'infinity'");
-        C!PGtimestamp_without_time_zone(TimeStamp.min, "timestamp without time zone", "'-infinity'");
+        C!TimeStamp(TimeStamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+        C!TimeStamp(TimeStamp.max, "timestamp without time zone", "'infinity'");
+        C!TimeStamp(TimeStamp.min, "timestamp without time zone", "'-infinity'");
 
         // systime testing
         auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
