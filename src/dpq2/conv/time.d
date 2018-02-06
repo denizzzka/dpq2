@@ -37,7 +37,7 @@ if( is( T == SysTime ) )
         throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
 
-    auto t = rawTimeStamp2nativeTime(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
+    auto t = rawTimeStamp2nativeTime!TimeStampUTC(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
     return SysTime(t.dateTime, t.fracSec, UTC());
 }
 
@@ -86,7 +86,23 @@ if( is( T == TimeStamp ) )
         throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
             "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
 
-    return rawTimeStamp2nativeTime(
+    return rawTimeStamp2nativeTime!TimeStamp(
+        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
+    );
+}
+
+/// Returns value timestamp with time zone as TimeStampUTC
+TimeStampUTC binaryValueAs(T)(in Value v) @trusted
+if( is( T == TimeStampUTC ) )
+{
+    if(!(v.oidType == OidType.TimeStampWithZone))
+        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
+
+    if(!(v.data.length == long.sizeof))
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
+
+    return rawTimeStamp2nativeTime!TimeStampUTC(
         bigEndianToNative!long(v.data.ptr[0..long.sizeof])
     );
 }
@@ -101,7 +117,7 @@ if( is( T == DateTime ) )
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
-struct TimeStamp
+private struct TTimeStamp(bool isWithTZ)
 {
     DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
@@ -119,27 +135,44 @@ struct TimeStamp
     /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
     static max()
     {
-        return TimeStamp(DateTime.max, long.max.hnsecs);
+        return TTimeStamp(DateTime.max, long.max.hnsecs);
     }
 
     /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
     static min()
     {
-        return TimeStamp(DateTime.min, Duration.zero);
+        return TTimeStamp(DateTime.min, Duration.zero);
     }
 
-    unittest
+    string toString() const
     {
-        {
-            auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
-            assert(t.dateTime.hour == 14);
-        }
-        {
-            auto dt = DateTime(2017, 11, 13, 14, 29, 17);
-            auto t = TimeStamp(dt, 75_678.usecs);
+        return dateTime.toString~" "~fracSec.toString;
+    }
+}
 
-            assert(t == dt); // test the implicit conversion to DateTime
-        }
+alias TimeStamp = TTimeStamp!false; /// Unknown TZ timestamp
+alias TimeStampUTC = TTimeStamp!true; /// Assumed that this is UTC timestamp
+
+unittest
+{
+    {
+        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+        assert(t.dateTime.hour == 14);
+    }
+    {
+        auto dt = DateTime(2017, 11, 13, 14, 29, 17);
+        auto t = TimeStamp(dt, 75_678.usecs);
+
+        assert(t == dt); // test the implicit conversion to DateTime
+    }
+    {
+        auto t = TimeStampUTC(
+                DateTime(2017, 11, 13, 14, 29, 17),
+                75_678.usecs
+            );
+
+        assert(t.dateTime.hour == 14);
+        assert(t.fracSec == 75_678.usecs);
     }
 }
 
@@ -149,10 +182,11 @@ static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
 
 private:
 
-TimeStamp rawTimeStamp2nativeTime(long raw)
+T rawTimeStamp2nativeTime(T)(long raw)
+if(is(T == TimeStamp) || is(T == TimeStampUTC))
 {
-    if(raw >= time_t.max) return TimeStamp.max;
-    if(raw <= time_t.min) return TimeStamp.min;
+    if(raw >= time_t.max) return T.max;
+    if(raw <= time_t.min) return T.min;
 
     pg_tm tm;
     fsec_t ts;
@@ -163,7 +197,12 @@ TimeStamp rawTimeStamp2nativeTime(long raw)
             __FILE__, __LINE__
         );
 
-    return raw_pg_tm2nativeTime(tm, ts);
+    TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);
+
+    static if(is(T == TimeStamp))
+        return ret;
+    else
+        return TimeStampUTC(ret.dateTime, ret.fracSec);
 }
 
 TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
