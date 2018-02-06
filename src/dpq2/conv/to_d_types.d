@@ -188,6 +188,9 @@ public void _integration_test( string connParam ) @system
 
     auto conn = new Connection(connParam);
 
+    // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
+    conn.exec("SET TIMEZONE TO +02");
+
     QueryParams params;
     params.resultFormat = ValueFormat.BINARY;
 
@@ -282,20 +285,11 @@ public void _integration_test( string connParam ) @system
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamp(PGtimestamp.max, "timestamp without time zone", "'infinity'");
         C!PGtimestamp(PGtimestamp.min, "timestamp without time zone", "'-infinity'");
-        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012 UTC'");
+        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
 
-        // systime testing
+        // SysTime testing
         auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
-        auto sysTime = SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ); // time in custom TZ
-        auto sysTimeText = sysTime.toLocalTime.toISOExtString.replace("T", " "); // expected text to check against
-
-        // append LocalTime offset (SysTime.toISOExtString in LocalTime doesn't append the TZ offset)
-        auto splitRes = LocalTime().utcOffsetAt(sysTime.stdTime).split!("hours", "minutes");
-        sysTimeText ~= splitRes.hours >= 0 ? "+" : "-";
-        sysTimeText ~= format!"%02d"(abs(splitRes.hours));
-        if (splitRes.minutes > 0) sysTimeText ~= format!":%02d"(abs(splitRes.minutes));
-
-        C!SysTime(sysTime, "timestamp with time zone", "'"~sysTimeText~"'");
+        C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
 
         // json
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
