@@ -2,7 +2,7 @@ module dpq2.conv.from_d_types;
 
 @safe:
 
-import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStampWithoutTZ;
+import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp;
 import dpq2.oids : detectOidTypeFromNative, OidType;
 import dpq2.value : Value, ValueFormat;
 
@@ -87,9 +87,9 @@ if (is(Unqual!T == TimeOfDay))
     return Value(nativeToBigEndian(us).dup, OidType.Time, false);
 }
 
-/// Constructs Value from TimeStampWithoutTZ
+/// Constructs Value from TimeStamp
 Value toValue(T)(T v)
-if (is(Unqual!T == TimeStampWithoutTZ))
+if (is(Unqual!T == TimeStamp))
 {
     enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
     long j = v.dateTime.modJulianDay - mj_pg_epoch;
@@ -105,7 +105,7 @@ if (is(Unqual!T == TimeStampWithoutTZ))
 Value toValue(T)(T v)
 if (is(Unqual!T == DateTime))
 {
-    return TimeStampWithoutTZ(v).toValue;
+    return TimeStamp(v).toValue;
 }
 
 /++
@@ -177,7 +177,7 @@ unittest
 
     {
         import std.datetime : DateTime;
-        Value v = toValue(Nullable!TimeStampWithoutTZ(TimeStampWithoutTZ(DateTime(2017, 1, 2))));
+        Value v = toValue(Nullable!TimeStamp(TimeStamp(DateTime(2017, 1, 2))));
 
         assert(!v.isNull);
         assert(v.oidType == OidType.TimeStamp);
@@ -267,11 +267,11 @@ unittest
         import core.time : usecs;
         import std.datetime.date : DateTime;
 
-        // TimeStampWithoutTZ: '2017-11-13 14:29:17.075678'
-        auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+        // TimeStamp: '2017-11-13 14:29:17.075678'
+        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
         auto v = toValue(t);
 
         assert(v.oidType == OidType.TimeStamp);
-        assert(v.as!TimeStampWithoutTZ == t);
+        assert(v.as!TimeStamp == t);
     }
 }

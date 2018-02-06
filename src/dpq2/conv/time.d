@@ -75,9 +75,9 @@ if( is( T == TimeOfDay ) )
     return time2tm(bigEndianToNative!TimeADT(v.data.ptr[0..TimeADT.sizeof]));
 }
 
-/// Returns value timestamp without time zone as TimeStampWithoutTZ
-TimeStampWithoutTZ binaryValueAs(T)(in Value v) @trusted
-if( is( T == TimeStampWithoutTZ ) )
+/// Returns value timestamp without time zone as TimeStamp
+TimeStamp binaryValueAs(T)(in Value v) @trusted
+if( is( T == TimeStamp ) )
 {
     if(!(v.oidType == OidType.TimeStamp))
         throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
@@ -95,13 +95,13 @@ if( is( T == TimeStampWithoutTZ ) )
 DateTime binaryValueAs(T)(in Value v) @trusted
 if( is( T == DateTime ) )
 {
-    return v.binaryValueAs!TimeStampWithoutTZ.dateTime;
+    return v.binaryValueAs!TimeStamp.dateTime;
 }
 
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
-struct TimeStampWithoutTZ
+struct TimeStamp
 {
     DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
@@ -116,27 +116,27 @@ struct TimeStampWithoutTZ
         assert(fracSec < 1.seconds, fracSec.to!string);
     }
 
-    /// Returns the TimeStampWithoutTZ farthest in the future which is representable by TimeStampWithoutTZ.
+    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
     static max()
     {
-        return TimeStampWithoutTZ(DateTime.max, long.max.hnsecs);
+        return TimeStamp(DateTime.max, long.max.hnsecs);
     }
 
-    /// Returns the TimeStampWithoutTZ farthest in the past which is representable by TimeStampWithoutTZ.
+    /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
     static min()
     {
-        return TimeStampWithoutTZ(DateTime.min, Duration.zero);
+        return TimeStamp(DateTime.min, Duration.zero);
     }
 
     unittest
     {
         {
-            auto t = TimeStampWithoutTZ(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+            auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
             assert(t.dateTime.hour == 14);
         }
         {
             auto dt = DateTime(2017, 11, 13, 14, 29, 17);
-            auto t = TimeStampWithoutTZ(dt, 75_678.usecs);
+            auto t = TimeStamp(dt, 75_678.usecs);
 
             assert(t == dt); // test the implicit conversion to DateTime
         }
@@ -149,10 +149,10 @@ static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
 
 private:
 
-TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
+TimeStamp rawTimeStamp2nativeTime(long raw)
 {
-    if(raw >= time_t.max) return TimeStampWithoutTZ.max;
-    if(raw <= time_t.min) return TimeStampWithoutTZ.min;
+    if(raw >= time_t.max) return TimeStamp.max;
+    if(raw <= time_t.min) return TimeStamp.min;
 
     pg_tm tm;
     fsec_t ts;
@@ -166,7 +166,7 @@ TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
     return raw_pg_tm2nativeTime(tm, ts);
 }
 
-TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
+TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 {
     auto dateTime = DateTime(
             tm.tm_year,
@@ -179,7 +179,7 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 
     auto fracSec = dur!"usecs"(ts);
 
-    return TimeStampWithoutTZ(dateTime, fracSec);
+    return TimeStamp(dateTime, fracSec);
 }
 
 // Here is used names from the original Postgresql source
