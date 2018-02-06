@@ -17,7 +17,7 @@ import core.time: Duration;
 
 /*
  * Bugs: On Unix connection is not thread safe.
- * 
+ *
  * On Unix, forking a process with open libpq connections can lead
  * to unpredictable results because the parent and child processes share
  * the same sockets and operating system resources. For this reason,
@@ -114,7 +114,7 @@ class Connection
         const size_t r = PQconsumeInput( conn );
         if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
-    
+
     package bool flush()
     {
         assert(conn);
@@ -134,19 +134,23 @@ class Connection
         return r;
     }
 
-    Socket socket()
+    socket_t dupSocket()
     {
         version(Windows)
         {
-            assert(false, "FIXME: implement socket duplication");
+            static assert(false, "FIXME: implement socket duplication");
         }
         else // Posix
         {
             import core.sys.posix.unistd: dup;
 
-            socket_t s = cast(socket_t) dup(cast(socket_t) posixSocket);
-            return new Socket(s, AddressFamily.UNSPEC);
+            return cast(socket_t) dup(cast(socket_t) posixSocket);
         }
+    }
+
+    Socket socket()
+    {
+        return new Socket(dupSocket, AddressFamily.UNSPEC);
     }
 
     string errorMessage() const nothrow
