@@ -9,7 +9,7 @@ import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
-import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampWithTZ;
+import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;
@@ -33,8 +33,8 @@ alias PGbytea =         const ubyte[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
-alias PGtimestamp = TimeStamp; /// Both date and time (no time zone)
-alias PGtimestamptz = TimeStampWithTZ; /// Both date and time (with time zone)
+alias PGtimestamp = TimeStamp; /// Both date and time without time zone
+alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
 alias PGjson =          Json; /// json or jsonb
 
 package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure

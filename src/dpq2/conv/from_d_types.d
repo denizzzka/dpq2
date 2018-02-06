@@ -2,7 +2,7 @@ module dpq2.conv.from_d_types;
 
 @safe:
 
-import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampWithTZ;
+import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, OidType;
 import dpq2.value : Value, ValueFormat;
 
@@ -87,9 +87,9 @@ if (is(Unqual!T == TimeOfDay))
     return Value(nativeToBigEndian(us).dup, OidType.Time, false);
 }
 
-/// Constructs Value from TimeStamp or from TimeStampWithTZ
+/// Constructs Value from TimeStamp or from TimeStampUTC
 Value toValue(T)(T v)
-if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampWithTZ))
+if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
 {
     enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
     long j = v.dateTime.modJulianDay - mj_pg_epoch;
