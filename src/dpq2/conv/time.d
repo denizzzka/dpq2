@@ -197,10 +197,12 @@ if(is(T == TimeStamp) || is(T == TimeStampWithTZ))
             __FILE__, __LINE__
         );
 
+    TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);
+
     static if(is(T == TimeStamp))
-        return raw_pg_tm2nativeTime(tm, ts);
+        return ret;
     else
-        return TimeStampWithTZ(raw_pg_tm2nativeTime(tm, ts));
+        return TimeStampWithTZ(ret.dateTime, ret.fracSec);
 }
 
 TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
