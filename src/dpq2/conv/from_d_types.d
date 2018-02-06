@@ -58,21 +58,20 @@ if (!is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if (is(Unqual!T == Date))
 {
-    import std.conv: to, ConvOverflowException;
+    import std.conv: to;
     import dpq2.value;
 
-    int days;
+    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
+    long days = v.modJulianDay - mj_pg_epoch;
 
-    try
-        days = (v - POSTGRES_EPOCH_DATE).total!"days".to!int;
-    catch(ConvOverflowException e)
+    if (days > int.max || days < int.min)
         throw new ValueConvException(
                 ConvExceptionType.DATE_VALUE_OVERFLOW,
-                "Date value isn't fits to Postgres binary Date",
+                "Date value doesn't fit into Postgres binary Date",
                 __FILE__, __LINE__
             );
 
-    return Value(nativeToBigEndian(days).dup, OidType.Date, false);
+    return Value(nativeToBigEndian(days.to!int).dup, OidType.Date, false);
 }
 
 /// Constructs Value from TimeOfDay
@@ -216,8 +215,17 @@ unittest
     }
 
     {
-        // Date: max (overflow)
+        // Date: max
         auto d = Date.max;
+        auto v = toValue(d);
+
+        assert(v.oidType == OidType.Date);
+        assert(v.as!Date == d);
+    }
+
+    {
+        // Date: min (overflow)
+        auto d = Date.min;
         auto v = toValue(d);
 
         import std.stdio;
