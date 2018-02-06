@@ -151,11 +151,8 @@ private:
 
 TimeStampWithoutTZ rawTimeStamp2nativeTime(long raw)
 {
-    version(Have_Int64_TimeStamp)
-    {
-        if(raw >= time_t.max) return TimeStampWithoutTZ.max;
-        if(raw <= time_t.min) return TimeStampWithoutTZ.min;
-    }
+    if(raw >= time_t.max) return TimeStampWithoutTZ.max;
+    if(raw <= time_t.min) return TimeStampWithoutTZ.min;
 
     pg_tm tm;
     fsec_t ts;
@@ -180,14 +177,7 @@ TimeStampWithoutTZ raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
             tm.tm_sec
         );
 
-    version(Have_Int64_TimeStamp)
-    {
-        auto fracSec = dur!"usecs"(ts);
-    }
-    else
-    {
-        auto fracSec = dur!"usecs"((cast(long)(ts * 10e6)));
-    }
+    auto fracSec = dur!"usecs"(ts);
 
     return TimeStampWithoutTZ(dateTime, fracSec);
 }
@@ -215,89 +205,32 @@ void j2date(int jd, out int year, out int month, out int day)
     month = (quad + 10) % MONTHS_PER_YEAR + 1;
 }
 
-version(Have_Int64_TimeStamp)
+private alias long Timestamp;
+private alias long TimestampTz;
+private alias long TimeADT;
+private alias long TimeOffset;
+private alias int  fsec_t;      /* fractional seconds (in microseconds) */
+
+void TMODULO(ref long t, ref long q, double u)
 {
-    private alias long Timestamp;
-    private alias long TimestampTz;
-    private alias long TimeADT;
-    private alias long TimeOffset;
-    private alias int  fsec_t;      /* fractional seconds (in microseconds) */
-
-    void TMODULO(ref long t, ref long q, double u)
-    {
-        q = cast(long)(t / u);
-        if (q != 0) t -= q * cast(long)u;
-    }
-}
-else
-{
-    private alias Timestamp = double;
-    private alias TimestampTz = double;
-    private alias TimeADT = double;
-    private alias TimeOffset = double;
-    private alias fsec_t = double;    /* fractional seconds (in seconds) */
-
-    void TMODULO(T)(ref double t, ref T q, double u)
-        if(is(T == double) || is(T == int))
-    {
-        q = cast(T)((t < 0) ? ceil(t / u) : floor(t / u));
-        if (q != 0) t -= rint(q * u);
-    }
-
-    double TIMEROUND(double j)
-    {
-        enum TIME_PREC_INV = 10000000000.0;
-        return rint((cast(double) j) * TIME_PREC_INV) / TIME_PREC_INV;
-    }
+    q = cast(long)(t / u);
+    if (q != 0) t -= q * cast(long)u;
 }
 
 TimeOfDay time2tm(TimeADT time)
 {
-    /*
-        TODO: Have_Int64_TimeStamp should be removed from dpq2 due to
-        commit "Remove now-dead code for !HAVE_INT64_TIMESTAMP." in
-        Postgres code committed on 24 Feb 2017 b9d092c962ea3262930e3c31a8c3d79b66ce9d43
+    immutable long USECS_PER_HOUR  = 3600000000;
+    immutable long USECS_PER_MINUTE = 60000000;
+    immutable long USECS_PER_SEC = 1000000;
 
-        Discussion: https://postgr.es/m/26788.1487455319@sss.pgh.pa.us
-    */
+    int tm_hour = cast(int)(time / USECS_PER_HOUR);
+    time -= tm_hour * USECS_PER_HOUR;
+    int tm_min = cast(int)(time / USECS_PER_MINUTE);
+    time -= tm_min * USECS_PER_MINUTE;
+    int tm_sec = cast(int)(time / USECS_PER_SEC);
+    time -= tm_sec * USECS_PER_SEC;
 
-    version(Have_Int64_TimeStamp)
-    {
-        immutable long USECS_PER_HOUR  = 3600000000;
-        immutable long USECS_PER_MINUTE = 60000000;
-        immutable long USECS_PER_SEC = 1000000;
-
-        int tm_hour = cast(int)(time / USECS_PER_HOUR);
-        time -= tm_hour * USECS_PER_HOUR;
-        int tm_min = cast(int)(time / USECS_PER_MINUTE);
-        time -= tm_min * USECS_PER_MINUTE;
-        int tm_sec = cast(int)(time / USECS_PER_SEC);
-        time -= tm_sec * USECS_PER_SEC;
-
-        return TimeOfDay(tm_hour, tm_min, tm_sec);
-    }
-    else
-    {
-        enum SECS_PER_HOUR = 3600;
-        enum SECS_PER_MINUTE = 60;
-
-        double      trem;
-        int tm_hour, tm_min, tm_sec;
-    recalc:
-        trem = time;
-        TMODULO(trem, tm_hour, cast(double) SECS_PER_HOUR);
-        TMODULO(trem, tm_min, cast(double) SECS_PER_MINUTE);
-        TMODULO(trem, tm_sec, 1.0);
-        trem = TIMEROUND(trem);
-        /* roundoff may need to propagate to higher-order fields */
-        if (trem >= 1.0)
-        {
-            time = ceil(time);
-            goto recalc;
-        }
-
-        return TimeOfDay(tm_hour, tm_min, tm_sec);
-    }
+    return TimeOfDay(tm_hour, tm_min, tm_sec);
 }
 
 struct pg_tm
@@ -340,49 +273,17 @@ int timestamp2tm(Timestamp dt, out pg_tm tm, out fsec_t fsec)
     Timestamp   time;
     pg_time_t   utime;
 
-    version(Have_Int64_TimeStamp)
+    time = dt;
+    TMODULO(time, date, USECS_PER_DAY);
+
+    if (time < 0)
     {
-        time = dt;
-        TMODULO(time, date, USECS_PER_DAY);
-
-        if (time < 0)
-        {
-            time += USECS_PER_DAY;
-            date -= 1;
-        }
-
-        j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
-        dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
-    } else
-    {
-        time = dt;
-        TMODULO(time, date, cast(double) SECS_PER_DAY);
-
-        if (time < 0)
-        {
-            time += SECS_PER_DAY;
-            date -= 1;
-        }
-
-    recalc_d:
-        j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
-    recalc_t:
-        dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
-
-        fsec = TSROUND(fsec);
-        /* roundoff may need to propagate to higher-order fields */
-        if (fsec >= 1.0)
-        {
-            time = cast(Timestamp)ceil(time);
-            if (time >= cast(double) SECS_PER_DAY)
-            {
-                time = 0;
-                date += 1;
-                goto recalc_d;
-            }
-            goto recalc_t;
-        }
+        time += USECS_PER_DAY;
+        date -= 1;
     }
+
+    j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
+    dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
 
     return 0;
 }
@@ -392,21 +293,10 @@ void dt2time(Timestamp jd, out int hour, out int min, out int sec, out fsec_t fs
     TimeOffset  time;
 
     time = jd;
-    version(Have_Int64_TimeStamp)
-    {
-        hour = cast(int)(time / USECS_PER_HOUR);
-        time -= hour * USECS_PER_HOUR;
-        min = cast(int)(time / USECS_PER_MINUTE);
-        time -= min * USECS_PER_MINUTE;
-        sec = cast(int)(time / USECS_PER_SEC);
-        fsec = cast(int)(time - sec*USECS_PER_SEC);
-    } else
-    {
-        hour = cast(int)(time / SECS_PER_HOUR);
-        time -= hour * SECS_PER_HOUR;
-        min = cast(int)(time / SECS_PER_MINUTE);
-        time -= min * SECS_PER_MINUTE;
-        sec = cast(int)time;
-        fsec = cast(int)(time - sec);
-    }
+    hour = cast(int)(time / USECS_PER_HOUR);
+    time -= hour * USECS_PER_HOUR;
+    min = cast(int)(time / USECS_PER_MINUTE);
+    time -= min * USECS_PER_MINUTE;
+    sec = cast(int)(time / USECS_PER_SEC);
+    fsec = cast(int)(time - sec*USECS_PER_SEC);
 }
