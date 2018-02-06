@@ -6,7 +6,6 @@
 	"authors": [
 		"Denis Feklushkin", "Anton Gushcha"
 	],
-	"versions": ["Have_Int64_TimeStamp"],
 	"targetPath": "bin",
 	"dependencies": {
 		"derelict-pq": "~>3.0.0-alpha.2",
