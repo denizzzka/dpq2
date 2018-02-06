@@ -91,6 +91,22 @@ if( is( T == TimeStamp ) )
     );
 }
 
+/// Returns value timestamp with time zone as TimeStampWithTZ
+TimeStampWithTZ binaryValueAs(T)(in Value v) @trusted
+if( is( T == TimeStampWithTZ ) )
+{
+    if(!(v.oidType == OidType.TimeStampWithZone))
+        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
+
+    if(!(v.data.length == long.sizeof))
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
+
+    return rawTimeStamp2nativeTime!TimeStampWithTZ(
+        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
+    );
+}
+
 /// Returns value timestamp without time zone as DateTime (it drops the fracSecs from the database value)
 DateTime binaryValueAs(T)(in Value v) @trusted
 if( is( T == DateTime ) )
@@ -101,7 +117,7 @@ if( is( T == DateTime ) )
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
-private struct TTimeStamp(bool WithTZ)
+private struct TTimeStamp(bool isWithTZ)
 {
     DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
@@ -119,32 +135,46 @@ private struct TTimeStamp(bool WithTZ)
     /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
     static max()
     {
-        return TimeStamp(DateTime.max, long.max.hnsecs);
+        return TTimeStamp(DateTime.max, long.max.hnsecs);
     }
 
     /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
     static min()
     {
-        return TimeStamp(DateTime.min, Duration.zero);
+        return TTimeStamp(DateTime.min, Duration.zero);
     }
 
-    unittest
+    string toString() const
     {
-        {
-            auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
-            assert(t.dateTime.hour == 14);
-        }
-        {
-            auto dt = DateTime(2017, 11, 13, 14, 29, 17);
-            auto t = TimeStamp(dt, 75_678.usecs);
-
-            assert(t == dt); // test the implicit conversion to DateTime
-        }
+        return dateTime.toString~" "~fracSec.toString;
     }
 }
 
-alias TimeStamp = TTimeStamp!false;
-alias TimeStampWithTZ = TTimeStamp!false;
+alias TimeStamp = TTimeStamp!false; /// Unknown TZ timestamp
+alias TimeStampWithTZ = TTimeStamp!true; /// Assumed that this is UTC timestamp
+
+unittest
+{
+    {
+        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+        assert(t.dateTime.hour == 14);
+    }
+    {
+        auto dt = DateTime(2017, 11, 13, 14, 29, 17);
+        auto t = TimeStamp(dt, 75_678.usecs);
+
+        assert(t == dt); // test the implicit conversion to DateTime
+    }
+    {
+        auto t = TimeStampWithTZ(
+                DateTime(2017, 11, 13, 14, 29, 17),
+                75_678.usecs
+            );
+
+        assert(t.dateTime.hour == 14);
+        assert(t.fracSec == 75_678.usecs);
+    }
+}
 
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
@@ -167,7 +197,10 @@ if(is(T == TimeStamp) || is(T == TimeStampWithTZ))
             __FILE__, __LINE__
         );
 
-    return raw_pg_tm2nativeTime(tm, ts);
+    static if(is(T == TimeStamp))
+        return raw_pg_tm2nativeTime(tm, ts);
+    else
+        return TimeStampWithTZ(raw_pg_tm2nativeTime(tm, ts));
 }
 
 TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)

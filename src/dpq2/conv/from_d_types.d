@@ -263,6 +263,11 @@ unittest
         auto t = SysTime.fromISOExtString("2017-11-13T14:29:17.075678Z");
         auto v = toValue(t);
 
+        import std.stdio;
+        writeln(t);
+        writeln(v.as!TimeStampWithTZ);
+        writeln(v.as!SysTime);
+
         assert(v.oidType == OidType.TimeStampWithZone);
         assert(v.as!SysTime == t);
     }

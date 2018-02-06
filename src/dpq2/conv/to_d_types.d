@@ -9,7 +9,7 @@ import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
-import dpq2.conv.time: binaryValueAs, TimeStamp;
+import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampWithTZ;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;
@@ -282,6 +282,7 @@ public void _integration_test( string connParam ) @system
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamp(PGtimestamp.max, "timestamp without time zone", "'infinity'");
         C!PGtimestamp(PGtimestamp.min, "timestamp without time zone", "'-infinity'");
+        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012 UTC'");
 
         // systime testing
         auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
