@@ -61,10 +61,13 @@ if (is(Unqual!T == Date))
     import std.conv: to;
     import dpq2.value;
 
+    // FIXME: looks like modJulianDay have a bug:
+    // mj_pg_epoch == 51544, but expected 2451545 (value from timestamp.h)
     enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
     long days = v.modJulianDay - mj_pg_epoch;
 
-    if (days > int.max || days < int.min)
+    // max days isn't checked because Phobos Date days value always fits into Postgres Date
+    if (v.modJulianDay < -2451545 /*mj pg epoch from timestamp.h*/)
         throw new ValueConvException(
                 ConvExceptionType.DATE_VALUE_OVERFLOW,
                 "Date value doesn't fit into Postgres binary Date",
@@ -215,7 +218,7 @@ unittest
     }
 
     {
-        // Date: max
+        // Date: max (always fits into Postgres Date)
         auto d = Date.max;
         auto v = toValue(d);
 
@@ -225,15 +228,11 @@ unittest
 
     {
         // Date: min (overflow)
+        import std.exception: assertThrown;
+        import dpq2.value: ValueConvException;
+
         auto d = Date.min;
-        auto v = toValue(d);
-
-        import std.stdio;
-        writeln(d);
-        writeln(v.as!Date);
-
-        assert(v.oidType == OidType.Date);
-        assert(v.as!Date == d);
+        assertThrown!ValueConvException(d.toValue);
     }
 
     {
