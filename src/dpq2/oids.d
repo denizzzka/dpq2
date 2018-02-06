@@ -149,7 +149,7 @@ OidType detectOidTypeFromNative(T)()
     import std.datetime.date : StdDate = Date, TimeOfDay;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
-    import dpq2.conv.time: TimeStamp;
+    static import dpq2.conv.time;
 
     alias UT = Unqual!T;
 
@@ -166,7 +166,7 @@ OidType detectOidTypeFromNative(T)()
         static if(is(UT == StdDate)){ return Date; } else
         static if(is(UT == TimeOfDay)){ return Time; } else
         static if(is(UT == SysTime)){ return TimeStampWithZone; } else
-        static if(is(UT == dpq2.conv.time.TimeStamp)){ return Oid.TimeStamp; } else
+        static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
