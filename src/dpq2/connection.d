@@ -134,13 +134,13 @@ class Connection
         return r;
     }
 
-    socket_t dupSocket()
+    socket_t posixSocketDuplicate()
     {
         version(Windows)
         {
             static assert(false, "FIXME: implement socket duplication");
         }
-        else // Posix
+        else // Posix OS
         {
             import core.sys.posix.unistd: dup;
 
