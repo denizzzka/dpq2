@@ -150,7 +150,7 @@ class Connection
 
     Socket socket()
     {
-        return new Socket(dupSocket, AddressFamily.UNSPEC);
+        return new Socket(posixSocketDuplicate, AddressFamily.UNSPEC);
     }
 
     string errorMessage() const nothrow
