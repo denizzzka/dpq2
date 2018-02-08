@@ -39,8 +39,28 @@ struct QueryParams
             a = toValue(arr[i], ValueFormat.TEXT);
     }
 
+    void argsVariadic(Targs ...)(Targs t_args)
+    {
+        _args.length = t_args.length;
+
+        static foreach(i, T; Targs)
+        {
+            _args[i] = toValue!T(t_args[i]);
+        }
+    }
+
     @property string preparedStatementName() const { return sqlCommand; }
     @property void preparedStatementName(string s){ sqlCommand = s; }
+}
+
+unittest
+{
+    QueryParams qp;
+    qp.argsVariadic(123, "asd", true);
+
+    assert(qp.args[0] == 123.toValue);
+    assert(qp.args[1] == "asd".toValue);
+    assert(qp.args[2] == true.toValue);
 }
 
 /// Used as parameters by PQexecParams-like functions
