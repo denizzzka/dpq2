@@ -16,7 +16,8 @@ package OidType oid2oidType(Oid oid) pure
     return cast(OidType)(oid);
 }
 
-package OidType oidConvTo(string s)(OidType type)
+/// Convert between array Oid and element Oid or vice versa
+OidType oidConvTo(string s)(OidType type)
 {
     foreach(ref a; appropriateArrOid)
     {
