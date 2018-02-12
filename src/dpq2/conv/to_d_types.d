@@ -17,6 +17,7 @@ import std.traits;
 import std.uuid;
 import std.datetime;
 import std.traits: isScalarType;
+import std.typecons : Nullable;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 
@@ -79,13 +80,19 @@ if(!is(T == string) && !is(T == Bson))
         throw new AE(ET.NOT_BINARY,
             msg_NOT_BINARY, __FILE__, __LINE__);
 
-    return binaryValueAs!T(v);
+    static if (is(T == Nullable!R, R))
+    {
+        if (v.isNull) return T.init;
+        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
+    }
+    else return binaryValueAs!T(v);
 }
 
 package:
 
 string valueAsString(in Value v) pure
 {
+    if (v.isNull) return null;
     return (cast(const(char[])) v.data).to!string;
 }
 
@@ -141,6 +148,7 @@ if( is( T == UUID ) )
 
 /// Returns boolean as native bool value
 bool binaryValueAs(T : bool)(in Value v)
+if (!is(T == Nullable!R, R))
 {
     if(!(v.oidType == OidType.Bool))
         throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
@@ -201,7 +209,7 @@ public void _integration_test( string connParam ) @system
             import std.string : representation;
 
             // test string to native conversion
-            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue, pgType);
+            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
             params.args = null;
             auto answer = conn.execParams(params);
             immutable Value v = answer[0][0];
@@ -235,6 +243,8 @@ public void _integration_test( string connParam ) @system
 
         C!PGboolean(true, "boolean", "true");
         C!PGboolean(false, "boolean", "false");
+        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", null);
+        C!(Nullable!PGboolean)(Nullable!PGboolean(true), "boolean", "true");
         C!PGsmallint(-32_761, "smallint", "-32761");
         C!PGinteger(-2_147_483_646, "integer", "-2147483646");
         C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
@@ -242,6 +252,7 @@ public void _integration_test( string connParam ) @system
         C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
         C!PGtext("12345 ", "char(6)", "'12345'");
+        C!PGtext(null, "text", null);
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
