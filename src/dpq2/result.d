@@ -122,28 +122,24 @@ immutable class Answer : Result
     /**
      * Returns the command status tag from the SQL command that generated the PGresult
      * Commonly this is just the name of the command, but it might include
-     * additional data such as the number of rows processed. The caller should
-     * not free the result directly. It will be freed when the associated
-     * PGresult handle is passed to PQclear.
+     * additional data such as the number of rows processed.
      */
     string cmdStatus()
     {
-        return to!string( PQcmdStatus(result) );
+        return PQcmdStatus(result).to!string;
     }
 
     /**
      * Returns the number of rows affected by the SQL command.
      * This function returns a string containing the number of rows affected by the SQL statement
-     * that generated the PGresult. This function can only be used following the execution of
+     * that generated the Answer. This function can only be used following the execution of
      * a SELECT, CREATE TABLE AS, INSERT, UPDATE, DELETE, MOVE, FETCH, or COPY statement,
      * or an EXECUTE of a prepared query that contains an INSERT, UPDATE, or DELETE statement.
-     * If the command that generated the PGresult was anything else, PQcmdTuples returns an empty string.
-     * The caller should not free the return value directly.
-     * It will be freed when the associated PGresult handle is passed to PQclear.
+     * If the command that generated the Anser was anything else, cmdTuples returns an empty string.
     */
     string cmdTuples()
     {
-        return to!string( PQcmdTuples(cast(PGresult*)result) );
+        return PQcmdTuples(cast(PGresult*)result).to!string;
     }
 
     /// Returns row count
