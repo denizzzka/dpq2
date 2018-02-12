@@ -60,10 +60,12 @@ if(is(T == string))
         if(!(
             v.oidType == OidType.Text ||
             v.oidType == OidType.FixedString ||
+            v.oidType == OidType.VariableString ||
             v.oidType == OidType.Numeric ||
-            v.oidType == OidType.Json
+            v.oidType == OidType.Json ||
+            v.oidType == OidType.Jsonb
         ))
-            throwTypeComplaint(v.oidType, "Text, FixedString, Numeric or Json", __FILE__, __LINE__);
+            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
             return rawValueToNumeric(v.data);
@@ -252,6 +254,7 @@ public void _integration_test( string connParam ) @system
         C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
         C!PGtext("12345 ", "char(6)", "'12345'");
+        C!PGtext("12345", "varchar(6)", "'12345'");
         C!PGtext(null, "text", null);
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
