@@ -37,7 +37,7 @@ void main(string[] args)
         "array['first', 'second', NULL]::text[] as array_field, "~
         "$4::integer[] as multi_array, "~
         "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'::json as json_value";
-    
+
     p.argsFromArray = [
         "-1234.56789012345",
         "first line\nsecond line",
@@ -46,7 +46,7 @@ void main(string[] args)
     ];
 
     auto r = conn.execParams(p);
-    
+
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
     writeln( "1: ", r[0][1].as!PGtext );
     writeln( "2.1 isNull: ", r[0][2].isNull );

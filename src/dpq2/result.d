@@ -17,7 +17,7 @@ import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 
-/// Result table's cell coordinates 
+/// Result table's cell coordinates
 private struct Coords
 {
     size_t row; /// Row
@@ -121,9 +121,9 @@ immutable class Answer : Result
 
     /// Returns the command status tag from the SQL command that generated the PGresult
     /**
-     * Commonly this is just the name of the command, but it might include 
-     * additional data such as the number of rows processed. The caller should 
-     * not free the result directly. It will be freed when the associated 
+     * Commonly this is just the name of the command, but it might include
+     * additional data such as the number of rows processed. The caller should
+     * not free the result directly. It will be freed when the associated
      * PGresult handle is passed to PQclear.
      */
     string cmdStatus()
@@ -143,7 +143,7 @@ immutable class Answer : Result
         assertCol( colNum );
         return cast(ValueFormat) PQfformat(result, to!int(colNum));
     }
-    
+
     /// Returns column Oid
     OidType OID( size_t colNum )
     {
@@ -161,7 +161,7 @@ immutable class Answer : Result
 
     /// Returns column number by field name
     size_t columnNum( string columnName )
-    {    
+    {
         size_t n = PQfnumber(result, toStringz(columnName));
 
         if( n == -1 )
@@ -188,7 +188,7 @@ immutable class Answer : Result
 
     /// Returns true if the column exists, false if not
     bool columnExists( string columnName )
-    {    
+    {
         size_t n = PQfnumber(result, columnName.toStringz);
 
         return n != -1;
@@ -250,7 +250,7 @@ immutable class Answer : Result
                 __FILE__, __LINE__
             );
     }
-    
+
     private void assertRow( const size_t r )
     {
         if(!(r < length))
@@ -260,7 +260,7 @@ immutable class Answer : Result
                 __FILE__, __LINE__
             );
     }
-    
+
      private void assertCoords( const Coords c )
     {
         assertRow( c.row );
@@ -295,22 +295,22 @@ immutable struct Row
 {
     private Answer answer;
     private size_t row;
-    
+
     this(immutable Answer answer, in size_t row)
     {
         answer.assertRow( row );
-        
+
         this.answer = answer;
         this.row = row;
     }
-    
+
     /// Returns cell size
     size_t size( const size_t col )
     {
         answer.assertCol(col);
         return PQgetlength(answer.result, to!int(row), to!int(col));
     }
-    
+
     /// Value NULL checking
     /// Do not confuse it with Nullable's isNull method
     bool isNULL( const size_t col )
@@ -335,12 +335,12 @@ immutable struct Row
 
         return cast(immutable) r;
     }
-    
+
     immutable (Value) opIndex(in string column)
     {
         return opIndex(columnNum(column));
     }
-    
+
     /// Returns column number by field name
     size_t columnNum( string columnName )
     {
@@ -355,7 +355,7 @@ immutable struct Row
 
     /// Returns column count
     size_t length() { return answer.columnCount(); }
-    
+
     debug string toString()
     {
         string res;
@@ -526,19 +526,19 @@ immutable struct Array
     {
         return getValue(n);
     }
-    
+
     /// Returns Value struct
     /// Useful for multidimensional arrays
     immutable (Value) getValue( ... )
     {
         auto n = coords2Serial( _argptr, _arguments );
-        
+
         // it is legal to cast here because immutable value will be returned
         Value r = Value(cast(ubyte[]) elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
 
         return cast(immutable) r;
     }
-    
+
     /// Value NULL checking
     bool isNULL( ... )
     {
@@ -549,7 +549,7 @@ immutable struct Array
     private size_t coords2Serial( va_list _argptr, TypeInfo[] _arguments )
     {
         assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
-        
+
         // Variadic args parsing
         auto args = new int[ _arguments.length ];
 
@@ -572,7 +572,7 @@ immutable struct Array
                     __FILE__, __LINE__
                 );
         }
-        
+
         // Calculates serial number of the element
         auto inner = args.length - 1; // inner dimension
         auto element_num = args[inner]; // serial number of the element
@@ -582,7 +582,7 @@ immutable struct Array
             s *= dimsSize[i];
             element_num += s * args[i-1];
         }
-        
+
         assert( element_num <= nElems );
         return element_num;
     }
@@ -613,7 +613,7 @@ class Notify
     /// Returns process ID of notifying server process
     size_t pid() { return n.be_pid; }
 
-    nothrow invariant() 
+    nothrow invariant()
     {
         assert( n != null );
     }
@@ -694,10 +694,10 @@ void _integration_test( string connParam )
         "'first line\nsecond line'::text, "~
         "array[[[1,  2, 3], "~
                "[4,  5, 6]], "~
-               
+
               "[[7,  8, 9], "~
               "[10, 11,12]], "~
-              
+
               "[[13,14,NULL], "~
                "[16,17,18]]]::integer[] as test_array, "~
         "NULL::smallint,"~
@@ -764,7 +764,7 @@ void _integration_test( string connParam )
         assert( notify.name == "test_notify" );
         assert( notify.extra == "test payload" );
     }
-    
+
     // Async query test 1
     conn.sendQuery( "select 123; select 456; select 789" );
     while( conn.getResult() !is null ){}

@@ -43,7 +43,7 @@ mixin template Queries()
 
         return new immutable Answer(container);
     }
-    
+
     /// Submits a command to the server without waiting for the result(s)
     void sendQuery( string SQLcmd )
     {
@@ -219,13 +219,13 @@ enum WaitType
 
 void _integration_test( string connParam ) @trusted
 {
-    import dpq2.conv.to_d_types; 
+    import dpq2.conv.to_d_types;
     import dpq2.conv.to_bson;
 
     auto conn = new Connection(connParam);
 
     // Text type arguments testing
-    {    
+    {
         string sql_query =
         "select now() as time, 'abc'::text as string, 123, 456.78\n"~
         "union all\n"~
