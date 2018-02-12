@@ -119,8 +119,8 @@ immutable class Answer : Result
         }
     }
 
-    /// Returns the command status tag from the SQL command that generated the PGresult
     /**
+     * Returns the command status tag from the SQL command that generated the PGresult
      * Commonly this is just the name of the command, but it might include
      * additional data such as the number of rows processed. The caller should
      * not free the result directly. It will be freed when the associated
@@ -129,6 +129,21 @@ immutable class Answer : Result
     string cmdStatus()
     {
         return to!string( PQcmdStatus(result) );
+    }
+
+    /**
+     * Returns the number of rows affected by the SQL command.
+     * This function returns a string containing the number of rows affected by the SQL statement
+     * that generated the PGresult. This function can only be used following the execution of
+     * a SELECT, CREATE TABLE AS, INSERT, UPDATE, DELETE, MOVE, FETCH, or COPY statement,
+     * or an EXECUTE of a prepared query that contains an INSERT, UPDATE, or DELETE statement.
+     * If the command that generated the PGresult was anything else, PQcmdTuples returns an empty string.
+     * The caller should not free the return value directly.
+     * It will be freed when the associated PGresult handle is passed to PQclear.
+    */
+    string cmdTuples()
+    {
+        return to!string( PQcmdTuples(cast(PGresult*)result) );
     }
 
     /// Returns row count
@@ -813,5 +828,24 @@ void _integration_test( string connParam )
         }
         finally
             assert(exceptionFlag);
+    }
+
+    {
+        import dpq2.conv.from_d_types : toValue;
+
+        conn.exec("CREATE TABLE test (num INTEGER)");
+        scope (exit) conn.exec("DROP TABLE test");
+        conn.prepare("test", "INSERT INTO test (num) VALUES ($1)");
+        QueryParams qp;
+        qp.preparedStatementName = "test";
+        qp.args = new Value[1];
+        foreach (i; 0..10)
+        {
+            qp.args[0] = i.toValue;
+            conn.execPrepared(qp);
+        }
+
+        auto res = conn.exec("DELETE FROM test");
+        assert(res.cmdTuples == "10");
     }
 }
