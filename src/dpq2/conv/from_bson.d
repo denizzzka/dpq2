@@ -155,7 +155,7 @@ Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
                                     ConvExceptionType.NOT_ARRAY,
                                     "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
                                     __FILE__, __LINE__
-                                );                    
+                                );
                     }
 
                     rawValues ~= rawValue(v);
