@@ -403,6 +403,7 @@ class ConnectionException : Dpq2Exception
     }
 }
 
+version (integration_tests)
 void _integration_test( string connParam )
 {
     assert( PQlibVersion() >= 9_0100 );

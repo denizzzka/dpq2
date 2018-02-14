@@ -189,6 +189,7 @@ if( is( T == Json ) )
     return res;
 }
 
+version (integration_tests)
 public void _integration_test( string connParam ) @system
 {
     import std.algorithm : endsWith;

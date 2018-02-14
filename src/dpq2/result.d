@@ -667,6 +667,7 @@ class AnswerException : Dpq2Exception
 
 package immutable msg_NOT_BINARY = "Format of the column is not binary";
 
+version (integration_tests)
 void _integration_test( string connParam )
 {
     import core.exception: AssertError;
@@ -704,13 +705,13 @@ void _integration_test( string connParam )
         "-2147483646::integer as integer_value, "~
         "'first line\nsecond line'::text, "~
         "array[[[1,  2, 3], "~
-               "[4,  5, 6]], "~
+            "[4,  5, 6]], "~
 
-              "[[7,  8, 9], "~
-              "[10, 11,12]], "~
+            "[[7,  8, 9], "~
+            "[10, 11,12]], "~
 
-              "[[13,14,NULL], "~
-               "[16,17,18]]]::integer[] as test_array, "~
+            "[[13,14,NULL], "~
+            "[16,17,18]]]::integer[] as test_array, "~
         "NULL::smallint,"~
         "array[11,22,NULL,44]::integer[] as small_array, "~
         "array['1','23',NULL,'789A']::text[] as text_array, "~

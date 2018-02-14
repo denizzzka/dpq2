@@ -29,7 +29,8 @@
 			{
 				"dpq2": "*"
 			},
-			"sourcePath": "integration_tests"
+			"sourcePath": "integration_tests",
+			"versions": ["integration_tests"]
 		},
 		{
 			"name": "example",
