@@ -217,6 +217,7 @@ enum WaitType
     READ_WRITE
 }
 
+version (integration_tests)
 void _integration_test( string connParam ) @trusted
 {
     import dpq2.conv.to_d_types;

@@ -167,6 +167,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
     return res;
 }
 
+version (integration_tests)
 public void _integration_test( string connParam )
 {
     import dpq2.connection: Connection;
@@ -180,9 +181,9 @@ public void _integration_test( string connParam )
     {
         auto a = conn.exec(
                 "SELECT 123::int8 as int_num_value,"~
-                       "'text string'::text as text_value,"~
-                       "'123.456'::json as json_numeric_value,"~
-                       "'\"json_value_string\"'::json as json_text_value"
+                    "'text string'::text as text_value,"~
+                    "'123.456'::json as json_numeric_value,"~
+                    "'\"json_value_string\"'::json as json_text_value"
             );
 
         auto r = a[0]; // first row
