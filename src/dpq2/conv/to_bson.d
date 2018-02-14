@@ -131,6 +131,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 
         case Text:
         case FixedString:
+        case VariableString:
             res = Bson(v.valueAsString);
             break;
 
