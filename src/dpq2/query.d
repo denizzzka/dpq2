@@ -95,6 +95,7 @@ mixin template Queries()
     }
 
     /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
+    /// Returns: Result of query preparing
     immutable(Result) prepare(string statementName, string sqlStatement, in Oid[] oids = null)
     {
         PGresult* pgResult = PQprepare(
