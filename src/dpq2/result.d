@@ -630,8 +630,7 @@ class Notify
     }
 }
 
-/// Answer creation exception
-/// Useful for analyze error data
+/// Covers errors of Answer creation when data was not received due to syntax errors, etc
 class AnswerCreationException : Dpq2Exception
 {
     immutable(Result) result;
@@ -653,7 +652,7 @@ enum ExceptionType
     OUT_OF_RANGE
 }
 
-/// Exception
+/// Covers errors of access to Answer data
 class AnswerException : Dpq2Exception
 {
     const ExceptionType type; /// Exception type

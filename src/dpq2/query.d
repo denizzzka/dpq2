@@ -164,6 +164,7 @@ mixin template Queries()
 
     /// Waiting for completion of reading or writing
     /// Return: timeout not occured
+    version(unittest)
     bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
     {
         import std.socket;
