@@ -1,3 +1,6 @@
+/**
+ *  Represents connection to the PostgreSQL server
+ */
 module dpq2.connection;
 
 import dpq2.query;
@@ -43,6 +46,7 @@ class Connection
         assert(conn !is null);
     }
 
+    /// Makes a new connection to the database server
     this(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
@@ -53,7 +57,7 @@ class Connection
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-	/// Connect to DB in a nonblocking manner
+	/// Starts creation of a connection to the database server in a nonblocking manner
     this(ConnectionStart, string connString)
     {
         conn = PQconnectStart(toStringz(connString));
@@ -71,17 +75,20 @@ class Connection
 
     mixin Queries;
 
+    /// Returns the blocking status of the database connection
     bool isNonBlocking()
     {
         return PQisnonblocking(conn) == 1;
     }
 
-    private void setNonBlocking( bool state )
+    /// Sets the nonblocking status of the connection
+    private void setNonBlocking(bool state)
     {
         if( PQsetnonblocking(conn, state ? 1 : 0 ) == -1 )
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
+    /// Reset the communication channel to the server, in a nonblocking manner
     void resetStart()
     {
         if(PQresetStart(conn) == 0)
