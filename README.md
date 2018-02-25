@@ -86,7 +86,7 @@ void main(string[] args)
         "-1234.56789012345",
         "first line\nsecond line",
         null,
-        "{{1, 2, 3}, {4, 5, 6}}"
+        "{ {1, 2, 3}, {4, 5, 6} }"
     ];
 
     auto r = conn.execParams(p);
