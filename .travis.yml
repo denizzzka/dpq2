@@ -4,15 +4,15 @@ language: d
 
 d:
   - dmd
-  #- dmd-beta
+  #- dmd-beta https://github.com/vibe-d/vibe.d/issues/2075
   - ldc
-  #- ldc-beta
+  - ldc-beta
 
 addons:
   postgresql: 9.6
   apt:
     packages:
-      - libevent-dev
+      - libevent-dev # is need for scod
 
 services: postgresql
 
@@ -28,6 +28,7 @@ script:
 matrix:
   include:
     - d: dmd
+
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
         - dub run dpq2:example --build=release -- --conninfo="${CONN_STRING}"
