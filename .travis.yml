@@ -25,3 +25,11 @@ after_success:
   - rm -f .\.-*.lst
   - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
   - if [ ${DC} = "dmd" ]; then bash <(curl -s https://codecov.io/bash); fi
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: $TRAVIS_BUILD_DIR/docs
+  github_token: $GITHUB_API_KEY
+  on:
+    branch: master
