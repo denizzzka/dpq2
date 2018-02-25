@@ -241,6 +241,7 @@ class Connection
         c.doCancel;
     }
 
+    ///
     bool isBusy() nothrow
     {
         assert(conn);
@@ -248,6 +249,7 @@ class Connection
         return PQisBusy(conn) == 1;
     }
 
+    ///
     string parameterStatus(string paramName)
     {
         assert(conn);
@@ -260,6 +262,7 @@ class Connection
         return to!string(fromStringz(res));
     }
 
+    ///
     string escapeLiteral(string msg)
     {
         assert(conn);
@@ -276,6 +279,7 @@ class Connection
         return res;
     }
 
+    ///
     string escapeIdentifier(string msg)
     {
         assert(conn);
@@ -292,6 +296,7 @@ class Connection
         return res;
     }
 
+    ///
     string dbName() const nothrow
     {
         assert(conn);
@@ -299,6 +304,7 @@ class Connection
         return PQdb(conn).fromStringz.to!string;
     }
 
+    ///
     string host() const nothrow
     {
         assert(conn);
@@ -306,6 +312,7 @@ class Connection
         return PQhost(conn).fromStringz.to!string;
     }
 
+    ///
     int protocolVersion() const nothrow
     {
         assert(conn);
@@ -313,6 +320,7 @@ class Connection
         return PQprotocolVersion(conn);
     }
 
+    ///
     int serverVersion() const nothrow
     {
         assert(conn);
@@ -320,16 +328,19 @@ class Connection
         return PQserverVersion(conn);
     }
 
+    ///
     void trace(ref File stream)
     {
         PQtrace(conn, stream.getFP);
     }
 
+    ///
     void untrace()
     {
         PQuntrace(conn);
     }
 
+    ///
     void setClientEncoding(string encoding)
     {
         if(PQsetClientEncoding(conn, encoding.toStringz) != 0)
@@ -337,6 +348,9 @@ class Connection
     }
 }
 
+/// Check connection options from the provided connection string
+///
+/// Throws exception if connection string isn't passes check.
 void connStringCheck(string connString)
 {
     char* errmsg = null;
@@ -376,7 +390,7 @@ unittest
     }
 }
 
-/// Doing canceling queries in progress
+/// Represents query cancellation process
 class Cancellation
 {
     private PGcancel* cancel;
@@ -395,6 +409,10 @@ class Cancellation
     }
 
     /**
+     Requests that the server abandon processing of the current command
+
+     Throws exception if cancel request was not successfully dispatched.
+
      Successful dispatch is no guarantee that the request will have any
      effect, however. If the cancellation is effective, the current
      command will terminate early and return an error result
@@ -412,6 +430,7 @@ class Cancellation
     }
 }
 
+///
 class CancellationException : Dpq2Exception
 {
     this(string msg, string file, size_t line)
