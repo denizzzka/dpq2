@@ -2,14 +2,32 @@ dist: trusty
 
 language: d
 
+d:
+  - dmd
+  #- dmd-beta
+  - ldc
+  #- ldc-beta
+
 addons:
   postgresql: 9.6
 
 services: postgresql
 
+env:
+  - CONN_STRING="dbname=postgres"
+
+before_script:
+  - psql -c 'create database "dpq2-test"' -U postgres
+
+script:
+  - dub run dpq2:integration_tests --build=unittest -- --conninfo="${CONN_STRING}"
+
 matrix:
   include:
-    -d: dmd
+    - d: dmd
+      script:
+        - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
+        - dub run dpq2:example --build=release -- --conninfo="${CONN_STRING}"
 
       before_install:
         - dub fetch dscanner
@@ -26,10 +44,3 @@ matrix:
         github_token: $GITHUB_API_KEY
         on:
           branch: master
-
-    -d: ldc
-
-before_script:
-  - psql -c 'create database "dpq2-test"' -U postgres
-
-script: ./.test.sh "dbname=postgres"
