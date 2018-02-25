@@ -184,7 +184,9 @@ class Connection
     }
 
     /**
-     * returns the previous notice receiver or processor function pointer, and sets the new value.
+     * Sets or examines the current notice processor
+     *
+     * Returns the previous notice receiver or processor function pointer, and sets the new value.
      * If you supply a null function pointer, no action is taken, but the current pointer is returned.
      */
     PQnoticeProcessor setNoticeProcessor(PQnoticeProcessor proc, void* arg) nothrow
@@ -194,7 +196,9 @@ class Connection
         return PQsetNoticeProcessor(conn, proc, arg);
     }
 
-    /// Get for the next result from a sendQuery. Can return null.
+    /// Get next result after sending a non-blocking commands. Can return null.
+    ///
+    /// Useful only for non-blocking operations.
     immutable(Result) getResult()
     {
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
@@ -209,7 +213,7 @@ class Connection
         return null;
     }
 
-    /// Get result from PQexec* functions or throw error if pull is empty
+    /// Get result after PQexec* functions or throw exception if pull is empty
     package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
     {
         if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
@@ -217,6 +221,7 @@ class Connection
         return new immutable ResultContainer(r);
     }
 
+    /// Select single-row mode for the currently-executing query
     bool setSingleRowMode()
     {
         return PQsetSingleRowMode(conn) == 1;
