@@ -10,6 +10,9 @@ d:
 
 addons:
   postgresql: 9.6
+  apt:
+    packages:
+      - libevent-dev
 
 services: postgresql
 
