@@ -10,6 +10,9 @@ d:
 
 addons:
   postgresql: 9.6
+  apt:
+    packages:
+      - libevent-dev # is need for scod
 
 services: postgresql
 
@@ -25,10 +28,6 @@ script:
 matrix:
   include:
     - d: dmd
-      addons:
-        apt:
-          packages:
-            - libevent-dev # is need for scod
 
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
