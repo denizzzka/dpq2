@@ -12,6 +12,7 @@
 		"vibe-d:data": "~>0.8.2"
 	},
 	"targetType": "sourceLibrary",
+	"-ddoxTool": "scod",
 	"configurations": [
 		{
 			"name": "static",
