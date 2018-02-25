@@ -1,5 +1,8 @@
 /**
- *  Represents connection to the PostgreSQL server
+ * Represents connection to the PostgreSQL server
+ *
+ * Most functions is correspond to those in the documentation of Postgres:
+ * https://www.postgresql.org/docs/current/static/libpq.html
  */
 module dpq2.connection;
 
@@ -88,13 +91,16 @@ class Connection
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-    /// Reset the communication channel to the server, in a nonblocking manner
+    /// Begin reset the communication channel to the server, in a nonblocking manner
+    ///
+    /// Useful only for non-blocking operations.
     void resetStart()
     {
         if(PQresetStart(conn) == 0)
             throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
+    /// Useful only for non-blocking operations.
     PostgresPollingStatusType poll() nothrow
     {
         assert(conn);
@@ -102,6 +108,7 @@ class Connection
         return PQconnectPoll(conn);
     }
 
+    /// Useful only for non-blocking operations.
     PostgresPollingStatusType resetPoll() nothrow
     {
         assert(conn);
@@ -109,11 +116,15 @@ class Connection
         return PQresetPoll(conn);
     }
 
+    /// Returns the status of the connection
     ConnStatusType status() nothrow
     {
         return PQstatus(conn);
     }
 
+    /// If input is available from the server, consume it
+    ///
+    /// Useful only for non-blocking operations.
     void consumeInput()
     {
         assert(conn);
