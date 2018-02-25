@@ -37,6 +37,8 @@ matrix:
         - dub run doveralls
         - bash <(curl -s https://codecov.io/bash)
 
+      cache: { directories: [$HOME/.dub] }
+
       deploy:
         provider: pages
         skip_cleanup: true
