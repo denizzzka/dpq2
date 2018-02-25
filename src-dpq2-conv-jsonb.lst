@@ -1,0 +1,29 @@
+       |module dpq2.conv.jsonb;
+       |
+       |@safe:
+       |
+       |import vibe.data.json;
+       |import dpq2.value;
+       |import dpq2.oids: OidType;
+       |
+       |package:
+       |
+       |import std.string;
+       |import std.conv: to;
+       |
+       |Json jsonbValueToJson(in Value v) @trusted
+       |{
+      2|    assert(v.oidType == OidType.Jsonb);
+       |
+      2|    if(v.data[0] != 1)
+0000000|        throw new ValueConvException(
+       |            ConvExceptionType.CORRUPTED_JSONB,
+       |            "Unknown jsonb format byte: "~v._data[0].to!string,
+       |            __FILE__, __LINE__
+       |            );
+       |
+      2|    string s = (cast(const(char[])) v._data[1 .. $]).to!string;
+       |
+      2|    return parseJsonString(s); //TODO: make this @safe
+       |}
+src/dpq2/conv/jsonb.d is 80% covered

@@ -1,0 +1,320 @@
+       |﻿module dpq2.conv.to_d_types;
+       |
+       |@safe:
+       |
+       |import dpq2.value;
+       |import dpq2.oids: OidType, isNativeInteger, isNativeFloat;
+       |import dpq2.connection: Connection;
+       |import dpq2.query: QueryParams;
+       |import dpq2.result: msg_NOT_BINARY;
+       |import dpq2.conv.from_d_types;
+       |import dpq2.conv.numeric: rawValueToNumeric;
+       |import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
+       |
+       |import vibe.data.json: Json, parseJsonString;
+       |import vibe.data.bson: Bson;
+       |import std.traits;
+       |import std.uuid;
+       |import std.datetime;
+       |import std.traits: isScalarType;
+       |import std.typecons : Nullable;
+       |import std.bitmanip: bigEndianToNative;
+       |import std.conv: to;
+       |
+       |// Supported PostgreSQL binary types
+       |alias PGboolean =       bool; /// boolean
+       |alias PGsmallint =      short; /// smallint
+       |alias PGinteger =       int; /// integer
+       |alias PGbigint =        long; /// bigint
+       |alias PGreal =          float; /// real
+       |alias PGdouble_precision = double; /// double precision
+       |alias PGtext =          string; /// text
+       |alias PGnumeric =       string; /// numeric represented as string
+       |alias PGbytea =         const ubyte[]; /// bytea
+       |alias PGuuid =          UUID; /// UUID
+       |alias PGdate =          Date; /// Date (no time of day)
+       |alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
+       |alias PGtimestamp = TimeStamp; /// Both date and time without time zone
+       |alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
+       |alias PGjson =          Json; /// json or jsonb
+       |
+       |package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
+       |{
+      1|    throw new ValueConvException(
+       |            ConvExceptionType.NOT_IMPLEMENTED,
+       |            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
+       |            file, line
+       |        );
+       |}
+       |
+       |private alias VF = ValueFormat;
+       |private alias AE = ValueConvException;
+       |private alias ET = ConvExceptionType;
+       |
+       |/// Returns cell value as native string type from text or binary formatted field
+       |string as(T)(in Value v) pure @trusted
+       |if(is(T == string))
+       |{
+     79|    if(v.format == VF.BINARY)
+       |    {
+     75|        if(!(
+       |            v.oidType == OidType.Text ||
+     27|            v.oidType == OidType.FixedString ||
+     26|            v.oidType == OidType.VariableString ||
+     25|            v.oidType == OidType.Numeric ||
+      2|            v.oidType == OidType.Json ||
+      1|            v.oidType == OidType.Jsonb
+       |        ))
+      1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
+       |
+     74|        if(v.oidType == OidType.Numeric)
+     23|            return rawValueToNumeric(v.data);
+       |    }
+       |
+     55|    return valueAsString(v);
+       |}
+       |
+       |/// Returns value as D type value from binary formatted field
+       |T as(T)(in Value v)
+       |if(!is(T == string) && !is(T == Bson))
+       |{
+     46|    if(!(v.format == VF.BINARY))
+0000000|        throw new AE(ET.NOT_BINARY,
+       |            msg_NOT_BINARY, __FILE__, __LINE__);
+       |
+       |    static if (is(T == Nullable!R, R))
+       |    {
+      3|        if (v.isNull) return T.init;
+      1|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
+       |    }
+     44|    else return binaryValueAs!T(v);
+       |}
+       |
+       |package:
+       |
+       |string valueAsString(in Value v) pure
+       |{
+     70|    if (v.isNull) return null;
+     66|    return (cast(const(char[])) v.data).to!string;
+       |}
+       |
+       |/// Returns value as bytes from binary formatted field
+       |T binaryValueAs(T)(in Value v)
+       |if( is( T == const(ubyte[]) ) )
+       |{
+      2|    if(!(v.oidType == OidType.ByteArray))
+0000000|        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
+       |
+      2|    return v.data;
+       |}
+       |
+       |/// Returns cell value as native integer or decimal values
+       |///
+       |/// Postgres type "numeric" is oversized and not supported by now
+       |T binaryValueAs(T)(in Value v)
+       |if( isNumeric!(T) )
+       |{
+       |    static if(isIntegral!(T))
+     28|        if(!isNativeInteger(v.oidType))
+0000000|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
+       |
+       |    static if(isFloatingPoint!(T))
+      4|        if(!isNativeFloat(v.oidType))
+0000000|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
+       |
+     32|    if(!(v.data.length == T.sizeof))
+0000000|        throw new AE(ET.SIZE_MISMATCH,
+       |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
+       |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
+       |            __FILE__, __LINE__);
+       |
+     29|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     29|    return bigEndianToNative!(T)(s);
+       |}
+       |
+       |/// Returns UUID as native UUID value
+       |UUID binaryValueAs(T)(in Value v)
+       |if( is( T == UUID ) )
+       |{
+      2|    if(!(v.oidType == OidType.UUID))
+0000000|        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
+       |
+      2|    if(!(v.data.length == 16))
+0000000|        throw new AE(ET.SIZE_MISMATCH,
+       |            "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
+       |
+      2|    UUID r;
+      2|    r.data = v.data;
+      2|    return r;
+       |}
+       |
+       |/// Returns boolean as native bool value
+       |bool binaryValueAs(T : bool)(in Value v)
+       |if (!is(T == Nullable!R, R))
+       |{
+      9|    if(!(v.oidType == OidType.Bool))
+0000000|        throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
+       |
+      9|    if(!(v.data.length == 1))
+0000000|        throw new AE(ET.SIZE_MISMATCH,
+       |            "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
+       |
+      9|    return v.data[0] != 0;
+       |}
+       |
+       |/// Returns Vibe.d's Json
+       |Json binaryValueAs(T)(in Value v) @trusted
+       |if( is( T == Json ) )
+       |{
+       |    import dpq2.conv.jsonb: jsonbValueToJson;
+       |
+      4|    Json res;
+       |
+      4|    switch(v.oidType)
+       |    {
+      2|        case OidType.Json:
+       |            // represent value as text and parse it into Json
+      2|            string t = v.valueAsString;
+      2|            res = parseJsonString(t);
+      2|            break;
+       |
+      2|        case OidType.Jsonb:
+      2|            res = v.jsonbValueToJson;
+      2|            break;
+       |
+0000000|        default:
+0000000|            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
+       |    }
+       |
+      4|    return res;
+       |}
+       |
+       |version (integration_tests)
+       |public void _integration_test( string connParam ) @system
+       |{
+       |    import std.algorithm : endsWith;
+       |    import std.array : replace;
+       |    import std.format : format;
+       |    import std.math : abs;
+       |
+      1|    auto conn = new Connection(connParam);
+       |
+       |    // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
+      1|    conn.exec("SET TIMEZONE TO +02");
+       |
+      1|    QueryParams params;
+      1|    params.resultFormat = ValueFormat.BINARY;
+       |
+       |    {
+      1|        void testIt(T)(T nativeValue, string pgType, string pgValue)
+       |        {
+       |            import std.algorithm : strip;
+       |            import std.string : representation;
+       |
+       |            // test string to native conversion
+     96|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     48|            params.args = null;
+     48|            auto answer = conn.execParams(params);
+     48|            immutable Value v = answer[0][0];
+     48|            auto result = v.as!T;
+       |
+     48|            assert(result == nativeValue,
+       |                format("Received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+       |                v.oidType, typeid(T), pgValue, nativeValue, result)
+       |            );
+       |
+       |            //TODO: Implement toValue for all tested types and remove the condition
+       |            static if (!is(T == UUID) && !is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
+       |            {
+       |                // test binary to text conversion
+     41|                params.sqlCommand = "SELECT $1::text";
+     41|                params.args = [nativeValue.toValue];
+     41|                auto answer2 = conn.execParams(params);
+     41|                auto v2 = answer2[0][0];
+     41|                auto textResult = v2.as!string.strip(' ');
+     41|                pgValue = pgValue.strip('\'');
+       |
+     41|                assert(textResult == pgValue,
+       |                    format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
+       |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
+       |                );
+       |            }
+       |            else pragma(msg, T, " Is not tested in integration tests!");
+       |        }
+       |
+      1|        alias C = testIt; // "C" means "case"
+       |
+      1|        C!PGboolean(true, "boolean", "true");
+      1|        C!PGboolean(false, "boolean", "false");
+      1|        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", null);
+      1|        C!(Nullable!PGboolean)(Nullable!PGboolean(true), "boolean", "true");
+      1|        C!PGsmallint(-32_761, "smallint", "-32761");
+      1|        C!PGinteger(-2_147_483_646, "integer", "-2147483646");
+      1|        C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
+      1|        C!PGreal(-12.3456f, "real", "-12.3456");
+      1|        C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
+      1|        C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
+      1|        C!PGtext("12345 ", "char(6)", "'12345'");
+      1|        C!PGtext("12345", "varchar(6)", "'12345'");
+      1|        C!PGtext(null, "text", null);
+      1|        C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
+       |            "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
+      1|        C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+       |
+       |        // numeric testing
+      1|        C!PGnumeric("NaN", "numeric", "'NaN'");
+       |
+      1|        const string[] numericTests = [
+       |            "42",
+       |            "-42",
+       |            "0",
+       |            "0.0146328",
+       |            "0.0007",
+       |            "0.007",
+       |            "0.07",
+       |            "0.7",
+       |            "7",
+       |            "70",
+       |            "700",
+       |            "7000",
+       |            "70000",
+       |
+       |            "7.0",
+       |            "70.0",
+       |            "700.0",
+       |            "7000.0",
+       |            "70000.000",
+       |
+       |            "2354877787627192443",
+       |            "2354877787627192443.0",
+       |            "2354877787627192443.00000",
+       |            "-2354877787627192443.00000"
+       |        ];
+       |
+     91|        foreach(i, s; numericTests)
+     22|            C!PGnumeric(s, "numeric", s);
+       |
+       |        // date and time testing
+      1|        C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
+      1|        C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
+      1|        C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+      1|        C!PGtimestamp(PGtimestamp.max, "timestamp without time zone", "'infinity'");
+      1|        C!PGtimestamp(PGtimestamp.min, "timestamp without time zone", "'-infinity'");
+      1|        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
+       |
+       |        // SysTime testing
+      1|        auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
+      1|        C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
+       |
+       |        // json
+      1|        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
+       |
+       |        // json as string
+      1|        C!string(`{"float_value": 123.456}`, "json", `'{"float_value": 123.456}'`);
+       |
+       |        // jsonb
+      1|        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string"), "abc": Json(["key": Json("value")])]), "jsonb",
+       |            `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
+       |    }
+       |}
+src/dpq2/conv/to_d_types.d is 89% covered

@@ -1,0 +1,237 @@
+       |module dpq2.conv.from_bson;
+       |
+       |import dpq2.value;
+       |import dpq2.oids;
+       |import dpq2.result: ArrayProperties, ArrayHeader_net, Dim_net;
+       |import dpq2.conv.from_d_types;
+       |import dpq2.conv.to_d_types;
+       |import vibe.data.bson;
+       |import std.bitmanip: nativeToBigEndian;
+       |import std.conv: to;
+       |
+       |/// Default type will be used for NULL value and for array without detected type
+       |Value bsonToValue(Bson v, OidType defaultType = OidType.Undefined)
+       |{
+      8|    if(v.type == Bson.Type.array)
+      4|        return bsonArrayToValue(v, defaultType);
+       |    else
+      4|        return bsonValueToValue(v, defaultType);
+       |}
+       |
+       |private:
+       |
+       |Value bsonValueToValue(Bson v, OidType defaultType)
+       |{
+     17|    Value ret;
+       |
+       |    with(Bson.Type)
+     17|    switch(v.type)
+       |    {
+0000000|        case null_:
+0000000|            ret = Value(ValueFormat.BINARY, defaultType);
+0000000|            break;
+       |
+0000000|        case Bson.Type.object:
+0000000|            ret = v.toJson.toString.toValue;
+0000000|            ret.oidType = OidType.Json;
+0000000|            break;
+       |
+      2|        case bool_:
+      2|            ret = v.get!bool.toValue;
+      2|            break;
+       |
+     14|        case int_:
+     14|            ret = v.get!int.toValue;
+     14|            break;
+       |
+0000000|        case long_:
+0000000|            ret = v.get!long.toValue;
+0000000|            break;
+       |
+0000000|        case double_:
+0000000|            ret = v.get!double.toValue;
+0000000|            break;
+       |
+      1|        case Bson.Type.string:
+      1|            ret = v.get!(immutable(char)[]).toValue;
+      1|            break;
+       |
+0000000|        default:
+0000000|            throw new ValueConvException(
+       |                    ConvExceptionType.NOT_IMPLEMENTED,
+       |                    "Format "~v.type.to!(immutable(char)[])~" doesn't supported by Bson to Value converter",
+       |                    __FILE__, __LINE__
+       |                );
+       |    }
+       |
+     17|    return ret;
+       |}
+       |
+       |unittest
+       |{
+       |    {
+      1|        Value v1 = bsonToValue(Bson(123));
+      1|        Value v2 = (123).toValue;
+       |
+      1|        assert(v1.as!int == v2.as!int);
+       |    }
+       |
+       |    {
+      1|        Value v1 = bsonToValue(Bson("Test string"));
+      1|        Value v2 = ("Test string").toValue;
+       |
+      1|        assert(v1.as!string == v2.as!string);
+       |    }
+       |
+       |    {
+      1|        Value t = bsonToValue(Bson(true));
+      1|        Value f = bsonToValue(Bson(false));
+       |
+      1|        assert(t.as!bool == true);
+      1|        assert(f.as!bool == false);
+       |    }
+       |}
+       |
+       |Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
+       |{
+      4|    ubyte[] nullValue() pure
+       |    {
+      6|        ubyte[] ret = [0xff, 0xff, 0xff, 0xff]; //NULL magic number
+      6|        return ret;
+       |    }
+       |
+      4|    ubyte[] rawValue(Value v) pure
+       |    {
+     13|        if(v.isNull)
+       |        {
+0000000|            return nullValue();
+       |        }
+       |        else
+       |        {
+     13|            return v._data.length.to!uint.nativeToBigEndian ~ v._data;
+       |        }
+       |    }
+       |
+      4|    ArrayProperties ap;
+      4|    ubyte[] rawValues;
+       |
+      4|    void recursive(ref Bson bsonArr, int dimension)
+       |    {
+     10|        if(dimension == ap.dimsSize.length)
+       |        {
+      7|            ap.dimsSize ~= bsonArr.length.to!int;
+       |        }
+       |        else
+       |        {
+      3|            if(ap.dimsSize[dimension] != bsonArr.length)
+      1|                throw new ValueConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);
+       |        }
+       |
+      9|        foreach(bElem; bsonArr)
+       |        {
+     25|            ap.nElems++;
+       |
+     25|            switch(bElem.type)
+       |            {
+      6|                case Bson.Type.array:
+      6|                    recursive(bElem, dimension + 1);
+      5|                    break;
+       |
+      6|                case Bson.Type.null_:
+      6|                    rawValues ~= nullValue();
+      6|                    break;
+       |
+     13|                default:
+     13|                    Value v = bsonValueToValue(bElem, OidType.Undefined);
+       |
+     13|                    if(ap.OID == OidType.Undefined)
+       |                    {
+      4|                        ap.OID = v.oidType;
+       |                    }
+       |                    else
+       |                    {
+      9|                        if(ap.OID != v.oidType)
+0000000|                            throw new ValueConvException(
+       |                                    ConvExceptionType.NOT_ARRAY,
+       |                                    "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
+       |                                    __FILE__, __LINE__
+       |                                );
+       |                    }
+       |
+     13|                    rawValues ~= rawValue(v);
+       |            }
+       |        }
+       |    }
+       |
+      4|    recursive(bsonArr, 0);
+       |
+      3|    if(ap.OID == OidType.Undefined) ap.OID = defaultType.oidConvTo!"element";
+       |
+      3|    ArrayHeader_net h;
+      3|    h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
+      3|    h.OID = nativeToBigEndian(ap.OID.to!Oid);
+       |
+      3|    ubyte[] ret;
+      3|    ret ~= (cast(ubyte*) &h)[0 .. h.sizeof];
+       |
+     24|    foreach(i; 0 .. ap.dimsSize.length)
+       |    {
+      5|        Dim_net dim;
+      5|        dim.dim_size = nativeToBigEndian(ap.dimsSize[i]);
+      5|        dim.lbound = nativeToBigEndian!int(1);
+       |
+      5|        ret ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
+       |    }
+       |
+      3|    ret ~= rawValues;
+       |
+      3|    return Value(ret, ap.OID.oidConvTo!"array", false, ValueFormat.BINARY);
+       |}
+       |
+       |unittest
+       |{
+       |    import dpq2.conv.to_bson;
+       |
+       |    {
+      1|        Bson bsonArray = Bson(
+       |            [Bson(123), Bson(155), Bson(null), Bson(0), Bson(null)]
+       |        );
+       |
+      1|        Value v = bsonToValue(bsonArray);
+       |
+      1|        assert(v.isSupportedArray);
+      1|        assert(v.as!Bson == bsonArray);
+       |    }
+       |
+       |    {
+      1|        Bson bsonArray = Bson([
+       |            Bson([Bson(123), Bson(155), Bson(null)]),
+       |            Bson([Bson(0), Bson(null), Bson(155)])
+       |        ]);
+       |
+      1|        Value v = bsonToValue(bsonArray);
+       |
+      1|        assert(v.isSupportedArray);
+      1|        assert(v.as!Bson == bsonArray);
+       |    }
+       |
+       |    {
+      1|        Bson bsonArray = Bson([
+       |            Bson([Bson(123), Bson(155)]),
+       |            Bson([Bson(0)])
+       |        ]);
+       |
+      1|        bool exceptionFlag = false;
+       |
+       |        try
+      1|            bsonToValue(bsonArray);
+       |        catch(ValueConvException e)
+       |        {
+      1|            if(e.type == ConvExceptionType.NOT_ARRAY)
+      1|                exceptionFlag = true;
+       |        }
+       |
+      1|        assert(exceptionFlag);
+       |    }
+       |}
+src/dpq2/conv/from_bson.d is 82% covered

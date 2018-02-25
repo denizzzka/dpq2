@@ -1,0 +1,163 @@
+       |﻿module dpq2.args;
+       |
+       |@safe:
+       |
+       |public import dpq2.conv.from_d_types;
+       |public import dpq2.conv.from_bson;
+       |
+       |import dpq2.value;
+       |import dpq2.oids: Oid;
+       |import std.conv: to;
+       |import std.string: toStringz;
+       |
+       |/// Query parameters
+       |struct QueryParams
+       |{
+       |    string sqlCommand; /// SQL command
+       |    ValueFormat resultFormat = ValueFormat.BINARY; /// Result value format
+       |    private Value[] _args; // SQL command arguments
+       |
+       |    /// SQL command arguments
+       |    @property void args(Value[] vargs)
+       |    {
+     93|        _args = vargs;
+       |    }
+       |
+       |    /// ditto
+       |    @property ref inout (Value[]) args() inout pure
+       |    {
+   1037|        return _args;
+       |    }
+       |
+       |    /// Useful for simple text-only query params
+       |    /// Postgres infers a data type for the parameter in the same way it would do for an untyped literal string.
+       |    @property void argsFromArray(in string[] arr)
+       |    {
+      1|        _args.length = arr.length;
+       |
+     11|        foreach(i, ref a; _args)
+      2|            a = toValue(arr[i], ValueFormat.TEXT);
+       |    }
+       |
+       |    void argsVariadic(Targs ...)(Targs t_args)
+       |    {
+      1|        _args.length = t_args.length;
+       |
+      6|        static foreach(i, T; Targs)
+       |        {
+      3|            _args[i] = toValue!T(t_args[i]);
+       |        }
+       |    }
+       |
+0000000|    @property string preparedStatementName() const { return sqlCommand; }
+      3|    @property void preparedStatementName(string s){ sqlCommand = s; }
+       |}
+       |
+       |unittest
+       |{
+      1|    QueryParams qp;
+      1|    qp.argsVariadic(123, "asd", true);
+       |
+      4|    assert(qp.args[0] == 123.toValue);
+      4|    assert(qp.args[1] == "asd".toValue);
+      4|    assert(qp.args[2] == true.toValue);
+       |}
+       |
+       |/// Used as parameters by PQexecParams-like functions
+       |package struct InternalQueryParams
+       |{
+       |    private
+       |    {
+       |        const(string)* sqlCommand;
+       |        Oid[] oids;
+       |        int[] formats;
+       |        int[] lengths;
+       |        const(ubyte)*[] values;
+       |    }
+       |
+       |    ValueFormat resultFormat;
+       |
+    123|    this(in QueryParams* qp) pure
+       |    {
+    123|        sqlCommand = &qp.sqlCommand;
+    123|        resultFormat = qp.resultFormat;
+       |
+    123|        oids = new Oid[qp.args.length];
+    123|        formats = new int[qp.args.length];
+    123|        lengths = new int[qp.args.length];
+    123|        values = new const(ubyte)* [qp.args.length];
+       |
+    366|        for(int i = 0; i < qp.args.length; ++i)
+       |        {
+     60|            oids[i] = qp.args[i].oidType;
+     60|            formats[i] = qp.args[i].format;
+       |
+     60|            if(!qp.args[i].isNull)
+       |            {
+     57|                lengths[i] = qp.args[i].data.length.to!int;
+       |
+     57|                immutable ubyte[] zeroLengthArg = [123]; // fake value, isn't used as argument
+       |
+     57|                if(qp.args[i].data.length == 0)
+      2|                    values[i] = &zeroLengthArg[0];
+       |                else
+     55|                    values[i] = &qp.args[i].data[0];
+       |            }
+       |        }
+       |    }
+       |
+       |    /// Values used by PQexecParams-like functions
+       |    const(char)* command() pure const
+       |    {
+    123|        return cast(const(char)*) (*sqlCommand).toStringz;
+       |    }
+       |
+       |    /// ditto
+       |    const(char)* stmtName() pure const
+       |    {
+     12|        return command();
+       |    }
+       |
+       |    /// ditto
+       |    int nParams() pure const
+       |    {
+    123|        return values.length.to!int;
+       |    }
+       |
+       |    /// ditto
+       |    const(Oid)* paramTypes() pure
+       |    {
+    111|        if(oids.length == 0)
+     68|            return null;
+       |        else
+     43|            return &oids[0];
+       |    }
+       |
+       |    /// ditto
+       |    const(ubyte*)* paramValues() pure
+       |    {
+    123|        if(values.length == 0)
+     68|            return null;
+       |        else
+     55|            return &values[0];
+       |    }
+       |
+       |    /// ditto
+       |    const(int)* paramLengths() pure
+       |    {
+    123|        if(lengths.length == 0)
+     68|            return null;
+       |        else
+     55|            return &lengths[0];
+       |    }
+       |
+       |    /// ditto
+       |    const(int)* paramFormats() pure
+       |    {
+    123|        if(formats.length == 0)
+     68|            return null;
+       |        else
+     55|            return &formats[0];
+       |    }
+       |}
+src/dpq2/args.d is 97% covered

@@ -1,0 +1,282 @@
+       |module dpq2.conv.from_d_types;
+       |
+       |@safe:
+       |
+       |import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
+       |import dpq2.oids : detectOidTypeFromNative, OidType;
+       |import dpq2.value : Value, ValueFormat;
+       |
+       |import std.bitmanip: nativeToBigEndian;
+       |import std.datetime.date : Date, DateTime, TimeOfDay;
+       |import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
+       |import std.traits: isNumeric, TemplateArgsOf, Unqual;
+       |import std.typecons : Nullable;
+       |
+       |/// Converts Nullable!T to Value
+       |Value toValue(T)(T v)
+       |if (is(T == Nullable!R, R))
+       |{
+      5|    if (v.isNull)
+      2|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
+       |    else
+      3|        return toValue(v.get);
+       |}
+       |
+       |Value toValue(T)(T v)
+       |if(isNumeric!(T))
+       |{
+     36|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+       |}
+       |
+       |Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
+       |if(is(T == string))
+       |{
+     40|    if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
+       |
+     38|    ubyte[] buf = cast(ubyte[]) v;
+       |
+     38|    return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
+       |}
+       |
+       |Value toValue(T)(T v)
+       |if(is(T == ubyte[]))
+       |{
+      1|    return Value(v, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+       |}
+       |
+       |Value toValue(T : bool)(T v) @trusted
+       |if (!is(T == Nullable!R, R))
+       |{
+      9|    ubyte[] buf;
+      9|    buf.length = 1;
+     18|    buf[0] = (v ? 1 : 0);
+       |
+      9|    return Value(buf, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+       |}
+       |
+       |/// Constructs Value from Date
+       |Value toValue(T)(T v)
+       |if (is(Unqual!T == Date))
+       |{
+       |    import std.conv: to;
+       |    import dpq2.value;
+       |    import dpq2.conv.time: POSTGRES_EPOCH_JDATE;
+       |
+      7|    long mj_day = v.modJulianDay;
+       |
+       |    // max days isn't checked because Phobos Date days value always fits into Postgres Date
+      7|    if (mj_day < -POSTGRES_EPOCH_JDATE)
+      1|        throw new ValueConvException(
+       |                ConvExceptionType.DATE_VALUE_OVERFLOW,
+       |                "Date value doesn't fit into Postgres binary Date",
+       |                __FILE__, __LINE__
+       |            );
+       |
+      6|    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
+      6|    long days = mj_day - mj_pg_epoch;
+       |
+      6|    return Value(nativeToBigEndian(days.to!int).dup, OidType.Date, false);
+       |}
+       |
+       |/// Constructs Value from TimeOfDay
+       |Value toValue(T)(T v)
+       |if (is(Unqual!T == TimeOfDay))
+       |{
+      2|    long us = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
+       |
+      2|    return Value(nativeToBigEndian(us).dup, OidType.Time, false);
+       |}
+       |
+       |/// Constructs Value from TimeStamp or from TimeStampUTC
+       |Value toValue(T)(T v)
+       |if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
+       |{
+      4|    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
+      4|    long j = v.dateTime.modJulianDay - mj_pg_epoch;
+      4|    long us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
+       |
+      4|    return Value(
+       |            nativeToBigEndian(us).dup,
+       |            is(Unqual!T == TimeStamp) ? OidType.TimeStamp : OidType.TimeStampWithZone,
+       |            false
+       |        );
+       |}
+       |
+       |/++
+       |    Constructs Value from DateTime
+       |    It uses Timestamp without TZ as a resulting PG type
+       |+/
+       |Value toValue(T)(T v)
+       |if (is(Unqual!T == DateTime))
+       |{
+      1|    return TimeStamp(v).toValue;
+       |}
+       |
+       |/++
+       |    Constructs Value from SysTime
+       |    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
+       |    It means that PG value will have 10 times lower precision.
+       |    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
+       |+/
+       |Value toValue(T)(T v)
+       |if (is(Unqual!T == SysTime))
+       |{
+      2|    long us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
+       |
+      2|    return Value(nativeToBigEndian(us).dup, OidType.TimeStampWithZone, false);
+       |}
+       |
+       |unittest
+       |{
+       |    import dpq2.conv.to_d_types : as;
+       |
+       |    {
+      1|        Value v = toValue(cast(short) 123);
+       |
+      1|        assert(v.oidType == OidType.Int2);
+      1|        assert(v.as!short == 123);
+       |    }
+       |
+       |    {
+      1|        Value v = toValue(-123.456);
+       |
+      1|        assert(v.oidType == OidType.Float8);
+      1|        assert(v.as!double == -123.456);
+       |    }
+       |
+       |    {
+      1|        Value v = toValue("Test string");
+       |
+      1|        assert(v.oidType == OidType.Text);
+      1|        assert(v.as!string == "Test string");
+       |    }
+       |
+       |    {
+      1|        ubyte[] buf = [0, 1, 2, 3, 4, 5];
+      1|        Value v = toValue(buf.dup);
+       |
+      1|        assert(v.oidType == OidType.ByteArray);
+      1|        assert(v.as!(const ubyte[]) == buf);
+       |    }
+       |
+       |    {
+      1|        Value t = toValue(true);
+      1|        Value f = toValue(false);
+       |
+      1|        assert(t.as!bool == true);
+      1|        assert(f.as!bool == false);
+       |    }
+       |
+       |    {
+      1|        Value v = toValue(Nullable!long(1));
+      1|        Value nv = toValue(Nullable!bool.init);
+       |
+      1|        assert(!v.isNull);
+      1|        assert(v.oidType == OidType.Int8);
+      1|        assert(v.as!long == 1);
+       |
+      1|        assert(nv.isNull);
+      1|        assert(nv.oidType == OidType.Bool);
+       |    }
+       |
+       |    {
+       |        import std.datetime : DateTime;
+      1|        Value v = toValue(Nullable!TimeStamp(TimeStamp(DateTime(2017, 1, 2))));
+       |
+      1|        assert(!v.isNull);
+      1|        assert(v.oidType == OidType.TimeStamp);
+       |    }
+       |
+       |    {
+       |        // Date: '2018-1-15'
+      1|        auto d = Date(2018, 1, 15);
+      1|        auto v = toValue(d);
+       |
+      1|        assert(v.oidType == OidType.Date);
+      1|        assert(v.as!Date == d);
+       |    }
+       |
+       |    {
+      1|        auto d = immutable Date(2018, 1, 15);
+      1|        auto v = toValue(d);
+       |
+      1|        assert(v.oidType == OidType.Date);
+      1|        assert(v.as!Date == d);
+       |    }
+       |
+       |    {
+       |        // Date: '2000-1-1'
+      1|        auto d = Date(2000, 1, 1);
+      1|        auto v = toValue(d);
+       |
+      1|        assert(v.oidType == OidType.Date);
+      1|        assert(v.as!Date == d);
+       |    }
+       |
+       |    {
+       |        // Date: '0010-2-20'
+      1|        auto d = Date(10, 2, 20);
+      1|        auto v = toValue(d);
+       |
+      1|        assert(v.oidType == OidType.Date);
+      1|        assert(v.as!Date == d);
+       |    }
+       |
+       |    {
+       |        // Date: max (always fits into Postgres Date)
+      1|        auto d = Date.max;
+      1|        auto v = toValue(d);
+       |
+      1|        assert(v.oidType == OidType.Date);
+      1|        assert(v.as!Date == d);
+       |    }
+       |
+       |    {
+       |        // Date: min (overflow)
+       |        import std.exception: assertThrown;
+       |        import dpq2.value: ValueConvException;
+       |
+      1|        auto d = Date.min;
+      2|        assertThrown!ValueConvException(d.toValue);
+       |    }
+       |
+       |    {
+       |        // DateTime
+      1|        auto d = const DateTime(2018, 2, 20, 1, 2, 3);
+      1|        auto v = toValue(d);
+       |
+      1|        assert(v.oidType == OidType.TimeStamp);
+      1|        assert(v.as!DateTime == d);
+       |    }
+       |
+       |    {
+       |        // TimeOfDay: '14:29:17'
+      1|        auto tod = TimeOfDay(14, 29, 17);
+      1|        auto v = toValue(tod);
+       |
+      1|        assert(v.oidType == OidType.Time);
+      1|        assert(v.as!TimeOfDay == tod);
+       |    }
+       |
+       |    {
+       |        // SysTime: '2017-11-13T14:29:17.075678Z'
+      1|        auto t = SysTime.fromISOExtString("2017-11-13T14:29:17.075678Z");
+      1|        auto v = toValue(t);
+       |
+      1|        assert(v.oidType == OidType.TimeStampWithZone);
+      1|        assert(v.as!SysTime == t);
+       |    }
+       |
+       |    {
+       |        import core.time : usecs;
+       |        import std.datetime.date : DateTime;
+       |
+       |        // TimeStamp: '2017-11-13 14:29:17.075678'
+      1|        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+      1|        auto v = toValue(t);
+       |
+      1|        assert(v.oidType == OidType.TimeStamp);
+      1|        assert(v.as!TimeStamp == t);
+       |    }
+       |}
+src/dpq2/conv/from_d_types.d is 100% covered

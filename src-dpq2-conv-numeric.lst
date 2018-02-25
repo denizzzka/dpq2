@@ -1,0 +1,227 @@
+       |﻿/**
+       |*   PostgreSQL numeric format
+       |*
+       |*   Copyright: © 2014 DSoftOut
+       |*   Authors: NCrashed <ncrashed@gmail.com>
+       |*/
+       |module dpq2.conv.numeric;
+       |
+       |private pure // inner representation from libpq sources
+       |{
+       |    alias NumericDigit = ushort;
+       |    enum DEC_DIGITS = 4;
+       |    enum NUMERIC_NEG       = 0x4000;
+       |    enum NUMERIC_NAN       = 0xC000;
+       |
+       |    struct NumericVar
+       |    {
+       |        int weight;
+       |        int sign;
+       |        int dscale;
+       |        NumericDigit[] digits;
+       |    }
+       |
+       |    string numeric_out(in NumericVar num)
+       |    {
+     24|        string str;
+       |
+     24|        if(num.sign == NUMERIC_NAN)
+       |        {
+      1|            return "NaN";
+       |        }
+       |
+     23|        str = get_str_from_var(num);
+       |
+     23|        return str;
+       |    }
+       |
+       |    /*
+       |     * get_str_from_var() -
+       |     *
+       |     *  Convert a var to text representation (guts of numeric_out).
+       |     *  The var is displayed to the number of digits indicated by its dscale.
+       |     *  Returns a palloc'd string.
+       |     */
+       |    string get_str_from_var(in NumericVar var)
+       |    {
+     23|        int          dscale;
+     23|        ubyte[]      str;
+     23|        ubyte*       cp;
+     23|        ubyte*       endcp;
+     23|        int          i;
+     23|        int          d;
+     23|        NumericDigit dig;
+       |
+       |        static if(DEC_DIGITS > 1)
+       |        {
+     23|            NumericDigit d1;
+       |        }
+       |
+     23|        dscale = var.dscale;
+       |
+       |        /*
+       |         * Allocate space for the result.
+       |         *
+       |         * i is set to the # of decimal digits before decimal point. dscale is the
+       |         * # of decimal digits we will print after decimal point. We may generate
+       |         * as many as DEC_DIGITS-1 excess digits at the end, and in addition we
+       |         * need room for sign, decimal point, null terminator.
+       |         */
+     23|        i = (var.weight + 1) * DEC_DIGITS;
+     23|        if (i <= 0)
+      5|            i = 1;
+       |
+     23|        str = new ubyte[i + dscale + DEC_DIGITS + 2];
+     23|        cp = str.ptr;
+       |
+       |        /*
+       |         * Output a dash for negative values
+       |         */
+     23|        if (var.sign == NUMERIC_NEG)
+      3|            *cp++ = '-';
+       |
+       |        /*
+       |         * Output all digits before the decimal point
+       |         */
+     23|        if (var.weight < 0)
+       |        {
+      5|            d = var.weight + 1;
+      5|            *cp++ = '0';
+       |        }
+       |        else
+       |        {
+    112|            for (d = 0; d <= var.weight; d++)
+       |            {
+     76|                dig = (d < var.digits.length) ? var.digits[d] : 0;
+       |                /* In the first digit, suppress extra leading decimal zeroes */
+       |                static if(DEC_DIGITS == 4)
+       |                {
+     38|                    bool putit = (d > 0);
+       |
+     38|                    d1 = dig / 1000;
+     38|                    dig -= d1 * 1000;
+     38|                    putit |= (d1 > 0);
+     38|                    if (putit)
+     22|                        *cp++ = cast(char)(d1 + '0');
+     38|                    d1 = dig / 100;
+     38|                    dig -= d1 * 100;
+     38|                    putit |= (d1 > 0);
+     38|                    if (putit)
+     28|                        *cp++ = cast(char)(d1 + '0');
+     38|                    d1 = dig / 10;
+     38|                    dig -= d1 * 10;
+     38|                    putit |= (d1 > 0);
+     38|                    if (putit)
+     32|                        *cp++ = cast(char)(d1 + '0');
+     38|                    *cp++ = cast(char)(dig + '0');
+       |                }
+       |                else static if(DEC_DIGITS == 2)
+       |                {
+       |                        d1 = dig / 10;
+       |                        dig -= d1 * 10;
+       |                        if (d1 > 0 || d > 0)
+       |                            *cp++ = cast(char)(d1 + '0');
+       |                        *cp++ = cast(char)(dig + '0');
+       |                }
+       |                else static if(DEC_DIGITS == 1)
+       |                {
+       |                    *cp++ = cast(char)(dig + '0');
+       |                }
+       |                else pragma(error, "unsupported NBASE");
+       |            }
+       |        }
+       |
+       |        /*
+       |         * If requested, output a decimal point and all the digits that follow it.
+       |         * We initially put out a multiple of DEC_DIGITS digits, then truncate if
+       |         * needed.
+       |         */
+     23|        if (dscale > 0)
+       |        {
+     14|            *cp++ = '.';
+     14|            endcp = cp + dscale;
+     66|            for (i = 0; i < dscale; d++, i += DEC_DIGITS)
+       |            {
+     57|                dig = (d >= 0 && d < var.digits.length) ? var.digits[d] : 0;
+       |                static if(DEC_DIGITS == 4)
+       |                {
+     19|                        d1 = dig / 1000;
+     19|                        dig -= d1 * 1000;
+     19|                        *cp++ = cast(char)(d1 + '0');
+     19|                        d1 = dig / 100;
+     19|                        dig -= d1 * 100;
+     19|                        *cp++ = cast(char)(d1 + '0');
+     19|                        d1 = dig / 10;
+     19|                        dig -= d1 * 10;
+     19|                        *cp++ = cast(char)(d1 + '0');
+     19|                        *cp++ = cast(char)(dig + '0');
+       |                }
+       |                else static if(DEC_DIGITS == 2)
+       |                {
+       |                        d1 = dig / 10;
+       |                        dig -= d1 * 10;
+       |                        *cp++ = cast(char)(d1 + '0');
+       |                        *cp++ = cast(char)(dig + '0');
+       |                }
+       |                else static if(DEC_DIGITS == 1)
+       |                {
+       |                    *cp++ = cast(char)(dig + '0');
+       |            }
+       |            else pragma(error, "unsupported NBASE");
+       |            }
+     14|            cp = endcp;
+       |        }
+       |
+       |        /*
+       |         * terminate the string and return it
+       |         */
+     23|        *cp = '\0';
+       |
+     23|        return (cast(char*) str).fromStringz;
+       |    }
+       |}
+       |
+       |import std.conv: to;
+       |import std.string: fromStringz;
+       |import std.bitmanip: bigEndianToNative;
+       |
+       |package string rawValueToNumeric(in ubyte[] v) pure
+       |{
+       |    import dpq2.result: ValueConvException, ConvExceptionType;
+       |
+     24|    struct NumericVar_net // network byte order
+       |    {
+       |        ubyte[2] num; // num of digits
+       |        ubyte[2] weight;
+       |        ubyte[2] sign;
+       |        ubyte[2] dscale;
+       |    }
+       |
+     24|    if(!(v.length >= NumericVar_net.sizeof))
+0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+       |            "Value length ("~to!string(v.length)~") less than it is possible for numeric type",
+       |            __FILE__, __LINE__);
+       |
+     24|    NumericVar_net* h = cast(NumericVar_net*) v.ptr;
+       |
+     24|    NumericVar res;
+     24|    res.weight = bigEndianToNative!short(h.weight);
+     24|    res.sign   = bigEndianToNative!ushort(h.sign);
+     24|    res.dscale = bigEndianToNative!ushort(h.dscale);
+       |
+     24|    auto len = (v.length - NumericVar_net.sizeof) / NumericDigit.sizeof;
+       |
+     24|    res.digits = new NumericDigit[len];
+       |
+     24|    size_t offset = NumericVar_net.sizeof;
+    204|    foreach(i; 0 .. len)
+       |    {
+     44|        res.digits[i] = bigEndianToNative!NumericDigit(
+       |                (&(v[offset]))[0..NumericDigit.sizeof]
+       |            );
+     44|        offset += NumericDigit.sizeof;
+       |    }
+       |
+     24|    return numeric_out(res);
+       |}
+src/dpq2/conv/numeric.d is 98% covered

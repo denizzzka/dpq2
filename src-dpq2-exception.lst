@@ -1,0 +1,11 @@
+       |module dpq2.exception;
+       |
+       |/// Base for all dpq2 exceptions classes
+       |class Dpq2Exception : Exception
+       |{
+      4|    this(string msg, string file, size_t line) pure @safe
+       |    {
+      4|        super(msg, file, line);
+       |    }
+       |}
+src/dpq2/exception.d is 100% covered

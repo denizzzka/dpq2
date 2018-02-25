@@ -1,0 +1,262 @@
+       |module dpq2.conv.to_bson;
+       |
+       |import dpq2.value;
+       |import dpq2.oids: OidType;
+       |import dpq2.result: ArrayProperties;
+       |import dpq2.conv.to_d_types;
+       |import dpq2.conv.numeric: rawValueToNumeric;
+       |import vibe.data.bson;
+       |import std.uuid;
+       |import std.datetime: SysTime, dur, TimeZone;
+       |import std.bitmanip: bigEndianToNative;
+       |import std.conv: to;
+       |
+       |Bson as(T)(in Value v, immutable TimeZone tz = null)
+       |if(is(T == Bson))
+       |{
+     41|    if(v.isNull)
+       |    {
+      2|        return Bson(null);
+       |    }
+       |    else
+       |    {
+     44|        if(v.isSupportedArray && ValueFormat.BINARY)
+      5|            return arrayValueToBson(v, tz);
+       |        else
+     34|            return rawValueToBson(v, tz);
+       |    }
+       |}
+       |
+       |private:
+       |
+       |Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
+       |{
+      5|    const ap = ArrayProperties(cell);
+       |
+       |    // empty array
+      6|    if(ap.dimsSize.length == 0) return Bson.emptyArray;
+       |
+      4|    size_t curr_offset = ap.dataOffset;
+       |
+      4|    Bson recursive(size_t dimNum)
+       |    {
+     16|        const dimSize = ap.dimsSize[dimNum];
+     16|        Bson[] res = new Bson[dimSize];
+       |
+    153|        foreach(elemNum; 0..dimSize)
+       |        {
+     35|            if(dimNum < ap.dimsSize.length - 1)
+       |            {
+     12|                res[elemNum] = recursive(dimNum + 1);
+       |            }
+       |            else
+       |            {
+     23|                ubyte[int.sizeof] size_net; // network byte order
+     23|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
+     23|                uint size = bigEndianToNative!uint( size_net );
+       |
+     23|                curr_offset += size_net.sizeof;
+       |
+     23|                Bson b;
+     23|                if(size == size.max) // NULL magic number
+       |                {
+      7|                    b = Bson(null);
+      7|                    size = 0;
+       |                }
+       |                else
+       |                {
+     16|                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
+     16|                    b = v.as!Bson(tz);
+       |                }
+       |
+     23|                curr_offset += size;
+     23|                res[elemNum] = b;
+       |            }
+       |        }
+       |
+     16|        return Bson(res);
+       |    }
+       |
+      4|    return recursive(0);
+       |}
+       |
+       |Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
+       |{
+     34|    if(v.format == ValueFormat.TEXT)
+       |    {
+      4|        const text = v.valueAsString;
+       |
+      4|        if(v.oidType == OidType.Json)
+       |        {
+      2|            return Bson(text.parseJsonString);
+       |        }
+       |
+      2|        return Bson(text);
+       |    }
+       |
+     30|    Bson res;
+       |
+       |    with(OidType)
+       |    with(Bson.Type)
+     30|    switch(v.oidType)
+       |    {
+      2|        case OidType.Bool:
+      2|            bool n = v.binaryValueAs!PGboolean;
+      2|            res = Bson(n);
+      2|            break;
+       |
+      1|        case Int2:
+      1|            auto n = to!int(v.binaryValueAs!PGsmallint);
+      1|            res = Bson(n);
+      1|            break;
+       |
+     12|        case Int4:
+     12|            int n = v.binaryValueAs!PGinteger;
+     12|            res = Bson(n);
+     12|            break;
+       |
+      1|        case Int8:
+      1|            long n = v.binaryValueAs!PGbigint;
+      1|            res = Bson(n);
+      1|            break;
+       |
+      1|        case Float8:
+      1|            double n = v.binaryValueAs!PGdouble_precision;
+      1|            res = Bson(n);
+      1|            break;
+       |
+      1|        case Numeric:
+      1|            res = Bson(rawValueToNumeric(v.data));
+      1|            break;
+       |
+      6|        case Text:
+      7|        case FixedString:
+      7|        case VariableString:
+      7|            res = Bson(v.valueAsString);
+      7|            break;
+       |
+      1|        case ByteArray:
+      1|            auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
+      1|            res = Bson(b);
+      1|            break;
+       |
+      1|        case UUID:
+      1|            res = Bson(v.binaryValueAs!PGuuid);
+      1|            break;
+       |
+      1|        case TimeStamp:
+      1|            auto ts = v.binaryValueAs!(dpq2.conv.time.TimeStamp);
+      1|            auto time = BsonDate(SysTime(ts.dateTime, tz));
+      1|            long usecs = ts.fracSec.total!"usecs";
+      1|            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
+      1|            break;
+       |
+      1|        case Json:
+      2|        case Jsonb:
+      2|            vibe.data.json.Json json = binaryValueAs!PGjson(v);
+      2|            res = Bson(json);
+      2|            break;
+       |
+0000000|        default:
+0000000|            throw new ValueConvException(
+       |                    ConvExceptionType.NOT_IMPLEMENTED,
+       |                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Value to Bson converter",
+       |                    __FILE__, __LINE__
+       |                );
+       |    }
+       |
+     30|    return res;
+       |}
+       |
+       |version (integration_tests)
+       |public void _integration_test( string connParam )
+       |{
+       |    import dpq2.connection: Connection;
+       |    import dpq2.args: QueryParams;
+       |    import std.uuid;
+       |    import std.datetime: SysTime, DateTime, UTC;
+       |
+      1|    auto conn = new Connection(connParam);
+       |
+       |    // text answer tests
+       |    {
+      1|        auto a = conn.exec(
+       |                "SELECT 123::int8 as int_num_value,"~
+       |                    "'text string'::text as text_value,"~
+       |                    "'123.456'::json as json_numeric_value,"~
+       |                    "'\"json_value_string\"'::json as json_text_value"
+       |            );
+       |
+      1|        auto r = a[0]; // first row
+       |
+      1|        assert(r["int_num_value"].as!Bson == Bson("123"));
+      1|        assert(r["text_value"].as!Bson == Bson("text string"));
+      1|        assert(r["json_numeric_value"].as!Bson == Bson(123.456));
+      1|        assert(r["json_text_value"].as!Bson == Bson("json_value_string"));
+       |    }
+       |
+       |    // binary answer tests
+      1|    QueryParams params;
+      1|    params.resultFormat = ValueFormat.BINARY;
+       |
+       |    {
+      1|        void testIt(Bson bsonValue, string pgType, string pgValue)
+       |        {
+     18|            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
+     18|            auto answer = conn.execParams(params);
+       |
+     18|            immutable Value v = answer[0][0];
+     18|            Bson bsonRes = v.as!Bson(UTC());
+       |
+     34|            if(v.isNull || !v.isSupportedArray) // standalone
+       |            {
+     17|                if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
+       |
+     16|                assert(bsonRes == bsonValue, "Received unexpected value\nreceived bsonType="~to!string(bsonValue.type)~"\nexpected nativeType="~pgType~
+       |                    "\nsent pgValue="~pgValue~"\nexpected bsonValue="~to!string(bsonValue)~"\nresult="~to!string(bsonRes));
+       |            }
+       |            else // arrays
+       |            {
+      4|                assert(bsonRes.type == Bson.Type.array && bsonRes.toString == bsonValue.toString,
+       |                    "pgType="~pgType~" pgValue="~pgValue~" bsonValue="~to!string(bsonValue));
+       |            }
+       |        }
+       |
+      1|        alias C = testIt; // "C" means "case"
+       |
+      1|        C(Bson(null), "text", "null");
+      1|        C(Bson(null), "integer", "null");
+      1|        C(Bson(true), "boolean", "true");
+      1|        C(Bson(false), "boolean", "false");
+      1|        C(Bson(-32_761), "smallint", "-32761");
+      1|        C(Bson(-2_147_483_646), "integer", "-2147483646");
+      1|        C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
+      1|        C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
+      1|        C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
+      1|        C(Bson("12345 "), "char(6)", "'12345'");
+      1|        C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
+       |
+      1|        C(Bson(BsonBinData(
+       |                    BsonBinData.Type.userDefined,
+       |                    [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21]
+       |                )),
+       |                "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
+       |
+      1|        C(Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
+       |                "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+       |
+      1|        C(Bson([
+       |                Bson([Bson([Bson("1")]),Bson([Bson("22")]),Bson([Bson("333")])]),
+       |                Bson([Bson([Bson("4")]),Bson([Bson(null)]),Bson([Bson("6")])])
+       |            ]), "text[]", "'{{{1},{22},{333}},{{4},{null},{6}}}'");
+       |
+      1|        C(Bson.emptyArray, "text[]", "'{}'");
+       |
+      1|        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+       |
+      1|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+       |
+      1|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "jsonb", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+       |    }
+       |}
+src/dpq2/conv/to_bson.d is 98% covered
