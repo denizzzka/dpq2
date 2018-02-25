@@ -28,6 +28,7 @@ matrix:
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
         - dub run dpq2:example --build=release -- --conninfo="${CONN_STRING}"
+        - dub build --build= ddox
 
       before_install:
         - dub fetch dscanner
