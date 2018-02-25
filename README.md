@@ -10,6 +10,7 @@ D programming language.
 It adds only tiny overhead to the original low level library libpq but
 make convenient use PostgreSQL from D.
 
+_Please help us to make the documentation!_
 
 Features
 --------
