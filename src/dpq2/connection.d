@@ -228,11 +228,12 @@ class Connection
     }
 
     /**
+     Try to cancel query
+
      If the cancellation is effective, the current command will
-     terminate early and return an error result (exception). If the
-     cancellation fails (say, because the server was already done
-     processing the command), then there will be no visible result at
-     all.
+     terminate early and return an error result or exception. If the
+     cancellation will fails (say, because the server was already done
+     processing the command) there will be no visible result at all.
     */
     void cancel()
     {
