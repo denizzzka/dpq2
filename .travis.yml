@@ -32,4 +32,4 @@ deploy:
   local_dir: $TRAVIS_BUILD_DIR/docs
   github_token: $GITHUB_API_KEY
   on:
-    branch: master
+    branch: mastergh-pages
