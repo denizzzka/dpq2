@@ -4,15 +4,12 @@ language: d
 
 d:
   - dmd
-  #- dmd-beta
+  - dmd-beta
   - ldc
-  #- ldc-beta
+  - ldc-beta
 
 addons:
   postgresql: 9.6
-  apt:
-    packages:
-      - libevent-dev
 
 services: postgresql
 
@@ -28,6 +25,11 @@ script:
 matrix:
   include:
     - d: dmd
+      addons:
+        apt:
+          packages:
+            - libevent-dev # is need for scod
+
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
         - dub run dpq2:example --build=release -- --conninfo="${CONN_STRING}"
