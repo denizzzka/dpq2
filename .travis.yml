@@ -4,32 +4,43 @@ language: d
 
 d:
   - dmd
-  #- gdc
+  #- dmd-beta
   - ldc
+  #- ldc-beta
 
 addons:
   postgresql: 9.6
 
 services: postgresql
 
-before_install:
-  - dub fetch dscanner
-  - dub fetch doveralls
+env:
+  - CONN_STRING="dbname=postgres"
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
-script: ./.test.sh "dbname=postgres"
+script:
+  - dub run dpq2:integration_tests --build=unittest -- --conninfo="${CONN_STRING}"
 
-after_success:
-  - rm -f .\.-*.lst
-  - if [ ${DC} = "dmd" ]; then dub run doveralls; fi
-  - if [ ${DC} = "dmd" ]; then bash <(curl -s https://codecov.io/bash); fi
+matrix:
+  include:
+    - d: dmd
+      script:
+        - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
+        - dub run dpq2:example --build=release -- --conninfo="${CONN_STRING}"
 
-deploy:
-  provider: pages
-  skip_cleanup: true
-  keep-history: true
-  github_token: $GITHUB_API_KEY
-  on:
-    branch: master
+      before_install:
+        - dub fetch dscanner
+        - dub fetch doveralls
+
+      after_success:
+        - dub run doveralls
+        - bash <(curl -s https://codecov.io/bash)
+
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        keep-history: true
+        github_token: $GITHUB_API_KEY
+        on:
+          branch: master

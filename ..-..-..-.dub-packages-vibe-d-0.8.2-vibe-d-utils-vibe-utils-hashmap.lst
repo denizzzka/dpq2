@@ -1,0 +1,464 @@
+       |/**
+       |        Internal hash map implementation.
+       |
+       |        Copyright: © 2013 RejectedSoftware e.K.
+       |        License: Subject to the terms of the MIT license, as written in the included LICENSE.txt file.
+       |        Authors: Sönke Ludwig
+       |*/
+       |module vibe.utils.hashmap;
+       |
+       |import vibe.internal.utilallocator;
+       |
+       |import std.conv : emplace;
+       |import std.traits;
+       |
+       |
+       |struct DefaultHashMapTraits(Key) {
+       |        enum clearValue = Key.init;
+       |        static bool equals(in Key a, in Key b)
+       |        {
+       |                static if (is(Key == class)) return a is b;
+0000000|                else return a == b;
+       |        }
+       |        static size_t hashOf(in ref Key k)
+       |        @safe {
+       |                static if (is(Key == class) && &Unqual!Key.init.toHash is &Object.init.toHash)
+       |                        return () @trusted { return cast(size_t)cast(void*)k; } ();
+       |                else static if (__traits(compiles, Key.init.toHash()))
+       |                        return () @trusted { return (cast(Key)k).toHash(); } ();
+       |                else static if (__traits(compiles, Key.init.toHashShared()))
+       |                        return k.toHashShared();
+       |                else {
+       |                        // evil casts to be able to get the most basic operations of
+       |                        // HashMap nothrow and @nogc
+0000000|                        static size_t hashWrapper(in ref Key k) {
+0000000|                                static typeinfo = typeid(Key);
+0000000|                                return typeinfo.getHash(&k);
+       |                        }
+0000000|                        static @nogc nothrow size_t properlyTypedWrapper(in ref Key k) { return 0; }
+0000000|                        return () @trusted { return (cast(typeof(&properlyTypedWrapper))&hashWrapper)(k); } ();
+       |                }
+       |        }
+       |}
+       |
+       |struct HashMap(TKey, TValue, Traits = DefaultHashMapTraits!TKey)
+       |{
+       |        import core.memory : GC;
+       |        import vibe.internal.meta.traits : isOpApplyDg;
+       |        import std.algorithm.iteration : filter, map;
+       |
+       |        alias Key = TKey;
+       |        alias Value = TValue;
+       |
+       |        static if (__VERSION__ < 2074) {
+       |                struct AW { // work around AffixAllocator limitations
+       |                        import std.algorithm.comparison : max;
+       |                        IAllocator alloc;
+       |                        alias alloc this;
+       |                        enum alignment = max(Key.alignof, int.alignof);
+       |                        void[] resolveInternalPointer(void* p) { void[] ret; alloc.resolveInternalPointer(p, ret); return ret; }
+       |                }
+       |                alias AllocatorType = AffixAllocator!(AW, int);
+       |        } else {
+0000000|                IAllocator AW(IAllocator a) { return a; }
+       |                alias AllocatorType = AffixAllocator!(IAllocator, int);
+       |        }
+       |
+       |        struct TableEntry {
+       |                UnConst!Key key = Traits.clearValue;
+       |                Value value;
+       |
+0000000|                this(ref Key key, ref Value value)
+       |                {
+       |                        import std.algorithm.mutation : move;
+0000000|                        this.key = cast(UnConst!Key)key;
+0000000|                        this.value = value.move;
+       |                }
+       |        }
+       |        private {
+       |                TableEntry[] m_table; // NOTE: capacity is always POT
+       |                size_t m_length;
+       |                AllocatorType m_allocator;
+       |                bool m_resizing;
+       |        }
+       |
+0000000|        this(IAllocator allocator)
+       |        {
+0000000|                m_allocator = typeof(m_allocator)(AW(allocator));
+       |        }
+       |
+       |        ~this()
+       |        {
+0000000|                int rc;
+0000000|                try rc = m_table is null ? 1 : () @trusted { return --m_allocator.prefix(m_table); } ();
+       |                catch (Exception e) assert(false, e.msg);
+       |
+0000000|                if (rc == 0) {
+0000000|                        clear();
+0000000|                        if (m_table.ptr !is null) () @trusted {
+0000000|                                static if (hasIndirections!TableEntry) GC.removeRange(m_table.ptr);
+0000000|                                try m_allocator.dispose(m_table);
+0000000|                                catch (Exception e) assert(false, e.msg);
+       |                        } ();
+       |                }
+       |        }
+       |
+       |        this(this)
+       |        @trusted {
+0000000|                if (m_table.ptr) {
+0000000|                        try m_allocator.prefix(m_table)++;
+       |                        catch (Exception e) assert(false, e.msg);
+       |                }
+       |        }
+       |
+0000000|        @property size_t length() const { return m_length; }
+       |
+       |        void remove(Key key)
+       |        {
+       |                import std.algorithm.mutation : move;
+       |
+0000000|                auto idx = findIndex(key);
+0000000|                assert (idx != size_t.max, "Removing non-existent element.");
+0000000|                auto i = idx;
+0000000|                while (true) {
+0000000|                        m_table[i].key = Traits.clearValue;
+0000000|                        m_table[i].value = Value.init;
+       |
+0000000|                        size_t j = i, r;
+       |                        do {
+0000000|                                if (++i >= m_table.length) i -= m_table.length;
+0000000|                                if (Traits.equals(m_table[i].key, Traits.clearValue)) {
+0000000|                                        m_length--;
+0000000|                                        return;
+       |                                }
+0000000|                                r = Traits.hashOf(m_table[i].key) & (m_table.length-1);
+0000000|                        } while ((j<r && r<=i) || (i<j && j<r) || (r<=i && i<j));
+0000000|                        m_table[j] = m_table[i].move;
+       |                }
+       |        }
+       |
+       |        Value get(Key key, lazy Value default_value = Value.init)
+       |        {
+0000000|                auto idx = findIndex(key);
+0000000|                if (idx == size_t.max) return default_value;
+0000000|                return m_table[idx].value;
+       |        }
+       |
+       |        /// Workaround #12647
+       |        package(vibe) Value getNothrow(Key key, Value default_value = Value.init)
+       |        {
+0000000|                auto idx = findIndex(key);
+0000000|                if (idx == size_t.max) return default_value;
+0000000|                return m_table[idx].value;
+       |        }
+       |
+       |        static if (!is(typeof({ Value v; const(Value) vc; v = vc; }))) {
+       |                const(Value) get(Key key, lazy const(Value) default_value = Value.init)
+       |                {
+       |                        auto idx = findIndex(key);
+       |                        if (idx == size_t.max) return default_value;
+       |                        return m_table[idx].value;
+       |                }
+       |        }
+       |
+       |        void clear()
+       |        {
+0000000|                foreach (i; 0 .. m_table.length)
+0000000|                        if (!Traits.equals(m_table[i].key, Traits.clearValue)) {
+0000000|                                m_table[i].key = Traits.clearValue;
+0000000|                                m_table[i].value = Value.init;
+       |                        }
+0000000|                m_length = 0;
+       |        }
+       |
+       |        void opIndexAssign(T)(T value, Key key)
+       |        {
+       |                import std.algorithm.mutation : move;
+       |
+0000000|                assert(!Traits.equals(key, Traits.clearValue), "Inserting clear value into hash map.");
+0000000|                grow(1);
+0000000|                auto i = findInsertIndex(key);
+0000000|                if (!Traits.equals(m_table[i].key, key)) m_length++;
+0000000|                m_table[i].key = () @trusted { return cast(UnConst!Key)key; } ();
+0000000|                m_table[i].value = value;
+       |        }
+       |
+       |        ref inout(Value) opIndex(Key key)
+       |        inout {
+0000000|                auto idx = findIndex(key);
+0000000|                assert (idx != size_t.max, "Accessing non-existent key.");
+0000000|                return m_table[idx].value;
+       |        }
+       |
+       |        inout(Value)* opBinaryRight(string op)(Key key)
+       |        inout if (op == "in") {
+       |                auto idx = findIndex(key);
+       |                if (idx == size_t.max) return null;
+       |                return &m_table[idx].value;
+       |        }
+       |
+       |        int opApply(DG)(scope DG del) if (isOpApplyDg!(DG, Key, Value))
+       |        {
+       |                import std.traits : arity;
+       |                foreach (i; 0 .. m_table.length)
+       |                        if (!Traits.equals(m_table[i].key, Traits.clearValue)) {
+       |                                static assert(arity!del >= 1 && arity!del <= 2,
+       |                                                  "isOpApplyDg should have prevented this");
+       |                                static if (arity!del == 1) {
+       |                                        if (int ret = del(m_table[i].value))
+       |                                                return ret;
+       |                                } else
+       |                                        if (int ret = del(m_table[i].key, m_table[i].value))
+       |                                                return ret;
+       |                        }
+       |                return 0;
+       |        }
+       |
+0000000|        auto byKey() { return bySlot.map!(e => e.key); }
+0000000|        auto byKey() const { return bySlot.map!(e => e.key); }
+0000000|        auto byValue() { return bySlot.map!(e => e.value); }
+0000000|        auto byValue() const { return bySlot.map!(e => e.value); }
+0000000|        auto byKeyValue() { import std.typecons : Tuple; return bySlot.map!(e => Tuple!(Key, "key", Value, "value")(e.key, e.value)); }
+0000000|        auto byKeyValue() const { import std.typecons : Tuple; return bySlot.map!(e => Tuple!(const(Key), "key", const(Value), "value")(e.key, e.value)); }
+       |
+0000000|        private auto bySlot() { return m_table[].filter!(e => !Traits.equals(e.key, Traits.clearValue)); }
+0000000|        private auto bySlot() const { return m_table[].filter!(e => !Traits.equals(e.key, Traits.clearValue)); }
+       |
+       |        private size_t findIndex(Key key)
+       |        const {
+0000000|                if (m_length == 0) return size_t.max;
+0000000|                size_t start = Traits.hashOf(key) & (m_table.length-1);
+0000000|                auto i = start;
+0000000|                while (!Traits.equals(m_table[i].key, key)) {
+0000000|                        if (Traits.equals(m_table[i].key, Traits.clearValue)) return size_t.max;
+0000000|                        if (++i >= m_table.length) i -= m_table.length;
+0000000|                        if (i == start) return size_t.max;
+       |                }
+0000000|                return i;
+       |        }
+       |
+       |        private size_t findInsertIndex(Key key)
+       |        const {
+0000000|                auto hash = Traits.hashOf(key);
+0000000|                size_t target = hash & (m_table.length-1);
+0000000|                auto i = target;
+0000000|                while (!Traits.equals(m_table[i].key, Traits.clearValue) && !Traits.equals(m_table[i].key, key)) {
+0000000|                        if (++i >= m_table.length) i -= m_table.length;
+0000000|                        assert (i != target, "No free bucket found, HashMap full!?");
+       |                }
+0000000|                return i;
+       |        }
+       |
+       |        private void grow(size_t amount)
+       |        @trusted {
+       |                try {
+       |                                static if (__VERSION__ < 2074) auto palloc = m_allocator.parent;
+0000000|                                else auto palloc = m_allocator._parent;
+0000000|                        if (!palloc) {
+0000000|                                try m_allocator = typeof(m_allocator)(AW(vibeThreadAllocator()));
+       |                                catch (Exception e) assert(false, e.msg);
+       |                        }
+       |                } catch (Exception e) {
+       |                        assert(false, e.msg);
+       |                }
+       |
+0000000|                auto newsize = m_length + amount;
+0000000|                if (newsize < (m_table.length*2)/3) {
+0000000|                        int rc;
+0000000|                        try rc = m_allocator.prefix(m_table);
+       |                        catch (Exception e) assert(false, e.msg);
+0000000|                        if (rc > 1) {
+       |                                // enforce copy-on-write
+0000000|                                auto oldtable = m_table;
+       |                                try {
+0000000|                                        m_table = m_allocator.makeArray!TableEntry(m_table.length);
+0000000|                                        m_table[] = oldtable;
+0000000|                                        m_allocator.prefix(oldtable)--;
+0000000|                                        m_allocator.prefix(m_table) = 1;
+       |                                } catch (Exception e) {
+0000000|                                        assert(false, e.msg);
+       |                                }
+       |                        }
+0000000|                        return;
+       |                }
+0000000|                auto newcap = m_table.length ? m_table.length : 16;
+0000000|                while (newsize >= (newcap*2)/3) newcap *= 2;
+0000000|                resize(newcap);
+       |        }
+       |
+       |        private void resize(size_t new_size)
+       |        @trusted {
+0000000|                assert(!m_resizing);
+0000000|                m_resizing = true;
+0000000|                scope(exit) m_resizing = false;
+       |
+0000000|                uint pot = 0;
+0000000|                while (new_size > 1) {
+0000000|                        pot++;
+0000000|                        new_size /= 2;
+       |                }
+0000000|                new_size = 1 << pot;
+       |
+0000000|                auto oldtable = m_table;
+       |
+       |                // allocate the new array, automatically initializes with empty entries (Traits.clearValue)
+       |                try {
+0000000|                        m_table = m_allocator.makeArray!TableEntry(new_size);
+0000000|                        m_allocator.prefix(m_table) = 1;
+0000000|                } catch (Exception e) assert(false, e.msg);
+0000000|                static if (hasIndirections!TableEntry) GC.addRange(m_table.ptr, m_table.length * TableEntry.sizeof);
+       |                // perform a move operation of all non-empty elements from the old array to the new one
+0000000|                foreach (ref el; oldtable)
+0000000|                        if (!Traits.equals(el.key, Traits.clearValue)) {
+0000000|                                auto idx = findInsertIndex(el.key);
+0000000|                                (cast(ubyte[])(&m_table[idx])[0 .. 1])[] = (cast(ubyte[])(&el)[0 .. 1])[];
+       |                        }
+       |
+       |                // all elements have been moved to the new array, so free the old one without calling destructors
+0000000|                int rc;
+0000000|                try rc = oldtable is null ? 1 : --m_allocator.prefix(oldtable);
+       |                catch (Exception e) assert(false, e.msg);
+0000000|                if (rc == 0) {
+0000000|                        static if (hasIndirections!TableEntry) GC.removeRange(oldtable.ptr);
+0000000|                        try m_allocator.deallocate(oldtable);
+0000000|                        catch (Exception e) assert(false, e.msg);
+       |                }
+       |        }
+       |}
+       |
+       |unittest {
+       |        import std.conv;
+       |
+       |        HashMap!(string, string) map;
+       |
+       |        foreach (i; 0 .. 100) {
+       |                map[to!string(i)] = to!string(i) ~ "+";
+       |                assert(map.length == i+1);
+       |        }
+       |
+       |        foreach (i; 0 .. 100) {
+       |                auto str = to!string(i);
+       |                auto pe = str in map;
+       |                assert(pe !is null && *pe == str ~ "+");
+       |                assert(map[str] == str ~ "+");
+       |        }
+       |
+       |        foreach (i; 0 .. 50) {
+       |                map.remove(to!string(i));
+       |                assert(map.length == 100-i-1);
+       |        }
+       |
+       |        foreach (i; 50 .. 100) {
+       |                auto str = to!string(i);
+       |                auto pe = str in map;
+       |                assert(pe !is null && *pe == str ~ "+");
+       |                assert(map[str] == str ~ "+");
+       |        }
+       |}
+       |
+       |// test for nothrow/@nogc compliance
+       |nothrow unittest {
+       |        HashMap!(int, int) map1;
+       |        HashMap!(string, string) map2;
+       |        map1[1] = 2;
+       |        map2["1"] = "2";
+       |
+       |        @nogc nothrow void performNoGCOps()
+       |        {
+       |                foreach (int v; map1) {}
+       |                foreach (int k, int v; map1) {}
+       |                assert(1 in map1);
+       |                assert(map1.length == 1);
+       |                assert(map1[1] == 2);
+       |                assert(map1.getNothrow(1, -1) == 2);
+       |
+       |                foreach (string v; map2) {}
+       |                foreach (string k, string v; map2) {}
+       |                assert("1" in map2);
+       |                assert(map2.length == 1);
+       |                assert(map2["1"] == "2");
+       |                assert(map2.getNothrow("1", "") == "2");
+       |        }
+       |
+       |        performNoGCOps();
+       |}
+       |
+       |unittest { // test for proper use of constructor/post-blit/destructor
+       |        static struct Test {
+       |                static size_t constructedCounter = 0;
+       |                bool constructed = false;
+       |                this(int) { constructed = true; constructedCounter++; }
+       |                this(this) nothrow { if (constructed) constructedCounter++; }
+       |                ~this() nothrow { if (constructed) constructedCounter--; }
+       |        }
+       |
+       |        assert(Test.constructedCounter == 0);
+       |
+       |        { // sanity check
+       |                Test t;
+       |                assert(Test.constructedCounter == 0);
+       |                t = Test(1);
+       |                assert(Test.constructedCounter == 1);
+       |                auto u = t;
+       |                assert(Test.constructedCounter == 2);
+       |                t = Test.init;
+       |                assert(Test.constructedCounter == 1);
+       |        }
+       |        assert(Test.constructedCounter == 0);
+       |
+       |        { // basic insertion and hash map resizing
+       |                HashMap!(int, Test) map;
+       |                foreach (i; 1 .. 67) {
+       |                        map[i] = Test(1);
+       |                        assert(Test.constructedCounter == i);
+       |                }
+       |        }
+       |
+       |        assert(Test.constructedCounter == 0);
+       |
+       |        { // test clear() and overwriting existing entries
+       |                HashMap!(int, Test) map;
+       |                foreach (i; 1 .. 67) {
+       |                        map[i] = Test(1);
+       |                        assert(Test.constructedCounter == i);
+       |                }
+       |                map.clear();
+       |                foreach (i; 1 .. 67) {
+       |                        map[i] = Test(1);
+       |                        assert(Test.constructedCounter == i);
+       |                }
+       |                foreach (i; 1 .. 67) {
+       |                        map[i] = Test(1);
+       |                        assert(Test.constructedCounter == 66);
+       |                }
+       |        }
+       |
+       |        assert(Test.constructedCounter == 0);
+       |
+       |        { // test removing entries and adding entries after remove
+       |                HashMap!(int, Test) map;
+       |                foreach (i; 1 .. 67) {
+       |                        map[i] = Test(1);
+       |                        assert(Test.constructedCounter == i);
+       |                }
+       |                foreach (i; 1 .. 33) {
+       |                        map.remove(i);
+       |                        assert(Test.constructedCounter == 66 - i);
+       |                }
+       |                foreach (i; 67 .. 130) {
+       |                        map[i] = Test(1);
+       |                        assert(Test.constructedCounter == i - 32);
+       |                }
+       |        }
+       |
+       |        assert(Test.constructedCounter == 0);
+       |}
+       |
+       |private template UnConst(T) {
+       |        static if (is(T U == const(U))) {
+       |                alias UnConst = U;
+       |        } else static if (is(T V == immutable(V))) {
+       |                alias UnConst = V;
+       |        } else alias UnConst = T;
+       |}
+../../../.dub/packages/vibe-d-0.8.2/vibe-d/utils/vibe/utils/hashmap.d is 0% covered
