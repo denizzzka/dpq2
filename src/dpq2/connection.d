@@ -2,7 +2,7 @@
  * Represents connection to the PostgreSQL server
  *
  * Most functions is correspond to those in the documentation of Postgres:
- * https://www.postgresql.org/docs/current/static/libpq.html
+ * $(HTTPS https://www.postgresql.org/docs/current/static/libpq.html)
  */
 module dpq2.connection;
 
@@ -348,7 +348,7 @@ class Connection
     }
 }
 
-/// Check connection options from the provided connection string
+/// Check connection options in the provided connection string
 ///
 /// Throws exception if connection string isn't passes check.
 void connStringCheck(string connString)
