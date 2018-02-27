@@ -673,7 +673,7 @@
 					{
 						"endchar": 1,
 						"name": "oidConvTo",
-						"line": 20,
+						"line": 25,
 						"type": "OidType(OidType type)",
 						"parameters": [
 							{
@@ -681,14 +681,14 @@
 								"type": "OidType"
 							}
 						],
-						"endline": 47,
+						"endline": 52,
 						"char": 9,
 						"kind": "function"
 					}
 				],
 				"name": "oidConvTo",
-				"line": 20,
-				"comment": "Convert between array Oid and element Oid or vice versa\n",
+				"line": 25,
+				"comment": " Convert between array Oid and element Oid or vice versa\n\n Params:\n  s = \"array\" or \"element\"\n",
 				"parameters": [
 					{
 						"name": "s",
@@ -700,9 +700,1258 @@
 				"kind": "template"
 			},
 			{
-				"members": [],
+				"endchar": 1,
+				"name": "isNativeInteger",
+				"line": 55,
+				"comment": "Checks if Oid type can be mapped to native D integer\n",
+				"deco": "FNaNfE4dpq24oids7OidTypeZb",
+				"parameters": [
+					{
+						"name": "t",
+						"deco": "E4dpq24oids7OidType"
+					}
+				],
+				"endline": 69,
+				"char": 6,
+				"kind": "function"
+			},
+			{
+				"endchar": 1,
+				"name": "isNativeFloat",
+				"line": 72,
+				"comment": "Checks if Oid type can be mapped to native D float\n",
+				"deco": "FNaNfE4dpq24oids7OidTypeZb",
+				"parameters": [
+					{
+						"name": "t",
+						"deco": "E4dpq24oids7OidType"
+					}
+				],
+				"endline": 85,
+				"char": 6,
+				"kind": "function"
+			},
+			{
+				"members": [
+					{
+						"name": "Undefined",
+						"line": 186,
+						"value": "0u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Bool",
+						"line": 188,
+						"value": "16u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "ByteArray",
+						"line": 189,
+						"value": "17u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Char",
+						"line": 190,
+						"value": "18u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Name",
+						"line": 191,
+						"value": "19u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int8",
+						"line": 192,
+						"value": "20u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int2",
+						"line": 193,
+						"value": "21u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int2Vector",
+						"line": 194,
+						"value": "22u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int4",
+						"line": 195,
+						"value": "23u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegProc",
+						"line": 196,
+						"value": "24u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Text",
+						"line": 197,
+						"value": "25u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Oid",
+						"line": 198,
+						"value": "26u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Tid",
+						"line": 199,
+						"value": "27u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Xid",
+						"line": 200,
+						"value": "28u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Cid",
+						"line": 201,
+						"value": "29u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "OidVector",
+						"line": 202,
+						"value": "30u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AccessControlList",
+						"line": 204,
+						"value": "1033u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TypeCatalog",
+						"line": 205,
+						"value": "71u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AttributeCatalog",
+						"line": 206,
+						"value": "75u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "ProcCatalog",
+						"line": 207,
+						"value": "81u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "ClassCatalog",
+						"line": 208,
+						"value": "83u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Json",
+						"line": 210,
+						"value": "114u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Jsonb",
+						"line": 211,
+						"value": "3802u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Xml",
+						"line": 212,
+						"value": "142u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NodeTree",
+						"line": 213,
+						"value": "194u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "StorageManager",
+						"line": 214,
+						"value": "210u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Point",
+						"line": 216,
+						"value": "600u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "LineSegment",
+						"line": 217,
+						"value": "601u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Path",
+						"line": 218,
+						"value": "602u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Box",
+						"line": 219,
+						"value": "603u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Polygon",
+						"line": 220,
+						"value": "604u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Line",
+						"line": 221,
+						"value": "628u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Float4",
+						"line": 223,
+						"value": "700u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Float8",
+						"line": 224,
+						"value": "701u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AbsTime",
+						"line": 225,
+						"value": "702u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RelTime",
+						"line": 226,
+						"value": "703u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Interval",
+						"line": 227,
+						"value": "704u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Unknown",
+						"line": 228,
+						"value": "705u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Circle",
+						"line": 230,
+						"value": "718u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Money",
+						"line": 231,
+						"value": "790u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "MacAddress",
+						"line": 232,
+						"value": "829u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "HostAddress",
+						"line": 233,
+						"value": "869u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NetworkAddress",
+						"line": 234,
+						"value": "650u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "FixedString",
+						"line": 236,
+						"value": "1042u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "VariableString",
+						"line": 237,
+						"value": "1043u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Date",
+						"line": 239,
+						"value": "1082u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Time",
+						"line": 240,
+						"value": "1083u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStamp",
+						"line": 241,
+						"value": "1114u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampWithZone",
+						"line": 242,
+						"value": "1184u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeInterval",
+						"line": 243,
+						"value": "1186u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeWithZone",
+						"line": 244,
+						"value": "1266u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "FixedBitString",
+						"line": 246,
+						"value": "1560u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "VariableBitString",
+						"line": 247,
+						"value": "1562u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Numeric",
+						"line": 249,
+						"value": "1700u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RefCursor",
+						"line": 250,
+						"value": "1790u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegProcWithArgs",
+						"line": 251,
+						"value": "2202u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegOperator",
+						"line": 252,
+						"value": "2203u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegOperatorWithArgs",
+						"line": 253,
+						"value": "2204u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegClass",
+						"line": 254,
+						"value": "2205u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegType",
+						"line": 255,
+						"value": "2206u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "UUID",
+						"line": 257,
+						"value": "2950u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TSVector",
+						"line": 258,
+						"value": "3614u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "GTSVector",
+						"line": 259,
+						"value": "3642u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TSQuery",
+						"line": 260,
+						"value": "3615u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegConfig",
+						"line": 261,
+						"value": "3734u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegDictionary",
+						"line": 262,
+						"value": "3769u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TXidSnapshot",
+						"line": 263,
+						"value": "2970u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int4Range",
+						"line": 265,
+						"value": "3904u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NumRange",
+						"line": 266,
+						"value": "3906u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampRange",
+						"line": 267,
+						"value": "3908u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampWithZoneRange",
+						"line": 268,
+						"value": "3910u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "DateRange",
+						"line": 269,
+						"value": "3912u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int8Range",
+						"line": 270,
+						"value": "3926u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "XmlArray",
+						"line": 273,
+						"value": "143u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "JsonArray",
+						"line": 274,
+						"value": "3807u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "JsonbArray",
+						"line": 275,
+						"value": "199u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "BoolArray",
+						"line": 276,
+						"value": "1000u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "ByteArrayArray",
+						"line": 277,
+						"value": "1001u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "CharArray",
+						"line": 278,
+						"value": "1002u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NameArray",
+						"line": 279,
+						"value": "1003u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int2Array",
+						"line": 280,
+						"value": "1005u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int2VectorArray",
+						"line": 281,
+						"value": "1006u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int4Array",
+						"line": 282,
+						"value": "1007u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegProcArray",
+						"line": 283,
+						"value": "1008u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TextArray",
+						"line": 284,
+						"value": "1009u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "OidArray",
+						"line": 285,
+						"value": "1028u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TidArray",
+						"line": 286,
+						"value": "1010u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "XidArray",
+						"line": 287,
+						"value": "1011u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "CidArray",
+						"line": 288,
+						"value": "1012u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "OidVectorArray",
+						"line": 289,
+						"value": "1013u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "FixedStringArray",
+						"line": 290,
+						"value": "1014u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "VariableStringArray",
+						"line": 291,
+						"value": "1015u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int8Array",
+						"line": 292,
+						"value": "1016u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "PointArray",
+						"line": 293,
+						"value": "1017u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "LineSegmentArray",
+						"line": 294,
+						"value": "1018u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "PathArray",
+						"line": 295,
+						"value": "1019u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "BoxArray",
+						"line": 296,
+						"value": "1020u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Float4Array",
+						"line": 297,
+						"value": "1021u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Float8Array",
+						"line": 298,
+						"value": "1022u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AbsTimeArray",
+						"line": 299,
+						"value": "1023u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RelTimeArray",
+						"line": 300,
+						"value": "1024u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "IntervalArray",
+						"line": 301,
+						"value": "1025u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "PolygonArray",
+						"line": 302,
+						"value": "1027u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AccessControlListArray",
+						"line": 303,
+						"value": "1034u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "MacAddressArray",
+						"line": 304,
+						"value": "1040u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "HostAdressArray",
+						"line": 305,
+						"value": "1041u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NetworkAdressArray",
+						"line": 306,
+						"value": "651u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "CStringArray",
+						"line": 307,
+						"value": "1263u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampArray",
+						"line": 308,
+						"value": "1115u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "DateArray",
+						"line": 309,
+						"value": "1182u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeArray",
+						"line": 310,
+						"value": "1183u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampWithZoneArray",
+						"line": 311,
+						"value": "1185u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeIntervalArray",
+						"line": 312,
+						"value": "1187u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NumericArray",
+						"line": 313,
+						"value": "1231u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeWithZoneArray",
+						"line": 314,
+						"value": "1270u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "FixedBitStringArray",
+						"line": 315,
+						"value": "1561u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "VariableBitStringArray",
+						"line": 316,
+						"value": "1563u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RefCursorArray",
+						"line": 317,
+						"value": "2201u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegProcWithArgsArray",
+						"line": 318,
+						"value": "2207u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegOperatorArray",
+						"line": 319,
+						"value": "2208u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegOperatorWithArgsArray",
+						"line": 320,
+						"value": "2209u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegClassArray",
+						"line": 321,
+						"value": "2210u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegTypeArray",
+						"line": 322,
+						"value": "2211u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "UUIDArray",
+						"line": 323,
+						"value": "2951u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TSVectorArray",
+						"line": 324,
+						"value": "3643u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "GTSVectorArray",
+						"line": 325,
+						"value": "3644u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TSQueryArray",
+						"line": 326,
+						"value": "3645u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegConfigArray",
+						"line": 327,
+						"value": "3735u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RegDictionaryArray",
+						"line": 328,
+						"value": "3770u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TXidSnapshotArray",
+						"line": 329,
+						"value": "2949u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int4RangeArray",
+						"line": 330,
+						"value": "3905u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NumRangeArray",
+						"line": 331,
+						"value": "3907u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampRangeArray",
+						"line": 332,
+						"value": "3909u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "TimeStampWithZoneRangeArray",
+						"line": 333,
+						"value": "3911u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "DateRangeArray",
+						"line": 334,
+						"value": "3913u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Int8RangeArray",
+						"line": 335,
+						"value": "3927u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Record",
+						"line": 338,
+						"value": "2249u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "RecordArray",
+						"line": 339,
+						"value": "2287u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "CString",
+						"line": 340,
+						"value": "2275u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AnyVoid",
+						"line": 341,
+						"value": "2276u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AnyArray",
+						"line": 342,
+						"value": "2277u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Void",
+						"line": 343,
+						"value": "2278u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Trigger",
+						"line": 344,
+						"value": "2279u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "EventTrigger",
+						"line": 345,
+						"value": "3838u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "LanguageHandler",
+						"line": 346,
+						"value": "2280u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Internal",
+						"line": 347,
+						"value": "2281u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "Opaque",
+						"line": 348,
+						"value": "2282u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AnyElement",
+						"line": 349,
+						"value": "2283u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AnyNoArray",
+						"line": 350,
+						"value": "2776u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AnyEnum",
+						"line": 351,
+						"value": "3500u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "FDWHandler",
+						"line": 352,
+						"value": "3115u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "AnyRange",
+						"line": 353,
+						"value": "3831u",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					}
+				],
 				"name": "OidType",
-				"line": 177,
+				"line": 184,
 				"comment": "Enum of Oid types defined in PG\n",
 				"baseDeco": "k",
 				"char": 8,

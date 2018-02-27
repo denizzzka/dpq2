@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Function oidConvTo</title>
+		<title>Function isNativeFloat</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -83,28 +83,22 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function oidConvTo</h1><p>Convert between array Oid and element Oid or vice versa
+				<h1>Function isNativeFloat</h1><p>Checks if Oid type can be mapped to native D float
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<a href="../../dpq2/oids/OidType.html"><span class="typ">OidType</span></a> <span class="pln">oidConvTo</span>(<span class="typ">string</span> s)
+				<span class="typ">bool</span> <span class="pln">isNativeFloat</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<a href="../../dpq2/oids/OidType.html"><span class="typ">OidType</span></a> <span class="pln">type</span>
+				&nbsp;&nbsp;<a href="../../dpq2/oids/OidType.html"><span class="typ">OidType</span></a> <span class="pln">t</span>
 				<br/>
-				<span class="pun">)</span><span class="pun">;</span>
+				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure @safe</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				<section></section>
-
-				<section><h2>Parameters</h2>
-<table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
-<tr><td id="s">s</td><td> "array" or "element"</td></tr>
-</table>
-</section>
-
+				
+				
 			</div>
 			<footer>
 				<div id="license-info">
