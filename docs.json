@@ -906,27 +906,6 @@
 						"endline": 160,
 						"char": 10,
 						"kind": "function"
-					},
-					{
-						"endchar": 5,
-						"name": "waitEndOf",
-						"line": 182,
-						"comment": "Waiting for completion of reading or writing\nReturn: timeout not occured\n",
-						"type": "bool(WaitType type, Duration timeout = Duration.zero)",
-						"parameters": [
-							{
-								"name": "type",
-								"type": "WaitType"
-							},
-							{
-								"name": "timeout",
-								"type": "Duration",
-								"default": "Duration.zero"
-							}
-						],
-						"endline": 225,
-						"char": 10,
-						"kind": "function"
 					}
 				],
 				"name": "Queries",

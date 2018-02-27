@@ -54,5 +54,4 @@ var symbols = [
 {name: 'dpq2.query.Queries.sendQuery', kind: "functiondeclaration", path: './dpq2/query/Queries.sendQuery.html', attributes: []},
 {name: 'dpq2.query.Queries.sendQueryParams', kind: "functiondeclaration", path: './dpq2/query/Queries.sendQueryParams.html', attributes: []},
 {name: 'dpq2.query.Queries.sendQueryPrepared', kind: "functiondeclaration", path: './dpq2/query/Queries.sendQueryPrepared.html', attributes: []},
-{name: 'dpq2.query.Queries.waitEndOf', kind: "functiondeclaration", path: './dpq2/query/Queries.waitEndOf.html', attributes: []},
 ];

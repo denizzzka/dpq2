@@ -176,8 +176,8 @@ mixin template Queries()
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-    /// Waiting for completion of reading or writing
-    /// Return: timeout not occured
+    // Waiting for completion of reading or writing
+    // Returns: timeout is not occured
     version(unittest)
     bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
     {

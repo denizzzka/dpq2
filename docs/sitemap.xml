@@ -61,5 +61,4 @@
 <url><loc>http://127.0.0.1/dpq2/query/Queries.sendQuery.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/query/Queries.sendQueryParams.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/query/Queries.sendQueryPrepared.html</loc></url>
-<url><loc>http://127.0.0.1/dpq2/query/Queries.waitEndOf.html</loc></url>
 </urlset>
