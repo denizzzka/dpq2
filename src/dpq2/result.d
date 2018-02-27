@@ -410,7 +410,8 @@ immutable (Array) asArray(immutable(Value) v)
     return immutable Array(v);
 }
 
-debug string toString(immutable Value v)
+///
+string toString(immutable Value v)
 {
     import vibe.data.bson: Bson;
 
