@@ -325,7 +325,7 @@ immutable struct Row
         this.row = row;
     }
 
-    /// Returns the actual length of a field (cell) value in bytes.
+    /// Returns the actual length of a cell value in bytes.
     size_t size( const size_t col )
     {
         answer.assertCol(col);
