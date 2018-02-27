@@ -1,5 +1,146 @@
 [
 	{
+		"file": "src/dpq2/args.d",
+		"name": "dpq2.args",
+		"members": [
+			{
+				"name": "QueryParams",
+				"line": 15,
+				"comment": "Query parameters\n",
+				"members": [
+					{
+						"offset": 0,
+						"name": "sqlCommand",
+						"line": 17,
+						"comment": "SQL command\n",
+						"deco": "Aya",
+						"char": 12,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"offset": 16,
+						"name": "resultFormat",
+						"line": 18,
+						"comment": "Result value format\n",
+						"deco": "E4dpq25value11ValueFormat",
+						"init": "cast(ValueFormat)1",
+						"char": 17,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"endchar": 5,
+						"name": "args",
+						"line": 22,
+						"comment": "SQL command arguments\n",
+						"deco": "FNdNfAS4dpq25value5ValueZv",
+						"parameters": [
+							{
+								"name": "vargs",
+								"deco": "AS4dpq25value5Value"
+							}
+						],
+						"endline": 25,
+						"char": 20,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "args",
+						"line": 28,
+						"comment": "ditto\n",
+						"deco": "NgFNaNcNdNfZNgAS4dpq25value5Value",
+						"endline": 31,
+						"char": 35,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "argsFromArray",
+						"line": 37,
+						"comment": "Fills out arguments from array\n\nUseful for simple text-only query params\nPostgres infers a data type for the parameter in the same way it would do for an untyped literal string.\n",
+						"deco": "FNdNfxAAyaZv",
+						"parameters": [
+							{
+								"name": "arr",
+								"deco": "xAAya"
+							}
+						],
+						"endline": 43,
+						"originalType": "@property @safe void(in string[] arr)",
+						"char": 20,
+						"kind": "function"
+					},
+					{
+						"members": [
+							{
+								"endchar": 5,
+								"name": "argsVariadic",
+								"line": 46,
+								"type": "void(Targs t_args)",
+								"parameters": [
+									{
+										"name": "t_args",
+										"type": "Targs"
+									}
+								],
+								"endline": 54,
+								"char": 10,
+								"kind": "function"
+							}
+						],
+						"name": "argsVariadic",
+						"line": 46,
+						"comment": "Fills out arguments from variadic arguments\n",
+						"parameters": [
+							{
+								"name": "Targs",
+								"kind": "tuple"
+							}
+						],
+						"char": 10,
+						"kind": "template"
+					},
+					{
+						"endchar": 73,
+						"name": "preparedStatementName",
+						"line": 59,
+						"comment": "Access to prepared statement name\n\nUse it to prepare queries\n",
+						"deco": "xFNdNfZAya",
+						"endline": 59,
+						"char": 22,
+						"kind": "function"
+					},
+					{
+						"endchar": 69,
+						"name": "preparedStatementName",
+						"line": 61,
+						"comment": "ditto\n",
+						"deco": "FNdNfAyaZv",
+						"parameters": [
+							{
+								"name": "s",
+								"deco": "Aya"
+							}
+						],
+						"endline": 61,
+						"char": 20,
+						"kind": "function"
+					}
+				],
+				"char": 1,
+				"kind": "struct"
+			}
+		],
+		"comment": "Dealing with query arguments\n",
+		"kind": "module"
+	},
+	{
 		"file": "src/dpq2/connection.d",
 		"name": "dpq2.connection",
 		"members": [

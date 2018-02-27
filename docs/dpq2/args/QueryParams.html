@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Struct QueryParams</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dpq2
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">conv
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/numeric.html">numeric</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/time.html">time</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dpq2/args.html">args</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/connection.html">connection</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/exception.html">exception</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/oids.html">oids</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query.html">query</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/result.html">result</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/value.html">value</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Struct QueryParams</h1><p>Query parameters
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">struct</span> <span class="typ">QueryParams</span>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/args/QueryParams.resultFormat.html" class="public"><code>resultFormat</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dpq2/value/ValueFormat.html"><span class="typ">ValueFormat</span></a></code></td><td>Result value format
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/args/QueryParams.sqlCommand.html" class="public"><code>sqlCommand</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">string</span></code></td><td>SQL command
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Properties</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/args/QueryParams.args.html" class="public property"><code>args</code></a><span class="tableEntryAnnotation">[get, set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dpq2/value/Value.html"><span class="typ">Value</span></a><span class="pun">[]</span></code></td><td>SQL command arguments
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/args/QueryParams.argsFromArray.html" class="public property"><code>argsFromArray</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><span class="typ">string</span><span class="pun">[]</span><span class="pun">)</span></code></td><td>Fills out arguments from array
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/args/QueryParams.preparedStatementName.html" class="public property"><code>preparedStatementName</code></a><span class="tableEntryAnnotation">[get, set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">string</span></code></td><td>Access to prepared statement name
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/args/QueryParams.argsVariadic.html" class="public">
+									<code>argsVariadic</code>
+								</a>
+							</td>
+							<td>Fills out arguments from variadic arguments
+</td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

@@ -1,4 +1,5 @@
-﻿module dpq2.args;
+/// Dealing with query arguments
+module dpq2.args;
 
 @safe:
 
@@ -29,6 +30,8 @@ struct QueryParams
         return _args;
     }
 
+    /// Fills out arguments from array
+    ///
     /// Useful for simple text-only query params
     /// Postgres infers a data type for the parameter in the same way it would do for an untyped literal string.
     @property void argsFromArray(in string[] arr)
@@ -39,6 +42,7 @@ struct QueryParams
             a = toValue(arr[i], ValueFormat.TEXT);
     }
 
+    /// Fills out arguments from variadic arguments
     void argsVariadic(Targs ...)(Targs t_args)
     {
         _args.length = t_args.length;
@@ -49,7 +53,11 @@ struct QueryParams
         }
     }
 
+    /// Access to prepared statement name
+    ///
+    /// Use it to prepare queries
     @property string preparedStatementName() const { return sqlCommand; }
+    /// ditto
     @property void preparedStatementName(string s){ sqlCommand = s; }
 }
 

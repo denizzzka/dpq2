@@ -11,6 +11,16 @@
 <url><loc>http://127.0.0.1/dpq2/conv/time/binaryValueAs.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/TimeStamp.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/TimeStampUTC.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.args.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.args.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.argsFromArray.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.argsVariadic.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.preparedStatementName.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.preparedStatementName.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.resultFormat.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/args/QueryParams.sqlCommand.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Cancellation.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Cancellation.doCancel.html</loc></url>
