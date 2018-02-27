@@ -624,8 +624,10 @@ class Notify
 {
     private immutable PGnotify* n;
 
-    this(immutable PGnotify* pgn )
+    package this(immutable PGnotify* pgn)
     {
+        assert(pgn != null);
+
         n = pgn;
         cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
     }
@@ -643,11 +645,6 @@ class Notify
 
     /// Returns process ID of notifying server process
     size_t pid() { return n.be_pid; }
-
-    nothrow invariant()
-    {
-        assert( n != null );
-    }
 }
 
 /// Covers errors of Answer creation when data was not received due to syntax errors, etc
