@@ -950,5 +950,523 @@
 		],
 		"comment": "Query methods\n",
 		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/result.d",
+		"name": "dpq2.result",
+		"members": [
+			{
+				"name": "Result",
+				"line": 56,
+				"comment": "Contains result of query regardless of whether it contains an error or data answer\n",
+				"members": [
+					{
+						"endchar": 5,
+						"name": "status",
+						"line": 66,
+						"comment": "Returns the result status of the command.\n",
+						"deco": "yFNbZi",
+						"endline": 69,
+						"originalType": "immutable nothrow ExecStatusType()",
+						"char": 20,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "statusString",
+						"line": 72,
+						"comment": "Text description of result status.\n",
+						"deco": "yFZAya",
+						"endline": 75,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "resultErrorMessage",
+						"line": 78,
+						"comment": "Returns the error message associated with the command, or an empty string if there was no error.\n",
+						"deco": "yFZAya",
+						"endline": 81,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "resultErrorField",
+						"line": 84,
+						"comment": "Returns an individual field of an error report.\n",
+						"deco": "yFiZAya",
+						"parameters": [
+							{
+								"name": "fieldcode",
+								"deco": "i"
+							}
+						],
+						"endline": 87,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "getAnswer",
+						"line": 90,
+						"comment": "Creates Answer object\n",
+						"deco": "yFZyC4dpq26result6Answer",
+						"endline": 93,
+						"char": 23,
+						"kind": "function"
+					}
+				],
+				"char": 11,
+				"kind": "class"
+			},
+			{
+				"members": [
+					{
+						"endchar": 5,
+						"name": "cmdStatus",
+						"line": 133,
+						"comment": " Returns the command status tag from the SQL command that generated the PGresult\n Commonly this is just the name of the command, but it might include\n additional data such as the number of rows processed.\n",
+						"deco": "yFZAya",
+						"endline": 136,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "cmdTuples",
+						"line": 146,
+						"comment": " Returns the number of rows affected by the SQL command.\n This function returns a string containing the number of rows affected by the SQL statement\n that generated the Answer. This function can only be used following the execution of\n a SELECT, CREATE TABLE AS, INSERT, UPDATE, DELETE, MOVE, FETCH, or COPY statement,\n or an EXECUTE of a prepared query that contains an INSERT, UPDATE, or DELETE statement.\n If the command that generated the Anser was anything else, cmdTuples returns an empty string.\n",
+						"deco": "yFZAya",
+						"endline": 149,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 57,
+						"name": "length",
+						"line": 152,
+						"comment": "Returns row count\n",
+						"deco": "yFNbZm",
+						"endline": 152,
+						"originalType": "immutable nothrow size_t()",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 62,
+						"name": "columnCount",
+						"line": 155,
+						"comment": "Returns column count\n",
+						"deco": "yFNbZm",
+						"endline": 155,
+						"originalType": "immutable nothrow size_t()",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "columnFormat",
+						"line": 158,
+						"comment": "Returns column format\n",
+						"deco": "yFxmZE4dpq25value11ValueFormat",
+						"parameters": [
+							{
+								"name": "colNum",
+								"deco": "xm"
+							}
+						],
+						"endline": 163,
+						"originalType": "immutable ValueFormat(const size_t colNum)",
+						"char": 17,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "OID",
+						"line": 166,
+						"comment": "Returns column Oid\n",
+						"deco": "yFmZE4dpq24oids7OidType",
+						"parameters": [
+							{
+								"name": "colNum",
+								"deco": "m"
+							}
+						],
+						"endline": 171,
+						"originalType": "immutable OidType(size_t colNum)",
+						"char": 13,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "columnNum",
+						"line": 181,
+						"comment": "Returns column number by field name\n",
+						"deco": "yFAyaZm",
+						"parameters": [
+							{
+								"name": "columnName",
+								"deco": "Aya"
+							}
+						],
+						"endline": 190,
+						"originalType": "immutable size_t(string columnName)",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "columnName",
+						"line": 193,
+						"comment": "Returns column name by field number\n",
+						"deco": "yFxmZAya",
+						"parameters": [
+							{
+								"name": "colNum",
+								"deco": "xm"
+							}
+						],
+						"endline": 205,
+						"originalType": "immutable string(in size_t colNum)",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "columnExists",
+						"line": 208,
+						"comment": "Returns true if the column exists, false if not\n",
+						"deco": "yFAyaZb",
+						"parameters": [
+							{
+								"name": "columnName",
+								"deco": "Aya"
+							}
+						],
+						"endline": 213,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "opIndex",
+						"line": 216,
+						"comment": "Returns row of cells\n",
+						"deco": "yFxmZyS4dpq26result3Row",
+						"parameters": [
+							{
+								"name": "row",
+								"deco": "xm"
+							}
+						],
+						"endline": 222,
+						"originalType": "immutable immutable(Row)(in size_t row)",
+						"char": 21,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "nParams",
+						"line": 229,
+						"comment": "     Returns the number of parameters of a prepared statement.\n     This function is only useful when inspecting the result of describePrepared.\n     For other types of queries it will return zero.\n",
+						"deco": "yFZk",
+						"endline": 232,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"members": [
+							{
+								"endchar": 5,
+								"name": "paramType",
+								"line": 240,
+								"type": "OidType(T paramNum)",
+								"parameters": [
+									{
+										"name": "paramNum",
+										"type": "T"
+									}
+								],
+								"endline": 243,
+								"char": 13,
+								"kind": "function"
+							}
+						],
+						"name": "paramType",
+						"line": 240,
+						"comment": "     Returns the data type of the indicated statement parameter.\n     Parameter numbers start at 0.\n     This function is only useful when inspecting the result of describePrepared.\n     For other types of queries it will return zero.\n",
+						"parameters": [
+							{
+								"name": "T",
+								"kind": "type"
+							}
+						],
+						"char": 13,
+						"kind": "template"
+					}
+				],
+				"name": "Answer",
+				"line": 106,
+				"comment": "Contains result of query with valid data answer\n",
+				"base": "dpq2.result.Result",
+				"char": 11,
+				"kind": "class"
+			},
+			{
+				"name": "Row",
+				"line": 312,
+				"comment": "Represents one row from the answer table\n",
+				"members": [
+					{
+						"endchar": 5,
+						"name": "size",
+						"line": 326,
+						"comment": "Returns cell size\n",
+						"deco": "yFxmZm",
+						"parameters": [
+							{
+								"name": "col",
+								"deco": "xm"
+							}
+						],
+						"endline": 330,
+						"originalType": "immutable size_t(const size_t col)",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "isNULL",
+						"line": 334,
+						"comment": "Value NULL checking\nDo not confuse it with Nullable's isNull method\n",
+						"deco": "yFxmZb",
+						"parameters": [
+							{
+								"name": "col",
+								"deco": "xm"
+							}
+						],
+						"endline": 339,
+						"originalType": "immutable bool(const size_t col)",
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "columnNum",
+						"line": 363,
+						"comment": "Returns column number by field name\n",
+						"deco": "yFAyaZm",
+						"parameters": [
+							{
+								"name": "columnName",
+								"deco": "Aya"
+							}
+						],
+						"endline": 366,
+						"originalType": "immutable size_t(string columnName)",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "columnName",
+						"line": 369,
+						"comment": "Returns column name by field number\n",
+						"deco": "yFxmZAya",
+						"parameters": [
+							{
+								"name": "colNum",
+								"deco": "xm"
+							}
+						],
+						"endline": 372,
+						"originalType": "immutable string(in size_t colNum)",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 52,
+						"name": "length",
+						"line": 375,
+						"comment": "Returns column count\n",
+						"deco": "yFZm",
+						"endline": 375,
+						"originalType": "immutable size_t()",
+						"char": 12,
+						"kind": "function"
+					}
+				],
+				"char": 11,
+				"kind": "struct"
+			},
+			{
+				"name": "Array",
+				"line": 480,
+				"comment": "Link to the cell of the answer table\n",
+				"members": [
+					{
+						"endchar": 5,
+						"name": "length",
+						"line": 529,
+						"comment": "Returns number of elements in array\nUseful for one-dimensional arrays\n",
+						"deco": "yFZm",
+						"endline": 532,
+						"originalType": "immutable size_t()",
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "opIndex",
+						"line": 536,
+						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
+						"deco": "yFmZyS4dpq25value5Value",
+						"parameters": [
+							{
+								"name": "n",
+								"deco": "m"
+							}
+						],
+						"endline": 539,
+						"originalType": "immutable immutable(Value)(size_t n)",
+						"char": 23,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "opIndex",
+						"line": 543,
+						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
+						"deco": "yFiZyS4dpq25value5Value",
+						"parameters": [
+							{
+								"name": "n",
+								"deco": "i"
+							}
+						],
+						"endline": 546,
+						"char": 23,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "getValue",
+						"line": 550,
+						"comment": "Returns Value struct\nUseful for multidimensional arrays\n",
+						"deco": "yFYyS4dpq25value5Value",
+						"endline": 558,
+						"char": 23,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "isNULL",
+						"line": 561,
+						"comment": "Value NULL checking\n",
+						"deco": "yFYb",
+						"endline": 565,
+						"char": 10,
+						"kind": "function"
+					}
+				],
+				"char": 11,
+				"kind": "struct"
+			},
+			{
+				"name": "Notify",
+				"line": 610,
+				"comment": "Notify\n",
+				"members": [
+					{
+						"endchar": 52,
+						"name": "name",
+						"line": 626,
+						"comment": "Returns notification condition name\n",
+						"deco": "FZAya",
+						"endline": 626,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 51,
+						"name": "extra",
+						"line": 629,
+						"comment": "Returns notification parameter\n",
+						"deco": "FZAya",
+						"endline": 629,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 37,
+						"name": "pid",
+						"line": 632,
+						"comment": "Returns process ID of notifying server process\n",
+						"deco": "FZm",
+						"endline": 632,
+						"originalType": "size_t()",
+						"char": 12,
+						"kind": "function"
+					}
+				],
+				"char": 1,
+				"kind": "class"
+			},
+			{
+				"members": [],
+				"name": "ResponseException",
+				"line": 641,
+				"comment": "Covers errors of Answer creation when data was not received due to syntax errors, etc\n",
+				"base": "dpq2.exception.Dpq2Exception",
+				"char": 1,
+				"kind": "class"
+			},
+			{
+				"members": [
+					{
+						"name": "COLUMN_NOT_FOUND",
+						"line": 661,
+						"value": "1",
+						"comment": "Column is not found\n",
+						"char": 5,
+						"kind": "enum member"
+					}
+				],
+				"name": "ExceptionType",
+				"line": 658,
+				"comment": "Answer exception types\n",
+				"baseDeco": "i",
+				"char": 1,
+				"kind": "enum"
+			},
+			{
+				"members": [
+					{
+						"offset": 76,
+						"name": "type",
+						"line": 668,
+						"comment": "Exception type\n",
+						"deco": "xE4dpq26result13ExceptionType",
+						"originalType": "ExceptionType",
+						"char": 25,
+						"kind": "variable",
+						"storageClass": [
+							"const"
+						]
+					}
+				],
+				"name": "AnswerException",
+				"line": 666,
+				"comment": "Covers errors of access to Answer data\n",
+				"base": "dpq2.exception.Dpq2Exception",
+				"char": 1,
+				"kind": "class"
+			}
+		],
+		"comment": "Dealing with results of queries\n",
+		"kind": "module"
 	}
 ]

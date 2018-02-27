@@ -1,4 +1,5 @@
-﻿module dpq2.result;
+/// Dealing with results of queries
+module dpq2.result;
 
 public import dpq2.conv.to_d_types;
 public import dpq2.conv.to_bson;
@@ -11,7 +12,7 @@ import dpq2.exception;
 import derelict.pq.pq;
 
 import core.vararg;
-import std.string: toStringz, fromStringz;
+import std.string: toStringz;
 import std.exception: enforceEx;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
@@ -61,26 +62,31 @@ immutable class Result
         result = r;
     }
 
+    /// Returns the result status of the command.
     ExecStatusType status() nothrow
     {
         return PQresultStatus(result);
     }
 
+    /// Text description of result status.
     string statusString()
     {
-        return to!string(fromStringz(PQresStatus(status)));
+        return PQresStatus(status).to!string;
     }
 
+    /// Returns the error message associated with the command, or an empty string if there was no error.
     string resultErrorMessage()
     {
-        return to!string( PQresultErrorMessage(result) );
+        return PQresultErrorMessage(result).to!string;
     }
 
+    /// Returns an individual field of an error report.
     string resultErrorField(int fieldcode)
     {
         return PQresultErrorField(result, fieldcode).to!string;
     }
 
+    /// Creates Answer object
     immutable(Answer) getAnswer()
     {
         return new immutable Answer(result);
@@ -152,6 +158,7 @@ immutable class Answer : Result
     ValueFormat columnFormat( const size_t colNum )
     {
         assertCol( colNum );
+
         return cast(ValueFormat) PQfformat(result, to!int(colNum));
     }
 
@@ -194,7 +201,7 @@ immutable class Answer : Result
                     __FILE__, __LINE__
                 );
 
-        return to!string(fromStringz(s));
+        return s.to!string;
     }
 
     /// Returns true if the column exists, false if not
