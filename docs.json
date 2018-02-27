@@ -519,11 +519,38 @@
 				"members": [
 					{
 						"endchar": 5,
+						"name": "this",
+						"line": 399,
+						"comment": "\n",
+						"deco": "FC4dpq210connection10ConnectionZCQBfQBd12Cancellation",
+						"parameters": [
+							{
+								"name": "c",
+								"deco": "C4dpq210connection10Connection"
+							}
+						],
+						"endline": 405,
+						"originalType": "(Connection c)",
+						"char": 5,
+						"kind": "constructor"
+					},
+					{
+						"endchar": 5,
+						"name": "~this",
+						"line": 408,
+						"comment": "\n",
+						"deco": "FZv",
+						"endline": 411,
+						"char": 5,
+						"kind": "destructor"
+					},
+					{
+						"endchar": 5,
 						"name": "doCancel",
-						"line": 423,
+						"line": 425,
 						"comment": "     Requests that the server abandon processing of the current command\n\n     Throws exception if cancel request was not successfully dispatched.\n\n     Successful dispatch is no guarantee that the request will have any\n     effect, however. If the cancellation is effective, the current\n     command will terminate early and return an error result\n     (exception). If the cancellation fails (say, because the server\n     was already done processing the command), then there will be no\n     visible result at all.\n",
 						"deco": "FZv",
-						"endline": 430,
+						"endline": 432,
 						"char": 10,
 						"kind": "function"
 					}
@@ -534,7 +561,7 @@
 			{
 				"members": [],
 				"name": "CancellationException",
-				"line": 434,
+				"line": 436,
 				"comment": "\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -543,7 +570,7 @@
 			{
 				"members": [],
 				"name": "ConnectionException",
-				"line": 443,
+				"line": 445,
 				"comment": "Connection exception\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,

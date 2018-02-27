@@ -45,6 +45,7 @@ var symbols = [
 {name: 'dpq2.connection', kind: "module", path: './dpq2/connection.html', attributes: []},
 {name: 'dpq2.connection.Cancellation', kind: "classdeclaration", path: './dpq2/connection/Cancellation.html', attributes: []},
 {name: 'dpq2.connection.Cancellation.doCancel', kind: "functiondeclaration", path: './dpq2/connection/Cancellation.doCancel.html', attributes: []},
+{name: 'dpq2.connection.Cancellation.this', kind: "functiondeclaration", path: './dpq2/connection/Cancellation.this.html', attributes: []},
 {name: 'dpq2.connection.CancellationException', kind: "classdeclaration", path: './dpq2/connection/CancellationException.html', attributes: []},
 {name: 'dpq2.connection.Connection', kind: "classdeclaration", path: './dpq2/connection/Connection.html', attributes: []},
 {name: 'dpq2.connection.Connection.cancel', kind: "functiondeclaration", path: './dpq2/connection/Connection.cancel.html', attributes: []},

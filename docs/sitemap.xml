@@ -63,6 +63,7 @@
 <url><loc>http://127.0.0.1/dpq2/connection.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Cancellation.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Cancellation.doCancel.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/connection/Cancellation.this.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/CancellationException.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.cancel.html</loc></url>
