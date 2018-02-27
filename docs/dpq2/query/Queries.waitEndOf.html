@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Module dpq2.query</title>
-		<link rel="stylesheet" href="../css/style.min.css"/>
-		<script type="text/javascript" src="../js/script.min.js"></script>
+		<title>Function Queries.waitEndOf</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
 	<body onload="setupDdox();">
 		<header></header>
@@ -18,7 +18,7 @@
 					<form action="#" method="GET">
 						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
 					</form>
-					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../";
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
 document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</div>
 				<ul class="tree-view">
@@ -32,29 +32,29 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<ul class="tree-view">
 					<li>
 						<div class="module ">
-							<a href="../dpq2/conv/numeric.html">numeric</a>
+							<a href="../../dpq2/conv/numeric.html">numeric</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../dpq2/conv/time.html">time</a>
+							<a href="../../dpq2/conv/time.html">time</a>
 						</div>
 					</li>
 				</ul>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../dpq2/connection.html">connection</a>
+							<a href="../../dpq2/connection.html">connection</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../dpq2/oids.html">oids</a>
+							<a href="../../dpq2/oids.html">oids</a>
 						</div>
 					</li>
 					<li>
 						<div class="module selected">
-							<a href="../dpq2/query.html">query</a>
+							<a href="../../dpq2/query.html">query</a>
 						</div>
 					</li>
 				</ul>
@@ -68,27 +68,28 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Module dpq2.query</h1><p>Query methods
+				<h1>Function Queries.waitEndOf</h1><p>Waiting for completion of reading or writing
 </p>
-				<section></section>
-				<section>
-					<h2>Templates</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<code>
-									<a id="Queries" class="public" href="../dpq2/query/Queries.html">Queries</a>
-								</code>
-							</td>
-							<td>Extends Connection by adding query methods
-</td>
-						</tr>
-					</table>
-				</section>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">bool</span> <span class="pln">waitEndOf</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">WaitType</span> <span class="pln">type</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">Duration</span> <span class="pln">timeout</span> <span class="pun">=</span> <span class="typ">Duration<wbr/></span><span class="pun">.</span><span class="pln">zero</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Return</h2>
+<p>timeout not occured
+</p>
+</section>
+
 			</div>
 			<footer>
 				<div id="license-info">

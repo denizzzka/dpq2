@@ -698,8 +698,246 @@
 	{
 		"file": "src/dpq2/query.d",
 		"name": "dpq2.query",
-		"members": [],
-		"comment": "Extends Connection by adding query methods\n",
+		"members": [
+			{
+				"members": [
+					{
+						"endchar": 5,
+						"name": "exec",
+						"line": 18,
+						"comment": "Perform SQL query to DB\n",
+						"type": "immutable(Answer)(string SQLcmd)",
+						"parameters": [
+							{
+								"name": "SQLcmd",
+								"type": "string"
+							}
+						],
+						"endline": 26,
+						"char": 24,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "execParams",
+						"line": 29,
+						"comment": "Perform SQL query to DB\n",
+						"type": "immutable(Answer)(ref QueryParams qp)",
+						"parameters": [
+							{
+								"name": "qp",
+								"type": "QueryParams",
+								"storageClass": [
+									"in",
+									"ref"
+								]
+							}
+						],
+						"endline": 47,
+						"char": 24,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "sendQuery",
+						"line": 50,
+						"comment": "Submits a command to the server without waiting for the result(s)\n",
+						"type": "void(string SQLcmd)",
+						"parameters": [
+							{
+								"name": "SQLcmd",
+								"type": "string"
+							}
+						],
+						"endline": 54,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "sendQueryParams",
+						"line": 57,
+						"comment": "Submits a command and separate parameters to the server without waiting for the result(s)\n",
+						"type": "void(ref QueryParams qp)",
+						"parameters": [
+							{
+								"name": "qp",
+								"type": "QueryParams",
+								"storageClass": [
+									"in",
+									"ref"
+								]
+							}
+						],
+						"endline": 72,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "sendQueryPrepared",
+						"line": 75,
+						"comment": "Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)\n",
+						"type": "void(ref QueryParams qp)",
+						"parameters": [
+							{
+								"name": "qp",
+								"type": "QueryParams",
+								"storageClass": [
+									"in",
+									"ref"
+								]
+							}
+						],
+						"endline": 89,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "getNextNotify",
+						"line": 92,
+						"comment": "Returns null if no notifies was received\n",
+						"type": "Notify()",
+						"endline": 97,
+						"char": 12,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "prepare",
+						"line": 101,
+						"comment": "Submits a request to create a prepared statement with the given parameters, and waits for completion.\nReturns: Result of query preparing\n",
+						"type": "immutable(Result)(string statementName, string sqlStatement, in Oid[] oids = null)",
+						"parameters": [
+							{
+								"name": "statementName",
+								"type": "string"
+							},
+							{
+								"name": "sqlStatement",
+								"type": "string"
+							},
+							{
+								"name": "oids",
+								"type": "Oid[]",
+								"storageClass": [
+									"in"
+								],
+								"default": "null"
+							}
+						],
+						"endline": 115,
+						"char": 23,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "prepareEx",
+						"line": 120,
+						"comment": "Submits a request to create a prepared statement with the given parameters, and waits for completion.\n\nThrows an exception if preparing failed.\n",
+						"type": "void(string statementName, string sqlStatement, in Oid[] oids = null)",
+						"parameters": [
+							{
+								"name": "statementName",
+								"type": "string"
+							},
+							{
+								"name": "sqlStatement",
+								"type": "string"
+							},
+							{
+								"name": "oids",
+								"type": "Oid[]",
+								"storageClass": [
+									"in"
+								],
+								"default": "null"
+							}
+						],
+						"endline": 126,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "execPrepared",
+						"line": 129,
+						"comment": "Submits a request to execute a prepared statement with given parameters, and waits for completion.\n",
+						"type": "immutable(Answer)(ref QueryParams qp)",
+						"parameters": [
+							{
+								"name": "qp",
+								"type": "QueryParams",
+								"storageClass": [
+									"in",
+									"ref"
+								]
+							}
+						],
+						"endline": 146,
+						"char": 23,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "sendPrepare",
+						"line": 149,
+						"comment": "Sends a request to create a prepared statement with the given parameters, without waiting for completion.\n",
+						"type": "void(string statementName, string sqlStatement, in Oid[] oids = null)",
+						"parameters": [
+							{
+								"name": "statementName",
+								"type": "string"
+							},
+							{
+								"name": "sqlStatement",
+								"type": "string"
+							},
+							{
+								"name": "oids",
+								"type": "Oid[]",
+								"storageClass": [
+									"in"
+								],
+								"default": "null"
+							}
+						],
+						"endline": 160,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "waitEndOf",
+						"line": 182,
+						"comment": "Waiting for completion of reading or writing\nReturn: timeout not occured\n",
+						"type": "bool(WaitType type, Duration timeout = Duration.zero)",
+						"parameters": [
+							{
+								"name": "type",
+								"type": "WaitType"
+							},
+							{
+								"name": "timeout",
+								"type": "Duration",
+								"default": "Duration.zero"
+							}
+						],
+						"endline": 225,
+						"char": 10,
+						"kind": "function"
+					}
+				],
+				"name": "Queries",
+				"line": 15,
+				"comment": "Extends Connection by adding query methods\n",
+				"parameters": [],
+				"char": 7,
+				"kind": "template"
+			}
+		],
+		"comment": "Query methods\n",
 		"kind": "module"
 	}
 ]

@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Module dpq2.query</title>
-		<link rel="stylesheet" href="../css/style.min.css"/>
-		<script type="text/javascript" src="../js/script.min.js"></script>
+		<title>Function Queries.sendPrepare</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
 	<body onload="setupDdox();">
 		<header></header>
@@ -18,7 +18,7 @@
 					<form action="#" method="GET">
 						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
 					</form>
-					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../";
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
 document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</div>
 				<ul class="tree-view">
@@ -32,29 +32,29 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<ul class="tree-view">
 					<li>
 						<div class="module ">
-							<a href="../dpq2/conv/numeric.html">numeric</a>
+							<a href="../../dpq2/conv/numeric.html">numeric</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../dpq2/conv/time.html">time</a>
+							<a href="../../dpq2/conv/time.html">time</a>
 						</div>
 					</li>
 				</ul>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../dpq2/connection.html">connection</a>
+							<a href="../../dpq2/connection.html">connection</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../dpq2/oids.html">oids</a>
+							<a href="../../dpq2/oids.html">oids</a>
 						</div>
 					</li>
 					<li>
 						<div class="module selected">
-							<a href="../dpq2/query.html">query</a>
+							<a href="../../dpq2/query.html">query</a>
 						</div>
 					</li>
 				</ul>
@@ -68,27 +68,26 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Module dpq2.query</h1><p>Query methods
+				<h1>Function Queries.sendPrepare</h1><p>Sends a request to create a prepared statement with the given parameters, without waiting for completion.
 </p>
-				<section></section>
-				<section>
-					<h2>Templates</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<code>
-									<a id="Queries" class="public" href="../dpq2/query/Queries.html">Queries</a>
-								</code>
-							</td>
-							<td>Extends Connection by adding query methods
-</td>
-						</tr>
-					</table>
-				</section>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">sendPrepare</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">statementName</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">sqlStatement</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">in </span><span class="typ">Oid</span><span class="pun">[]</span> <span class="pln">oids</span> <span class="pun">=</span> <span class="kwd">null</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				
 			</div>
 			<footer>
 				<div id="license-info">

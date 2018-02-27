@@ -50,4 +50,16 @@
 <url><loc>http://127.0.0.1/dpq2/oids/oidConvTo.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/oids/OidType.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/query.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.exec.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.execParams.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.execPrepared.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.getNextNotify.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.prepare.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.prepareEx.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.sendPrepare.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.sendQuery.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.sendQueryParams.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.sendQueryPrepared.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/query/Queries.waitEndOf.html</loc></url>
 </urlset>
