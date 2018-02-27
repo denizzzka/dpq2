@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Struct Array</title>
+		<title>Function asArray</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -73,78 +73,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Struct Array</h1><p>Link to the cell of the answer table
+				<h1>Function asArray</h1><p>Creates Array from appropriate Value
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">struct</span> <span class="typ">Array</span>
-				<span class="pun">;</span>
+				<span class="kwd">immutable</span><span class="pun">(</span><a href="../../dpq2/result/Array.html"><span class="typ">Array</span></a><span class="pun">)</span> <span class="pln">asArray</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">immutable</span><span class="pun">(</span><span class="pln">dpq2<wbr/></span><span class="pun">.</span><span class="pln">value<wbr/></span><span class="pun">.</span><span class="typ">Value</span><span class="pun">)</span> <span class="pln">v</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
-				<section><h2>Fields</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Type</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dpq2/result/Array.ap.html" class="public"><code>ap</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><a href="../../dpq2/result/ArrayProperties.html"><span class="typ">ArrayProperties</span></a><span class="pun">)</span></code></td><td></td>
-						</tr>
-					</table>
-				</section>
-				<section><h2>Methods</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dpq2/result/Array.getValue.html" class="public">
-									<code>getValue</code>
-								</a>
-							</td>
-							<td>Returns Value struct
-Useful for multidimensional arrays
-</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dpq2/result/Array.isNULL.html" class="public">
-									<code>isNULL</code>
-								</a>
-							</td>
-							<td>Value NULL checking
-</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dpq2/result/Array.length.html" class="public">
-									<code>length</code>
-								</a>
-							</td>
-							<td>Returns number of elements in array
-Useful for one-dimensional arrays
-</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dpq2/result/Array.opIndex.html" class="public">
-									<code>opIndex</code>
-								</a>
-							</td>
-							<td>Returns Value struct by index
-Useful for one-dimensional arrays
-</td>
-						</tr>
-					</table>
-				</section>
 				
 			</div>
 			<footer>

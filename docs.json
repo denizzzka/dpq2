@@ -1445,8 +1445,24 @@
 			},
 			{
 				"endchar": 1,
+				"name": "asArray",
+				"line": 397,
+				"comment": "Creates Array from appropriate Value\n",
+				"deco": "FyS4dpq25value5ValueZySQu6result5Array",
+				"parameters": [
+					{
+						"name": "v",
+						"deco": "yS4dpq25value5Value"
+					}
+				],
+				"endline": 412,
+				"char": 19,
+				"kind": "function"
+			},
+			{
+				"endchar": 1,
 				"name": "toString",
-				"line": 414,
+				"line": 415,
 				"comment": "\n",
 				"deco": "FyS4dpq25value5ValueZAya",
 				"parameters": [
@@ -1455,23 +1471,74 @@
 						"deco": "yS4dpq25value5Value"
 					}
 				],
-				"endline": 419,
+				"endline": 420,
 				"originalType": "string(immutable Value v)",
 				"char": 8,
 				"kind": "function"
 			},
 			{
+				"name": "ArrayProperties",
+				"line": 436,
+				"comment": "\n",
+				"members": [
+					{
+						"offset": 0,
+						"name": "OID",
+						"line": 438,
+						"comment": "Oid\n",
+						"deco": "E4dpq24oids7OidType",
+						"init": "cast(OidType)0u",
+						"char": 13,
+						"kind": "variable"
+					},
+					{
+						"offset": 8,
+						"name": "dimsSize",
+						"line": 439,
+						"comment": "Dimensions sizes info\n",
+						"deco": "Ai",
+						"char": 11,
+						"kind": "variable"
+					},
+					{
+						"offset": 24,
+						"name": "nElems",
+						"line": 440,
+						"comment": "Total elements\n",
+						"deco": "m",
+						"originalType": "size_t",
+						"char": 12,
+						"kind": "variable"
+					}
+				],
+				"char": 1,
+				"kind": "struct"
+			},
+			{
 				"name": "Array",
-				"line": 489,
+				"line": 491,
 				"comment": "Link to the cell of the answer table\n",
 				"members": [
 					{
+						"offset": 0,
+						"name": "ap",
+						"line": 493,
+						"comment": "\n",
+						"deco": "yS4dpq26result15ArrayProperties",
+						"originalType": "ArrayProperties",
+						"char": 21,
+						"kind": "variable",
+						"storageClass": [
+							"immutable"
+						]
+					},
+					{
 						"endchar": 5,
 						"name": "length",
-						"line": 538,
+						"line": 540,
 						"comment": "Returns number of elements in array\nUseful for one-dimensional arrays\n",
 						"deco": "yFZm",
-						"endline": 541,
+						"endline": 543,
 						"originalType": "immutable size_t()",
 						"char": 12,
 						"kind": "function"
@@ -1479,7 +1546,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 545,
+						"line": 547,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFmZyS4dpq25value5Value",
 						"parameters": [
@@ -1488,7 +1555,7 @@
 								"deco": "m"
 							}
 						],
-						"endline": 548,
+						"endline": 550,
 						"originalType": "immutable immutable(Value)(size_t n)",
 						"char": 23,
 						"kind": "function"
@@ -1496,7 +1563,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 552,
+						"line": 554,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFiZyS4dpq25value5Value",
 						"parameters": [
@@ -1505,27 +1572,27 @@
 								"deco": "i"
 							}
 						],
-						"endline": 555,
+						"endline": 557,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "getValue",
-						"line": 559,
+						"line": 561,
 						"comment": "Returns Value struct\nUseful for multidimensional arrays\n",
 						"deco": "yFYyS4dpq25value5Value",
-						"endline": 567,
+						"endline": 569,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "isNULL",
-						"line": 570,
+						"line": 572,
 						"comment": "Value NULL checking\n",
 						"deco": "yFYb",
-						"endline": 574,
+						"endline": 576,
 						"char": 10,
 						"kind": "function"
 					}
@@ -1535,36 +1602,36 @@
 			},
 			{
 				"name": "Notify",
-				"line": 619,
+				"line": 621,
 				"comment": "Notify\n",
 				"members": [
 					{
 						"endchar": 52,
 						"name": "name",
-						"line": 635,
+						"line": 637,
 						"comment": "Returns notification condition name\n",
 						"deco": "FZAya",
-						"endline": 635,
+						"endline": 637,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 51,
 						"name": "extra",
-						"line": 638,
+						"line": 640,
 						"comment": "Returns notification parameter\n",
 						"deco": "FZAya",
-						"endline": 638,
+						"endline": 640,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 37,
 						"name": "pid",
-						"line": 641,
+						"line": 643,
 						"comment": "Returns process ID of notifying server process\n",
 						"deco": "FZm",
-						"endline": 641,
+						"endline": 643,
 						"originalType": "size_t()",
 						"char": 12,
 						"kind": "function"
@@ -1576,7 +1643,7 @@
 			{
 				"members": [],
 				"name": "ResponseException",
-				"line": 650,
+				"line": 652,
 				"comment": "Covers errors of Answer creation when data was not received due to syntax errors, etc\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -1585,16 +1652,32 @@
 			{
 				"members": [
 					{
+						"name": "FATAL_ERROR",
+						"line": 671,
+						"value": "0",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
 						"name": "COLUMN_NOT_FOUND",
-						"line": 670,
+						"line": 672,
 						"value": "1",
 						"comment": "Column is not found\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "OUT_OF_RANGE",
+						"line": 673,
+						"value": "2",
+						"comment": "\n",
 						"char": 5,
 						"kind": "enum member"
 					}
 				],
 				"name": "ExceptionType",
-				"line": 667,
+				"line": 669,
 				"comment": "Answer exception types\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -1605,7 +1688,7 @@
 					{
 						"offset": 76,
 						"name": "type",
-						"line": 677,
+						"line": 679,
 						"comment": "Exception type\n",
 						"deco": "xE4dpq26result13ExceptionType",
 						"originalType": "ExceptionType",
@@ -1617,7 +1700,7 @@
 					}
 				],
 				"name": "AnswerException",
-				"line": 675,
+				"line": 677,
 				"comment": "Covers errors of access to Answer data\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,

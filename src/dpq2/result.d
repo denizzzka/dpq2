@@ -393,6 +393,7 @@ immutable struct Row
     }
 }
 
+/// Creates Array from appropriate Value
 immutable (Array) asArray(immutable(Value) v)
 {
     if(v.format == ValueFormat.TEXT)
@@ -431,9 +432,10 @@ package struct Dim_net // network byte order
     ubyte[4] lbound; // unknown
 }
 
+///
 struct ArrayProperties
 {
-    OidType OID = OidType.Undefined;
+    OidType OID = OidType.Undefined; /// Oid
     int[] dimsSize; /// Dimensions sizes info
     size_t nElems; /// Total elements
     package size_t dataOffset;
@@ -488,7 +490,7 @@ struct ArrayProperties
 /// Link to the cell of the answer table
 immutable struct Array
 {
-    ArrayProperties ap;
+    ArrayProperties ap; ///
     alias ap this;
 
     private ubyte[][] elements;
@@ -666,9 +668,9 @@ alias AnswerCreationException = ResponseException;
 /// Answer exception types
 enum ExceptionType
 {
-    FATAL_ERROR,
+    FATAL_ERROR, ///
     COLUMN_NOT_FOUND, /// Column is not found
-    OUT_OF_RANGE
+    OUT_OF_RANGE, ///
 }
 
 /// Covers errors of access to Answer data

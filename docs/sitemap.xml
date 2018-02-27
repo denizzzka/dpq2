@@ -87,11 +87,17 @@
 <url><loc>http://127.0.0.1/dpq2/result/AnswerException.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/AnswerException.type.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Array.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/Array.ap.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Array.getValue.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Array.isNULL.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Array.length.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Array.opIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Array.opIndex.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.dimsSize.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.nElems.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.OID.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/asArray.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/ExceptionType.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Notify.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Notify.extra.html</loc></url>
