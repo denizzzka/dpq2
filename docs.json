@@ -906,6 +906,38 @@
 						"endline": 160,
 						"char": 10,
 						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "describePrepared",
+						"line": 163,
+						"comment": "Submits a request to obtain information about the specified prepared statement, and waits for completion.\n",
+						"type": "immutable(Answer)(string statementName)",
+						"parameters": [
+							{
+								"name": "statementName",
+								"type": "string"
+							}
+						],
+						"endline": 171,
+						"char": 23,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "sendDescribePrepared",
+						"line": 174,
+						"comment": "Submits a request to obtain information about the specified prepared statement, without waiting for completion.\n",
+						"type": "void(string statementName)",
+						"parameters": [
+							{
+								"name": "statementName",
+								"type": "string"
+							}
+						],
+						"endline": 179,
+						"char": 10,
+						"kind": "function"
 					}
 				],
 				"name": "Queries",

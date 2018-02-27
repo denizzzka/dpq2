@@ -159,6 +159,7 @@ mixin template Queries()
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
+    /// Submits a request to obtain information about the specified prepared statement, and waits for completion.
     immutable(Answer) describePrepared(string statementName)
     {
         PGresult* pgResult = PQdescribePrepared(conn, toStringz(statementName));
@@ -169,6 +170,7 @@ mixin template Queries()
         return new immutable Answer(container);
     }
 
+    /// Submits a request to obtain information about the specified prepared statement, without waiting for completion.
     void sendDescribePrepared(string statementName)
     {
         size_t r = PQsendDescribePrepared(conn, statementName.toStringz);
