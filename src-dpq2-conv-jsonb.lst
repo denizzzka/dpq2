@@ -1,3 +1,4 @@
+       |///
        |module dpq2.conv.jsonb;
        |
        |@safe:
@@ -11,6 +12,7 @@
        |import std.string;
        |import std.conv: to;
        |
+       |///
        |Json jsonbValueToJson(in Value v) @trusted
        |{
       2|    assert(v.oidType == OidType.Jsonb);

@@ -117,7 +117,7 @@ if( is( T == DateTime ) )
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
-private struct TTimeStamp(bool isWithTZ)
+struct TTimeStamp(bool isWithTZ)
 {
     DateTime dateTime; /// date and time of TimeStamp
     Duration fracSec; /// fractional seconds
@@ -144,6 +144,7 @@ private struct TTimeStamp(bool isWithTZ)
         return TTimeStamp(DateTime.min, Duration.zero);
     }
 
+    ///
     string toString() const
     {
         return dateTime.toString~" "~fracSec.toString;

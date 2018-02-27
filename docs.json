@@ -554,10 +554,10 @@
 		"kind": "module"
 	},
 	{
-		"file": "src/dpq2/conv/numeric.d",
-		"name": "dpq2.conv.numeric",
+		"file": "src/dpq2/conv/jsonb.d",
+		"name": "dpq2.conv.jsonb",
 		"members": [],
-		"comment": "   PostgreSQL numeric format\n\n   Copyright: © 2014 DSoftOut\n   Authors: NCrashed <ncrashed@gmail.com>\n",
+		"comment": "\n",
 		"kind": "module"
 	},
 	{
@@ -769,8 +769,84 @@
 				"kind": "template"
 			},
 			{
+				"members": [
+					{
+						"name": "TTimeStamp",
+						"line": 120,
+						"members": [
+							{
+								"name": "dateTime",
+								"line": 122,
+								"comment": "date and time of TimeStamp\n",
+								"type": "DateTime",
+								"char": 14,
+								"kind": "variable"
+							},
+							{
+								"name": "fracSec",
+								"line": 123,
+								"comment": "fractional seconds\n",
+								"type": "Duration",
+								"char": 14,
+								"kind": "variable"
+							},
+							{
+								"endchar": 5,
+								"name": "max",
+								"line": 136,
+								"comment": "Returns the TimeStamp farthest in the future which is representable by TimeStamp.\n",
+								"type": "()",
+								"endline": 139,
+								"char": 12,
+								"kind": "function",
+								"storageClass": [
+									"static"
+								]
+							},
+							{
+								"endchar": 5,
+								"name": "min",
+								"line": 142,
+								"comment": "Returns the TimeStamp farthest in the past which is representable by TimeStamp.\n",
+								"type": "()",
+								"endline": 145,
+								"char": 12,
+								"kind": "function",
+								"storageClass": [
+									"static"
+								]
+							},
+							{
+								"endchar": 5,
+								"name": "toString",
+								"line": 148,
+								"comment": "\n",
+								"type": "const string()",
+								"endline": 151,
+								"char": 12,
+								"kind": "function"
+							}
+						],
+						"char": 1,
+						"kind": "struct"
+					}
+				],
+				"name": "TTimeStamp",
+				"line": 120,
+				"comment": "    Structure to represent PostgreSQL Timestamp with/without time zone\n",
+				"parameters": [
+					{
+						"name": "isWithTZ",
+						"deco": "b",
+						"kind": "value"
+					}
+				],
+				"char": 1,
+				"kind": "template"
+			},
+			{
 				"name": "TimeStamp",
-				"line": 153,
+				"line": 154,
 				"comment": "Unknown TZ timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
 				"char": 1,
@@ -778,7 +854,7 @@
 			},
 			{
 				"name": "TimeStampUTC",
-				"line": 154,
+				"line": 155,
 				"comment": "Assumed that this is UTC timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
 				"char": 1,

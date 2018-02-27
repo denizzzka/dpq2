@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Function Connection.socket</title>
-		<link rel="stylesheet" href="../../css/style.min.css"/>
-		<script type="text/javascript" src="../../js/script.min.js"></script>
+		<title>Variable TTimeStamp.fracSec</title>
+		<link rel="stylesheet" href="../../../css/style.min.css"/>
+		<script type="text/javascript" src="../../../js/script.min.js"></script>
 	</head>
 	<body onload="setupDdox();">
 		<header></header>
@@ -18,7 +18,7 @@
 					<form action="#" method="GET">
 						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
 					</form>
-					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../../";
 document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</div>
 				<ul class="tree-view">
@@ -26,55 +26,55 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<div class="package ">dpq2
 						</div>
 				<ul class="tree-view">
-					<li class="tree-view collapsed">
+					<li class="tree-view ">
 						<div class="package ">conv
 						</div>
 				<ul class="tree-view">
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/conv/jsonb.html">jsonb</a>
+							<a href="../../../dpq2/conv/jsonb.html">jsonb</a>
 						</div>
 					</li>
 					<li>
-						<div class="module ">
-							<a href="../../dpq2/conv/time.html">time</a>
+						<div class="module selected">
+							<a href="../../../dpq2/conv/time.html">time</a>
 						</div>
 					</li>
 				</ul>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/args.html">args</a>
-						</div>
-					</li>
-					<li>
-						<div class="module selected">
-							<a href="../../dpq2/connection.html">connection</a>
+							<a href="../../../dpq2/args.html">args</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/exception.html">exception</a>
+							<a href="../../../dpq2/connection.html">connection</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/oids.html">oids</a>
+							<a href="../../../dpq2/exception.html">exception</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/query.html">query</a>
+							<a href="../../../dpq2/oids.html">oids</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/result.html">result</a>
+							<a href="../../../dpq2/query.html">query</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../dpq2/value.html">value</a>
+							<a href="../../../dpq2/result.html">result</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dpq2/value.html">value</a>
 						</div>
 					</li>
 				</ul>
@@ -88,27 +88,39 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Connection.socket</h1><p>Obtains std.socket.Socket of the connection to the server
+				<h1>Variable TTimeStamp.fracSec</h1><p>fractional seconds
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">socket<wbr/></span><span class="pun">.</span><span class="typ">Socket</span> <span class="pln">socket
-				<span class="pun">()</span><span class="pun">;</span>
+				<span class="kwd">struct</span> <a href="../../../dpq2/conv/time/TTimeStamp.html"><span class="typ">TTimeStamp</span></a>
+				<br/>
+				<span class="pun">
+					{
+					<br/>
+				</span>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">Duration</span> <span class="pln">fracSec</span>
+				<span class="pun">;</span>
+				<br/>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				<span class="pun">}</span>
 						</div>
 					</code>
 				</div>
-				<section><p>Due to a limitation of Socket actually for the Socket creation
-duplicate of internal posix socket will be used.
-</p>
-</section>
-
+				
 				
 			</div>
 			<footer>
 				<div id="license-info">
-					
-					
+					<p>NCrashed <ncrashed@gmail.com>
+</p>
+
+					<p>© 2014 DSoftOut
+</p>
+
 					
 				</div>
 			</footer>

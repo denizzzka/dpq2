@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Alias TimeStamp</title>
+		<title>Struct TTimeStamp</title>
 		<link rel="stylesheet" href="../../../css/style.min.css"/>
 		<script type="text/javascript" src="../../../js/script.min.js"></script>
 	</head>
@@ -88,17 +88,73 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Alias TimeStamp</h1><p>Unknown TZ timestamp
+				<h1>Struct TTimeStamp</h1><p>Structure to represent PostgreSQL Timestamp with/without time zone
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">alias</span> <span class="pln">TimeStamp</span>
-				 <span class="pun">=</span> <a href="../../../dpq2/conv/time/TTimeStamp.html"><span class="typ">TTimeStamp</span></a>!(false)<span class="pun">;</span>
+				<span class="kwd">struct</span> <span class="typ">TTimeStamp</span>(<span class="typ">bool</span> isWithTZ)
+				<span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../dpq2/conv/time/TTimeStamp.dateTime.html" class="public"><code>dateTime</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">DateTime</span></code></td><td>date and time of TimeStamp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../dpq2/conv/time/TTimeStamp.fracSec.html" class="public"><code>fracSec</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">Duration</span></code></td><td>fractional seconds
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../dpq2/conv/time/TTimeStamp.max.html" class="public">
+									<code>max</code>
+								</a>
+							</td>
+							<td>Returns the TimeStamp farthest in the future which is representable by TimeStamp.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../dpq2/conv/time/TTimeStamp.min.html" class="public">
+									<code>min</code>
+								</a>
+							</td>
+							<td>Returns the TimeStamp farthest in the past which is representable by TimeStamp.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../dpq2/conv/time/TTimeStamp.toString.html" class="public">
+									<code>toString</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
 				
 			</div>
 			<footer>
