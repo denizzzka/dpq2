@@ -1516,13 +1516,13 @@
 			},
 			{
 				"name": "Array",
-				"line": 491,
-				"comment": "Link to the cell of the answer table\n",
+				"line": 493,
+				"comment": "Represents Value as array\n\nActually it is a reference to the cell value of the answer table\n",
 				"members": [
 					{
 						"offset": 0,
 						"name": "ap",
-						"line": 493,
+						"line": 495,
 						"comment": "\n",
 						"deco": "yS4dpq26result15ArrayProperties",
 						"originalType": "ArrayProperties",
@@ -1535,10 +1535,10 @@
 					{
 						"endchar": 5,
 						"name": "length",
-						"line": 540,
+						"line": 542,
 						"comment": "Returns number of elements in array\nUseful for one-dimensional arrays\n",
 						"deco": "yFZm",
-						"endline": 543,
+						"endline": 545,
 						"originalType": "immutable size_t()",
 						"char": 12,
 						"kind": "function"
@@ -1546,7 +1546,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 547,
+						"line": 549,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFmZyS4dpq25value5Value",
 						"parameters": [
@@ -1555,7 +1555,7 @@
 								"deco": "m"
 							}
 						],
-						"endline": 550,
+						"endline": 552,
 						"originalType": "immutable immutable(Value)(size_t n)",
 						"char": 23,
 						"kind": "function"
@@ -1563,7 +1563,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 554,
+						"line": 556,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFiZyS4dpq25value5Value",
 						"parameters": [
@@ -1572,27 +1572,27 @@
 								"deco": "i"
 							}
 						],
-						"endline": 557,
+						"endline": 559,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "getValue",
-						"line": 561,
+						"line": 563,
 						"comment": "Returns Value struct\nUseful for multidimensional arrays\n",
 						"deco": "yFYyS4dpq25value5Value",
-						"endline": 569,
+						"endline": 571,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "isNULL",
-						"line": 572,
+						"line": 574,
 						"comment": "Value NULL checking\n",
 						"deco": "yFYb",
-						"endline": 576,
+						"endline": 578,
 						"char": 10,
 						"kind": "function"
 					}
@@ -1602,36 +1602,36 @@
 			},
 			{
 				"name": "Notify",
-				"line": 621,
+				"line": 623,
 				"comment": "Notify\n",
 				"members": [
 					{
 						"endchar": 52,
 						"name": "name",
-						"line": 637,
+						"line": 639,
 						"comment": "Returns notification condition name\n",
 						"deco": "FZAya",
-						"endline": 637,
+						"endline": 639,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 51,
 						"name": "extra",
-						"line": 640,
+						"line": 642,
 						"comment": "Returns notification parameter\n",
 						"deco": "FZAya",
-						"endline": 640,
+						"endline": 642,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 37,
 						"name": "pid",
-						"line": 643,
+						"line": 645,
 						"comment": "Returns process ID of notifying server process\n",
 						"deco": "FZm",
-						"endline": 643,
+						"endline": 645,
 						"originalType": "size_t()",
 						"char": 12,
 						"kind": "function"
@@ -1643,7 +1643,7 @@
 			{
 				"members": [],
 				"name": "ResponseException",
-				"line": 652,
+				"line": 654,
 				"comment": "Covers errors of Answer creation when data was not received due to syntax errors, etc\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -1653,7 +1653,7 @@
 				"members": [
 					{
 						"name": "FATAL_ERROR",
-						"line": 671,
+						"line": 673,
 						"value": "0",
 						"comment": "\n",
 						"char": 5,
@@ -1661,7 +1661,7 @@
 					},
 					{
 						"name": "COLUMN_NOT_FOUND",
-						"line": 672,
+						"line": 674,
 						"value": "1",
 						"comment": "Column is not found\n",
 						"char": 5,
@@ -1669,7 +1669,7 @@
 					},
 					{
 						"name": "OUT_OF_RANGE",
-						"line": 673,
+						"line": 675,
 						"value": "2",
 						"comment": "\n",
 						"char": 5,
@@ -1677,7 +1677,7 @@
 					}
 				],
 				"name": "ExceptionType",
-				"line": 669,
+				"line": 671,
 				"comment": "Answer exception types\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -1688,7 +1688,7 @@
 					{
 						"offset": 76,
 						"name": "type",
-						"line": 679,
+						"line": 681,
 						"comment": "Exception type\n",
 						"deco": "xE4dpq26result13ExceptionType",
 						"originalType": "ExceptionType",
@@ -1700,7 +1700,7 @@
 					}
 				],
 				"name": "AnswerException",
-				"line": 677,
+				"line": 679,
 				"comment": "Covers errors of access to Answer data\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,

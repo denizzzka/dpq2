@@ -487,7 +487,9 @@
        |    }
        |}
        |
-       |/// Link to the cell of the answer table
+       |/// Represents Value as array
+       |///
+       |/// Actually it is a reference to the cell value of the answer table
        |immutable struct Array
        |{
        |    ArrayProperties ap; ///
