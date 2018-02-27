@@ -554,6 +554,360 @@
 		"kind": "module"
 	},
 	{
+		"file": "src/dpq2/conv/from_bson.d",
+		"name": "dpq2.conv.from_bson",
+		"members": [
+			{
+				"endchar": 1,
+				"name": "bsonToValue",
+				"line": 14,
+				"comment": "Default type will be used for NULL value and for array without detected type\n",
+				"deco": "FS4vibe4data4bson4BsonE4dpq24oids7OidTypeZSQu5value5Value",
+				"parameters": [
+					{
+						"name": "v",
+						"deco": "S4vibe4data4bson4Bson"
+					},
+					{
+						"name": "defaultType",
+						"deco": "E4dpq24oids7OidType",
+						"default": "cast(OidType)0u"
+					}
+				],
+				"endline": 20,
+				"originalType": "Value(Bson v, OidType defaultType = OidType.Undefined)",
+				"char": 7,
+				"kind": "function"
+			}
+		],
+		"comment": "\n",
+		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/conv/from_d_types.d",
+		"name": "dpq2.conv.from_d_types",
+		"members": [
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 17,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 24,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 17,
+				"comment": "Converts Nullable!T to Value\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(T == Nullable!R, R)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 27,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 31,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 27,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "isNumeric!T",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 34,
+						"type": "@trusted Value(T v, ValueFormat valueFormat = ValueFormat.BINARY)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							},
+							{
+								"name": "valueFormat",
+								"type": "ValueFormat",
+								"default": "ValueFormat.BINARY"
+							}
+						],
+						"endline": 42,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 34,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(T == string)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 45,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 49,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 45,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(T == ubyte[])",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 52,
+						"type": "@trusted Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 60,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 52,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"deco": "b",
+						"kind": "type"
+					}
+				],
+				"constraint": "!is(T == Nullable!R, R)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 63,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 84,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 63,
+				"comment": "Constructs Value from Date\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == Date)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 87,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 93,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 87,
+				"comment": "Constructs Value from TimeOfDay\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == TimeOfDay)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 96,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 108,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 96,
+				"comment": "Constructs Value from TimeStamp or from TimeStampUTC\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 114,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 118,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 114,
+				"comment": "    Constructs Value from DateTime\n    It uses Timestamp without TZ as a resulting PG type\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == DateTime)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 126,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 132,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 126,
+				"comment": "    Constructs Value from SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == SysTime)",
+				"char": 7,
+				"kind": "template"
+			}
+		],
+		"comment": "\n",
+		"kind": "module"
+	},
+	{
 		"file": "src/dpq2/conv/jsonb.d",
 		"name": "dpq2.conv.jsonb",
 		"members": [],

@@ -1,3 +1,4 @@
+///
 module dpq2.conv.from_d_types;
 
 @safe:
@@ -22,12 +23,14 @@ if (is(T == Nullable!R, R))
         return toValue(v.get);
 }
 
+///
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
     return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
+///
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T == string))
 {
@@ -38,12 +41,14 @@ if(is(T == string))
     return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
 }
 
+///
 Value toValue(T)(T v)
 if(is(T == ubyte[]))
 {
     return Value(v, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
+///
 Value toValue(T : bool)(T v) @trusted
 if (!is(T == Nullable!R, R))
 {

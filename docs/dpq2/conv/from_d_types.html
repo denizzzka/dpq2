@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Struct Array</title>
+		<title>Module dpq2.conv.from_d_types</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -26,7 +26,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<div class="package ">dpq2
 						</div>
 				<ul class="tree-view">
-					<li class="tree-view collapsed">
+					<li class="tree-view ">
 						<div class="package ">conv
 						</div>
 				<ul class="tree-view">
@@ -36,7 +36,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dpq2/conv/from_d_types.html">from_d_types</a>
 						</div>
 					</li>
@@ -78,7 +78,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dpq2/result.html">result</a>
 						</div>
 					</li>
@@ -98,35 +98,10 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Struct Array</h1><p>Represents Value as array
-</p>
-				<div class="prototype">
-					<code class="lang-d">
-						<div class="single-prototype">
-				<span class="kwd">struct</span> <span class="typ">Array</span>
-				<span class="pun">;</span>
-						</div>
-					</code>
-				</div>
-				<section><p>Actually it is a reference to the cell value of the answer table
-</p>
-</section>
-
-				<section><h2>Fields</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Type</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dpq2/result/Array.ap.html" class="public"><code>ap</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><a href="../../dpq2/result/ArrayProperties.html"><span class="typ">ArrayProperties</span></a><span class="pun">)</span></code></td><td></td>
-						</tr>
-					</table>
-				</section>
-				<section><h2>Methods</h2>
+				<h1>Module dpq2.conv.from_d_types</h1><p></p>
+				<section></section>
+				<section>
+					<h2>Functions</h2>
 					<table>
 						<col class="caption"/>
 						<tr>
@@ -134,46 +109,96 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dpq2/result/Array.getValue.html" class="public">
-									<code>getValue</code>
-								</a>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
 							</td>
-							<td>Returns Value struct
-Useful for multidimensional arrays
+							<td>Converts Nullable!T to Value
 </td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dpq2/result/Array.isNULL.html" class="public">
-									<code>isNULL</code>
-								</a>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
 							</td>
-							<td>Value NULL checking
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v, valueFormat)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
+							</td>
+							<td>Constructs Value from Date
 </td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dpq2/result/Array.length.html" class="public">
-									<code>length</code>
-								</a>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
 							</td>
-							<td>Returns number of elements in array
-Useful for one-dimensional arrays
+							<td>Constructs Value from TimeOfDay
 </td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dpq2/result/Array.opIndex.html" class="public">
-									<code>opIndex</code>
-								</a>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
 							</td>
-							<td>Returns Value struct by index
-Useful for one-dimensional arrays
+							<td>Constructs Value from TimeStamp or from TimeStampUTC
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
+							</td>
+							<td>Constructs Value from DateTime
+    It uses Timestamp without TZ as a resulting PG type
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/from_d_types/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
+							</td>
+							<td>Constructs Value from SysTime
+    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
+    It means that PG value will have 10 times lower precision.
+    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
 </td>
 						</tr>
 					</table>
 				</section>
-				
 			</div>
 			<footer>
 				<div id="license-info">
