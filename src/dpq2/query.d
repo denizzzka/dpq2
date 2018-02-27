@@ -1,4 +1,5 @@
-﻿module dpq2.query;
+/// Extends Connection by adding query methods
+module dpq2.query;
 
 public import dpq2.args;
 
@@ -112,6 +113,17 @@ mixin template Queries()
         return new immutable Result(container);
     }
 
+    /// Submits a request to create a prepared statement with the given parameters, and waits for completion.
+    ///
+    /// Throws an exception if preparing failed.
+    void prepareEx(string statementName, string sqlStatement, in Oid[] oids = null)
+    {
+        auto r = prepare(statementName, sqlStatement, oids);
+
+        if(r.status != PGRES_COMMAND_OK)
+            throw new AnswerCreationException(r, __FILE__, __LINE__);
+    }
+
     /// Submits a request to execute a prepared statement with given parameters, and waits for completion.
     immutable(Answer) execPrepared(in ref QueryParams qp)
     {
@@ -212,6 +224,7 @@ mixin template Queries()
     }
 }
 
+version(unittest)
 enum WaitType
 {
     READ,
@@ -301,8 +314,7 @@ void _integration_test( string connParam ) @trusted
     // checking prepared statements
     {
         // uses PQprepare:
-        auto s = conn.prepare("prepared statement 1", "SELECT $1::integer");
-        assert(s.status == PGRES_COMMAND_OK);
+        conn.prepareEx("prepared statement 1", "SELECT $1::integer");
 
         QueryParams p;
         p.preparedStatementName = "prepared statement 1";
