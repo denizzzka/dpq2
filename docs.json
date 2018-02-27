@@ -2782,6 +2782,13 @@
 		"kind": "module"
 	},
 	{
+		"file": "src/dpq2/package.d",
+		"name": "dpq2",
+		"members": [],
+		"comment": " Main module\n\n Include it to use common functions.\n",
+		"kind": "module"
+	},
+	{
 		"file": "src/dpq2/query.d",
 		"name": "dpq2.query",
 		"members": [
