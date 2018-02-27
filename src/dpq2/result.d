@@ -115,7 +115,7 @@ immutable class Answer : Result
                 break;
 
             default:
-                throw new AnswerCreationException(this, __FILE__, __LINE__);
+                throw new ResponseException(this, __FILE__, __LINE__);
         }
     }
 
@@ -631,7 +631,7 @@ class Notify
 }
 
 /// Covers errors of Answer creation when data was not received due to syntax errors, etc
-class AnswerCreationException : Dpq2Exception
+class ResponseException : Dpq2Exception
 {
     immutable(Result) result;
     alias result this;
@@ -643,6 +643,9 @@ class AnswerCreationException : Dpq2Exception
         super(result.resultErrorMessage(), file, line);
     }
 }
+
+// TODO: deprecated
+alias AnswerCreationException = ResponseException;
 
 /// Answer exception types
 enum ExceptionType
@@ -815,7 +818,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try conn.exec("WRONG SQL QUERY");
-        catch(AnswerCreationException e)
+        catch(ResponseException e)
         {
             exceptionFlag = true;
             assert(e.msg.length > 20); // error message check
