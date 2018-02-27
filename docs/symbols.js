@@ -326,5 +326,4 @@ var symbols = [
 {name: 'dpq2.value.ValueFormat', kind: "enumdeclaration", path: './dpq2/value/ValueFormat.html', attributes: []},
 {name: 'dpq2.value.ValueFormat.BINARY', kind: "enummemberdeclaration", path: './dpq2/value/ValueFormat.html#BINARY', attributes: []},
 {name: 'dpq2.value.ValueFormat.TEXT', kind: "enummemberdeclaration", path: './dpq2/value/ValueFormat.html#TEXT', attributes: []},
-{name: 'dpq2', kind: "module", path: './dpq2.html', attributes: []},
 ];
