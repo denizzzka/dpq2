@@ -92,7 +92,8 @@ immutable class Result
         return new immutable Answer(result);
     }
 
-    debug string toString()
+    ///
+    string toString()
     {
         import std.ascii: newline;
 
@@ -170,12 +171,14 @@ immutable class Answer : Result
         return PQftype(result, to!int(colNum)).oid2oidType;
     }
 
-    bool isSupportedArray( const size_t colNum )
+    /// Checks if column type is array
+    bool isArray( const size_t colNum )
     {
         assertCol(colNum);
 
         return dpq2.oids.isSupportedArray(OID(colNum));
     }
+    alias isSupportedArray = isArray; //TODO: deprecated
 
     /// Returns column number by field name
     size_t columnNum( string columnName )
@@ -215,10 +218,7 @@ immutable class Answer : Result
     /// Returns row of cells
     immutable (Row) opIndex(in size_t row)
     {
-        return immutable Row(
-            cast(immutable)(this), // legal because this.ctor is immutable
-            row
-        );
+        return immutable Row(this, row);
     }
 
     /**
@@ -242,7 +242,8 @@ immutable class Answer : Result
         return PQparamtype(result, paramNum.to!uint).oid2oidType;
     }
 
-    debug override string toString()
+    ///
+    override string toString()
     {
         import std.ascii: newline;
 
@@ -286,6 +287,7 @@ immutable class Answer : Result
     }
 }
 
+/// Creates forward range from immutable Answer
 auto rangify(T)(T obj)
 {
     struct Rangify(T)
