@@ -122,7 +122,7 @@
        |        auto r = prepare(statementName, sqlStatement, oids);
        |
        |        if(r.status != PGRES_COMMAND_OK)
-       |            throw new AnswerCreationException(r, __FILE__, __LINE__);
+       |            throw new ResponseException(r, __FILE__, __LINE__);
        |    }
        |
        |    /// Submits a request to execute a prepared statement with given parameters, and waits for completion.

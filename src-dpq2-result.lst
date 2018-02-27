@@ -115,7 +115,7 @@
     134|                break;
        |
       1|            default:
-      1|                throw new AnswerCreationException(this, __FILE__, __LINE__);
+      1|                throw new ResponseException(this, __FILE__, __LINE__);
        |        }
        |    }
        |
@@ -631,7 +631,7 @@
        |}
        |
        |/// Covers errors of Answer creation when data was not received due to syntax errors, etc
-       |class AnswerCreationException : Dpq2Exception
+       |class ResponseException : Dpq2Exception
        |{
        |    immutable(Result) result;
        |    alias result this;
@@ -643,6 +643,9 @@
       1|        super(result.resultErrorMessage(), file, line);
        |    }
        |}
+       |
+       |// TODO: deprecated
+       |alias AnswerCreationException = ResponseException;
        |
        |/// Answer exception types
        |enum ExceptionType
@@ -815,7 +818,7 @@
       1|        bool exceptionFlag = false;
        |
       1|        try conn.exec("WRONG SQL QUERY");
-       |        catch(AnswerCreationException e)
+       |        catch(ResponseException e)
        |        {
       1|            exceptionFlag = true;
       1|            assert(e.msg.length > 20); // error message check
