@@ -12,6 +12,8 @@ import core.time: Duration, dur;
 import std.exception: enforce;
 
 /// Extends Connection by adding query methods
+///
+/// Just use it as Connection.* methods.
 mixin template Queries()
 {
     /// Perform SQL query to DB

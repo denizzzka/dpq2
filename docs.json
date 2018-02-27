@@ -2797,7 +2797,7 @@
 					{
 						"endchar": 5,
 						"name": "exec",
-						"line": 18,
+						"line": 20,
 						"comment": "Perform SQL query to DB\n",
 						"type": "immutable(Answer)(string SQLcmd)",
 						"parameters": [
@@ -2806,14 +2806,14 @@
 								"type": "string"
 							}
 						],
-						"endline": 26,
+						"endline": 28,
 						"char": 24,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "execParams",
-						"line": 29,
+						"line": 31,
 						"comment": "Perform SQL query to DB\n",
 						"type": "immutable(Answer)(ref QueryParams qp)",
 						"parameters": [
@@ -2826,14 +2826,14 @@
 								]
 							}
 						],
-						"endline": 47,
+						"endline": 49,
 						"char": 24,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "sendQuery",
-						"line": 50,
+						"line": 52,
 						"comment": "Submits a command to the server without waiting for the result(s)\n",
 						"type": "void(string SQLcmd)",
 						"parameters": [
@@ -2842,14 +2842,14 @@
 								"type": "string"
 							}
 						],
-						"endline": 54,
+						"endline": 56,
 						"char": 10,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "sendQueryParams",
-						"line": 57,
+						"line": 59,
 						"comment": "Submits a command and separate parameters to the server without waiting for the result(s)\n",
 						"type": "void(ref QueryParams qp)",
 						"parameters": [
@@ -2862,14 +2862,14 @@
 								]
 							}
 						],
-						"endline": 72,
+						"endline": 74,
 						"char": 10,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "sendQueryPrepared",
-						"line": 75,
+						"line": 77,
 						"comment": "Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)\n",
 						"type": "void(ref QueryParams qp)",
 						"parameters": [
@@ -2882,24 +2882,24 @@
 								]
 							}
 						],
-						"endline": 89,
+						"endline": 91,
 						"char": 10,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "getNextNotify",
-						"line": 92,
+						"line": 94,
 						"comment": "Returns null if no notifies was received\n",
 						"type": "Notify()",
-						"endline": 97,
+						"endline": 99,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "prepare",
-						"line": 101,
+						"line": 103,
 						"comment": "Submits a request to create a prepared statement with the given parameters, and waits for completion.\nReturns: Result of query preparing\n",
 						"type": "immutable(Result)(string statementName, string sqlStatement, in Oid[] oids = null)",
 						"parameters": [
@@ -2920,14 +2920,14 @@
 								"default": "null"
 							}
 						],
-						"endline": 115,
+						"endline": 117,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "prepareEx",
-						"line": 120,
+						"line": 122,
 						"comment": "Submits a request to create a prepared statement with the given parameters, and waits for completion.\n\nThrows an exception if preparing failed.\n",
 						"type": "void(string statementName, string sqlStatement, in Oid[] oids = null)",
 						"parameters": [
@@ -2948,14 +2948,14 @@
 								"default": "null"
 							}
 						],
-						"endline": 126,
+						"endline": 128,
 						"char": 10,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "execPrepared",
-						"line": 129,
+						"line": 131,
 						"comment": "Submits a request to execute a prepared statement with given parameters, and waits for completion.\n",
 						"type": "immutable(Answer)(ref QueryParams qp)",
 						"parameters": [
@@ -2968,14 +2968,14 @@
 								]
 							}
 						],
-						"endline": 146,
+						"endline": 148,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "sendPrepare",
-						"line": 149,
+						"line": 151,
 						"comment": "Sends a request to create a prepared statement with the given parameters, without waiting for completion.\n",
 						"type": "void(string statementName, string sqlStatement, in Oid[] oids = null)",
 						"parameters": [
@@ -2996,14 +2996,14 @@
 								"default": "null"
 							}
 						],
-						"endline": 160,
+						"endline": 162,
 						"char": 10,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "describePrepared",
-						"line": 163,
+						"line": 165,
 						"comment": "Submits a request to obtain information about the specified prepared statement, and waits for completion.\n",
 						"type": "immutable(Answer)(string statementName)",
 						"parameters": [
@@ -3012,14 +3012,14 @@
 								"type": "string"
 							}
 						],
-						"endline": 171,
+						"endline": 173,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "sendDescribePrepared",
-						"line": 174,
+						"line": 176,
 						"comment": "Submits a request to obtain information about the specified prepared statement, without waiting for completion.\n",
 						"type": "void(string statementName)",
 						"parameters": [
@@ -3028,14 +3028,14 @@
 								"type": "string"
 							}
 						],
-						"endline": 179,
+						"endline": 181,
 						"char": 10,
 						"kind": "function"
 					}
 				],
 				"name": "Queries",
-				"line": 15,
-				"comment": "Extends Connection by adding query methods\n",
+				"line": 17,
+				"comment": "Extends Connection by adding query methods\n\nJust use it as Connection.* methods.\n",
 				"parameters": [],
 				"char": 7,
 				"kind": "template"
