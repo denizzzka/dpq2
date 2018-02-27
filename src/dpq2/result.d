@@ -12,7 +12,7 @@ import dpq2.exception;
 import derelict.pq.pq;
 
 import core.vararg;
-import std.string: toStringz, fromStringz;
+import std.string: toStringz;
 import std.exception: enforceEx;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
@@ -71,7 +71,7 @@ immutable class Result
     /// Text description of result status.
     string statusString()
     {
-        return PQresStatus(status).fromStringz.to!string;
+        return PQresStatus(status).to!string;
     }
 
     /// Returns the error message associated with the command, or an empty string if there was no error.
@@ -201,7 +201,7 @@ immutable class Answer : Result
                     __FILE__, __LINE__
                 );
 
-        return to!string(fromStringz(s));
+        return s.to!string;
     }
 
     /// Returns true if the column exists, false if not
