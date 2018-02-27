@@ -56,6 +56,7 @@
        |    /// Access to prepared statement name
        |    ///
        |    /// Use it to prepare queries
+       |    // FIXME: it is need to check in debug mode what sqlCommand is used in "SQL command" or "prepared statement" mode
 0000000|    @property string preparedStatementName() const { return sqlCommand; }
        |    /// ditto
       3|    @property void preparedStatementName(string s){ sqlCommand = s; }
