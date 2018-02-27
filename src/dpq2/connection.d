@@ -395,6 +395,7 @@ class Cancellation
 {
     private PGcancel* cancel;
 
+    ///
     this(Connection c)
     {
         cancel = PQgetCancel(c.conn);
@@ -403,6 +404,7 @@ class Cancellation
             throw new ConnectionException(c, __FILE__, __LINE__);
     }
 
+    ///
     ~this()
     {
         PQfreeCancel(cancel);
