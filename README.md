@@ -12,7 +12,7 @@ make convenient use PostgreSQL from D.
 
 [API documentation](https://denizzzka.github.io/dpq2/docs)
 
-_Please help us to make the documentation!_
+_Please help us to make documentation better!_
 
 Features
 --------
