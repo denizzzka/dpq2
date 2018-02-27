@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Enum ConvExceptionType</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dpq2
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">conv
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/numeric.html">numeric</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/time.html">time</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/connection.html">connection</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/oids.html">oids</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query.html">query</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/result.html">result</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dpq2/value.html">value</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Enum ConvExceptionType</h1><p>Conversion exception types
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">enum</span> <span class="typ">ConvExceptionType</span>
+				 <span class="pun">:</span> <span class="typ">int</span> <span class="pun">{ ... }</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Enum members</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td id="CORRUPTED_JSONB">
+								<code>CORRUPTED_JSONB</code>
+							</td>
+							<td>Corrupted JSONB value
+</td>
+						</tr>
+						<tr>
+							<td id="DATE_VALUE_OVERFLOW">
+								<code>DATE_VALUE_OVERFLOW</code>
+							</td>
+							<td>Date value isn't fits to Postgres binary Date value
+</td>
+						</tr>
+						<tr>
+							<td id="NOT_ARRAY">
+								<code>NOT_ARRAY</code>
+							</td>
+							<td>Format of the value isn't array
+</td>
+						</tr>
+						<tr>
+							<td id="NOT_BINARY">
+								<code>NOT_BINARY</code>
+							</td>
+							<td>Format of the column isn't binary
+</td>
+						</tr>
+						<tr>
+							<td id="NOT_IMPLEMENTED">
+								<code>NOT_IMPLEMENTED</code>
+							</td>
+							<td>Support of this type isn't implemented (or format isn't matches to specified D type)
+</td>
+						</tr>
+						<tr>
+							<td id="NOT_TEXT">
+								<code>NOT_TEXT</code>
+							</td>
+							<td>Format of the column isn't text string
+</td>
+						</tr>
+						<tr>
+							<td id="SIZE_MISMATCH">
+								<code>SIZE_MISMATCH</code>
+							</td>
+							<td>Result value size is not matched to the received Postgres value
+</td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

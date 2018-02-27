@@ -123,4 +123,17 @@
 <url><loc>http://127.0.0.1/dpq2/result/Row.this.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.toString.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/toString.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/ConvExceptionType.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.format.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.isArray.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.isNull.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.oidType.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.this.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.this.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/Value.toString.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/ValueConvException.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/ValueConvException.type.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/value/ValueFormat.html</loc></url>
 </urlset>

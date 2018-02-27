@@ -1709,5 +1709,239 @@
 		],
 		"comment": "Dealing with results of queries\n",
 		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/value.d",
+		"name": "dpq2.value",
+		"members": [
+			{
+				"name": "Value",
+				"line": 15,
+				"comment": "Represents table cell or argument value\n\nInternally it is a ubyte[].\nIf it returned by Answer methods it contains a reference to the data of\nthe server answer and it can not be accessed after Answer is destroyed.\n",
+				"members": [
+					{
+						"endchar": 5,
+						"name": "this",
+						"line": 34,
+						"comment": "ctor\n",
+						"deco": "FNaNcNfAhxE4dpq24oids7OidTypebxEQv5value11ValueFormatZSQBsQy5Value",
+						"parameters": [
+							{
+								"name": "data",
+								"deco": "Ah"
+							},
+							{
+								"name": "oidType",
+								"deco": "xE4dpq24oids7OidType"
+							},
+							{
+								"name": "isNull",
+								"deco": "b"
+							},
+							{
+								"name": "format",
+								"deco": "xE4dpq25value11ValueFormat",
+								"default": "cast(ValueFormat)1"
+							}
+						],
+						"endline": 40,
+						"originalType": "pure ref @safe (ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY)",
+						"char": 5,
+						"kind": "constructor"
+					},
+					{
+						"endchar": 5,
+						"name": "this",
+						"line": 43,
+						"comment": "Null Value constructor\n",
+						"deco": "FNaNcNfxE4dpq25value11ValueFormatxEQBa4oids7OidTypeZSQBsQBq5Value",
+						"parameters": [
+							{
+								"name": "format",
+								"deco": "xE4dpq25value11ValueFormat"
+							},
+							{
+								"name": "oidType",
+								"deco": "xE4dpq24oids7OidType"
+							}
+						],
+						"endline": 47,
+						"originalType": "pure ref @safe (in ValueFormat format, in OidType oidType)",
+						"char": 5,
+						"kind": "constructor"
+					},
+					{
+						"endchar": 9,
+						"name": "isNull",
+						"line": 52,
+						"comment": "Indicates if the value is NULL\n",
+						"deco": "xFNaNbNiNfZb",
+						"endline": 55,
+						"char": 14,
+						"kind": "function"
+					},
+					{
+						"endchar": 9,
+						"name": "isArray",
+						"line": 58,
+						"comment": "Indicates if the value is array type\n",
+						"deco": "xFNaNbNiNfZb",
+						"endline": 61,
+						"char": 14,
+						"kind": "function"
+					},
+					{
+						"endchar": 9,
+						"name": "oidType",
+						"line": 65,
+						"comment": "Returns Oid of the value\n",
+						"deco": "xFNaNbNiNfZE4dpq24oids7OidType",
+						"endline": 68,
+						"char": 17,
+						"kind": "function"
+					},
+					{
+						"endchar": 9,
+						"name": "format",
+						"line": 71,
+						"comment": "Returns ValueFormat representation (text or binary)\n",
+						"deco": "xFNaNbNiNfZE4dpq25value11ValueFormat",
+						"endline": 74,
+						"char": 21,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "toString",
+						"line": 93,
+						"comment": "\n",
+						"deco": "xFNeZAya",
+						"endline": 100,
+						"char": 12,
+						"kind": "function"
+					}
+				],
+				"char": 1,
+				"kind": "struct"
+			},
+			{
+				"members": [
+					{
+						"name": "TEXT",
+						"line": 122,
+						"value": "0",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "BINARY",
+						"line": 123,
+						"value": "1",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					}
+				],
+				"name": "ValueFormat",
+				"line": 121,
+				"comment": "\n",
+				"baseDeco": "i",
+				"char": 1,
+				"kind": "enum"
+			},
+			{
+				"members": [
+					{
+						"name": "NOT_ARRAY",
+						"line": 131,
+						"value": "0",
+						"comment": "Format of the value isn't array\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NOT_BINARY",
+						"line": 132,
+						"value": "1",
+						"comment": "Format of the column isn't binary\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NOT_TEXT",
+						"line": 133,
+						"value": "2",
+						"comment": "Format of the column isn't text string\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "NOT_IMPLEMENTED",
+						"line": 134,
+						"value": "3",
+						"comment": "Support of this type isn't implemented (or format isn't matches to specified D type)\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "SIZE_MISMATCH",
+						"line": 135,
+						"value": "4",
+						"comment": "Result value size is not matched to the received Postgres value\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "CORRUPTED_JSONB",
+						"line": 136,
+						"value": "5",
+						"comment": "Corrupted JSONB value\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "DATE_VALUE_OVERFLOW",
+						"line": 137,
+						"value": "6",
+						"comment": "Date value isn't fits to Postgres binary Date value\n",
+						"char": 5,
+						"kind": "enum member"
+					}
+				],
+				"name": "ConvExceptionType",
+				"line": 129,
+				"comment": "Conversion exception types\n",
+				"baseDeco": "i",
+				"char": 1,
+				"kind": "enum"
+			},
+			{
+				"members": [
+					{
+						"offset": 76,
+						"name": "type",
+						"line": 143,
+						"comment": "Exception type\n",
+						"deco": "xE4dpq25value17ConvExceptionType",
+						"originalType": "ConvExceptionType",
+						"char": 29,
+						"kind": "variable",
+						"storageClass": [
+							"const",
+							"@safe"
+						]
+					}
+				],
+				"name": "ValueConvException",
+				"line": 141,
+				"comment": "Value conversion exception\n",
+				"base": "std.conv.ConvException",
+				"char": 1,
+				"kind": "class"
+			}
+		],
+		"comment": "\n",
+		"kind": "module"
 	}
 ]

@@ -1,10 +1,17 @@
+///
 module dpq2.value;
-
-@safe:
 
 import dpq2.oids;
 
-/// Minimal Postgres value
+@safe:
+
+/**
+Represents table cell or argument value
+
+Internally it is a ubyte[].
+If it returned by Answer methods it contains a reference to the data of
+the server answer and it can not be accessed after Answer is destroyed.
+*/
 struct Value
 {
     private
@@ -23,6 +30,7 @@ struct Value
     // storage if it is to be used past the lifetime of the PGresult structure itself.
     // Thus, it is need to store reference to Answer here to ensure that result is still available.
 
+    /// ctor
     this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
     {
         this._data = data;
@@ -46,13 +54,14 @@ struct Value
             return _isNull;
         }
 
-        /// Indicates if the value is supported array type
-        bool isSupportedArray()
+        /// Indicates if the value is array type
+        bool isArray()
         {
             return dpq2.oids.isSupportedArray(oidType);
         }
+        alias isSupportedArray = isArray; //TODO: deprecate
 
-        /// Returns OidType of the value
+        /// Returns Oid of the value
         OidType oidType()
         {
             return _oidType;
@@ -80,7 +89,8 @@ struct Value
         return _data;
     }
 
-    debug string toString() const @trusted
+    ///
+    string toString() const @trusted
     {
         import vibe.data.bson: Bson;
         import dpq2.conv.to_bson;
@@ -90,7 +100,7 @@ struct Value
     }
 }
 
-@trusted unittest
+@system unittest
 {
     import dpq2.conv.to_d_types;
     import core.exception: AssertError;
@@ -107,9 +117,10 @@ struct Value
     assert(exceptionFlag);
 }
 
+///
 enum ValueFormat : int {
-    TEXT,
-    BINARY
+    TEXT, ///
+    BINARY ///
 }
 
 import std.conv: to, ConvException;
@@ -126,6 +137,7 @@ enum ConvExceptionType
     DATE_VALUE_OVERFLOW, /// Date value isn't fits to Postgres binary Date value
 }
 
+/// Value conversion exception
 class ValueConvException : ConvException
 {
     const ConvExceptionType type; /// Exception type
