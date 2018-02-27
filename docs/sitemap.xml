@@ -46,6 +46,8 @@
 <url><loc>http://127.0.0.1/dpq2/connection/ConnectionException.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/ConnectionStart.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/connStringCheck.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/exception.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/exception/Dpq2Exception.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/oids.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/oids/oidConvTo.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/oids/OidType.html</loc></url>

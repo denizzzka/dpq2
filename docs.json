@@ -648,6 +648,23 @@
 		"kind": "module"
 	},
 	{
+		"file": "src/dpq2/exception.d",
+		"name": "dpq2.exception",
+		"members": [
+			{
+				"members": [],
+				"name": "Dpq2Exception",
+				"line": 5,
+				"comment": "Base for all dpq2 exceptions classes\n",
+				"base": "object.Exception",
+				"char": 1,
+				"kind": "class"
+			}
+		],
+		"comment": "\n",
+		"kind": "module"
+	},
+	{
 		"file": "src/dpq2/oids.d",
 		"name": "dpq2.oids",
 		"members": [

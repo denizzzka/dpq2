@@ -1,3 +1,4 @@
+///
 module dpq2.exception;
 
 /// Base for all dpq2 exceptions classes
