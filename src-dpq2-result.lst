@@ -624,8 +624,10 @@
        |{
        |    private immutable PGnotify* n;
        |
-      2|    this(immutable PGnotify* pgn )
+      1|    package this(immutable PGnotify* pgn)
        |    {
+      1|        assert(pgn != null);
+       |
       1|        n = pgn;
       1|        cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
        |    }
@@ -636,18 +638,13 @@
        |    }
        |
        |    /// Returns notification condition name
-      2|    string name() { return to!string( n.relname ); }
+      1|    string name() { return to!string( n.relname ); }
        |
        |    /// Returns notification parameter
-      2|    string extra() { return to!string( n.extra ); }
+      1|    string extra() { return to!string( n.extra ); }
        |
        |    /// Returns process ID of notifying server process
 0000000|    size_t pid() { return n.be_pid; }
-       |
-       |    nothrow invariant()
-       |    {
-      6|        assert( n != null );
-       |    }
        |}
        |
        |/// Covers errors of Answer creation when data was not received due to syntax errors, etc

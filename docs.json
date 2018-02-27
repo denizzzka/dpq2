@@ -1608,30 +1608,30 @@
 					{
 						"endchar": 52,
 						"name": "name",
-						"line": 639,
+						"line": 641,
 						"comment": "Returns notification condition name\n",
 						"deco": "FZAya",
-						"endline": 639,
+						"endline": 641,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 51,
 						"name": "extra",
-						"line": 642,
+						"line": 644,
 						"comment": "Returns notification parameter\n",
 						"deco": "FZAya",
-						"endline": 642,
+						"endline": 644,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 37,
 						"name": "pid",
-						"line": 645,
+						"line": 647,
 						"comment": "Returns process ID of notifying server process\n",
 						"deco": "FZm",
-						"endline": 645,
+						"endline": 647,
 						"originalType": "size_t()",
 						"char": 12,
 						"kind": "function"
@@ -1643,7 +1643,7 @@
 			{
 				"members": [],
 				"name": "ResponseException",
-				"line": 654,
+				"line": 651,
 				"comment": "Covers errors of Answer creation when data was not received due to syntax errors, etc\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -1653,7 +1653,7 @@
 				"members": [
 					{
 						"name": "FATAL_ERROR",
-						"line": 673,
+						"line": 670,
 						"value": "0",
 						"comment": "\n",
 						"char": 5,
@@ -1661,7 +1661,7 @@
 					},
 					{
 						"name": "COLUMN_NOT_FOUND",
-						"line": 674,
+						"line": 671,
 						"value": "1",
 						"comment": "Column is not found\n",
 						"char": 5,
@@ -1669,7 +1669,7 @@
 					},
 					{
 						"name": "OUT_OF_RANGE",
-						"line": 675,
+						"line": 672,
 						"value": "2",
 						"comment": "\n",
 						"char": 5,
@@ -1677,7 +1677,7 @@
 					}
 				],
 				"name": "ExceptionType",
-				"line": 671,
+				"line": 668,
 				"comment": "Answer exception types\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -1688,7 +1688,7 @@
 					{
 						"offset": 76,
 						"name": "type",
-						"line": 681,
+						"line": 678,
 						"comment": "Exception type\n",
 						"deco": "xE4dpq26result13ExceptionType",
 						"originalType": "ExceptionType",
@@ -1700,7 +1700,7 @@
 					}
 				],
 				"name": "AnswerException",
-				"line": 679,
+				"line": 676,
 				"comment": "Covers errors of access to Answer data\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
