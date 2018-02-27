@@ -1,4 +1,5 @@
-﻿module dpq2.result;
+/// Dealing with results of queries
+module dpq2.result;
 
 public import dpq2.conv.to_d_types;
 public import dpq2.conv.to_bson;
@@ -61,26 +62,31 @@ immutable class Result
         result = r;
     }
 
+    /// Returns the result status of the command.
     ExecStatusType status() nothrow
     {
         return PQresultStatus(result);
     }
 
+    /// Text description of result status.
     string statusString()
     {
-        return to!string(fromStringz(PQresStatus(status)));
+        return PQresStatus(status).fromStringz.to!string;
     }
 
+    /// Returns the error message associated with the command, or an empty string if there was no error.
     string resultErrorMessage()
     {
-        return to!string( PQresultErrorMessage(result) );
+        return PQresultErrorMessage(result).to!string;
     }
 
+    /// Returns an individual field of an error report.
     string resultErrorField(int fieldcode)
     {
         return PQresultErrorField(result, fieldcode).to!string;
     }
 
+    /// Creates Answer object
     immutable(Answer) getAnswer()
     {
         return new immutable Answer(result);
@@ -152,6 +158,7 @@ immutable class Answer : Result
     ValueFormat columnFormat( const size_t colNum )
     {
         assertCol( colNum );
+
         return cast(ValueFormat) PQfformat(result, to!int(colNum));
     }
 
