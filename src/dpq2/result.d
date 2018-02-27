@@ -92,7 +92,8 @@ immutable class Result
         return new immutable Answer(result);
     }
 
-    debug string toString()
+    ///
+    string toString()
     {
         import std.ascii: newline;
 
@@ -170,12 +171,14 @@ immutable class Answer : Result
         return PQftype(result, to!int(colNum)).oid2oidType;
     }
 
-    bool isSupportedArray( const size_t colNum )
+    /// Checks if column type is array
+    bool isArray( const size_t colNum )
     {
         assertCol(colNum);
 
         return dpq2.oids.isSupportedArray(OID(colNum));
     }
+    alias isSupportedArray = isArray; //TODO: deprecated
 
     /// Returns column number by field name
     size_t columnNum( string columnName )
@@ -215,10 +218,7 @@ immutable class Answer : Result
     /// Returns row of cells
     immutable (Row) opIndex(in size_t row)
     {
-        return immutable Row(
-            cast(immutable)(this), // legal because this.ctor is immutable
-            row
-        );
+        return immutable Row(this, row);
     }
 
     /**
@@ -242,7 +242,8 @@ immutable class Answer : Result
         return PQparamtype(result, paramNum.to!uint).oid2oidType;
     }
 
-    debug override string toString()
+    ///
+    override string toString()
     {
         import std.ascii: newline;
 
@@ -286,6 +287,7 @@ immutable class Answer : Result
     }
 }
 
+/// Creates forward range from immutable Answer
 auto rangify(T)(T obj)
 {
     struct Rangify(T)
@@ -314,6 +316,7 @@ immutable struct Row
     private Answer answer;
     private size_t row;
 
+    ///
     this(immutable Answer answer, in size_t row)
     {
         answer.assertRow( row );
@@ -322,14 +325,16 @@ immutable struct Row
         this.row = row;
     }
 
-    /// Returns cell size
+    /// Returns the actual length of a field (cell) value in bytes.
     size_t size( const size_t col )
     {
         answer.assertCol(col);
+
         return PQgetlength(answer.result, to!int(row), to!int(col));
     }
 
-    /// Value NULL checking
+    /// Checks if value is NULL
+    ///
     /// Do not confuse it with Nullable's isNull method
     bool isNULL( const size_t col )
     {
@@ -338,6 +343,7 @@ immutable struct Row
         return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
     }
 
+    /// Returns cell value by column number
     immutable (Value) opIndex(in size_t col)
     {
         answer.assertCoords( Coords( row, col ) );
@@ -354,6 +360,7 @@ immutable struct Row
         return cast(immutable) r;
     }
 
+    /// Returns cell value by field name
     immutable (Value) opIndex(in string column)
     {
         return opIndex(columnNum(column));
@@ -374,7 +381,8 @@ immutable struct Row
     /// Returns column count
     size_t length() { return answer.columnCount(); }
 
-    debug string toString()
+    ///
+    string toString()
     {
         string res;
 
@@ -402,7 +410,8 @@ immutable (Array) asArray(immutable(Value) v)
     return immutable Array(v);
 }
 
-debug string toString(immutable Value v)
+///
+string toString(immutable Value v)
 {
     import vibe.data.bson: Bson;
 
