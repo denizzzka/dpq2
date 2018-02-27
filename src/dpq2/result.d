@@ -316,6 +316,7 @@ immutable struct Row
     private Answer answer;
     private size_t row;
 
+    ///
     this(immutable Answer answer, in size_t row)
     {
         answer.assertRow( row );
@@ -324,14 +325,16 @@ immutable struct Row
         this.row = row;
     }
 
-    /// Returns cell size
+    /// Returns the actual length of a field (cell) value in bytes.
     size_t size( const size_t col )
     {
         answer.assertCol(col);
+
         return PQgetlength(answer.result, to!int(row), to!int(col));
     }
 
-    /// Value NULL checking
+    /// Checks if value is NULL
+    ///
     /// Do not confuse it with Nullable's isNull method
     bool isNULL( const size_t col )
     {
@@ -340,6 +343,7 @@ immutable struct Row
         return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
     }
 
+    /// Returns cell value by column number
     immutable (Value) opIndex(in size_t col)
     {
         answer.assertCoords( Coords( row, col ) );
@@ -356,6 +360,7 @@ immutable struct Row
         return cast(immutable) r;
     }
 
+    /// Returns cell value by field name
     immutable (Value) opIndex(in string column)
     {
         return opIndex(columnNum(column));
