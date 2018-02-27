@@ -381,7 +381,8 @@ immutable struct Row
     /// Returns column count
     size_t length() { return answer.columnCount(); }
 
-    debug string toString()
+    ///
+    string toString()
     {
         string res;
 
