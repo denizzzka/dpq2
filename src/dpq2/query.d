@@ -1,4 +1,4 @@
-/// Extends Connection by adding query methods
+/// Query methods
 module dpq2.query;
 
 public import dpq2.args;
@@ -11,6 +11,7 @@ import derelict.pq.pq;
 import core.time: Duration, dur;
 import std.exception: enforce;
 
+/// Extends Connection by adding query methods
 mixin template Queries()
 {
     /// Perform SQL query to DB
