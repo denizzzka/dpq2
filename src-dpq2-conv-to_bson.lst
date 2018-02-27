@@ -1,3 +1,4 @@
+       |///
        |module dpq2.conv.to_bson;
        |
        |import dpq2.value;
@@ -11,6 +12,7 @@
        |import std.bitmanip: bigEndianToNative;
        |import std.conv: to;
        |
+       |///
        |Bson as(T)(in Value v, immutable TimeZone tz = null)
        |if(is(T == Bson))
        |{

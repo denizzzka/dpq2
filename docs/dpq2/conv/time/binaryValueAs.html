@@ -50,6 +50,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../../dpq2/conv/time.html">time</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dpq2/conv/to_bson.html">to_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dpq2/conv/to_d_types.html">to_d_types</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li>
@@ -133,9 +143,6 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</li>
 					</ul>
 				</nav><h2 id="0">Function binaryValueAs</h2><p>Returns value timestamp with time zone as SysTime
-    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
-    It means that PG value will have 10 times lower precision.
-    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
@@ -151,7 +158,12 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</code>
 				</div>
-				<section><p>Because of these differences, it can happen that database value will not fit to the SysTime range of values.
+				<section><p>Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.
+    It means that PG value will have 10 times lower precision.
+    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.
+</p>
+
+<p>    Because of these differences, it can happen that database value will not fit to the SysTime range of values.
 </p>
 </section>
 

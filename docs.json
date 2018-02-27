@@ -923,7 +923,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 30,
+						"line": 31,
 						"type": "@trusted SysTime(in Value v)",
 						"parameters": [
 							{
@@ -934,14 +934,14 @@
 								]
 							}
 						],
-						"endline": 42,
+						"endline": 43,
 						"char": 9,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 30,
-				"comment": "    Returns value timestamp with time zone as SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n\n    Because of these differences, it can happen that database value will not fit to the SysTime range of values.\n",
+				"line": 31,
+				"comment": "    Returns value timestamp with time zone as SysTime\n\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n\n    Because of these differences, it can happen that database value will not fit to the SysTime range of values.\n",
 				"parameters": [
 					{
 						"name": "T",
@@ -957,7 +957,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 47,
+						"line": 48,
 						"type": "@trusted Date(in Value v)",
 						"parameters": [
 							{
@@ -968,13 +968,13 @@
 								]
 							}
 						],
-						"endline": 62,
+						"endline": 63,
 						"char": 6,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 47,
+				"line": 48,
 				"comment": "Returns value data as native Date\n",
 				"parameters": [
 					{
@@ -991,7 +991,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 65,
+						"line": 66,
 						"type": "@trusted TimeOfDay(in Value v)",
 						"parameters": [
 							{
@@ -1002,13 +1002,13 @@
 								]
 							}
 						],
-						"endline": 76,
+						"endline": 77,
 						"char": 11,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 65,
+				"line": 66,
 				"comment": "Returns value time without time zone as native TimeOfDay\n",
 				"parameters": [
 					{
@@ -1025,7 +1025,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 79,
+						"line": 80,
 						"type": "@trusted TimeStamp(in Value v)",
 						"parameters": [
 							{
@@ -1036,13 +1036,13 @@
 								]
 							}
 						],
-						"endline": 92,
+						"endline": 93,
 						"char": 11,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 79,
+				"line": 80,
 				"comment": "Returns value timestamp without time zone as TimeStamp\n",
 				"parameters": [
 					{
@@ -1059,7 +1059,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 95,
+						"line": 96,
 						"type": "@trusted TimeStampUTC(in Value v)",
 						"parameters": [
 							{
@@ -1070,13 +1070,13 @@
 								]
 							}
 						],
-						"endline": 108,
+						"endline": 109,
 						"char": 14,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 95,
+				"line": 96,
 				"comment": "Returns value timestamp with time zone as TimeStampUTC\n",
 				"parameters": [
 					{
@@ -1093,7 +1093,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 111,
+						"line": 112,
 						"type": "@trusted DateTime(in Value v)",
 						"parameters": [
 							{
@@ -1104,13 +1104,13 @@
 								]
 							}
 						],
-						"endline": 115,
+						"endline": 116,
 						"char": 10,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 111,
+				"line": 112,
 				"comment": "Returns value timestamp without time zone as DateTime (it drops the fracSecs from the database value)\n",
 				"parameters": [
 					{
@@ -1126,11 +1126,11 @@
 				"members": [
 					{
 						"name": "TTimeStamp",
-						"line": 120,
+						"line": 121,
 						"members": [
 							{
 								"name": "dateTime",
-								"line": 122,
+								"line": 123,
 								"comment": "date and time of TimeStamp\n",
 								"type": "DateTime",
 								"char": 14,
@@ -1138,7 +1138,7 @@
 							},
 							{
 								"name": "fracSec",
-								"line": 123,
+								"line": 124,
 								"comment": "fractional seconds\n",
 								"type": "Duration",
 								"char": 14,
@@ -1147,10 +1147,10 @@
 							{
 								"endchar": 5,
 								"name": "max",
-								"line": 136,
+								"line": 137,
 								"comment": "Returns the TimeStamp farthest in the future which is representable by TimeStamp.\n",
 								"type": "()",
-								"endline": 139,
+								"endline": 140,
 								"char": 12,
 								"kind": "function",
 								"storageClass": [
@@ -1160,10 +1160,10 @@
 							{
 								"endchar": 5,
 								"name": "min",
-								"line": 142,
+								"line": 143,
 								"comment": "Returns the TimeStamp farthest in the past which is representable by TimeStamp.\n",
 								"type": "()",
-								"endline": 145,
+								"endline": 146,
 								"char": 12,
 								"kind": "function",
 								"storageClass": [
@@ -1173,10 +1173,10 @@
 							{
 								"endchar": 5,
 								"name": "toString",
-								"line": 148,
+								"line": 149,
 								"comment": "\n",
 								"type": "const string()",
-								"endline": 151,
+								"endline": 152,
 								"char": 12,
 								"kind": "function"
 							}
@@ -1186,7 +1186,7 @@
 					}
 				],
 				"name": "TTimeStamp",
-				"line": 120,
+				"line": 121,
 				"comment": "    Structure to represent PostgreSQL Timestamp with/without time zone\n",
 				"parameters": [
 					{
@@ -1200,7 +1200,7 @@
 			},
 			{
 				"name": "TimeStamp",
-				"line": 154,
+				"line": 155,
 				"comment": "Unknown TZ timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
 				"char": 1,
@@ -1208,7 +1208,7 @@
 			},
 			{
 				"name": "TimeStampUTC",
-				"line": 155,
+				"line": 156,
 				"comment": "Assumed that this is UTC timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
 				"char": 1,
@@ -1216,6 +1216,255 @@
 			}
 		],
 		"comment": "   PostgreSQL time types binary format.\n\n   Copyright: © 2014 DSoftOut\n   Authors: NCrashed <ncrashed@gmail.com>\n",
+		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/conv/to_bson.d",
+		"name": "dpq2.conv.to_bson",
+		"members": [
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "as",
+						"line": 16,
+						"type": "Bson(in Value v, immutable TimeZone tz = null)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "Value",
+								"storageClass": [
+									"in"
+								]
+							},
+							{
+								"name": "tz",
+								"type": "TimeZone",
+								"storageClass": [
+									"immutable"
+								],
+								"default": "null"
+							}
+						],
+						"endline": 30,
+						"char": 6,
+						"kind": "function"
+					}
+				],
+				"name": "as",
+				"line": 16,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(T == Bson)",
+				"char": 6,
+				"kind": "template"
+			}
+		],
+		"comment": "\n",
+		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/conv/to_d_types.d",
+		"name": "dpq2.conv.to_d_types",
+		"members": [
+			{
+				"name": "PGboolean",
+				"line": 26,
+				"comment": "boolean\n",
+				"deco": "b",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGsmallint",
+				"line": 27,
+				"comment": "smallint\n",
+				"deco": "s",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGinteger",
+				"line": 28,
+				"comment": "integer\n",
+				"deco": "i",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGbigint",
+				"line": 29,
+				"comment": "bigint\n",
+				"deco": "l",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGreal",
+				"line": 30,
+				"comment": "real\n",
+				"deco": "f",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGdouble_precision",
+				"line": 31,
+				"comment": "double precision\n",
+				"deco": "d",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGtext",
+				"line": 32,
+				"comment": "text\n",
+				"deco": "Aya",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGnumeric",
+				"line": 33,
+				"comment": "numeric represented as string\n",
+				"deco": "Aya",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGbytea",
+				"line": 34,
+				"comment": "bytea\n",
+				"deco": "xAh",
+				"char": 1,
+				"kind": "alias",
+				"storageClass": [
+					"const"
+				]
+			},
+			{
+				"name": "PGuuid",
+				"line": 35,
+				"comment": "UUID\n",
+				"deco": "S3std4uuid4UUID",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGdate",
+				"line": 36,
+				"comment": "Date (no time of day)\n",
+				"deco": "S3std8datetime4date4Date",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGtime_without_time_zone",
+				"line": 37,
+				"comment": "Time of day (no date)\n",
+				"deco": "S3std8datetime4date9TimeOfDay",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGtimestamp",
+				"line": 38,
+				"comment": "Both date and time without time zone\n",
+				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGtimestamptz",
+				"line": 39,
+				"comment": "Both date and time stored in UTC time zone\n",
+				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGjson",
+				"line": 40,
+				"comment": "json or jsonb\n",
+				"deco": "S4vibe4data4json4Json",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "as",
+						"line": 56,
+						"type": "pure @trusted string(in Value v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "Value",
+								"storageClass": [
+									"in"
+								]
+							}
+						],
+						"endline": 76,
+						"char": 8,
+						"kind": "function"
+					}
+				],
+				"name": "as",
+				"line": 56,
+				"comment": "Returns cell value as native string type from text or binary formatted field\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(T == string)",
+				"char": 8,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "as",
+						"line": 79,
+						"type": "T(in Value v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "Value",
+								"storageClass": [
+									"in"
+								]
+							}
+						],
+						"endline": 92,
+						"char": 3,
+						"kind": "function"
+					}
+				],
+				"name": "as",
+				"line": 79,
+				"comment": "Returns value as D type value from binary formatted field\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "!is(T == string) && !is(T == Bson)",
+				"char": 3,
+				"kind": "template"
+			}
+		],
+		"comment": "\n",
 		"kind": "module"
 	},
 	{
