@@ -1,4 +1,9 @@
-﻿module dpq2;
+/**
+ * Main module
+ *
+ * Include it to use common functions.
+ */
+module dpq2;
 
 import derelict.pq.pq;
 debug import std.experimental.logger;
