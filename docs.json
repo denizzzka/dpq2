@@ -1320,7 +1320,7 @@
 						"endchar": 5,
 						"name": "size",
 						"line": 329,
-						"comment": "Returns the actual length of a field (cell) value in bytes.\n",
+						"comment": "Returns the actual length of a cell value in bytes.\n",
 						"deco": "yFxmZm",
 						"parameters": [
 							{
