@@ -42,4 +42,5 @@ var symbols = [
 {name: 'dpq2.oids', kind: "module", path: './dpq2/oids.html', attributes: []},
 {name: 'dpq2.oids.oidConvTo', kind: "functiondeclaration", path: './dpq2/oids/oidConvTo.html', attributes: []},
 {name: 'dpq2.oids.OidType', kind: "enumdeclaration", path: './dpq2/oids/OidType.html', attributes: []},
+{name: 'dpq2.query', kind: "module", path: './dpq2/query.html', attributes: []},
 ];

@@ -694,5 +694,12 @@
 		],
 		"comment": "   PostgreSQL major types oids.\n\n   Copyright: © 2014 DSoftOut\n   Authors: NCrashed <ncrashed@gmail.com>\n",
 		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/query.d",
+		"name": "dpq2.query",
+		"members": [],
+		"comment": "Extends Connection by adding query methods\n",
+		"kind": "module"
 	}
 ]

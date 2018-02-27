@@ -46,7 +46,7 @@
        |
        |    invariant
        |    {
-    401|        assert(conn !is null);
+    403|        assert(conn !is null);
        |    }
        |
        |    /// Makes a new connection to the database server
