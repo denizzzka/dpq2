@@ -314,3 +314,103 @@ if (is(T == Circle))
         v.data[16..24].bigEndianToNative!double
     );
 }
+
+unittest
+{
+    // binary write/read
+    {
+        auto pt = Point(1,2);
+        assert(pt.toValue.binaryValueAs!Point == pt);
+
+        auto ln = Line(1,2,3);
+        assert(ln.toValue.binaryValueAs!Line == ln);
+
+        auto lseg = LineSegment(Point(1,2),Point(3,4));
+        assert(lseg.toValue.binaryValueAs!LineSegment == lseg);
+
+        auto b = Box(Point(2,2), Point(1,1));
+        assert(b.toValue.binaryValueAs!Box == b);
+
+        auto p = Path(false, [Point(1,1), Point(2,2)]);
+        assert(p.toValue.binaryValueAs!Path == p);
+
+        p = Path(true, [Point(1,1), Point(2,2)]);
+        assert(p.toValue.binaryValueAs!Path == p);
+
+        auto poly = Polygon([Point(1,1), Point(2,2), Point(3,3)]);
+        assert(poly.toValue.binaryValueAs!Polygon == poly);
+
+        auto c = Circle(Point(1,2), 3);
+        assert(c.toValue.binaryValueAs!Circle == c);
+    }
+
+    // Invalid OID tests
+    {
+        import std.exception : assertThrown;
+
+        auto v = Point(1,1).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Point);
+
+        v = Line(1,2,3).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Line);
+
+        v = LineSegment(Point(1,1), Point(2,2)).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
+
+        v = Box(Point(1,1), Point(2,2)).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Box);
+
+        v = Path(true, [Point(1,1), Point(2,2)]).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Path);
+
+        v = Polygon([Point(1,1), Point(2,2)]).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+
+        v = Circle(Point(1,1), 3).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Circle);
+    }
+
+    // Invalid data size
+    {
+        import std.exception : assertThrown;
+
+        auto v = Point(1,1).toValue;
+        v._data = new ubyte[1];
+        assertThrown!ValueConvException(v.binaryValueAs!Point);
+
+        v = Line(1,2,3).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!Line);
+
+        v = LineSegment(Point(1,1), Point(2,2)).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
+
+        v = Box(Point(1,1), Point(2,2)).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!Box);
+
+        v = Path(true, [Point(1,1), Point(2,2)]).toValue;
+        v._data.length -= 16;
+        assertThrown!ValueConvException(v.binaryValueAs!Path);
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!Path);
+
+        v = Polygon([Point(1,1), Point(2,2)]).toValue;
+        v._data.length -= 16;
+        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+
+        v = Circle(Point(1,1), 3).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!Circle);
+    }
+}
