@@ -148,3 +148,12 @@ class ValueConvException : ConvException
         super(msg, file, line);
     }
 }
+
+package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
+{
+    throw new ValueConvException(
+            ConvExceptionType.NOT_IMPLEMENTED,
+            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
+            file, line
+        );
+}

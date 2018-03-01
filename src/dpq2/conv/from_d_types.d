@@ -3,6 +3,7 @@ module dpq2.conv.from_d_types;
 
 @safe:
 
+import dpq2.conv.geometric : toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, OidType;
 import dpq2.value : Value, ValueFormat;
