@@ -21,7 +21,8 @@ private template GetRvalueOfMember(T, string memberName)
     alias GetRvalueOfMember = R;
 }
 
-private bool isValidPointType(T)()
+///
+bool isValidPointType(T)()
 {
     static if(hasMember!(T, "x") && hasMember!(T, "y"))
     {
@@ -33,7 +34,8 @@ private bool isValidPointType(T)()
         return false;
 }
 
-private bool isValidBoxType(T)()
+///
+bool isValidBoxType(T)()
 {
     //~ static if(hasMember!(T, "m2245s2") && hasMember!(T, "ma333"))
     //~ {
@@ -53,7 +55,8 @@ private bool isValidBoxType(T)()
         return false;
 }
 
-private bool isValidLineSegmentType(T)()
+///
+bool isValidLineSegmentType(T)()
 {
     // TODO: reduce duplication
     static if(__traits(compiles, isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b))))
@@ -62,7 +65,8 @@ private bool isValidLineSegmentType(T)()
         return false;
 }
 
-private bool isValidPolygon(T)()
+///
+bool isValidPolygon(T)()
 {
     return isArray!T && isValidPointType!(ElementType!T);
 }
