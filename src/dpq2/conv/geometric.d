@@ -1,16 +1,36 @@
+///
 module dpq2.conv.geometric;
 
 import dpq2.oids: OidType;
 import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
-import std.traits: ReturnType, isInstanceOf, isArray;
+import std.traits;
 import std.range.primitives: ElementType;
 
 @safe:
 
+private bool checkRvalueOfMember(RequiredType, string memberName, T)()
+{
+    static if(!hasMember!(T, memberName))
+        return false;
+    else
+    {
+        mixin("alias member = T."~memberName~";");
+
+        pragma(msg, typeof(member));
+
+        static if(isCallable!T)
+            return is(ReturnType!member == RequiredType);
+        else
+            return is(typeof(member) == RequiredType);
+    }
+}
+
 private bool isValidPointType(T)()
 {
-    return is(typeof(T.x) == double) && is(typeof(T.y) == double);
+    return
+        checkRvalueOfMember!(double, "x", T) &&
+        checkRvalueOfMember!(double, "y", T);
 }
 
 private bool isValidBoxType(T)()
