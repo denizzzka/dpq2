@@ -8,9 +8,8 @@ import std.exception : enforce;
 @safe:
 
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
+if(is(typeof(Vec2Ddouble.x) == double) && is(typeof(Vec2Ddouble.y) == double))
 {
-    //TODO: type of x and y check
-
     import std.algorithm : copy;
 
     auto rem = point.x.nativeToBigEndian.copy(target);
