@@ -16,8 +16,6 @@ private bool isValidPointType(T)()
 
 private bool isValidBoxType(T)()
 {
-    import gfm.math;
-
     // TODO: reduce code duplication, use hasMember
     static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
         return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
@@ -27,8 +25,6 @@ private bool isValidBoxType(T)()
 
 private bool isValidLineSegmentType(T)()
 {
-    import gfm.math;
-
     static if(__traits(compiles, isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b))))
         return isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b));
     else
