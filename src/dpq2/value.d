@@ -31,7 +31,7 @@ struct Value
     // Thus, it is need to store reference to Answer here to ensure that result is still available.
 
     /// ctor
-    this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
+    this(ubyte[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) pure
     {
         this._data = data;
         this._format = format;

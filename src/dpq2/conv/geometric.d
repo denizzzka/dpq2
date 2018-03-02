@@ -7,21 +7,18 @@ import std.exception : enforce;
 
 @safe:
 
+import gfm.math.vector;
 /// Point on a plane - (x,y)
-struct Point
+alias Point = vec2d;
+
+private auto serialize(T)(Point point, T target)
 {
-    double x;
-    double y;
+    import std.algorithm : copy;
 
-    private auto serialize(T)(T target)
-    {
-        import std.algorithm : copy;
+    auto rem = point.x.nativeToBigEndian.copy(target);
+    rem = point.y.nativeToBigEndian.copy(rem);
 
-        auto rem = x.nativeToBigEndian.copy(target);
-        rem = y.nativeToBigEndian.copy(rem);
-
-        return rem;
-    }
+    return rem;
 }
 
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
@@ -39,19 +36,15 @@ struct LineSegment
     Point end;
 }
 
+import gfm.math.box;
 /// Rectangular box - ((x1,y1),(x2,y2))
-struct Box
+alias Box = box2d;
+private auto serialize(T)(Box box, T target)
 {
-    Point high;
-    Point low;
+    auto rem = box.min.serialize(target);
+    rem = box.max.serialize(rem);
 
-    private auto serialize(T)(T target)
-    {
-        auto rem = high.serialize(target);
-        rem = low.serialize(rem);
-
-        return rem;
-    }
+    return rem;
 }
 
 /// Closed path (similar to polygon) - ((x1,y1),...)
@@ -67,25 +60,25 @@ struct Polygon
     Point[] points; /// Polygon's points
 
     /// Polygon's bounding box
-    @property Box bbox()
-    {
-        import std.algorithm : map, max, min, reduce;
-        enforce(points.length, "No points defined");
+    //~ @property Box bbox()
+    //~ {
+        //~ import std.algorithm : map, max, min, reduce;
+        //~ enforce(points.length, "No points defined");
 
-        auto lr = points.map!(a=>a.x).reduce!(min, max);
-        auto bt = points.map!(a=>a.y).reduce!(min, max);
+        //~ auto lr = points.map!(a=>a.x).reduce!(min, max);
+        //~ auto bt = points.map!(a=>a.y).reduce!(min, max);
 
-        return Box(Point(lr[1], bt[1]), Point(lr[0], bt[0]));
-    }
+        //~ return Box(Point(lr[1], bt[1]), Point(lr[0], bt[0]));
+    //~ }
 
-    unittest
-    {
-        auto poly = Polygon([Point(1,1), Point(2,2), Point(3,3)]);
-        assert(poly.bbox == Box(Point(3,3), Point(1,1)));
+    //~ unittest
+    //~ {
+        //~ auto poly = Polygon([Point(1,1), Point(2,2), Point(3,3)]);
+        //~ assert(poly.bbox == Box(Point(3,3), Point(1,1)));
 
-        poly = Polygon([Point(0,0), Point(1,1), Point(2,0)]);
-        assert(poly.bbox == Box(Point(2,1), Point(0,0)));
-    }
+        //~ poly = Polygon([Point(0,0), Point(1,1), Point(2,0)]);
+        //~ assert(poly.bbox == Box(Point(2,1), Point(0,0)));
+    //~ }
 }
 
 /// Circle - <(x,y),r> (center point and radius)
@@ -131,7 +124,7 @@ Value toValue(Box box)
     ubyte[] data = new ubyte[32];
     box.serialize(data);
 
-    return Value(data, OidType.Box, false);
+    return Value(data, OidType.Box);
 }
 
 Value toValue(Path path)
