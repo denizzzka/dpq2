@@ -162,8 +162,6 @@ private alias ET = ConvExceptionType;
 Vec2Ddouble binaryValueAsPoint(Vec2Ddouble)(in Value v)
 if(isValidPointType!Vec2Ddouble)
 {
-    // TODO: Vec2Ddouble x and y types check
-
     if(!(v.oidType == OidType.Point))
         throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
 
