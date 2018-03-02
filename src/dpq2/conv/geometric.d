@@ -60,12 +60,12 @@ if(isValidBoxType!Box)
 }
 
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
-//~ struct Line
-//~ {
-    //~ double a;
-    //~ double b;
-    //~ double c;
-//~ }
+struct Line
+{
+    double a;
+    double b;
+    double c;
+}
 
 /// Finite line segment - ((x1,y1),(x2,y2))
 //~ struct LineSegment
@@ -94,18 +94,18 @@ if(isValidBoxType!Box)
     //~ double radius;
 //~ }
 
-//~ Value toValue(Line line)
-//~ {
-    //~ import std.algorithm : copy;
+Value toValue(Line line)
+{
+    import std.algorithm : copy;
 
-    //~ ubyte[] data = new ubyte[24];
+    ubyte[] data = new ubyte[24];
 
-    //~ auto rem = line.a.nativeToBigEndian.copy(data);
-    //~ rem = line.b.nativeToBigEndian.copy(rem);
-    //~ rem = line.c.nativeToBigEndian.copy(rem);
+    auto rem = line.a.nativeToBigEndian.copy(data);
+    rem = line.b.nativeToBigEndian.copy(rem);
+    rem = line.c.nativeToBigEndian.copy(rem);
 
-    //~ return Value(data, OidType.Line, false);
-//~ }
+    return Value(data, OidType.Line, false);
+}
 
 //~ Value toValue(LineSegment lseg)
 //~ {
@@ -188,19 +188,18 @@ if(isValidPointType!Vec2Ddouble)
     return Vec2Ddouble(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
 }
 
-//~ T binaryValueAs(T)(in Value v)
-//~ if (is(T == Line))
-//~ {
-    //~ if(!(v.oidType == OidType.Line))
-        //~ throwTypeComplaint(v.oidType, "Line", __FILE__, __LINE__);
+T binaryValueAs(T)(in Value v)
+if (is(T == Line))
+{
+    if(!(v.oidType == OidType.Line))
+        throwTypeComplaint(v.oidType, "Line", __FILE__, __LINE__);
 
-    //~ if(!(v.data.length == 24))
-        //~ throw new AE(ET.SIZE_MISMATCH,
-            //~ "Value length isn't equal to Postgres Line size", __FILE__, __LINE__);
+    if(!(v.data.length == 24))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres Line size", __FILE__, __LINE__);
 
-    //~ return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
-//~ }
-
+    return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
+}
 
 //~ T binaryValueAs(T)(in Value v)
 //~ if (is(T == LineSegment))
@@ -317,8 +316,8 @@ unittest
         auto pt = Point(1,2);
         assert(pt.toValue.binaryValueAsPoint!Point == pt);
 
-        //~ auto ln = Line(1,2,3);
-        //~ assert(ln.toValue.binaryValueAs!Line == ln);
+        auto ln = Line(1,2,3);
+        assert(ln.toValue.binaryValueAs!Line == ln);
 
         //~ auto lseg = LineSegment(Point(1,2),Point(3,4));
         //~ assert(lseg.toValue.binaryValueAs!LineSegment == lseg);
@@ -347,9 +346,9 @@ unittest
         v.oidType = OidType.Text;
         assertThrown!ValueConvException(v.binaryValueAsPoint!Point);
 
-        //~ v = Line(1,2,3).toValue;
-        //~ v.oidType = OidType.Text;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Line);
+        v = Line(1,2,3).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!Line);
 
         //~ v = LineSegment(Point(1,1), Point(2,2)).toValue;
         //~ v.oidType = OidType.Text;
@@ -380,9 +379,9 @@ unittest
         v._data = new ubyte[1];
         assertThrown!ValueConvException(v.binaryValueAsPoint!Point);
 
-        //~ v = Line(1,2,3).toValue;
-        //~ v._data.length = 1;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Line);
+        v = Line(1,2,3).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!Line);
 
         //~ v = LineSegment(Point(1,1), Point(2,2)).toValue;
         //~ v._data.length = 1;
