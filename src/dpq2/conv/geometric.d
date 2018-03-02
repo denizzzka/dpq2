@@ -35,11 +35,6 @@ private bool isValidLineSegmentType(T)()
         return false;
 }
 
-//~ private bool isValidPathType(T)()
-//~ {
-    //~ return isInstanceOf!(Path, T) /*&& isValidPointType!(typeof(T.points))*/; //FIXME
-//~ }
-
 private bool isValidPolygon(T)()
 {
     return isArray!T && isValidPointType!(ElementType!T);
