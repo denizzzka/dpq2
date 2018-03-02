@@ -311,10 +311,10 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        import dpq2.conv.geometric: InstancesForIntegrationTest, Circle, Line, Path;
+        import dpq2.conv.geometric: InstancesForIntegrationTest;
         mixin InstancesForIntegrationTest;
 
-        //~ C!Point(Point(1,2), "point", "'(1,2)'");
+        C!Point(Point(1,2), "point", "'(1,2)'");
         C!Line(Line(1,2,3), "line", "'{1,2,3}'");
         //~ C!PGlseg(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
         //~ C!PGbox(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");

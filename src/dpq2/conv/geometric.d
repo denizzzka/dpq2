@@ -177,7 +177,8 @@ if(isInstanceOf!(Circle, T))
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
-Vec2Ddouble binaryValueAsPoint(Vec2Ddouble)(in Value v)
+/// Convert to Point
+Vec2Ddouble binaryValueAs(Vec2Ddouble)(in Value v)
 if(isValidPointType!Vec2Ddouble)
 {
     if(!(v.oidType == OidType.Point))
@@ -330,6 +331,7 @@ version (integration_tests)
 mixin template InstancesForIntegrationTest()
 {
     import gfm.math;
+    import dpq2.conv.geometric: Circle, Path;
 
     alias Point = vec2d;
     alias Box = box2d;
@@ -360,7 +362,7 @@ unittest
     // binary write/read
     {
         auto pt = Point(1,2);
-        assert(pt.toValue.binaryValueAsPoint!Point == pt);
+        assert(pt.toValue.binaryValueAs!Point == pt);
 
         auto ln = Line(1,2,3);
         assert(ln.toValue.binaryValueAs!Line == ln);
@@ -390,7 +392,7 @@ unittest
 
         auto v = Point(1,1).toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAsPoint!Point);
+        assertThrown!ValueConvException(v.binaryValueAs!Point);
 
         v = Line(1,2,3).toValue;
         v.oidType = OidType.Text;
@@ -423,7 +425,7 @@ unittest
 
         auto v = Point(1,1).toValue;
         v._data = new ubyte[1];
-        assertThrown!ValueConvException(v.binaryValueAsPoint!Point);
+        assertThrown!ValueConvException(v.binaryValueAs!Point);
 
         v = Line(1,2,3).toValue;
         v._data.length = 1;
