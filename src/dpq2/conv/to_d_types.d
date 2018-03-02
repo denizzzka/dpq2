@@ -311,8 +311,8 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        import dpq2.conv.geometric: InstancesForIntegrationTest;
-        mixin InstancesForIntegrationTest;
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
+        mixin GeometricInstancesForIntegrationTest;
 
         C!Point(Point(1,2), "point", "'(1,2)'");
         C!Line(Line(1,2,3), "line", "'{1,2,3}'");
@@ -321,6 +321,6 @@ public void _integration_test( string connParam ) @system
         C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
         C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
         C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
-        //~ C!PGcircle(Circle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+        C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
     }
 }

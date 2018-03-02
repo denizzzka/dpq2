@@ -328,7 +328,7 @@ if(isInstanceOf!(Circle, T))
 }
 
 version (integration_tests)
-mixin template InstancesForIntegrationTest()
+mixin template GeometricInstancesForIntegrationTest()
 {
     @safe:
 
@@ -359,7 +359,7 @@ mixin template InstancesForIntegrationTest()
 version (integration_tests)
 unittest
 {
-    mixin InstancesForIntegrationTest;
+    mixin GeometricInstancesForIntegrationTest;
 
     // binary write/read
     {
