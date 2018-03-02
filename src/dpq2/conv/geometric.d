@@ -4,7 +4,7 @@ import dpq2.oids: OidType;
 import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.exception: enforce;
-import std.traits: ReturnType;
+import std.traits: ReturnType, isInstanceOf;
 
 @safe:
 
@@ -32,6 +32,11 @@ private bool isValidLineSegmentType(T)()
         return isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b));
     else
         return false;
+}
+
+private bool isValidPathType(T)()
+{
+    return isInstanceOf!(Path, T) /*&& isValidPointType!(typeof(T.points))*/; //FIXME
 }
 
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
@@ -79,12 +84,12 @@ struct Line
     double c;
 }
 
-/// Closed path (similar to polygon) - ((x1,y1),...)
-//~ struct Path
-//~ {
-    //~ bool closed;
-    //~ Point[] points;
-//~ }
+///
+struct Path(Point)
+{
+    bool isClosed;
+    Point[] points;
+}
 
 /// Polygon (similar to closed path) - ((x1,y1),...)
 //~ struct Polygon
@@ -123,24 +128,25 @@ if(isValidLineSegmentType!LineSegment)
     return Value(data, OidType.LineSegment, false);
 }
 
-//~ Value toValue(Path path)
-//~ {
-    //~ import std.algorithm : copy;
+Value toValue(Path)(Path path)
+if(isValidPathType!Path)
+{
+    import std.algorithm : copy;
 
-    //~ enforce(path.points.length >= 1, "At least one point is needed for Path");
+    enforce(path.points.length >= 1, "At least one point is needed for Path");
 
-    //~ ubyte[] data = new ubyte[path.points.length * 16 + 5];
+    ubyte[] data = new ubyte[path.points.length * 16 + 5];
 
-    //~ auto rem = (cast(ubyte)(path.closed ? 1 : 0)).nativeToBigEndian.copy(data);
-    //~ rem = (cast(int)path.points.length).nativeToBigEndian.copy(rem);
+    auto rem = (cast(ubyte)(path.isClosed ? 1 : 0)).nativeToBigEndian.copy(data);
+    rem = (cast(int)path.points.length).nativeToBigEndian.copy(rem);
 
-    //~ foreach (ref p; path.points)
-    //~ {
-        //~ rem = p.serialize(rem);
-    //~ }
+    foreach (ref p; path.points)
+    {
+        rem = p.serializePoint(rem);
+    }
 
-    //~ return Value(data, OidType.Path, false);
-//~ }
+    return Value(data, OidType.Path, false);
+}
 
 //~ Value toValue(Polygon poly)
 //~ {
@@ -243,33 +249,36 @@ if(isValidBoxType!Box)
     return Box(min, max);
 }
 
-//~ T binaryValueAs(T)(in Value v)
-//~ if (is(T == Path))
-//~ {
-    //~ import std.array : uninitializedArray;
+Path binaryValueAs(Path)(in Value v)
+if(isValidPathType!Path)
+{
+    import std.array : uninitializedArray;
 
-    //~ if(!(v.oidType == OidType.Path))
-        //~ throwTypeComplaint(v.oidType, "Path", __FILE__, __LINE__);
+    if(!(v.oidType == OidType.Path))
+        throwTypeComplaint(v.oidType, "Path", __FILE__, __LINE__);
 
-    //~ if(!((v.data.length - 5) % 16 == 0))
-        //~ throw new AE(ET.SIZE_MISMATCH,
-            //~ "Value length isn't equal to Postgres Path size", __FILE__, __LINE__);
+    if(!((v.data.length - 5) % 16 == 0))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres Path size", __FILE__, __LINE__);
 
-    //~ T res;
-    //~ res.closed = v.data[0..1].bigEndianToNative!byte == 1;
-    //~ int len = v.data[1..5].bigEndianToNative!int;
+    Path res;
+    res.isClosed = v.data[0..1].bigEndianToNative!byte == 1;
+    int len = v.data[1..5].bigEndianToNative!int;
 
-    //~ if (len != (v.data.length - 5)/16)
-        //~ throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
+    if (len != (v.data.length - 5)/16)
+        throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
 
-    //~ res.points = uninitializedArray!(Point[])(len);
-    //~ for (int i=0; i<len; i++)
-    //~ {
-        //~ res.points[i] = v.data[(i*16+5)..(i*16+16+5)].binaryValueAs!Point;
-    //~ }
+    alias Point = typeof(Path.points[0]);
 
-    //~ return res;
-//~ }
+    res.points = uninitializedArray!(Point[])(len);
+    for (int i=0; i<len; i++)
+    {
+        const ubyte[] b = v.data[ i*16+5 .. i*16+5+16 ];
+        res.points[i] = b[0..16].pointFromBytes!Point;
+    }
+
+    return res;
+}
 
 //~ T binaryValueAs(T)(in Value v)
 //~ if (is(T == Polygon))
@@ -321,7 +330,6 @@ unittest
 
     alias Point = vec2d;
     alias Box = box2d;
-
     static struct LineSegment
     {
         seg2d seg;
@@ -336,6 +344,7 @@ unittest
             seg.b = b;
         }
     }
+    alias TestPath = Path!Point;
 
     // binary write/read
     {
@@ -351,11 +360,11 @@ unittest
         auto b = Box(Point(2,2), Point(1,1));
         assert(b.toValue.binaryValueAsBox!Box == b);
 
-        //~ auto p = Path(false, [Point(1,1), Point(2,2)]);
-        //~ assert(p.toValue.binaryValueAs!Path == p);
+        auto p = TestPath(false, [Point(1,1), Point(2,2)]);
+        assert(p.toValue.binaryValueAs!TestPath == p);
 
-        //~ p = Path(true, [Point(1,1), Point(2,2)]);
-        //~ assert(p.toValue.binaryValueAs!Path == p);
+        p = TestPath(true, [Point(1,1), Point(2,2)]);
+        assert(p.toValue.binaryValueAs!TestPath == p);
 
         //~ auto poly = Polygon([Point(1,1), Point(2,2), Point(3,3)]);
         //~ assert(poly.toValue.binaryValueAs!Polygon == poly);
@@ -384,9 +393,9 @@ unittest
         v.oidType = OidType.Text;
         assertThrown!ValueConvException(v.binaryValueAsBox!Box);
 
-        //~ v = Path(true, [Point(1,1), Point(2,2)]).toValue;
-        //~ v.oidType = OidType.Text;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Path);
+        v = TestPath(true, [Point(1,1), Point(2,2)]).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!TestPath);
 
         //~ v = Polygon([Point(1,1), Point(2,2)]).toValue;
         //~ v.oidType = OidType.Text;
@@ -417,11 +426,11 @@ unittest
         v._data.length = 1;
         assertThrown!ValueConvException(v.binaryValueAsBox!Box);
 
-        //~ v = Path(true, [Point(1,1), Point(2,2)]).toValue;
-        //~ v._data.length -= 16;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Path);
-        //~ v._data.length = 1;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Path);
+        v = TestPath(true, [Point(1,1), Point(2,2)]).toValue;
+        v._data.length -= 16;
+        assertThrown!ValueConvException(v.binaryValueAs!TestPath);
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!TestPath);
 
         //~ v = Polygon([Point(1,1), Point(2,2)]).toValue;
         //~ v._data.length -= 16;
