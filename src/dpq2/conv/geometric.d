@@ -45,7 +45,7 @@ private bool isValidBoxType(T)()
     //~ else
         //~ return false;
 
-    // TODO: swizzle in gfm.math.vector works wrong
+    // TODO: swizzle in gfm.math.vector works wrong: https://github.com/d-gamedev-team/gfm/issues/195
     // TODO: GetRvalueOfMember can be simplified?
     static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
         return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
