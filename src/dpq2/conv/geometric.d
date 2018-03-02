@@ -45,6 +45,11 @@ private bool isValidPolygon(T)()
     return isArray!T && isValidPointType!(ElementType!T);
 }
 
+private bool isValidCircle(T)()
+{
+    return isInstanceOf!(Circle, T);
+}
+
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
 if(isValidPointType!Vec2Ddouble)
 {
@@ -97,18 +102,13 @@ struct Path(Point)
     Point[] points;
 }
 
-/// Polygon (similar to closed path) - ((x1,y1),...)
-//~ struct Polygon
-//~ {
-    //~ Point[] points; /// Polygon's points
-//~ }
-
-/// Circle - <(x,y),r> (center point and radius)
-//~ struct Circle
-//~ {
-    //~ Point center;
-    //~ double radius;
-//~ }
+///
+struct Circle(Point)
+if(isValidPointType!Point)
+{
+    Point center; ///
+    double radius; ///
+}
 
 Value toValue(Line line)
 {
@@ -170,16 +170,17 @@ if(isValidPolygon!Polygon)
     return Value(data, OidType.Polygon, false);
 }
 
-//~ Value toValue(Circle c)
-//~ {
-    //~ import std.algorithm : copy;
+Value toValue(Circle)(Circle c)
+if(isValidCircle!Circle)
+{
+    import std.algorithm : copy;
 
-    //~ ubyte[] data = new ubyte[24];
-    //~ auto rem = c.center.serialize(data);
-    //~ c.radius.nativeToBigEndian.copy(rem);
+    ubyte[] data = new ubyte[24];
+    auto rem = c.center.serializePoint(data);
+    c.radius.nativeToBigEndian.copy(rem);
 
-    //~ return Value(data, OidType.Circle, false);
-//~ }
+    return Value(data, OidType.Circle, false);
+}
 
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
@@ -315,21 +316,23 @@ if(isValidPolygon!Polygon)
     return res;
 }
 
-//~ T binaryValueAs(T)(in Value v)
-//~ if (is(T == Circle))
-//~ {
-    //~ if(!(v.oidType == OidType.Circle))
-        //~ throwTypeComplaint(v.oidType, "Circle", __FILE__, __LINE__);
+Circle binaryValueAs(Circle)(in Value v)
+if(isValidCircle!Circle)
+{
+    if(!(v.oidType == OidType.Circle))
+        throwTypeComplaint(v.oidType, "Circle", __FILE__, __LINE__);
 
-    //~ if(!(v.data.length == 24))
-        //~ throw new AE(ET.SIZE_MISMATCH,
-            //~ "Value length isn't equal to Postgres Circle size", __FILE__, __LINE__);
+    if(!(v.data.length == 24))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres Circle size", __FILE__, __LINE__);
 
-    //~ return Circle(
-        //~ v.data[0..16].binaryValueAs!Point,
-        //~ v.data[16..24].bigEndianToNative!double
-    //~ );
-//~ }
+    alias Point = typeof(Circle.center);
+
+    return Circle(
+        v.data[0..16].pointFromBytes!Point,
+        v.data[16..24].bigEndianToNative!double
+    );
+}
 
 unittest
 {
@@ -354,6 +357,7 @@ unittest
     }
     alias TestPath = Path!Point;
     alias Polygon = Point[];
+    alias TestCircle = Circle!Point;
 
     // binary write/read
     {
@@ -378,8 +382,8 @@ unittest
         Polygon poly = [Point(1,1), Point(2,2), Point(3,3)];
         assert(poly.toValue.binaryValueAsPolygon!Polygon == poly);
 
-        //~ auto c = Circle(Point(1,2), 3);
-        //~ assert(c.toValue.binaryValueAs!Circle == c);
+        auto c = TestCircle(Point(1,2), 3);
+        assert(c.toValue.binaryValueAs!TestCircle == c);
     }
 
     // Invalid OID tests
@@ -410,9 +414,9 @@ unittest
         v.oidType = OidType.Text;
         assertThrown!ValueConvException(v.binaryValueAsPolygon!Polygon);
 
-        //~ v = Circle(Point(1,1), 3).toValue;
-        //~ v.oidType = OidType.Text;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Circle);
+        v = TestCircle(Point(1,1), 3).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAs!TestCircle);
     }
 
     // Invalid data size
@@ -447,8 +451,8 @@ unittest
         v._data.length = 1;
         assertThrown!ValueConvException(v.binaryValueAsPolygon!Polygon);
 
-        //~ v = Circle(Point(1,1), 3).toValue;
-        //~ v._data.length = 1;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Circle);
+        v = TestCircle(Point(1,1), 3).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAs!TestCircle);
     }
 }
