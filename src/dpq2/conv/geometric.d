@@ -279,7 +279,7 @@ if(isInstanceOf!(Path, T))
     return res;
 }
 
-Polygon binaryValueAsPolygon(Polygon)(in Value v)
+Polygon binaryValueAs(Polygon)(in Value v)
 if(isValidPolygon!Polygon)
 {
     import std.array : uninitializedArray;
@@ -382,7 +382,7 @@ unittest
         assert(p.toValue.binaryValueAs!TestPath == p);
 
         Polygon poly = [Point(1,1), Point(2,2), Point(3,3)];
-        assert(poly.toValue.binaryValueAsPolygon!Polygon == poly);
+        assert(poly.toValue.binaryValueAs!Polygon == poly);
 
         auto c = TestCircle(Point(1,2), 3);
         assert(c.toValue.binaryValueAs!TestCircle == c);
@@ -414,7 +414,7 @@ unittest
 
         v = [Point(1,1), Point(2,2)].toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAsPolygon!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
 
         v = TestCircle(Point(1,1), 3).toValue;
         v.oidType = OidType.Text;
@@ -449,9 +449,9 @@ unittest
 
         v = [Point(1,1), Point(2,2)].toValue;
         v._data.length -= 16;
-        assertThrown!ValueConvException(v.binaryValueAsPolygon!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAsPolygon!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
 
         v = TestCircle(Point(1,1), 3).toValue;
         v._data.length = 1;

@@ -319,8 +319,8 @@ public void _integration_test( string connParam ) @system
         C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
         C!Box(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
         C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
-        //~ C!PGpath(Path(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
-        //~ C!PGpolygon(Polygon([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
+        C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
+        C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
         //~ C!PGcircle(Circle(Point(1,2), 10), "circle", "'<(1,2),10>'");
     }
 }
