@@ -1,23 +1,35 @@
 module dpq2.conv.geometric;
 
-import dpq2.oids : OidType;
-import dpq2.value : ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
+import dpq2.oids: OidType;
+import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
-import std.exception : enforce;
+import std.exception: enforce;
+import std.traits: ReturnType;
 
 @safe:
 
-bool isValidPointType(T)()
+private bool isValidPointType(T)()
 {
     return is(typeof(T.x) == double) && is(typeof(T.y) == double);
 }
 
-bool isValidBoxType(T)()
+private bool isValidBoxType(T)()
 {
     import gfm.math;
 
+    // TODO: reduce code duplication, use hasMember
     static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
         return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
+    else
+        return false;
+}
+
+private bool isValidLineSegmentType(T)()
+{
+    import gfm.math;
+
+    static if(__traits(compiles, isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b))))
+        return isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b));
     else
         return false;
 }
@@ -67,13 +79,6 @@ struct Line
     double c;
 }
 
-/// Finite line segment - ((x1,y1),(x2,y2))
-//~ struct LineSegment
-//~ {
-    //~ Point start;
-    //~ Point end;
-//~ }
-
 /// Closed path (similar to polygon) - ((x1,y1),...)
 //~ struct Path
 //~ {
@@ -107,15 +112,16 @@ Value toValue(Line line)
     return Value(data, OidType.Line, false);
 }
 
-//~ Value toValue(LineSegment lseg)
-//~ {
-    //~ ubyte[] data = new ubyte[32];
+Value toValue(LineSegment)(LineSegment lseg)
+if(isValidLineSegmentType!LineSegment)
+{
+    ubyte[] data = new ubyte[32];
 
-    //~ auto rem = lseg.start.serialize(data);
-    //~ rem = lseg.end.serialize(rem);
+    auto rem = lseg.start.serializePoint(data);
+    rem = lseg.end.serializePoint(rem);
 
-    //~ return Value(data, OidType.LineSegment, false);
-//~ }
+    return Value(data, OidType.LineSegment, false);
+}
 
 //~ Value toValue(Path path)
 //~ {
@@ -201,18 +207,23 @@ if (is(T == Line))
     return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
 }
 
-//~ T binaryValueAs(T)(in Value v)
-//~ if (is(T == LineSegment))
-//~ {
-    //~ if(!(v.oidType == OidType.LineSegment))
-        //~ throwTypeComplaint(v.oidType, "LineSegment", __FILE__, __LINE__);
+LineSegment binaryValueAsLineSegment(LineSegment)(in Value v)
+if(isValidLineSegmentType!LineSegment)
+{
+    if(!(v.oidType == OidType.LineSegment))
+        throwTypeComplaint(v.oidType, "LineSegment", __FILE__, __LINE__);
 
-    //~ if(!(v.data.length == 32))
-        //~ throw new AE(ET.SIZE_MISMATCH,
-            //~ "Value length isn't equal to Postgres LineSegment size", __FILE__, __LINE__);
+    if(!(v.data.length == 32))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres LineSegment size", __FILE__, __LINE__);
 
-    //~ return LineSegment(v.data[0..16].binaryValueAs!Point, v.data[16..$].binaryValueAs!Point);
-//~ }
+    alias Point = ReturnType!(LineSegment.start);
+
+    auto start = v.data[0..16].pointFromBytes!Point;
+    auto end = v.data[16..32].pointFromBytes!Point;
+
+    return LineSegment(start, end);
+}
 
 Box binaryValueAsBox(Box)(in Value v)
 if(isValidBoxType!Box)
@@ -311,6 +322,21 @@ unittest
     alias Point = vec2d;
     alias Box = box2d;
 
+    static struct LineSegment
+    {
+        seg2d seg;
+        alias seg this;
+
+        ref Point start(){ return a; }
+        ref Point end(){ return b; }
+
+        this(Point a, Point b)
+        {
+            seg.a = a;
+            seg.b = b;
+        }
+    }
+
     // binary write/read
     {
         auto pt = Point(1,2);
@@ -319,8 +345,8 @@ unittest
         auto ln = Line(1,2,3);
         assert(ln.toValue.binaryValueAs!Line == ln);
 
-        //~ auto lseg = LineSegment(Point(1,2),Point(3,4));
-        //~ assert(lseg.toValue.binaryValueAs!LineSegment == lseg);
+        auto lseg = LineSegment(Point(1,2),Point(3,4));
+        assert(lseg.toValue.binaryValueAsLineSegment!LineSegment == lseg);
 
         auto b = Box(Point(2,2), Point(1,1));
         assert(b.toValue.binaryValueAsBox!Box == b);
