@@ -11,17 +11,14 @@ import std.range.primitives: ElementType;
 
 private template GetRvalueOfMember(T, string memberName)
 {
-    //~ pragma(msg, "member name: "~memberName);
-
-    mixin("alias Member = T."~memberName~";");
-
-    //~ pragma(msg, "Member.typeof:");
-    //~ pragma(msg, typeof(Member));
-
-    static if(isCallable!T)
-        alias GetRvalueOfMember = ReturnType!Member;
+    mixin("
+    static if(is(T."~memberName~" == function))
+        alias R = ReturnType!(T."~memberName~");
     else
-        alias GetRvalueOfMember = typeof(Member);
+        alias R = typeof(T."~memberName~");
+    ");
+
+    alias GetRvalueOfMember = R;
 }
 
 private bool isValidPointType(T)()
@@ -38,10 +35,18 @@ private bool isValidPointType(T)()
 
 private bool isValidBoxType(T)()
 {
-    //~ return
-        //~ checkRvalueOfMember!(double, "min", T) &&
+    //~ static if(hasMember!(T, "m2245s2") && hasMember!(T, "ma333"))
+    //~ {
+        //~ pragma(msg, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        //~ pragma(msg, T);
 
-    // TODO: reduce code duplication, use hasMember
+        //~ return isValidPointType!(GetRvalueOfMember!(T, "min"));
+    //~ }
+    //~ else
+        //~ return false;
+
+    // TODO: swizzle in gfm.math.vector works wrong
+    // TODO: GetRvalueOfMember can be simplified?
     static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
         return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
     else
