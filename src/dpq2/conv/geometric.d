@@ -35,10 +35,10 @@ private bool isValidLineSegmentType(T)()
         return false;
 }
 
-private bool isValidPathType(T)()
-{
-    return isInstanceOf!(Path, T) /*&& isValidPointType!(typeof(T.points))*/; //FIXME
-}
+//~ private bool isValidPathType(T)()
+//~ {
+    //~ return isInstanceOf!(Path, T) /*&& isValidPointType!(typeof(T.points))*/; //FIXME
+//~ }
 
 private bool isValidPolygon(T)()
 {
@@ -130,8 +130,8 @@ if(isValidLineSegmentType!LineSegment)
     return Value(data, OidType.LineSegment, false);
 }
 
-Value toValue(Path)(Path path)
-if(isValidPathType!Path)
+Value toValue(T)(T path)
+if(isInstanceOf!(Path, T))
 {
     import std.algorithm : copy;
 
@@ -251,8 +251,8 @@ if(isValidBoxType!Box)
     return Box(min, max);
 }
 
-Path binaryValueAs(Path)(in Value v)
-if(isValidPathType!Path)
+T binaryValueAs(T)(in Value v)
+if(isInstanceOf!(Path, T))
 {
     import std.array : uninitializedArray;
 
@@ -263,14 +263,14 @@ if(isValidPathType!Path)
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Path size", __FILE__, __LINE__);
 
-    Path res;
+    T res;
     res.isClosed = v.data[0..1].bigEndianToNative!byte == 1;
     int len = v.data[1..5].bigEndianToNative!int;
 
     if (len != (v.data.length - 5)/16)
         throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
 
-    alias Point = typeof(Path.points[0]);
+    alias Point = typeof(T.points[0]);
 
     res.points = uninitializedArray!(Point[])(len);
     for (int i=0; i<len; i++)
