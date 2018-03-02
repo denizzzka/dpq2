@@ -3,7 +3,6 @@ module dpq2.conv.geometric;
 import dpq2.oids: OidType;
 import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
-import std.exception: enforce;
 import std.traits: ReturnType, isInstanceOf, isArray;
 import std.range.primitives: ElementType;
 
@@ -127,7 +126,9 @@ if(isInstanceOf!(Path, T))
 {
     import std.algorithm : copy;
 
-    enforce(path.points.length >= 1, "At least one point is needed for Path");
+    if(path.points.length < 1)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "At least one point is needed for Path", __FILE__, __LINE__);
 
     ubyte[] data = new ubyte[path.points.length * 16 + 5];
 
@@ -147,7 +148,9 @@ if(isValidPolygon!Polygon)
 {
     import std.algorithm : copy;
 
-    enforce(poly.length >= 1, "At least one point is needed for Polygon"); //FIXME: Value conv exception
+    if(poly.length < 1)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "At least one point is needed for Polygon", __FILE__, __LINE__);
 
     ubyte[] data = new ubyte[poly.length * 16 + 4];
     auto rem = (cast(int)poly.length).nativeToBigEndian.copy(data);
