@@ -9,32 +9,38 @@ import std.range.primitives: ElementType;
 
 @safe:
 
-private bool checkRvalueOfMember(RequiredType, string memberName, T)()
+private template GetRvalueOfMember(T, string memberName)
 {
-    static if(!hasMember!(T, memberName))
-        return false;
+    //~ pragma(msg, "member name: "~memberName);
+
+    mixin("alias Member = T."~memberName~";");
+
+    //~ pragma(msg, "Member.typeof:");
+    //~ pragma(msg, typeof(Member));
+
+    static if(isCallable!T)
+        alias GetRvalueOfMember = ReturnType!Member;
     else
-    {
-        mixin("alias member = T."~memberName~";");
-
-        pragma(msg, typeof(member));
-
-        static if(isCallable!T)
-            return is(ReturnType!member == RequiredType);
-        else
-            return is(typeof(member) == RequiredType);
-    }
+        alias GetRvalueOfMember = typeof(Member);
 }
 
 private bool isValidPointType(T)()
 {
-    return
-        checkRvalueOfMember!(double, "x", T) &&
-        checkRvalueOfMember!(double, "y", T);
+    static if(hasMember!(T, "x") && hasMember!(T, "y"))
+    {
+        return
+            is(GetRvalueOfMember!(T, "x") == double) &&
+            is(GetRvalueOfMember!(T, "y") == double);
+    }
+    else
+        return false;
 }
 
 private bool isValidBoxType(T)()
 {
+    //~ return
+        //~ checkRvalueOfMember!(double, "min", T) &&
+
     // TODO: reduce code duplication, use hasMember
     static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
         return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
