@@ -28,9 +28,6 @@ if(is(typeof(Vec2Ddouble.x) == double) && is(typeof(Vec2Ddouble.y) == double))
     return Value(data, OidType.Point);
 }
 
-import gfm.math.vector;
-alias Point = vec2d;
-
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
 //~ struct Line
 //~ {
@@ -158,24 +155,20 @@ Value toValue(Box box)
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
-T binaryValueAs(T, V)(in V v)
-if (is(T == Point) && (is(V == Value) || is(V == const(ubyte)[])))
+Vec2Ddouble binaryValueAsPoint(Vec2Ddouble)(in Value v)
 {
-    static if (is(V == Value))
-    {
-        if(!(v.oidType == OidType.Point))
-            throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
+    // TODO: Vec2Ddouble x and y types check
 
-        auto data = v.data;
-    }
-    else
-        auto data = v;
+    if(!(v.oidType == OidType.Point))
+        throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
+
+    auto data = v.data;
 
     if(!(data.length == 16))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Point size", __FILE__, __LINE__);
 
-    return Point(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
+    return Vec2Ddouble(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
 }
 
 //~ T binaryValueAs(T)(in Value v)
@@ -289,13 +282,16 @@ if (is(T == Point) && (is(V == Value) || is(V == const(ubyte)[])))
     //~ );
 //~ }
 
-//~ unittest
-//~ {
+unittest
+{
+
+    import gfm.math.vector;
+    alias Point = vec2d;
+
     // binary write/read
-    unittest
     {
         auto pt = Point(1,2);
-        assert(pt.toValue.binaryValueAs!Point == pt);
+        assert(pt.toValue.binaryValueAsPoint!Point == pt);
 
         //~ auto ln = Line(1,2,3);
         //~ assert(ln.toValue.binaryValueAs!Line == ln);
@@ -320,13 +316,12 @@ if (is(T == Point) && (is(V == Value) || is(V == const(ubyte)[])))
     }
 
     // Invalid OID tests
-    unittest
     {
         import std.exception : assertThrown;
 
         auto v = Point(1,1).toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAs!Point);
+        assertThrown!ValueConvException(v.binaryValueAsPoint!Point);
 
         //~ v = Line(1,2,3).toValue;
         //~ v.oidType = OidType.Text;
@@ -354,13 +349,12 @@ if (is(T == Point) && (is(V == Value) || is(V == const(ubyte)[])))
     }
 
     // Invalid data size
-    unittest
     {
         import std.exception : assertThrown;
 
         auto v = Point(1,1).toValue;
         v._data = new ubyte[1];
-        assertThrown!ValueConvException(v.binaryValueAs!Point);
+        assertThrown!ValueConvException(v.binaryValueAsPoint!Point);
 
         //~ v = Line(1,2,3).toValue;
         //~ v._data.length = 1;
@@ -390,4 +384,4 @@ if (is(T == Point) && (is(V == Value) || is(V == const(ubyte)[])))
         //~ v._data.length = 1;
         //~ assertThrown!ValueConvException(v.binaryValueAs!Circle);
     }
-//~ }
+}
