@@ -212,7 +212,7 @@ if (is(T == Line))
     return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
 }
 
-LineSegment binaryValueAsLineSegment(LineSegment)(in Value v)
+LineSegment binaryValueAs(LineSegment)(in Value v)
 if(isValidLineSegmentType!LineSegment)
 {
     if(!(v.oidType == OidType.LineSegment))
@@ -330,6 +330,8 @@ if(isInstanceOf!(Circle, T))
 version (integration_tests)
 mixin template InstancesForIntegrationTest()
 {
+    @safe:
+
     import gfm.math;
     import dpq2.conv.geometric: Circle, Path;
 
@@ -368,7 +370,7 @@ unittest
         assert(ln.toValue.binaryValueAs!Line == ln);
 
         auto lseg = LineSegment(Point(1,2),Point(3,4));
-        assert(lseg.toValue.binaryValueAsLineSegment!LineSegment == lseg);
+        assert(lseg.toValue.binaryValueAs!LineSegment == lseg);
 
         auto b = Box(Point(2,2), Point(1,1));
         assert(b.toValue.binaryValueAsBox!Box == b);
@@ -400,7 +402,7 @@ unittest
 
         v = LineSegment(Point(1,1), Point(2,2)).toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAsLineSegment!LineSegment);
+        assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
 
         v = Box(Point(1,1), Point(2,2)).toValue;
         v.oidType = OidType.Text;
@@ -433,7 +435,7 @@ unittest
 
         v = LineSegment(Point(1,1), Point(2,2)).toValue;
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAsLineSegment!LineSegment);
+        assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
 
         v = Box(Point(1,1), Point(2,2)).toValue;
         v._data.length = 1;
