@@ -76,17 +76,17 @@ if(isValidBoxType!Box)
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
 struct Line
 {
-    double a;
-    double b;
-    double c;
+    double a; ///
+    double b; ///
+    double c; ///
 }
 
 ///
 struct Path(Point)
 if(isValidPointType!Point)
 {
-    bool isClosed;
-    Point[] points;
+    bool isClosed; ///
+    Point[] points; ///
 }
 
 ///
