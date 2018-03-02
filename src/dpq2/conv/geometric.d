@@ -12,6 +12,16 @@ bool isValidPointType(T)()
     return is(typeof(T.x) == double) && is(typeof(T.y) == double);
 }
 
+bool isValidBoxType(T)()
+{
+    import gfm.math;
+
+    static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
+        return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
+    else
+        return false;
+}
+
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
 if(isValidPointType!Vec2Ddouble)
 {
@@ -32,6 +42,23 @@ if(isValidPointType!Vec2Ddouble)
     return Value(data, OidType.Point);
 }
 
+private auto serializeBox(Box, T)(Box box, T target)
+{
+    auto rem = box.min.serializePoint(target);
+    rem = box.max.serializePoint(rem);
+
+    return rem;
+}
+
+Value toValue(Box)(Box box)
+if(isValidBoxType!Box)
+{
+    ubyte[] data = new ubyte[32];
+    box.serializeBox(data);
+
+    return Value(data, OidType.Box);
+}
+
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
 //~ struct Line
 //~ {
@@ -46,17 +73,6 @@ if(isValidPointType!Vec2Ddouble)
     //~ Point start;
     //~ Point end;
 //~ }
-
-import gfm.math.box;
-/// Rectangular box - ((x1,y1),(x2,y2))
-alias Box = box2d;
-private auto serialize(T)(Box box, T target)
-{
-    auto rem = box.min.serializePoint(target);
-    rem = box.max.serializePoint(rem);
-
-    return rem;
-}
 
 /// Closed path (similar to polygon) - ((x1,y1),...)
 //~ struct Path
@@ -100,14 +116,6 @@ private auto serialize(T)(Box box, T target)
 
     //~ return Value(data, OidType.LineSegment, false);
 //~ }
-
-Value toValue(Box box)
-{
-    ubyte[] data = new ubyte[32];
-    box.serialize(data);
-
-    return Value(data, OidType.Box);
-}
 
 //~ Value toValue(Path path)
 //~ {
@@ -171,6 +179,12 @@ if(isValidPointType!Vec2Ddouble)
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Point size", __FILE__, __LINE__);
 
+    return pointFromBytes!Vec2Ddouble(data[0..16]);
+}
+
+private Vec2Ddouble pointFromBytes(Vec2Ddouble)(in ubyte[16] data) pure
+if(isValidPointType!Vec2Ddouble)
+{
     return Vec2Ddouble(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
 }
 
@@ -201,18 +215,23 @@ if(isValidPointType!Vec2Ddouble)
     //~ return LineSegment(v.data[0..16].binaryValueAs!Point, v.data[16..$].binaryValueAs!Point);
 //~ }
 
-//~ T binaryValueAs(T)(in Value v)
-//~ if (is(T == Box))
-//~ {
-    //~ if(!(v.oidType == OidType.Box))
-        //~ throwTypeComplaint(v.oidType, "Box", __FILE__, __LINE__);
+Box binaryValueAsBox(Box)(in Value v)
+if(isValidBoxType!Box)
+{
+    if(!(v.oidType == OidType.Box))
+        throwTypeComplaint(v.oidType, "Box", __FILE__, __LINE__);
 
-    //~ if(!(v.data.length == 32))
-        //~ throw new AE(ET.SIZE_MISMATCH,
-            //~ "Value length isn't equal to Postgres Box size", __FILE__, __LINE__);
+    if(!(v.data.length == 32))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres Box size", __FILE__, __LINE__);
 
-    //~ return Box(v.data[0..16].binaryValueAs!Point, v.data[16..$].binaryValueAs!Point);
-//~ }
+    alias Point = typeof(Box.min);
+
+    auto min = v.data[0..16].pointFromBytes!Point;
+    auto max = v.data[16..32].pointFromBytes!Point;
+
+    return Box(min, max);
+}
 
 //~ T binaryValueAs(T)(in Value v)
 //~ if (is(T == Path))
@@ -288,8 +307,10 @@ if(isValidPointType!Vec2Ddouble)
 unittest
 {
 
-    import gfm.math.vector;
+    import gfm.math;
+
     alias Point = vec2d;
+    alias Box = box2d;
 
     // binary write/read
     {
@@ -302,8 +323,8 @@ unittest
         //~ auto lseg = LineSegment(Point(1,2),Point(3,4));
         //~ assert(lseg.toValue.binaryValueAs!LineSegment == lseg);
 
-        //~ auto b = Box(Point(2,2), Point(1,1));
-        //~ assert(b.toValue.binaryValueAs!Box == b);
+        auto b = Box(Point(2,2), Point(1,1));
+        assert(b.toValue.binaryValueAsBox!Box == b);
 
         //~ auto p = Path(false, [Point(1,1), Point(2,2)]);
         //~ assert(p.toValue.binaryValueAs!Path == p);
@@ -334,9 +355,9 @@ unittest
         //~ v.oidType = OidType.Text;
         //~ assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
 
-        //~ v = Box(Point(1,1), Point(2,2)).toValue;
-        //~ v.oidType = OidType.Text;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Box);
+        v = Box(Point(1,1), Point(2,2)).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAsBox!Box);
 
         //~ v = Path(true, [Point(1,1), Point(2,2)]).toValue;
         //~ v.oidType = OidType.Text;
@@ -367,9 +388,9 @@ unittest
         //~ v._data.length = 1;
         //~ assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
 
-        //~ v = Box(Point(1,1), Point(2,2)).toValue;
-        //~ v._data.length = 1;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!Box);
+        v = Box(Point(1,1), Point(2,2)).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAsBox!Box);
 
         //~ v = Path(true, [Point(1,1), Point(2,2)]).toValue;
         //~ v._data.length -= 16;
