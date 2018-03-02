@@ -101,7 +101,8 @@ if(isValidPointType!Point)
     double radius; ///
 }
 
-Value toValue(Line line)
+Value toValue(T)(T line)
+if(is(T == Line))
 {
     import std.algorithm : copy;
 
@@ -325,9 +326,9 @@ if(isInstanceOf!(Circle, T))
     );
 }
 
-unittest
+version (integration_tests)
+mixin template InstancesForIntegrationTest()
 {
-
     import gfm.math;
 
     alias Point = vec2d;
@@ -349,6 +350,12 @@ unittest
     alias TestPath = Path!Point;
     alias Polygon = Point[];
     alias TestCircle = Circle!Point;
+}
+
+version (integration_tests)
+unittest
+{
+    mixin InstancesForIntegrationTest;
 
     // binary write/read
     {
