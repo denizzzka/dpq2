@@ -9,6 +9,7 @@
        |import dpq2.query: QueryParams;
        |import dpq2.result: msg_NOT_BINARY;
        |import dpq2.conv.from_d_types;
+       |import dpq2.conv.geometric : binaryValueAs, Box, Circle, Line, LineSegment, Path, Point, Polygon;
        |import dpq2.conv.numeric: rawValueToNumeric;
        |import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
        |
@@ -38,15 +39,13 @@
        |alias PGtimestamp = TimeStamp; /// Both date and time without time zone
        |alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
        |alias PGjson =          Json; /// json or jsonb
-       |
-       |package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
-       |{
-      1|    throw new ValueConvException(
-       |            ConvExceptionType.NOT_IMPLEMENTED,
-       |            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
-       |            file, line
-       |        );
-       |}
+       |alias PGpoint =         Point; /// Point
+       |alias PGline =          Line; /// LineSegment
+       |alias PGlseg =          LineSegment; /// LineSegment
+       |alias PGbox =           Box; /// Box
+       |alias PGpath =          Path; /// Path
+       |alias PGpolygon =       Polygon; /// Polygon
+       |alias PGcircle =        Circle; /// Circle
        |
        |private alias VF = ValueFormat;
        |private alias AE = ValueConvException;
@@ -56,9 +55,9 @@
        |string as(T)(in Value v) pure @trusted
        |if(is(T == string))
        |{
-     79|    if(v.format == VF.BINARY)
+     87|    if(v.format == VF.BINARY)
        |    {
-     75|        if(!(
+     83|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -68,18 +67,18 @@
        |        ))
       1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
        |
-     74|        if(v.oidType == OidType.Numeric)
+     82|        if(v.oidType == OidType.Numeric)
      23|            return rawValueToNumeric(v.data);
        |    }
        |
-     55|    return valueAsString(v);
+     63|    return valueAsString(v);
        |}
        |
        |/// Returns value as D type value from binary formatted field
        |T as(T)(in Value v)
        |if(!is(T == string) && !is(T == Bson))
        |{
-     46|    if(!(v.format == VF.BINARY))
+     54|    if(!(v.format == VF.BINARY))
 0000000|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
@@ -88,15 +87,15 @@
       3|        if (v.isNull) return T.init;
       1|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
        |    }
-     44|    else return binaryValueAs!T(v);
+     52|    else return binaryValueAs!T(v);
        |}
        |
        |package:
        |
        |string valueAsString(in Value v) pure
        |{
-     70|    if (v.isNull) return null;
-     66|    return (cast(const(char[])) v.data).to!string;
+     78|    if (v.isNull) return null;
+     74|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -213,13 +212,13 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-     96|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     48|            params.args = null;
-     48|            auto answer = conn.execParams(params);
-     48|            immutable Value v = answer[0][0];
-     48|            auto result = v.as!T;
+    112|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     56|            params.args = null;
+     56|            auto answer = conn.execParams(params);
+     56|            immutable Value v = answer[0][0];
+     56|            auto result = v.as!T;
        |
-     48|            assert(result == nativeValue,
+     69|            assert(result == nativeValue,
        |                format("Received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
@@ -228,14 +227,14 @@
        |            static if (!is(T == UUID) && !is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
        |            {
        |                // test binary to text conversion
-     41|                params.sqlCommand = "SELECT $1::text";
-     41|                params.args = [nativeValue.toValue];
-     41|                auto answer2 = conn.execParams(params);
-     41|                auto v2 = answer2[0][0];
-     41|                auto textResult = v2.as!string.strip(' ');
-     41|                pgValue = pgValue.strip('\'');
+     49|                params.sqlCommand = "SELECT $1::text";
+     49|                params.args = [nativeValue.toValue];
+     49|                auto answer2 = conn.execParams(params);
+     49|                auto v2 = answer2[0][0];
+     49|                auto textResult = v2.as!string.strip(' ');
+     49|                pgValue = pgValue.strip('\'');
        |
-     41|                assert(textResult == pgValue,
+     49|                assert(textResult == pgValue,
        |                    format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -316,6 +315,16 @@
        |        // jsonb
       1|        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string"), "abc": Json(["key": Json("value")])]), "jsonb",
        |            `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
+       |
+       |        // Geometric
+      1|        C!PGpoint(Point(1,2), "point", "'(1,2)'");
+      1|        C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
+      1|        C!PGlseg(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
+      1|        C!PGbox(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
+      1|        C!PGpath(Path(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
+      1|        C!PGpath(Path(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
+      1|        C!PGpolygon(Polygon([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
+      1|        C!PGcircle(Circle(Point(1,2), 10), "circle", "'<(1,2),10>'");
        |    }
        |}
-src/dpq2/conv/to_d_types.d is 89% covered
+src/dpq2/conv/to_d_types.d is 90% covered

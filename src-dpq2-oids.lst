@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    169|    return cast(OidType)(oid);
+    185|    return cast(OidType)(oid);
        |}
        |
        |/**

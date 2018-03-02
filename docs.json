@@ -619,7 +619,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 17,
+						"line": 18,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -627,13 +627,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 24,
+						"endline": 25,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 17,
+				"line": 18,
 				"comment": "Converts Nullable!T to Value\n",
 				"parameters": [
 					{
@@ -650,7 +650,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 27,
+						"line": 28,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -658,13 +658,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 31,
+						"endline": 32,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 27,
+				"line": 28,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -681,7 +681,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 34,
+						"line": 35,
 						"type": "@trusted Value(T v, ValueFormat valueFormat = ValueFormat.BINARY)",
 						"parameters": [
 							{
@@ -694,13 +694,13 @@
 								"default": "ValueFormat.BINARY"
 							}
 						],
-						"endline": 42,
+						"endline": 43,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 34,
+				"line": 35,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -717,7 +717,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 45,
+						"line": 46,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -725,13 +725,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 49,
+						"endline": 50,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 45,
+				"line": 46,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -748,7 +748,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 52,
+						"line": 53,
 						"type": "@trusted Value(T v)",
 						"parameters": [
 							{
@@ -756,13 +756,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 60,
+						"endline": 61,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 52,
+				"line": 53,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -780,7 +780,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 63,
+						"line": 64,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -788,13 +788,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 84,
+						"endline": 85,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 63,
+				"line": 64,
 				"comment": "Constructs Value from Date\n",
 				"parameters": [
 					{
@@ -811,7 +811,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 87,
+						"line": 88,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -819,13 +819,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 93,
+						"endline": 94,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 87,
+				"line": 88,
 				"comment": "Constructs Value from TimeOfDay\n",
 				"parameters": [
 					{
@@ -842,7 +842,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 96,
+						"line": 97,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -850,13 +850,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 108,
+						"endline": 109,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 96,
+				"line": 97,
 				"comment": "Constructs Value from TimeStamp or from TimeStampUTC\n",
 				"parameters": [
 					{
@@ -873,7 +873,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 114,
+						"line": 115,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -881,13 +881,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 118,
+						"endline": 119,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 114,
+				"line": 115,
 				"comment": "    Constructs Value from DateTime\n    It uses Timestamp without TZ as a resulting PG type\n",
 				"parameters": [
 					{
@@ -904,7 +904,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 126,
+						"line": 127,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -912,13 +912,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 132,
+						"endline": 133,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 126,
+				"line": 127,
 				"comment": "    Constructs Value from SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n",
 				"parameters": [
 					{
@@ -1301,7 +1301,7 @@
 		"members": [
 			{
 				"name": "PGboolean",
-				"line": 26,
+				"line": 27,
 				"comment": "boolean\n",
 				"deco": "b",
 				"char": 1,
@@ -1309,7 +1309,7 @@
 			},
 			{
 				"name": "PGsmallint",
-				"line": 27,
+				"line": 28,
 				"comment": "smallint\n",
 				"deco": "s",
 				"char": 1,
@@ -1317,7 +1317,7 @@
 			},
 			{
 				"name": "PGinteger",
-				"line": 28,
+				"line": 29,
 				"comment": "integer\n",
 				"deco": "i",
 				"char": 1,
@@ -1325,7 +1325,7 @@
 			},
 			{
 				"name": "PGbigint",
-				"line": 29,
+				"line": 30,
 				"comment": "bigint\n",
 				"deco": "l",
 				"char": 1,
@@ -1333,7 +1333,7 @@
 			},
 			{
 				"name": "PGreal",
-				"line": 30,
+				"line": 31,
 				"comment": "real\n",
 				"deco": "f",
 				"char": 1,
@@ -1341,7 +1341,7 @@
 			},
 			{
 				"name": "PGdouble_precision",
-				"line": 31,
+				"line": 32,
 				"comment": "double precision\n",
 				"deco": "d",
 				"char": 1,
@@ -1349,7 +1349,7 @@
 			},
 			{
 				"name": "PGtext",
-				"line": 32,
+				"line": 33,
 				"comment": "text\n",
 				"deco": "Aya",
 				"char": 1,
@@ -1357,7 +1357,7 @@
 			},
 			{
 				"name": "PGnumeric",
-				"line": 33,
+				"line": 34,
 				"comment": "numeric represented as string\n",
 				"deco": "Aya",
 				"char": 1,
@@ -1365,7 +1365,7 @@
 			},
 			{
 				"name": "PGbytea",
-				"line": 34,
+				"line": 35,
 				"comment": "bytea\n",
 				"deco": "xAh",
 				"char": 1,
@@ -1376,7 +1376,7 @@
 			},
 			{
 				"name": "PGuuid",
-				"line": 35,
+				"line": 36,
 				"comment": "UUID\n",
 				"deco": "S3std4uuid4UUID",
 				"char": 1,
@@ -1384,7 +1384,7 @@
 			},
 			{
 				"name": "PGdate",
-				"line": 36,
+				"line": 37,
 				"comment": "Date (no time of day)\n",
 				"deco": "S3std8datetime4date4Date",
 				"char": 1,
@@ -1392,7 +1392,7 @@
 			},
 			{
 				"name": "PGtime_without_time_zone",
-				"line": 37,
+				"line": 38,
 				"comment": "Time of day (no date)\n",
 				"deco": "S3std8datetime4date9TimeOfDay",
 				"char": 1,
@@ -1400,7 +1400,7 @@
 			},
 			{
 				"name": "PGtimestamp",
-				"line": 38,
+				"line": 39,
 				"comment": "Both date and time without time zone\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
 				"char": 1,
@@ -1408,7 +1408,7 @@
 			},
 			{
 				"name": "PGtimestamptz",
-				"line": 39,
+				"line": 40,
 				"comment": "Both date and time stored in UTC time zone\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
 				"char": 1,
@@ -1416,9 +1416,65 @@
 			},
 			{
 				"name": "PGjson",
-				"line": 40,
+				"line": 41,
 				"comment": "json or jsonb\n",
 				"deco": "S4vibe4data4json4Json",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGpoint",
+				"line": 42,
+				"comment": "Point\n",
+				"deco": "S4dpq24conv9geometric5Point",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGline",
+				"line": 43,
+				"comment": "LineSegment\n",
+				"deco": "S4dpq24conv9geometric4Line",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGlseg",
+				"line": 44,
+				"comment": "LineSegment\n",
+				"deco": "S4dpq24conv9geometric11LineSegment",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGbox",
+				"line": 45,
+				"comment": "Box\n",
+				"deco": "S4dpq24conv9geometric3Box",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGpath",
+				"line": 46,
+				"comment": "Path\n",
+				"deco": "S4dpq24conv9geometric4Path",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGpolygon",
+				"line": 47,
+				"comment": "Polygon\n",
+				"deco": "S4dpq24conv9geometric7Polygon",
+				"char": 1,
+				"kind": "alias"
+			},
+			{
+				"name": "PGcircle",
+				"line": 48,
+				"comment": "Circle\n",
+				"deco": "S4dpq24conv9geometric6Circle",
 				"char": 1,
 				"kind": "alias"
 			},
@@ -1427,7 +1483,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 56,
+						"line": 55,
 						"type": "pure @trusted string(in Value v)",
 						"parameters": [
 							{
@@ -1438,13 +1494,13 @@
 								]
 							}
 						],
-						"endline": 76,
+						"endline": 75,
 						"char": 8,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 56,
+				"line": 55,
 				"comment": "Returns cell value as native string type from text or binary formatted field\n",
 				"parameters": [
 					{
@@ -1461,7 +1517,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 79,
+						"line": 78,
 						"type": "T(in Value v)",
 						"parameters": [
 							{
@@ -1472,13 +1528,13 @@
 								]
 							}
 						],
-						"endline": 92,
+						"endline": 91,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 79,
+				"line": 78,
 				"comment": "Returns value as D type value from binary formatted field\n",
 				"parameters": [
 					{

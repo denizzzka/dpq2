@@ -34,21 +34,21 @@
        |
        |    nothrow invariant()
        |    {
-    282|        assert( result != null );
+    314|        assert( result != null );
        |    }
        |
-    282|    package this(immutable PGresult* r)
+    314|    package this(immutable PGresult* r)
        |    {
-    141|        assert(r);
+    157|        assert(r);
        |
-    141|        result = r;
+    157|        result = r;
        |    }
        |
        |    ~this()
        |    {
-    141|        assert(result != null);
+    157|        assert(result != null);
        |
-    141|        PQclear(result);
+    157|        PQclear(result);
        |    }
        |}
        |
@@ -57,15 +57,15 @@
        |{
        |    private ResultContainer result;
        |
-    144|    package this(immutable ResultContainer r)
+    160|    package this(immutable ResultContainer r)
        |    {
-    144|        result = r;
+    160|        result = r;
        |    }
        |
        |    /// Returns the result status of the command.
        |    ExecStatusType status() nothrow
        |    {
-    138|        return PQresultStatus(result);
+    154|        return PQresultStatus(result);
        |    }
        |
        |    /// Text description of result status.
@@ -106,20 +106,20 @@
        |/// Contains result of query with valid data answer
        |immutable class Answer : Result
        |{
-    134|    package this(immutable ResultContainer r)
+    150|    package this(immutable ResultContainer r)
        |    {
-    135|        super(r);
+    151|        super(r);
        |
-    135|        checkAnswerForErrors();
+    151|        checkAnswerForErrors();
        |    }
        |
        |    private void checkAnswerForErrors()
        |    {
-    135|        switch(status)
+    151|        switch(status)
        |        {
      17|            case PGRES_COMMAND_OK:
-    134|            case PGRES_TUPLES_OK:
-    134|                break;
+    150|            case PGRES_TUPLES_OK:
+    150|                break;
        |
       1|            default:
       1|                throw new ResponseException(this, __FILE__, __LINE__);
@@ -150,25 +150,25 @@
        |    }
        |
        |    /// Returns row count
-    282|    size_t length() nothrow { return PQntuples(result); }
+    314|    size_t length() nothrow { return PQntuples(result); }
        |
        |    /// Returns column count
-    741|    size_t columnCount() nothrow { return PQnfields(result); }
+    821|    size_t columnCount() nothrow { return PQnfields(result); }
        |
        |    /// Returns column format
        |    ValueFormat columnFormat( const size_t colNum )
        |    {
-    149|        assertCol( colNum );
+    165|        assertCol( colNum );
        |
-    149|        return cast(ValueFormat) PQfformat(result, to!int(colNum));
+    165|        return cast(ValueFormat) PQfformat(result, to!int(colNum));
        |    }
        |
        |    /// Returns column Oid
        |    OidType OID( size_t colNum )
        |    {
-    150|        assertCol( colNum );
+    166|        assertCol( colNum );
        |
-    150|        return PQftype(result, to!int(colNum)).oid2oidType;
+    166|        return PQftype(result, to!int(colNum)).oid2oidType;
        |    }
        |
        |    /// Checks if column type is array
@@ -218,7 +218,7 @@
        |    /// Returns row of cells
        |    immutable (Row) opIndex(in size_t row)
        |    {
-    137|        return immutable Row(this, row);
+    153|        return immutable Row(this, row);
        |    }
        |
        |    /**
@@ -262,7 +262,7 @@
        |
        |    private void assertCol( const size_t c )
        |    {
-    731|        if(!(c < columnCount))
+    811|        if(!(c < columnCount))
 0000000|            throw new AnswerException(
        |                ExceptionType.OUT_OF_RANGE,
        |                "Column "~to!string(c)~" is out of range 0.."~to!string(columnCount)~" of result columns",
@@ -272,7 +272,7 @@
        |
        |    private void assertRow( const size_t r )
        |    {
-    279|        if(!(r < length))
+    311|        if(!(r < length))
 0000000|            throw new AnswerException(
        |                ExceptionType.OUT_OF_RANGE,
        |                "Row "~to!string(r)~" is out of range 0.."~to!string(length)~" of result rows",
@@ -282,8 +282,8 @@
        |
        |     private void assertCoords( const Coords c )
        |    {
-    142|        assertRow( c.row );
-    142|        assertCol( c.col );
+    158|        assertRow( c.row );
+    158|        assertCol( c.col );
        |    }
        |}
        |
@@ -317,20 +317,20 @@
        |    private size_t row;
        |
        |    ///
-    137|    this(immutable Answer answer, in size_t row)
+    153|    this(immutable Answer answer, in size_t row)
        |    {
-    137|        answer.assertRow( row );
+    153|        answer.assertRow( row );
        |
-    137|        this.answer = answer;
-    137|        this.row = row;
+    153|        this.answer = answer;
+    153|        this.row = row;
        |    }
        |
        |    /// Returns the actual length of a cell value in bytes.
        |    size_t size( const size_t col )
        |    {
-    142|        answer.assertCol(col);
+    158|        answer.assertCol(col);
        |
-    142|        return PQgetlength(answer.result, to!int(row), to!int(col));
+    158|        return PQgetlength(answer.result, to!int(row), to!int(col));
        |    }
        |
        |    /// Checks if value is NULL
@@ -338,26 +338,26 @@
        |    /// Do not confuse it with Nullable's isNull method
        |    bool isNULL( const size_t col )
        |    {
-    146|        answer.assertCol(col);
+    162|        answer.assertCol(col);
        |
-    146|        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
+    162|        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
        |    }
        |
        |    /// Returns cell value by column number
        |    immutable (Value) opIndex(in size_t col)
        |    {
-    142|        answer.assertCoords( Coords( row, col ) );
+    158|        answer.assertCoords( Coords( row, col ) );
        |
        |        // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
        |        // One should not modify the data it points to, and one must explicitly copy the data into other
        |        // storage if it is to be used past the lifetime of the PGresult structure itself.
-    142|        const ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
-    142|        size_t s = size(col);
+    158|        const ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
+    158|        size_t s = size(col);
        |
        |        // it is legal to cast here because immutable value will be returned
-    142|        Value r = Value(cast(ubyte[]) v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
+    158|        Value r = Value(cast(ubyte[]) v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
        |
-    142|        return cast(immutable) r;
+    158|        return cast(immutable) r;
        |    }
        |
        |    /// Returns cell value by field name
