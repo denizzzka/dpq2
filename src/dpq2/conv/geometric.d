@@ -376,9 +376,9 @@ unittest
         v.oidType = OidType.Text;
         assertThrown!ValueConvException(v.binaryValueAs!Line);
 
-        //~ v = LineSegment(Point(1,1), Point(2,2)).toValue;
-        //~ v.oidType = OidType.Text;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
+        v = LineSegment(Point(1,1), Point(2,2)).toValue;
+        v.oidType = OidType.Text;
+        assertThrown!ValueConvException(v.binaryValueAsLineSegment!LineSegment);
 
         v = Box(Point(1,1), Point(2,2)).toValue;
         v.oidType = OidType.Text;
@@ -409,9 +409,9 @@ unittest
         v._data.length = 1;
         assertThrown!ValueConvException(v.binaryValueAs!Line);
 
-        //~ v = LineSegment(Point(1,1), Point(2,2)).toValue;
-        //~ v._data.length = 1;
-        //~ assertThrown!ValueConvException(v.binaryValueAs!LineSegment);
+        v = LineSegment(Point(1,1), Point(2,2)).toValue;
+        v._data.length = 1;
+        assertThrown!ValueConvException(v.binaryValueAsLineSegment!LineSegment);
 
         v = Box(Point(1,1), Point(2,2)).toValue;
         v._data.length = 1;
