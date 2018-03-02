@@ -45,11 +45,6 @@ private bool isValidPolygon(T)()
     return isArray!T && isValidPointType!(ElementType!T);
 }
 
-private bool isValidCircle(T)()
-{
-    return isInstanceOf!(Circle, T);
-}
-
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
 if(isValidPointType!Vec2Ddouble)
 {
@@ -97,6 +92,7 @@ struct Line
 
 ///
 struct Path(Point)
+if(isValidPointType!Point)
 {
     bool isClosed;
     Point[] points;
@@ -170,8 +166,8 @@ if(isValidPolygon!Polygon)
     return Value(data, OidType.Polygon, false);
 }
 
-Value toValue(Circle)(Circle c)
-if(isValidCircle!Circle)
+Value toValue(T)(T c)
+if(isInstanceOf!(Circle, T))
 {
     import std.algorithm : copy;
 
@@ -316,8 +312,8 @@ if(isValidPolygon!Polygon)
     return res;
 }
 
-Circle binaryValueAs(Circle)(in Value v)
-if(isValidCircle!Circle)
+T binaryValueAs(T)(in Value v)
+if(isInstanceOf!(Circle, T))
 {
     if(!(v.oidType == OidType.Circle))
         throwTypeComplaint(v.oidType, "Circle", __FILE__, __LINE__);
@@ -326,9 +322,9 @@ if(isValidCircle!Circle)
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Circle size", __FILE__, __LINE__);
 
-    alias Point = typeof(Circle.center);
+    alias Point = typeof(T.center);
 
-    return Circle(
+    return T(
         v.data[0..16].pointFromBytes!Point,
         v.data[16..24].bigEndianToNative!double
     );
