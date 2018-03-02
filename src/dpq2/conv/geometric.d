@@ -7,8 +7,13 @@ import std.exception : enforce;
 
 @safe:
 
+bool isValidPointType(T)()
+{
+    return is(typeof(T.x) == double) && is(typeof(T.y) == double);
+}
+
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
-if(is(typeof(Vec2Ddouble.x) == double) && is(typeof(Vec2Ddouble.y) == double))
+if(isValidPointType!Vec2Ddouble)
 {
     import std.algorithm : copy;
 
@@ -19,7 +24,7 @@ if(is(typeof(Vec2Ddouble.x) == double) && is(typeof(Vec2Ddouble.y) == double))
 }
 
 Value toValue(Vec2Ddouble)(Vec2Ddouble pt)
-if(is(typeof(Vec2Ddouble.x) == double) && is(typeof(Vec2Ddouble.y) == double))
+if(isValidPointType!Vec2Ddouble)
 {
     ubyte[] data = new ubyte[16];
     pt.serializePoint(data);
@@ -155,6 +160,7 @@ private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
 Vec2Ddouble binaryValueAsPoint(Vec2Ddouble)(in Value v)
+if(isValidPointType!Vec2Ddouble)
 {
     // TODO: Vec2Ddouble x and y types check
 
