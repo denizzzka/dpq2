@@ -55,6 +55,7 @@ private bool isValidBoxType(T)()
 
 private bool isValidLineSegmentType(T)()
 {
+    // TODO: reduce duplication
     static if(__traits(compiles, isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b))))
         return isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b));
     else
