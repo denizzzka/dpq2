@@ -363,7 +363,7 @@ if(isInstanceOf!(Circle, T))
 }
 
 version (integration_tests)
-mixin template GeometricInstancesForIntegrationTest()
+package mixin template GeometricInstancesForIntegrationTest()
 {
     @safe:
 
