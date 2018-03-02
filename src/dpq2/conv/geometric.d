@@ -230,7 +230,7 @@ if(isValidLineSegmentType!LineSegment)
     return LineSegment(start, end);
 }
 
-Box binaryValueAsBox(Box)(in Value v)
+Box binaryValueAs(Box)(in Value v)
 if(isValidBoxType!Box)
 {
     if(!(v.oidType == OidType.Box))
@@ -373,7 +373,7 @@ unittest
         assert(lseg.toValue.binaryValueAs!LineSegment == lseg);
 
         auto b = Box(Point(2,2), Point(1,1));
-        assert(b.toValue.binaryValueAsBox!Box == b);
+        assert(b.toValue.binaryValueAs!Box == b);
 
         auto p = TestPath(false, [Point(1,1), Point(2,2)]);
         assert(p.toValue.binaryValueAs!TestPath == p);
@@ -406,7 +406,7 @@ unittest
 
         v = Box(Point(1,1), Point(2,2)).toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAsBox!Box);
+        assertThrown!ValueConvException(v.binaryValueAs!Box);
 
         v = TestPath(true, [Point(1,1), Point(2,2)]).toValue;
         v.oidType = OidType.Text;
@@ -439,7 +439,7 @@ unittest
 
         v = Box(Point(1,1), Point(2,2)).toValue;
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAsBox!Box);
+        assertThrown!ValueConvException(v.binaryValueAs!Box);
 
         v = TestPath(true, [Point(1,1), Point(2,2)]).toValue;
         v._data.length -= 16;
