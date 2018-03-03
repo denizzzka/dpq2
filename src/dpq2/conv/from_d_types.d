@@ -44,11 +44,19 @@ if(is(T == string))
     return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
 }
 
-///
+/// Constructs Value from array of bytes
 Value toValue(T)(T v)
-if(is(T == ubyte[]))
+if(is(T : const ubyte[]))
 {
-    return Value(v, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    ubyte[] b = v.dup;
+    return Value(b, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
+}
+
+/// ditto
+Value toValue(T)(T v)
+if(is(T == immutable ubyte[]))
+{
+    return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
 }
 
 ///
