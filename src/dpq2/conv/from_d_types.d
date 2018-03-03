@@ -9,8 +9,9 @@ import dpq2.oids : detectOidTypeFromNative, OidType;
 import dpq2.value : Value, ValueFormat;
 
 import std.bitmanip: nativeToBigEndian;
-import std.datetime.date : Date, DateTime, TimeOfDay;
-import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
+import std.datetime.date: Date, DateTime, TimeOfDay;
+import std.datetime.systime: SysTime;
+import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.traits: isNumeric, TemplateArgsOf, Unqual;
 import std.typecons : Nullable;
 

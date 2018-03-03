@@ -4,7 +4,7 @@ language: d
 
 d:
   - dmd
-  #- dmd-beta https://github.com/vibe-d/vibe.d/issues/2075
+  - dmd-beta
   - ldc
   - ldc-beta
 

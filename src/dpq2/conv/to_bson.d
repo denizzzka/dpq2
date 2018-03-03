@@ -103,27 +103,27 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
     switch(v.oidType)
     {
         case OidType.Bool:
-            bool n = v.binaryValueAs!PGboolean;
+            bool n = v.tunnelForBinaryValueAsCalls!PGboolean;
             res = Bson(n);
             break;
 
         case Int2:
-            auto n = to!int(v.binaryValueAs!PGsmallint);
+            auto n = v.tunnelForBinaryValueAsCalls!PGsmallint.to!int;
             res = Bson(n);
             break;
 
         case Int4:
-            int n = v.binaryValueAs!PGinteger;
+            int n = v.tunnelForBinaryValueAsCalls!PGinteger;
             res = Bson(n);
             break;
 
         case Int8:
-            long n = v.binaryValueAs!PGbigint;
+            long n = v.tunnelForBinaryValueAsCalls!PGbigint;
             res = Bson(n);
             break;
 
         case Float8:
-            double n = v.binaryValueAs!PGdouble_precision;
+            double n = v.tunnelForBinaryValueAsCalls!PGdouble_precision;
             res = Bson(n);
             break;
 
@@ -143,11 +143,11 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             break;
 
         case UUID:
-            res = Bson(v.binaryValueAs!PGuuid);
+            res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
             break;
 
         case TimeStamp:
-            auto ts = v.binaryValueAs!(dpq2.conv.time.TimeStamp);
+            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStamp);
             auto time = BsonDate(SysTime(ts.dateTime, tz));
             long usecs = ts.fracSec.total!"usecs";
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
@@ -155,7 +155,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 
         case Json:
         case Jsonb:
-            vibe.data.json.Json json = binaryValueAs!PGjson(v);
+            vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
             res = Bson(json);
             break;
 

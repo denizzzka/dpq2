@@ -9,12 +9,13 @@ module dpq2.conv.time;
 @safe:
 
 import dpq2.result;
-import dpq2.oids : OidType;
-import dpq2.conv.to_d_types: throwTypeComplaint;
+import dpq2.oids: OidType;
+import dpq2.value: throwTypeComplaint;
 
 import core.time;
 import std.datetime.date : Date, DateTime, TimeOfDay;
-import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
+import std.datetime.systime: SysTime;
+import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
 import core.stdc.time: time_t;

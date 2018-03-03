@@ -86,6 +86,15 @@ if(!is(T == string) && !is(T == Bson))
 
 package:
 
+/*
+ * Something was broken in DMD64 D Compiler v2.079.0-rc.1 so I made this "tunnel"
+ * TODO: remove it and replace by direct binaryValueAs calls
+ */
+auto tunnelForBinaryValueAsCalls(T)(in Value v)
+{
+    return binaryValueAs!T(v);
+}
+
 string valueAsString(in Value v) pure
 {
     if (v.isNull) return null;
