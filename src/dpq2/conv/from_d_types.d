@@ -13,6 +13,7 @@ import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.uuid: UUID;
+import vibe.data.json: Json;
 import std.traits: isNumeric, TemplateArgsOf, Unqual;
 import std.typecons : Nullable;
 
@@ -147,6 +148,16 @@ Value toValue(T)(T v)
 if (is(Unqual!T == UUID))
 {
     return Value(v.data.dup, OidType.UUID);
+}
+
+/// Constructs Value from Json
+Value toValue(T)(T v)
+if (is(Unqual!T == Json))
+{
+    auto r = toValue(v.toString);
+    r.oidType = OidType.Json;
+
+    return r;
 }
 
 unittest
