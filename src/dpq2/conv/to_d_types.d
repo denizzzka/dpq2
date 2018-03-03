@@ -226,7 +226,7 @@ public void _integration_test( string connParam ) @system
                 v.oidType, typeid(T), pgValue, nativeValue, result)
             );
 
-            static if (!is(T == Json) && !is(T == TimeStamp))
+            static if (!is(T == TimeStamp))
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";
@@ -244,6 +244,13 @@ public void _integration_test( string connParam ) @system
                 // Special cases:
                 static if(is(T == const ubyte[]))
                     pgValue = `\x442072756c65730021`; // Server formats its reply slightly different of an argument
+
+                static if(is(T == Json))
+                {
+                    // Reformatting by same way in the hope that the data will be sorted same in both cases
+                    pgValue = pgValue.parseJsonString.toString;
+                    textResult = textResult.parseJsonString.toString;
+                }
 
                 assert(textResult == pgValue,
                     format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
