@@ -31,9 +31,9 @@ struct Value
     // Thus, it is need to store reference to Answer here to ensure that result is still available.
 
     /// ctor
-    this(ubyte[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) pure
+    this(inout ubyte[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) pure
     {
-        this._data = data;
+        this._data = data.dup; //FIXME: _data should be immutable
         this._format = format;
         this._oidType = oidType;
         this._isNull = isNull;

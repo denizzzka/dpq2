@@ -47,15 +47,7 @@ if(is(T == string))
 
 /// Constructs Value from array of bytes
 Value toValue(T)(T v)
-if(is(T : const ubyte[]))
-{
-    ubyte[] b = v.dup;
-    return Value(b, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
-}
-
-/// ditto
-Value toValue(T)(T v)
-if(is(T == immutable ubyte[]))
+if(is(T : immutable ubyte[]))
 {
     return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
 }
@@ -186,8 +178,8 @@ unittest
     }
 
     {
-        ubyte[] buf = [0, 1, 2, 3, 4, 5];
-        Value v = toValue(buf.dup);
+        immutable ubyte[] buf = [0, 1, 2, 3, 4, 5];
+        Value v = toValue(buf);
 
         assert(v.oidType == OidType.ByteArray);
         assert(v.as!(const ubyte[]) == buf);

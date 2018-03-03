@@ -103,10 +103,10 @@ string valueAsString(in Value v) pure
 
 /// Returns value as bytes from binary formatted field
 T binaryValueAs(T)(in Value v)
-if( is( T == const(ubyte[]) ) )
+if(is(T : const ubyte[]))
 {
     if(!(v.oidType == OidType.ByteArray))
-        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "immutable ubyte[] or string", __FILE__, __LINE__);
 
     return v.data;
 }
@@ -226,16 +226,24 @@ public void _integration_test( string connParam ) @system
                 v.oidType, typeid(T), pgValue, nativeValue, result)
             );
 
-            //TODO: Implement toValue for all tested types and remove the condition
-            static if (!is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
+            static if (!is(T == Json) && !is(T == TimeStamp))
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";
-                params.args = [nativeValue.toValue];
+
+                static if(is(T == const ubyte[]))
+                    params.args = [nativeValue.idup.toValue];
+                else
+                    params.args = [nativeValue.toValue];
+
                 auto answer2 = conn.execParams(params);
                 auto v2 = answer2[0][0];
                 auto textResult = v2.as!string.strip(' ');
                 pgValue = pgValue.strip('\'');
+
+                // Special cases:
+                static if(is(T == const ubyte[]))
+                    pgValue = `\x442072756c65730021`; // Server formats its reply slightly different of an argument
 
                 assert(textResult == pgValue,
                     format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
