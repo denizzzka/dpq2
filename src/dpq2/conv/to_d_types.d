@@ -320,7 +320,7 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
         mixin GeometricInstancesForIntegrationTest;
 
         C!Point(Point(1,2), "point", "'(1,2)'");
