@@ -24,7 +24,7 @@ private template GetRvalueOfMember(T, string memberName)
 ///
 bool isValidPointType(T)()
 {
-    static if(hasMember!(T, "x") && hasMember!(T, "y"))
+    static if(__traits(compiles, typeof(T.x)) && __traits(compiles, typeof(T.y)))
     {
         return
             is(GetRvalueOfMember!(T, "x") == double) &&
@@ -37,20 +37,15 @@ bool isValidPointType(T)()
 ///
 bool isValidBoxType(T)()
 {
-    //~ static if(hasMember!(T, "m2245s2") && hasMember!(T, "ma333"))
-    //~ {
-        //~ pragma(msg, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        //~ pragma(msg, T);
+    static if(__traits(compiles, typeof(T.min)) && __traits(compiles, typeof(T.max)))
+    {
+        pragma(msg, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        pragma(msg, T);
 
-        //~ return isValidPointType!(GetRvalueOfMember!(T, "min"));
-    //~ }
-    //~ else
-        //~ return false;
-
-    // TODO: swizzle in gfm.math.vector works wrong: https://github.com/d-gamedev-team/gfm/issues/195
-    // TODO: GetRvalueOfMember can be simplified?
-    static if(__traits(compiles, isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max))))
-        return isValidPointType!(typeof(T.min)) && isValidPointType!(typeof(T.max));
+        return
+            isValidPointType!(GetRvalueOfMember!(T, "min")) &&
+            isValidPointType!(GetRvalueOfMember!(T, "max"));
+    }
     else
         return false;
 }
