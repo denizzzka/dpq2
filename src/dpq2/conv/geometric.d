@@ -39,9 +39,6 @@ bool isValidBoxType(T)()
 {
     static if(__traits(compiles, typeof(T.min)) && __traits(compiles, typeof(T.max)))
     {
-        pragma(msg, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        pragma(msg, T);
-
         return
             isValidPointType!(GetRvalueOfMember!(T, "min")) &&
             isValidPointType!(GetRvalueOfMember!(T, "max"));
