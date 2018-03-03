@@ -11,17 +11,17 @@ import std.range.primitives: ElementType;
 
 private template GetRvalueOfMember(T, string memberName)
 {
-    mixin("
-    static if(is(T."~memberName~" == function))
-        alias R = ReturnType!(T."~memberName~");
+    mixin("alias MemberType = typeof(T."~memberName~");");
+
+    static if(is(MemberType == function))
+        alias R = ReturnType!(MemberType);
     else
-        alias R = typeof(T."~memberName~");
-    ");
+        alias R = MemberType;
 
     alias GetRvalueOfMember = R;
 }
 
-///
+/// Checks that type have "x" and "y" members of returning type "double"
 bool isValidPointType(T)()
 {
     static if(__traits(compiles, typeof(T.x)) && __traits(compiles, typeof(T.y)))
@@ -34,7 +34,7 @@ bool isValidPointType(T)()
         return false;
 }
 
-///
+/// Checks that type have "min" and "max" members of suitable returning type of point
 bool isValidBoxType(T)()
 {
     static if(__traits(compiles, typeof(T.min)) && __traits(compiles, typeof(T.max)))
