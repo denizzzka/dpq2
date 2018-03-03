@@ -227,7 +227,7 @@ public void _integration_test( string connParam ) @system
             );
 
             //TODO: Implement toValue for all tested types and remove the condition
-            static if (!is(T == UUID) && !is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
+            static if (!is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";

@@ -12,6 +12,7 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
+import std.uuid: UUID;
 import std.traits: isNumeric, TemplateArgsOf, Unqual;
 import std.typecons : Nullable;
 
@@ -131,6 +132,13 @@ if (is(Unqual!T == SysTime))
     long us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
 
     return Value(nativeToBigEndian(us).dup, OidType.TimeStampWithZone, false);
+}
+
+/// Constructs Value from UUID
+Value toValue(T)(T v)
+if (is(Unqual!T == UUID))
+{
+    return Value(v.data.dup, OidType.UUID);
 }
 
 unittest
