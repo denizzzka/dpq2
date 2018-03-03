@@ -24,6 +24,7 @@ before_script:
 
 script:
   - dub run dpq2:integration_tests --build=unittest -- --conninfo="${CONN_STRING}"
+  - dub run dpq2:integration_tests --build=release -- --conninfo="${CONN_STRING}"
 
 matrix:
   include:

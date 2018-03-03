@@ -9,9 +9,9 @@ import dpq2.connection: Connection;
 import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
-import dpq2.conv.geometric : binaryValueAs, Box, Circle, Line, LineSegment, Path, Point, Polygon;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
+import dpq2.conv.geometric: binaryValueAs, Line;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;
@@ -39,13 +39,7 @@ alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp = TimeStamp; /// Both date and time without time zone
 alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
 alias PGjson =          Json; /// json or jsonb
-alias PGpoint =         Point; /// Point
-alias PGline =          Line; /// LineSegment
-alias PGlseg =          LineSegment; /// LineSegment
-alias PGbox =           Box; /// Box
-alias PGpath =          Path; /// Path
-alias PGpolygon =       Polygon; /// Polygon
-alias PGcircle =        Circle; /// Circle
+alias PGline =          Line; /// Line (geometric type)
 
 private alias VF = ValueFormat;
 private alias AE = ValueConvException;
@@ -326,13 +320,16 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        C!PGpoint(Point(1,2), "point", "'(1,2)'");
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
+        mixin GeometricInstancesForIntegrationTest;
+
+        C!Point(Point(1,2), "point", "'(1,2)'");
         C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
-        C!PGlseg(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
-        C!PGbox(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
-        C!PGpath(Path(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
-        C!PGpath(Path(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
-        C!PGpolygon(Polygon([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
-        C!PGcircle(Circle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+        C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
+        C!Box(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
+        C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
+        C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
+        C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
+        C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
     }
 }
