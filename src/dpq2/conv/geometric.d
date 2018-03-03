@@ -53,9 +53,12 @@ bool isValidBoxType(T)()
 ///
 bool isValidLineSegmentType(T)()
 {
-    // TODO: reduce duplication
-    static if(__traits(compiles, isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b))))
-        return isValidPointType!(typeof(T.a)) && isValidPointType!(typeof(T.b));
+    static if(__traits(compiles, typeof(T.start)) && __traits(compiles, typeof(T.end)))
+    {
+        return
+            isValidPointType!(GetRvalueOfMember!(T, "start")) &&
+            isValidPointType!(GetRvalueOfMember!(T, "end"));
+    }
     else
         return false;
 }
