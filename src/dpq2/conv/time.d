@@ -133,7 +133,7 @@ struct TTimeStamp(bool isWithTZ)
      *
      * If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max
      */
-    DateTime dateTime;
+    private DateTime _dateTime;
     Duration fracSec; /// fractional seconds, 1 microsecond resolution
     /// Duplicates year value as int
     ///
@@ -143,20 +143,28 @@ struct TTimeStamp(bool isWithTZ)
 
     this(DateTime dt, Duration fractionalSeconds = Duration.zero, int year = 0)
     {
-        dateTime = dt;
+        _dateTime = dt;
         fracSec = fractionalSeconds;
 
         if(year)
         {
             realYear = year;
-            dateTime.year = year;
+            _dateTime.year = year;
         }
         else
-            realYear = dateTime.year;
+            realYear = _dateTime.year;
     }
 
-    ///
-    alias dateTime this;
+    DateTime dateTime() const pure
+    {
+        import std.conv: to;
+
+        if(infinity != InfinityState.NONE)
+            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+                "Timestamp or timestamptz value is "~infinity.to!string, __FILE__, __LINE__);
+
+        return _dateTime;
+    }
 
     invariant()
     {
@@ -167,18 +175,34 @@ struct TTimeStamp(bool isWithTZ)
         assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
     }
 
-    bool isEarlier() const { return dateTime == earlier; } /// '-infinity'
-    bool isLater() const { return dateTime == later; } /// 'infinity'
+    bool isEarlier() const pure { return _dateTime == DateTime.min; } /// '-infinity'
+    bool isLater() const pure { return _dateTime == DateTime.max; } /// 'infinity'
 
-    InfinityState infinity() const
+    InfinityState infinity() const pure
     {
         with(InfinityState)
         {
-            if(isEarlier) return INFINITY_MAX;
-            if(isLater) return INFINITY_MIN;
+            if(isEarlier) return INFINITY_MIN;
+            if(isLater) return INFINITY_MAX;
 
             return NONE;
         }
+    }
+
+    unittest
+    {
+        assert(TTimeStamp.min == TTimeStamp.min);
+        assert(TTimeStamp.max == TTimeStamp.max);
+        assert(TTimeStamp.min != TTimeStamp.max);
+
+        assert(TTimeStamp.earlier != TTimeStamp.later);
+        assert(TTimeStamp.min != TTimeStamp.earlier);
+        assert(TTimeStamp.max != TTimeStamp.later);
+
+        assert(TTimeStamp.min.infinity == InfinityState.NONE);
+        assert(TTimeStamp.max.infinity == InfinityState.NONE);
+        assert(TTimeStamp.earlier.infinity == InfinityState.INFINITY_MIN);
+        assert(TTimeStamp.later.infinity == InfinityState.INFINITY_MAX);
     }
 
     /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
@@ -202,27 +226,17 @@ struct TTimeStamp(bool isWithTZ)
     }
 
     /// '-infinity', earlier than all other time stamps
-    static earlier()
-    {
-        enum r = TTimeStamp(DateTime.min);
-
-        return r;
-    }
+    static earlier() { return TTimeStamp(DateTime.min); }
 
     /// 'infinity', later than all other time stamps
-    static later()
-    {
-        enum r = TTimeStamp(DateTime.max);
-
-        return r;
-    }
+    static later() { return TTimeStamp(DateTime.max); }
 
     ///
     string toString() const
     {
         import std.format;
 
-        return format("%04d-%02d-%02d %s %s", realYear, month, day, timeOfDay, fracSec.toString);
+        return format("%04d-%02d-%02d %s %s", realYear, dateTime.month, dateTime.day, dateTime.timeOfDay, fracSec.toString);
     }
 }
 
@@ -239,7 +253,7 @@ unittest
         auto dt = DateTime(2017, 11, 13, 14, 29, 17);
         auto t = TimeStamp(dt, 75_678.usecs);
 
-        assert(t == dt); // test the implicit conversion to DateTime
+        assert(t.dateTime == dt); // test the implicit conversion to DateTime
     }
     {
         auto t = TimeStampUTC(

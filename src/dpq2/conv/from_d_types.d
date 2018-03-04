@@ -102,15 +102,15 @@ if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
 {
     long us; /// microseconds
 
-    if(v.dateTime == T.later) // infinity
+    if(v.isLater) // infinity
         us = us.max;
-    else if(v.dateTime == T.earlier) // -infinity
+    else if(v.isEarlier) // -infinity
         us = us.min;
     else
     {
         enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
-        long j = modJulianDayForIntYear(v.realYear, v.month, v.day) - mj_pg_epoch;
-        us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
+        long j = modJulianDayForIntYear(v.realYear, v.dateTime.month, v.dateTime.day) - mj_pg_epoch;
+        us = (((j * 24 + v.dateTime.hour) * 60 + v.dateTime.minute) * 60 + v.dateTime.second) * 1_000_000 + v.fracSec.total!"usecs";
     }
 
     return Value(
@@ -179,156 +179,172 @@ if (is(Unqual!T == Json))
     return r;
 }
 
+version(unittest)
+import dpq2.conv.to_d_types : as;
+
 unittest
 {
-    import dpq2.conv.to_d_types : as;
+    Value v = toValue(cast(short) 123);
 
-    {
-        Value v = toValue(cast(short) 123);
+    assert(v.oidType == OidType.Int2);
+    assert(v.as!short == 123);
+}
 
-        assert(v.oidType == OidType.Int2);
-        assert(v.as!short == 123);
-    }
+unittest
+{
+    Value v = toValue(-123.456);
 
-    {
-        Value v = toValue(-123.456);
+    assert(v.oidType == OidType.Float8);
+    assert(v.as!double == -123.456);
+}
 
-        assert(v.oidType == OidType.Float8);
-        assert(v.as!double == -123.456);
-    }
+unittest
+{
+    Value v = toValue("Test string");
 
-    {
-        Value v = toValue("Test string");
+    assert(v.oidType == OidType.Text);
+    assert(v.as!string == "Test string");
+}
 
-        assert(v.oidType == OidType.Text);
-        assert(v.as!string == "Test string");
-    }
+unittest
+{
+    immutable ubyte[] buf = [0, 1, 2, 3, 4, 5];
+    Value v = toValue(buf);
 
-    {
-        immutable ubyte[] buf = [0, 1, 2, 3, 4, 5];
-        Value v = toValue(buf);
+    assert(v.oidType == OidType.ByteArray);
+    assert(v.as!(const ubyte[]) == buf);
+}
 
-        assert(v.oidType == OidType.ByteArray);
-        assert(v.as!(const ubyte[]) == buf);
-    }
+unittest
+{
+    Value t = toValue(true);
+    Value f = toValue(false);
 
-    {
-        Value t = toValue(true);
-        Value f = toValue(false);
+    assert(t.as!bool == true);
+    assert(f.as!bool == false);
+}
 
-        assert(t.as!bool == true);
-        assert(f.as!bool == false);
-    }
+unittest
+{
+    Value v = toValue(Nullable!long(1));
+    Value nv = toValue(Nullable!bool.init);
 
-    {
-        Value v = toValue(Nullable!long(1));
-        Value nv = toValue(Nullable!bool.init);
+    assert(!v.isNull);
+    assert(v.oidType == OidType.Int8);
+    assert(v.as!long == 1);
 
-        assert(!v.isNull);
-        assert(v.oidType == OidType.Int8);
-        assert(v.as!long == 1);
+    assert(nv.isNull);
+    assert(nv.oidType == OidType.Bool);
+}
 
-        assert(nv.isNull);
-        assert(nv.oidType == OidType.Bool);
-    }
+unittest
+{
+    import std.datetime : DateTime;
 
-    {
-        import std.datetime : DateTime;
-        Value v = toValue(Nullable!TimeStamp(TimeStamp(DateTime(2017, 1, 2))));
+    Value v = toValue(Nullable!TimeStamp(TimeStamp(DateTime(2017, 1, 2))));
 
-        assert(!v.isNull);
-        assert(v.oidType == OidType.TimeStamp);
-    }
+    assert(!v.isNull);
+    assert(v.oidType == OidType.TimeStamp);
+}
 
-    {
-        // Date: '2018-1-15'
-        auto d = Date(2018, 1, 15);
-        auto v = toValue(d);
+unittest
+{
+    // Date: '2018-1-15'
+    auto d = Date(2018, 1, 15);
+    auto v = toValue(d);
 
-        assert(v.oidType == OidType.Date);
-        assert(v.as!Date == d);
-    }
+    assert(v.oidType == OidType.Date);
+    assert(v.as!Date == d);
+}
 
-    {
-        auto d = immutable Date(2018, 1, 15);
-        auto v = toValue(d);
+unittest
+{
+    auto d = immutable Date(2018, 1, 15);
+    auto v = toValue(d);
 
-        assert(v.oidType == OidType.Date);
-        assert(v.as!Date == d);
-    }
+    assert(v.oidType == OidType.Date);
+    assert(v.as!Date == d);
+}
 
-    {
-        // Date: '2000-1-1'
-        auto d = Date(2000, 1, 1);
-        auto v = toValue(d);
+unittest
+{
+    // Date: '2000-1-1'
+    auto d = Date(2000, 1, 1);
+    auto v = toValue(d);
 
-        assert(v.oidType == OidType.Date);
-        assert(v.as!Date == d);
-    }
+    assert(v.oidType == OidType.Date);
+    assert(v.as!Date == d);
+}
 
-    {
-        // Date: '0010-2-20'
-        auto d = Date(10, 2, 20);
-        auto v = toValue(d);
+unittest
+{
+    // Date: '0010-2-20'
+    auto d = Date(10, 2, 20);
+    auto v = toValue(d);
 
-        assert(v.oidType == OidType.Date);
-        assert(v.as!Date == d);
-    }
+    assert(v.oidType == OidType.Date);
+    assert(v.as!Date == d);
+}
 
-    {
-        // Date: max (always fits into Postgres Date)
-        auto d = Date.max;
-        auto v = toValue(d);
+unittest
+{
+    // Date: max (always fits into Postgres Date)
+    auto d = Date.max;
+    auto v = toValue(d);
 
-        assert(v.oidType == OidType.Date);
-        assert(v.as!Date == d);
-    }
+    assert(v.oidType == OidType.Date);
+    assert(v.as!Date == d);
+}
 
-    {
-        // Date: min (overflow)
-        import std.exception: assertThrown;
-        import dpq2.value: ValueConvException;
+unittest
+{
+    // Date: min (overflow)
+    import std.exception: assertThrown;
+    import dpq2.value: ValueConvException;
 
-        auto d = Date.min;
-        assertThrown!ValueConvException(d.toValue);
-    }
+    auto d = Date.min;
+    assertThrown!ValueConvException(d.toValue);
+}
 
-    {
-        // DateTime
-        auto d = const DateTime(2018, 2, 20, 1, 2, 3);
-        auto v = toValue(d);
+unittest
+{
+    // DateTime
+    auto d = const DateTime(2018, 2, 20, 1, 2, 3);
+    auto v = toValue(d);
 
-        assert(v.oidType == OidType.TimeStamp);
-        assert(v.as!DateTime == d);
-    }
+    assert(v.oidType == OidType.TimeStamp);
+    assert(v.as!DateTime == d);
+}
 
-    {
-        // TimeOfDay: '14:29:17'
-        auto tod = TimeOfDay(14, 29, 17);
-        auto v = toValue(tod);
+unittest
+{
+    // TimeOfDay: '14:29:17'
+    auto tod = TimeOfDay(14, 29, 17);
+    auto v = toValue(tod);
 
-        assert(v.oidType == OidType.Time);
-        assert(v.as!TimeOfDay == tod);
-    }
+    assert(v.oidType == OidType.Time);
+    assert(v.as!TimeOfDay == tod);
+}
 
-    {
-        // SysTime: '2017-11-13T14:29:17.075678Z'
-        auto t = SysTime.fromISOExtString("2017-11-13T14:29:17.075678Z");
-        auto v = toValue(t);
+unittest
+{
+    // SysTime: '2017-11-13T14:29:17.075678Z'
+    auto t = SysTime.fromISOExtString("2017-11-13T14:29:17.075678Z");
+    auto v = toValue(t);
 
-        assert(v.oidType == OidType.TimeStampWithZone);
-        assert(v.as!SysTime == t);
-    }
+    assert(v.oidType == OidType.TimeStampWithZone);
+    assert(v.as!SysTime == t);
+}
 
-    {
-        import core.time : usecs;
-        import std.datetime.date : DateTime;
+unittest
+{
+    import core.time : usecs;
+    import std.datetime.date : DateTime;
 
-        // TimeStamp: '2017-11-13 14:29:17.075678'
-        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
-        auto v = toValue(t);
+    // TimeStamp: '2017-11-13 14:29:17.075678'
+    auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+    auto v = toValue(t);
 
-        assert(v.oidType == OidType.TimeStamp);
-        assert(v.as!TimeStamp == t);
-    }
+    assert(v.oidType == OidType.TimeStamp);
+    assert(v.as!TimeStamp == t);
 }
