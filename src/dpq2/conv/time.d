@@ -18,6 +18,7 @@ import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
+import std.conv: to;
 
 /++
     Returns value timestamp with time zone as SysTime
@@ -115,6 +116,9 @@ if( is( T == DateTime ) )
     return v.binaryValueAs!TimeStamp.dateTime;
 }
 
+private enum lowestPgYear = -4712;
+private enum biggestPgYear = 294276;
+
 ///
 enum InfinityState : byte
 {
@@ -141,7 +145,7 @@ struct TTimeStamp(bool isWithTZ)
     /// https://issues.dlang.org/show_bug.cgi?id=18552
     int realYear;
 
-    this(DateTime dt, Duration fractionalSeconds = Duration.zero, int year = 0)
+    this(DateTime dt, Duration fractionalSeconds = Duration.zero, int year = 0) pure
     {
         _dateTime = dt;
         fracSec = fractionalSeconds;
@@ -157,18 +161,17 @@ struct TTimeStamp(bool isWithTZ)
 
     DateTime dateTime() const pure
     {
-        import std.conv: to;
-
         if(infinity != InfinityState.NONE)
             throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
-                "Timestamp or timestamptz value is "~infinity.to!string, __FILE__, __LINE__);
+                "TTimeStamp value is "~infinity.to!string, __FILE__, __LINE__);
 
         return _dateTime;
     }
 
     invariant()
     {
-        import std.conv : to;
+        //~ assert(realYear >= lowestPgYear, "Year too low: "~realYear.to!string);
+        assert(realYear <= biggestPgYear, "Year too big: "~realYear.to!string);
 
         assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
         assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
@@ -206,7 +209,7 @@ struct TTimeStamp(bool isWithTZ)
     }
 
     /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
-    static min()
+    static immutable(TTimeStamp) min()
     {
         /*
         Postgres low value is 4713 BC but here is used -4712 because
@@ -216,20 +219,22 @@ struct TTimeStamp(bool isWithTZ)
         is -1, etc." (Phobos docs). But Postgres isn't uses ISO 8601
         for date calculation.
         */
-        return TTimeStamp(DateTime(Date(-4712, 1, 1)), Duration.zero);
+        return TTimeStamp(DateTime(Date(lowestPgYear, 1, 1)), Duration.zero);
     }
 
     /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
-    static max()
+    static immutable(TTimeStamp) max()
     {
-        return TTimeStamp(DateTime(Date(123, 1, 1)), Duration.zero, 294276);
+        enum maxFract = 1.seconds - 1.usecs;
+
+        return TTimeStamp(DateTime(123, 12, 31, 23, 59, 59), maxFract, biggestPgYear);
     }
 
     /// '-infinity', earlier than all other time stamps
-    static earlier() { return TTimeStamp(DateTime.min); }
+    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(DateTime.min); }
 
     /// 'infinity', later than all other time stamps
-    static later() { return TTimeStamp(DateTime.max); }
+    static immutable(TTimeStamp) later() pure { return TTimeStamp(DateTime.max); }
 
     ///
     string toString() const

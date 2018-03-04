@@ -314,11 +314,11 @@ public void _integration_test( string connParam ) @system
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
         C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");
         C!PGtimestamp(PGtimestamp.later, "timestamp", "'infinity'");
         C!PGtimestamp(PGtimestamp.min, "timestamp", `'4713-01-01 00:00:00 BC'`);
-        C!PGtimestamp(PGtimestamp.max, "timestamp", `'294276-01-01 00:00:00'`);
-        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
+        C!PGtimestamp(PGtimestamp.max, "timestamp", `'294276-12-31 23:59:59.999999'`);
 
         // SysTime testing
         auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
