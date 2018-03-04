@@ -135,6 +135,25 @@ struct TTimeStamp(bool isWithTZ)
      */
     DateTime dateTime;
     Duration fracSec; /// fractional seconds, 1 microsecond resolution
+    /// Duplicates year value as int
+    ///
+    /// Issue 18552 - std.datetime.date.Date strips year int argument to short
+    /// https://issues.dlang.org/show_bug.cgi?id=18552
+    int realYear;
+
+    this(DateTime dt, Duration fractionalSeconds = Duration.zero, int year = 0)
+    {
+        dateTime = dt;
+        fracSec = fractionalSeconds;
+
+        if(year)
+        {
+            realYear = year;
+            dateTime.year = year;
+        }
+        else
+            realYear = dateTime.year;
+    }
 
     ///
     alias dateTime this;
@@ -179,7 +198,7 @@ struct TTimeStamp(bool isWithTZ)
     /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
     static max()
     {
-        return TTimeStamp(DateTime(Date(294276, 1, 1)), Duration.zero);
+        return TTimeStamp(DateTime(Date(123, 1, 1)), Duration.zero, 294276);
     }
 
     /// '-infinity', earlier than all other time stamps
@@ -201,7 +220,9 @@ struct TTimeStamp(bool isWithTZ)
     ///
     string toString() const
     {
-        return dateTime.toString~" "~fracSec.toString;
+        import std.conv: to;
+
+        return "realYear: "~realYear.to!string~" "~dateTime.toString~" "~fracSec.toString;
     }
 }
 
@@ -278,7 +299,7 @@ TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 
     auto fracSec = dur!"usecs"(ts);
 
-    return TimeStamp(dateTime, fracSec);
+    return TimeStamp(dateTime, fracSec, tm.tm_year);
 }
 
 // Here is used names from the original Postgresql source

@@ -109,7 +109,7 @@ if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
     else
     {
         enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
-        long j = v.dateTime.modJulianDay - mj_pg_epoch;
+        long j = modJulianDayForIntYear(v.realYear, v.month, v.day) - mj_pg_epoch;
         us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
     }
 
@@ -118,6 +118,24 @@ if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
             is(Unqual!T == TimeStamp) ? OidType.TimeStamp : OidType.TimeStampWithZone,
             false
         );
+}
+
+// Wikipedia's magic
+private auto modJulianDayForIntYear(const int year, const ubyte month, const short day) pure
+{
+    const a = (14 - month) / 12;
+    const y = year + 4800 - a;
+    const m = month + a * 12 - 3;
+
+    const jd = day + (m*153+2)/5 + y*365 + y/4 - y/100 + y/400 - 32045;
+
+    return jd - 2_400_001;
+}
+unittest
+{
+    assert(modJulianDayForIntYear(1858, 11, 17) == 0);
+    assert(modJulianDayForIntYear(2010, 8, 24) == 55_432);
+    assert(modJulianDayForIntYear(1999, 7, 6) == 51_365);
 }
 
 /++
