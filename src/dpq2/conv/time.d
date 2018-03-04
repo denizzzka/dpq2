@@ -220,9 +220,9 @@ struct TTimeStamp(bool isWithTZ)
     ///
     string toString() const
     {
-        import std.conv: to;
+        import std.format;
 
-        return "realYear: "~realYear.to!string~" "~dateTime.toString~" "~fracSec.toString;
+        return format("%04d-%02d-%02d %s %s", realYear, month, day, timeOfDay, fracSec.toString);
     }
 }
 
