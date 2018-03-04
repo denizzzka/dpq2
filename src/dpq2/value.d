@@ -30,7 +30,7 @@ struct Value
     // storage if it is to be used past the lifetime of the PGresult structure itself.
     // Thus, it is need to store reference to Answer here to ensure that result is still available.
     /// ctor
-    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) pure
+    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
     {
         this._data = data;
         this._format = format;
