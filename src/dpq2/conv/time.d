@@ -175,8 +175,8 @@ struct TTimeStamp(bool isWithTZ)
         assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
     }
 
-    bool isEarlier() const pure { return _dateTime == DateTime.min; } /// '-infinity'
-    bool isLater() const pure { return _dateTime == DateTime.max; } /// 'infinity'
+    bool isEarlier() const pure { return _dateTime == earlier._dateTime; } /// '-infinity'
+    bool isLater() const pure { return _dateTime == later._dateTime; } /// 'infinity'
 
     InfinityState infinity() const pure
     {
