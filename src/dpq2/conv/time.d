@@ -170,7 +170,7 @@ struct TTimeStamp(bool isWithTZ)
 
     invariant()
     {
-        //~ assert(realYear >= lowestPgYear, "Year too low: "~realYear.to!string);
+        assert(realYear >= lowestPgYear, "Year too low: "~realYear.to!string);
         assert(realYear <= biggestPgYear, "Year too big: "~realYear.to!string);
 
         assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
@@ -231,7 +231,11 @@ struct TTimeStamp(bool isWithTZ)
     }
 
     /// '-infinity', earlier than all other time stamps
-    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(DateTime.min); }
+    static immutable(TTimeStamp) earlier() pure
+    {
+        // -1 prevents invariant "year too low" error
+        return TTimeStamp(DateTime.min, Duration.zero, -1);
+    }
 
     /// 'infinity', later than all other time stamps
     static immutable(TTimeStamp) later() pure { return TTimeStamp(DateTime.max); }
