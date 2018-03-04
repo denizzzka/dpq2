@@ -83,7 +83,7 @@ if(isValidPointType!Vec2Ddouble)
     ubyte[] data = new ubyte[16];
     pt.serializePoint(data);
 
-    return Value(data, OidType.Point);
+    return createValue(data, OidType.Point);
 }
 
 private auto serializeBox(Box, T)(Box box, T target)
@@ -100,7 +100,7 @@ if(isValidBoxType!Box)
     ubyte[] data = new ubyte[32];
     box.serializeBox(data);
 
-    return Value(data, OidType.Box);
+    return createValue(data, OidType.Box);
 }
 
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
@@ -138,7 +138,7 @@ if(is(T == Line))
     rem = line.b.nativeToBigEndian.copy(rem);
     rem = line.c.nativeToBigEndian.copy(rem);
 
-    return Value(data, OidType.Line, false);
+    return createValue(data, OidType.Line);
 }
 
 Value toValue(LineSegment)(LineSegment lseg)
@@ -149,7 +149,7 @@ if(isValidLineSegmentType!LineSegment)
     auto rem = lseg.start.serializePoint(data);
     rem = lseg.end.serializePoint(rem);
 
-    return Value(data, OidType.LineSegment, false);
+    return createValue(data, OidType.LineSegment);
 }
 
 Value toValue(T)(T path)
@@ -171,7 +171,7 @@ if(isInstanceOf!(Path, T))
         rem = p.serializePoint(rem);
     }
 
-    return Value(data, OidType.Path, false);
+    return createValue(data, OidType.Path);
 }
 
 Value toValue(Polygon)(Polygon poly)
@@ -189,7 +189,7 @@ if(isValidPolygon!Polygon)
     foreach (ref p; poly)
         rem = p.serializePoint(rem);
 
-    return Value(data, OidType.Polygon, false);
+    return createValue(data, OidType.Polygon);
 }
 
 Value toValue(T)(T c)
@@ -201,7 +201,12 @@ if(isInstanceOf!(Circle, T))
     auto rem = c.center.serializePoint(data);
     c.radius.nativeToBigEndian.copy(rem);
 
-    return Value(data, OidType.Circle, false);
+    return createValue(data, OidType.Circle);
+}
+
+private Value createValue(const ubyte[] data, OidType oid) @trusted
+{
+    return Value(cast(immutable) data, oid);
 }
 
 private alias AE = ValueConvException;

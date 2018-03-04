@@ -40,7 +40,8 @@ if(is(T == string))
 {
     if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
 
-    ubyte[] buf = cast(ubyte[]) v;
+    static assert(is(T == immutable(char)[]));
+    auto buf = cast(immutable(ubyte)[]) v;
 
     return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
 }
@@ -56,9 +57,7 @@ if(is(T : immutable ubyte[]))
 Value toValue(T : bool)(T v) @trusted
 if (!is(T == Nullable!R, R))
 {
-    ubyte[] buf;
-    buf.length = 1;
-    buf[0] = (v ? 1 : 0);
+    immutable ubyte[] buf = [ v ? 1 : 0 ];
 
     return Value(buf, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
