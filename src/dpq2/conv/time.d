@@ -60,6 +60,11 @@ if( is( T == Date ) )
     int year, month, day;
     j2date(jd, year, month, day);
 
+    // TODO: support PG Date as TTimeStamp and remove this check
+    if(year > short.max)
+        throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+            "Year is bigger than supported by std.datetime.Data: "~year.to!string, __FILE__, __LINE__);
+
     return Date(year, month, day);
 }
 

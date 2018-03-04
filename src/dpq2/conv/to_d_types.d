@@ -312,6 +312,13 @@ public void _integration_test( string connParam ) @system
 
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
+        {
+            import std.exception : assertThrown;
+
+            assertThrown!ValueConvException(
+                    C!PGdate(Date(0001, 01, 8), "date", "'5874897-12-31'")
+                );
+        }
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
