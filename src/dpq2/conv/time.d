@@ -245,25 +245,38 @@ alias TimeStampUTC = TTimeStamp!true; /// Assumed that this is UTC timestamp
 
 unittest
 {
-    {
-        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
-        assert(t.dateTime.hour == 14);
-    }
-    {
-        auto dt = DateTime(2017, 11, 13, 14, 29, 17);
-        auto t = TimeStamp(dt, 75_678.usecs);
+    auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+    assert(t.dateTime.hour == 14);
+}
 
-        assert(t.dateTime == dt); // test the implicit conversion to DateTime
-    }
-    {
-        auto t = TimeStampUTC(
-                DateTime(2017, 11, 13, 14, 29, 17),
-                75_678.usecs
-            );
+unittest
+{
+    auto dt = DateTime(2017, 11, 13, 14, 29, 17);
+    auto t = TimeStamp(dt, 75_678.usecs);
 
-        assert(t.dateTime.hour == 14);
-        assert(t.fracSec == 75_678.usecs);
-    }
+    assert(t.dateTime == dt); // test the implicit conversion to DateTime
+}
+
+unittest
+{
+    auto t = TimeStampUTC(
+            DateTime(2017, 11, 13, 14, 29, 17),
+            75_678.usecs
+        );
+
+    assert(t.dateTime.hour == 14);
+    assert(t.fracSec == 75_678.usecs);
+}
+
+unittest
+{
+    import std.exception : assertThrown;
+
+    auto e = TimeStampUTC.earlier;
+    auto l = TimeStampUTC.later;
+
+    assertThrown!ValueConvException(e.dateTime.hour == 14);
+    assertThrown!ValueConvException(l.dateTime.hour == 14);
 }
 
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
