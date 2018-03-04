@@ -18,7 +18,6 @@ import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
-import core.stdc.time: time_t;
 
 /++
     Returns value timestamp with time zone as SysTime
@@ -116,34 +115,87 @@ if( is( T == DateTime ) )
     return v.binaryValueAs!TimeStamp.dateTime;
 }
 
+///
+enum InfinityState : byte
+{
+    NONE = 0, ///
+    INFINITY_MIN = -1, ///
+    INFINITY_MAX = 1, ///
+}
+
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
 struct TTimeStamp(bool isWithTZ)
 {
-    DateTime dateTime; /// date and time of TimeStamp
-    Duration fracSec; /// fractional seconds
+    /**
+     * Date and time of TimeStamp
+     *
+     * If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max
+     */
+    DateTime dateTime;
+    Duration fracSec; /// fractional seconds, 1 microsecond resolution
 
+    ///
     alias dateTime this;
 
     invariant()
     {
         import std.conv : to;
 
-        assert(fracSec >= Duration.zero, fracSec.to!string);
-        assert(fracSec < 1.seconds, fracSec.to!string);
+        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
+        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
+        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
     }
 
-    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
-    static max()
+    bool isEarlier() const { return dateTime == earlier; } /// '-infinity'
+    bool isLater() const { return dateTime == later; } /// 'infinity'
+
+    InfinityState infinity() const
     {
-        return TTimeStamp(DateTime.max, long.max.hnsecs);
+        with(InfinityState)
+        {
+            if(isEarlier) return INFINITY_MAX;
+            if(isLater) return INFINITY_MIN;
+
+            return NONE;
+        }
     }
 
     /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
     static min()
     {
-        return TTimeStamp(DateTime.min, Duration.zero);
+        /*
+        Postgres low value is 4713 BC but here is used -4712 because
+        "Date uses the Proleptic Gregorian Calendar, so it assumes the
+        Gregorian leap year calculations for its entire length. As per
+        ISO 8601, it treats 1 B.C. as year 0, i.e. 1 B.C. is 0, 2 B.C.
+        is -1, etc." (Phobos docs). But Postgres isn't uses ISO 8601
+        for date calculation.
+        */
+        return TTimeStamp(DateTime(Date(-4712, 1, 1)), Duration.zero);
+    }
+
+    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
+    static max()
+    {
+        return TTimeStamp(DateTime(Date(294276, 1, 1)), Duration.zero);
+    }
+
+    /// '-infinity', earlier than all other time stamps
+    static earlier()
+    {
+        enum r = TTimeStamp(DateTime.min);
+
+        return r;
+    }
+
+    /// 'infinity', later than all other time stamps
+    static later()
+    {
+        enum r = TTimeStamp(DateTime.max);
+
+        return r;
     }
 
     ///
@@ -188,8 +240,13 @@ private:
 T rawTimeStamp2nativeTime(T)(long raw)
 if(is(T == TimeStamp) || is(T == TimeStampUTC))
 {
-    if(raw >= time_t.max) return T.max;
-    if(raw <= time_t.min) return T.min;
+    import core.stdc.time: time_t;
+
+    static assert(raw.sizeof == time_t.min.sizeof);
+    static assert(raw.sizeof == time_t.max.sizeof);
+
+    if(raw == time_t.max) return T.later; // infinity
+    if(raw == time_t.min) return T.earlier; // -infinity
 
     pg_tm tm;
     fsec_t ts;

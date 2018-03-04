@@ -222,11 +222,10 @@ public void _integration_test( string connParam ) @system
             auto result = v.as!T;
 
             assert(result == nativeValue,
-                format("Received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
                 v.oidType, typeid(T), pgValue, nativeValue, result)
             );
 
-            static if (!is(T == TimeStamp))
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";
@@ -243,7 +242,7 @@ public void _integration_test( string connParam ) @system
 
                 // Special cases:
                 static if(is(T == const ubyte[]))
-                    pgValue = `\x442072756c65730021`; // Server formats its reply slightly different of an argument
+                    pgValue = `\x442072756c65730021`; // Server formats its reply slightly different from the passed argument
 
                 static if(is(T == Json))
                 {
@@ -253,11 +252,10 @@ public void _integration_test( string connParam ) @system
                 }
 
                 assert(textResult == pgValue,
-                    format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
+                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
                     v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
                 );
             }
-            else pragma(msg, T, " Is not tested in integration tests!");
         }
 
         alias C = testIt; // "C" means "case"
@@ -316,8 +314,10 @@ public void _integration_test( string connParam ) @system
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
-        C!PGtimestamp(PGtimestamp.max, "timestamp without time zone", "'infinity'");
-        C!PGtimestamp(PGtimestamp.min, "timestamp without time zone", "'-infinity'");
+        C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");
+        C!PGtimestamp(PGtimestamp.later, "timestamp", "'infinity'");
+        C!PGtimestamp(PGtimestamp.min, "timestamp", `'4713-01-01 00:00:00 BC'`);
+        C!PGtimestamp(PGtimestamp.max, "timestamp", `'294276-01-01 00:00:00'`);
         C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
 
         // SysTime testing

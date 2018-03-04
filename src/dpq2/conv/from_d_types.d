@@ -100,9 +100,18 @@ if (is(Unqual!T == TimeOfDay))
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
 {
-    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
-    long j = v.dateTime.modJulianDay - mj_pg_epoch;
-    long us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
+    long us; /// microseconds
+
+    if(v.dateTime == T.later) // infinity
+        us = us.max;
+    else if(v.dateTime == T.earlier) // -infinity
+        us = us.min;
+    else
+    {
+        enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
+        long j = v.dateTime.modJulianDay - mj_pg_epoch;
+        us = (((j * 24 + v.hour) * 60 + v.minute) * 60 + v.second) * 1_000_000 + v.fracSec.total!"usecs";
+    }
 
     return Value(
             nativeToBigEndian(us).dup,
