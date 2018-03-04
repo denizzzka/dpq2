@@ -204,7 +204,8 @@ if(isInstanceOf!(Circle, T))
     return createValue(data, OidType.Circle);
 }
 
-private Value createValue(const ubyte[] data, OidType oid) @trusted
+/// Caller must ensure that reference to the data will not be passed to elsewhere
+private Value createValue(const ubyte[] data, OidType oid) pure @trusted
 {
     return Value(cast(immutable) data, oid);
 }
