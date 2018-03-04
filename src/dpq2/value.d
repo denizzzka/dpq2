@@ -22,7 +22,7 @@ struct Value
         ValueFormat _format;
     }
 
-    package ubyte[] _data;
+    package immutable(ubyte)[] _data;
 
     // FIXME:
     // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
@@ -33,7 +33,13 @@ struct Value
     /// ctor
     this(inout ubyte[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) pure
     {
-        this._data = data.dup; //FIXME: _data should be immutable
+        this(data.idup, oidType, isNull, format);
+    }
+
+    /// ditto
+    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) pure
+    {
+        this._data = data;
         this._format = format;
         this._oidType = oidType;
         this._isNull = isNull;
@@ -79,7 +85,7 @@ struct Value
         _oidType = type;
     }
 
-    inout (ubyte[]) data() pure inout
+    immutable(ubyte)[] data() pure const
     {
         import std.exception;
         import core.exception;
