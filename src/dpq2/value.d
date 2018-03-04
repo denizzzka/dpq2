@@ -29,6 +29,7 @@ struct Value
     // One should not modify the data it points to, and one must explicitly copy the data into other
     // storage if it is to be used past the lifetime of the PGresult structure itself.
     // Thus, it is need to store reference to Answer here to ensure that result is still available.
+    // (Also see DIP1000)
     /// ctor
     this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
     {
