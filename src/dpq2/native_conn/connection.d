@@ -3,17 +3,26 @@ module dpq2.native_conn.connection;
 import std.socket;
 import std.datetime: Duration;
 import dpq2.connection: ConnectionException;
+import derelict.pq.types: ConnStatusType;
 
 class NativeConnection
 {
     private Socket socket;
+    private Address addr;
+    private ConnStatusType status;
 
     /// Starts creation of a connection to the database server in a nonblocking manner
     this(string host, ushort port)
     {
         socket = new TcpSocket();
         socket.blocking = false;
-        auto addr = new InternetAddress(host, port);
+        addr = new InternetAddress(host, port);
+
+        startConnect();
+    }
+
+    private void startConnect()
+    {
         socket.connect(addr);
     }
 
