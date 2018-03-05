@@ -32,7 +32,7 @@ alias PGreal =          float; /// real
 alias PGdouble_precision = double; /// double precision
 alias PGtext =          string; /// text
 alias PGnumeric =       string; /// numeric represented as string
-alias PGbytea =         const ubyte[]; /// bytea
+alias PGbytea =         immutable(ubyte)[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
@@ -229,11 +229,7 @@ public void _integration_test( string connParam ) @system
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";
-
-                static if(is(T == const ubyte[]))
-                    params.args = [nativeValue.idup.toValue];
-                else
-                    params.args = [nativeValue.toValue];
+                params.args = [nativeValue.toValue];
 
                 auto answer2 = conn.execParams(params);
                 auto v2 = answer2[0][0];
@@ -241,7 +237,7 @@ public void _integration_test( string connParam ) @system
                 pgValue = pgValue.strip('\'');
 
                 // Special cases:
-                static if(is(T == const ubyte[]))
+                static if(is(T == PGbytea))
                     pgValue = `\x442072756c65730021`; // Server formats its reply slightly different from the passed argument
 
                 static if(is(T == Json))
