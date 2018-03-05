@@ -5,7 +5,7 @@ module dpq2.conv.to_d_types;
 
 import dpq2.value;
 import dpq2.oids: OidType, isNativeInteger, isNativeFloat;
-import dpq2.connection: Connection;
+import dpq2.connection: Connection = LibPqConnection;
 import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;

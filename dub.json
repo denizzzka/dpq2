@@ -20,6 +20,10 @@
 		},
 		{
 			"name": "dynamic"
+		},
+		{
+			"name": "native",
+			"versions": ["native_conn_enabled"]
 		}
 	],
 	"subPackages": [
@@ -33,6 +37,20 @@
 			},
 			"sourcePath": "integration_tests",
 			"versions": ["integration_tests"]
+		},
+		{
+			"name": "integration_tests_native",
+			"targetType": "executable",
+			"dependencies":
+			{
+				"dpq2": "*",
+				"gfm:math": "~>7.0.0"
+			},
+			"sourcePath": "integration_tests",
+			"versions": ["integration_tests"],
+			"subConfigurations": {
+				"dpq2": "native"
+			}
 		},
 		{
 			"name": "example",

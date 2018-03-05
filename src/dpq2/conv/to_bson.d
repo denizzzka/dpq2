@@ -173,7 +173,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
 version (integration_tests)
 public void _integration_test( string connParam )
 {
-    import dpq2.connection: Connection;
+    import dpq2.connection: Connection = LibPqConnection;
     import dpq2.args: QueryParams;
     import std.uuid;
     import std.datetime: SysTime, DateTime, UTC;

@@ -3,7 +3,7 @@ module dpq2.query;
 
 public import dpq2.args;
 
-import dpq2.connection: Connection, ConnectionException;
+import dpq2.connection: LibPqConnection, ConnectionException;
 import dpq2.result: Result;
 import dpq2.value;
 import dpq2.oids: OidType;
@@ -243,7 +243,7 @@ void _integration_test( string connParam ) @trusted
     import dpq2.conv.to_d_types;
     import dpq2.conv.to_bson;
 
-    auto conn = new Connection(connParam);
+    auto conn = new LibPqConnection(connParam);
 
     // Text type arguments testing
     {

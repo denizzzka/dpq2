@@ -6,7 +6,7 @@ public import dpq2.conv.to_bson;
 public import dpq2.oids;
 public import dpq2.value;
 
-import dpq2.connection: Connection;
+import dpq2.connection: Connection = LibPqConnection;
 import dpq2.args: QueryParams;
 import dpq2.exception;
 import derelict.pq.pq;

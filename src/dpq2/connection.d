@@ -39,9 +39,17 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
-/// Connection
-class Connection
+version(native_conn_enabled){}
+else
 {
+    alias Connection = LibPqConnection;
+}
+
+/// Connection
+class LibPqConnection
+{
+    private alias Connection = LibPqConnection;
+
     package PGconn* conn;
 
     invariant
@@ -396,7 +404,7 @@ class Cancellation
     private PGcancel* cancel;
 
     ///
-    this(Connection c)
+    this(LibPqConnection c)
     {
         cancel = PQgetCancel(c.conn);
 
@@ -444,6 +452,8 @@ class CancellationException : Dpq2Exception
 /// Connection exception
 class ConnectionException : Dpq2Exception
 {
+    private alias Connection = LibPqConnection; //FIXME
+
     this(in Connection c, string file, size_t line)
     {
         super(c.errorMessage(), file, line);
@@ -459,6 +469,8 @@ version (integration_tests)
 void _integration_test( string connParam )
 {
     assert( PQlibVersion() >= 9_0100 );
+
+    alias Connection = LibPqConnection;
 
     {
         debug import std.experimental.logger;
