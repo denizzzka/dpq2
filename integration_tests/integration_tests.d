@@ -15,9 +15,13 @@ int main(string[] args)
     string conninfo;
     string native_host = "localhost";
     ushort native_port = 5432;
-    getopt(args, "conninfo", &conninfo);
-    getopt(args, "native_host", &native_host);
-    getopt(args, "native_port", &native_port);
+
+    with(std.getopt.config)
+    getopt(args,
+        required, "conninfo|c", &conninfo,
+        required, "native-host|h", &native_host,
+        required, "native-port|p", &native_port
+    );
 
     version(libpq_conn_enabled)
     {
