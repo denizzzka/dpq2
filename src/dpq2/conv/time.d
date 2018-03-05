@@ -60,10 +60,10 @@ if( is( T == Date ) )
     int year, month, day;
     j2date(jd, year, month, day);
 
-    // TODO: support PG Date as TTimeStamp and remove this check
+    // TODO: support PG Date like TTimeStamp manner and remove this check
     if(year > short.max)
         throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
-            "Year is bigger than supported by std.datetime.Data: "~year.to!string, __FILE__, __LINE__);
+            "Year "~year.to!string~" is bigger than supported by std.datetime.Date", __FILE__, __LINE__);
 
     return Date(year, month, day);
 }
@@ -142,7 +142,7 @@ struct TTimeStamp(bool isWithTZ)
      *
      * If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max
      */
-    private DateTime _dateTime;
+    package DateTime _dateTime;
     Duration fracSec; /// fractional seconds, 1 microsecond resolution
     /// Duplicates year value as int
     ///
@@ -169,6 +169,10 @@ struct TTimeStamp(bool isWithTZ)
         if(infinity != InfinityState.NONE)
             throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
                 "TTimeStamp value is "~infinity.to!string, __FILE__, __LINE__);
+
+        if(realYear > _dateTime.year)
+            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+                "Year "~realYear.to!string~" is bigger than supported by std.datetime.DateTime", __FILE__, __LINE__);
 
         return _dateTime;
     }
@@ -250,7 +254,7 @@ struct TTimeStamp(bool isWithTZ)
     {
         import std.format;
 
-        return format("%04d-%02d-%02d %s %s", realYear, dateTime.month, dateTime.day, dateTime.timeOfDay, fracSec.toString);
+        return format("%04d-%02d-%02d %s %s", realYear, _dateTime.month, _dateTime.day, _dateTime.timeOfDay, fracSec.toString);
     }
 }
 

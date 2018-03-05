@@ -108,8 +108,8 @@ if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
     else
     {
         enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
-        long j = modJulianDayForIntYear(v.realYear, v.dateTime.month, v.dateTime.day) - mj_pg_epoch;
-        us = (((j * 24 + v.dateTime.hour) * 60 + v.dateTime.minute) * 60 + v.dateTime.second) * 1_000_000 + v.fracSec.total!"usecs";
+        long j = modJulianDayForIntYear(v.realYear, v._dateTime.month, v._dateTime.day) - mj_pg_epoch;
+        us = (((j * 24 + v._dateTime.hour) * 60 + v._dateTime.minute) * 60 + v._dateTime.second) * 1_000_000 + v.fracSec.total!"usecs";
     }
 
     return Value(
