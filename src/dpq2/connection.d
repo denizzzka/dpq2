@@ -39,8 +39,7 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
-version(native_conn_enabled){}
-else
+version(libpq_conn_enabled)
 {
     alias Connection = LibPqConnection;
 }

@@ -16,14 +16,15 @@
 	"configurations": [
 		{
 			"name": "static",
-			"libs": ["pq"]
+			"libs": ["pq"],
+			"versions": ["libpq_conn_enabled"]
 		},
 		{
-			"name": "dynamic"
+			"name": "dynamic",
+			"versions": ["libpq_conn_enabled"]
 		},
 		{
-			"name": "native",
-			"versions": ["native_conn_enabled"]
+			"name": "native"
 		}
 	],
 	"subPackages": [

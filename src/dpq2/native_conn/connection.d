@@ -15,3 +15,8 @@ class NativeConnection
         socket.connect(addr);
     }
 }
+
+version (integration_tests)
+void _integration_test( string connParam )
+{
+}
