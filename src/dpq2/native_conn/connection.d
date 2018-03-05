@@ -1,3 +1,4 @@
+///
 module dpq2.native_conn.connection;
 
 import dpq2.native_conn.internal.socket;
@@ -6,6 +7,7 @@ import dpq2.connection: ConnectionException;
 import derelict.pq.types: ConnStatusType;
 import std.array: Appender;
 
+///
 struct ConnParams
 {
     public string host = "localhost"; /// Host to connect to
@@ -15,6 +17,7 @@ struct ConnParams
     public string dbname = "postgres"; /// Database to connect to
 }
 
+///
 class NativeConnection
 {
     private ConnParams connParams;
