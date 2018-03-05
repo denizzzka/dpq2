@@ -9,7 +9,8 @@
 	"targetPath": "bin",
 	"dependencies": {
 		"derelict-pq": "~>3.0.0-alpha.2",
-		"vibe-d:data": "~>0.8.3-beta.1"
+		"vibe-d:data": "~>0.8.3-beta.1",
+		"vibe-core": "~>1.4.0-rc.1"
 	},
 	"targetType": "sourceLibrary",
 	"-ddoxTool": "scod",
@@ -40,7 +41,7 @@
 			"versions": ["integration_tests"]
 		},
 		{
-			"name": "integration_tests_native",
+			"name": "integration_tests_native_only",
 			"targetType": "executable",
 			"dependencies":
 			{
