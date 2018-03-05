@@ -17,6 +17,7 @@ class NativeConnection
 }
 
 version (integration_tests)
-void _integration_test( string connParam )
+void _integration_test(string host, ushort port)
 {
+    auto conn = new NativeConnection(host, port);
 }
