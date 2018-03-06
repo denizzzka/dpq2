@@ -121,15 +121,35 @@ if( is( T == DateTime ) )
     return v.binaryValueAs!TimeStamp.dateTime;
 }
 
-private enum lowestPgYear = -4712;
-private enum biggestPgYear = 294276;
-
 ///
 enum InfinityState : byte
 {
     NONE = 0, ///
     INFINITY_MIN = -1, ///
     INFINITY_MAX = 1, ///
+}
+
+///
+struct PgDate
+{
+    int year; ///
+    ubyte month; ///
+    ubyte day; ///
+
+    /// '-infinity', earlier than all other dates
+    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
+
+    /// 'infinity', later than all other dates
+    static PgDate later() pure { return PgDate(int.max, 0, 0); }
+
+    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
+    bool isLater() const pure { return year == later.year; } /// 'infinity'
+}
+
+///
+static toPgDate(Date d) pure
+{
+    return PgDate(d.year, d.month, d.day);
 }
 
 /++
@@ -140,56 +160,57 @@ struct TTimeStamp(bool isWithTZ)
     /**
      * Date and time of TimeStamp
      *
-     * If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max
+     * If value is '-infinity' or '+infinity' it will be equal PgDate.min or PgDate.max
      */
-    package DateTime _dateTime;
+    PgDate date;
+    TimeOfDay time; ///
     Duration fracSec; /// fractional seconds, 1 microsecond resolution
-    /// Duplicates year value as int
+
     ///
-    /// Issue 18552 - std.datetime.date.Date strips year int argument to short
-    /// https://issues.dlang.org/show_bug.cgi?id=18552
-    int realYear;
-
-    this(DateTime dt, Duration fractionalSeconds = Duration.zero, int year = 0) pure
+    this(DateTime dt, Duration fractionalSeconds = Duration.zero) pure
     {
-        _dateTime = dt;
-        fracSec = fractionalSeconds;
-
-        if(year)
-        {
-            realYear = year;
-            _dateTime.year = year;
-        }
-        else
-            realYear = _dateTime.year;
+        this(dt.date.toPgDate, dt.timeOfDay, fractionalSeconds);
     }
 
+    ///
+    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
+    {
+        date = d;
+        time = t;
+        fracSec = fractionalSeconds;
+    }
+
+    ///
+    void throwIfNotFitsToDate() const
+    {
+        if(date.year > short.max)
+            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+                "Year "~date.year.to!string~" is bigger than supported by std.datetime", __FILE__, __LINE__);
+    }
+
+    ///
     DateTime dateTime() const pure
     {
         if(infinity != InfinityState.NONE)
             throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
                 "TTimeStamp value is "~infinity.to!string, __FILE__, __LINE__);
 
-        if(realYear > _dateTime.year)
-            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
-                "Year "~realYear.to!string~" is bigger than supported by std.datetime.DateTime", __FILE__, __LINE__);
+        throwIfNotFitsToDate();
 
-        return _dateTime;
+        return DateTime(Date(date.year, date.month, date.day), time);
     }
 
     invariant()
     {
-        assert(realYear >= lowestPgYear, "Year too low: "~realYear.to!string);
-        assert(realYear <= biggestPgYear, "Year too big: "~realYear.to!string);
-
         assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
         assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
         assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
     }
 
-    bool isEarlier() const pure { return _dateTime == earlier._dateTime; } /// '-infinity'
-    bool isLater() const pure { return _dateTime == later._dateTime; } /// 'infinity'
+    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
+    bool isLater() const pure { return date.isLater; } /// 'infinity'
 
+    /// Returns infinity state
     InfinityState infinity() const pure
     {
         with(InfinityState)
@@ -228,7 +249,7 @@ struct TTimeStamp(bool isWithTZ)
         is -1, etc." (Phobos docs). But Postgres isn't uses ISO 8601
         for date calculation.
         */
-        return TTimeStamp(DateTime(Date(lowestPgYear, 1, 1)), Duration.zero);
+        return TTimeStamp(PgDate(-4712, 1, 1), TimeOfDay.min, Duration.zero);
     }
 
     /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
@@ -236,25 +257,21 @@ struct TTimeStamp(bool isWithTZ)
     {
         enum maxFract = 1.seconds - 1.usecs;
 
-        return TTimeStamp(DateTime(123, 12, 31, 23, 59, 59), maxFract, biggestPgYear);
+        return TTimeStamp(PgDate(294276, 12, 31), TimeOfDay(23, 59, 59), maxFract);
     }
 
     /// '-infinity', earlier than all other time stamps
-    static immutable(TTimeStamp) earlier() pure
-    {
-        // -1 prevents invariant "year too low" error
-        return TTimeStamp(DateTime.min, Duration.zero, -1);
-    }
+    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.earlier); }
 
     /// 'infinity', later than all other time stamps
-    static immutable(TTimeStamp) later() pure { return TTimeStamp(DateTime.max); }
+    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.later); }
 
     ///
     string toString() const
     {
         import std.format;
 
-        return format("%04d-%02d-%02d %s %s", realYear, _dateTime.month, _dateTime.day, _dateTime.timeOfDay, fracSec.toString);
+        return format("%04d-%02d-%02d %s %s", date.year, date.month, date.day, time, fracSec.toString);
     }
 }
 
@@ -333,18 +350,19 @@ if(is(T == TimeStamp) || is(T == TimeStampUTC))
 
 TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 {
-    auto dateTime = DateTime(
+    return TimeStamp(
+        PgDate(
             tm.tm_year,
-            tm.tm_mon,
-            tm.tm_mday,
+            cast(ubyte) tm.tm_mon,
+            cast(ubyte) tm.tm_mday
+        ),
+        TimeOfDay(
             tm.tm_hour,
             tm.tm_min,
             tm.tm_sec
-        );
-
-    auto fracSec = dur!"usecs"(ts);
-
-    return TimeStamp(dateTime, fracSec, tm.tm_year);
+        ),
+        ts.dur!"usecs"
+    );
 }
 
 // Here is used names from the original Postgresql source
