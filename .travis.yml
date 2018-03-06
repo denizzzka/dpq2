@@ -17,8 +17,9 @@ addons:
 services: postgresql
 
 env:
-  - CONN_STRING="--conninfo=dbname=postgres"
-  - TESTS_OPTS="--conninfo=dbname=postgres --native-host=localhost --native-port=5432"
+  global:
+    - CONN_STRING="--conninfo=dbname=postgres"
+    - TESTS_OPTS="--conninfo=dbname=postgres --native-host=localhost --native-port=5432"
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
