@@ -28,7 +28,7 @@ script:
 
 matrix:
   include:
-    - d: dmd
+    - d: dmd-2.078.3
 
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- ${TESTS_OPTS}
