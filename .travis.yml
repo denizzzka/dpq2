@@ -24,16 +24,16 @@ before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script:
-  - dub run dpq2:integration_tests --build=unittest -- ${TESTS_OPTS}
-  - dub run dpq2:integration_tests --build=release -- ${TESTS_OPTS}
+  - dub run dpq2:integration_tests --build=unittest -- "${TESTS_OPTS}"
+  - dub run dpq2:integration_tests --build=release -- "${TESTS_OPTS}"
 
 matrix:
   include:
     - d: dmd-2.078.3
 
       script:
-        - dub run dpq2:integration_tests --build=unittest-cov -- ${TESTS_OPTS}
-        - dub run dpq2:example --build=release -- ${CONN_STRING}
+        - dub run dpq2:integration_tests --build=unittest-cov -- "${TESTS_OPTS}"
+        - dub run dpq2:example --build=release -- "${CONN_STRING}"
         - dub build --build=ddox
 
       before_install:
