@@ -157,7 +157,7 @@ struct TTimeStamp(bool isWithTZ)
      * If value is '-infinity' or '+infinity' it will be equal PgDate.min or PgDate.max
      */
     PgDate date;
-    TimeOfDay time;
+    TimeOfDay time; ///
     Duration fracSec; /// fractional seconds, 1 microsecond resolution
 
     ///
