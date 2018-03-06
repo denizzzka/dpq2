@@ -121,9 +121,6 @@ if( is( T == DateTime ) )
     return v.binaryValueAs!TimeStamp.dateTime;
 }
 
-private enum lowestPgYear = -4712;
-private enum biggestPgYear = 294276;
-
 ///
 enum InfinityState : byte
 {
@@ -246,7 +243,7 @@ struct TTimeStamp(bool isWithTZ)
         is -1, etc." (Phobos docs). But Postgres isn't uses ISO 8601
         for date calculation.
         */
-        return TTimeStamp(PgDate(lowestPgYear, 1, 1), TimeOfDay.min, Duration.zero);
+        return TTimeStamp(PgDate(-4712, 1, 1), TimeOfDay.min, Duration.zero);
     }
 
     /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
@@ -254,7 +251,7 @@ struct TTimeStamp(bool isWithTZ)
     {
         enum maxFract = 1.seconds - 1.usecs;
 
-        return TTimeStamp(PgDate(biggestPgYear, 12, 31), TimeOfDay(23, 59, 59), maxFract);
+        return TTimeStamp(PgDate(294276, 12, 31), TimeOfDay(23, 59, 59), maxFract);
     }
 
     /// '-infinity', earlier than all other time stamps
