@@ -468,4 +468,4 @@
        |
        |        static assert([RecursiveFunctionAttributes!(D.test)] == [3, 2, 1]);
        |}
-../../../.dub/packages/vibe-d-0.8.2/vibe-d/utils/vibe/internal/meta/traits.d has no code
+../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/utils/vibe/internal/meta/traits.d has no code

@@ -834,10 +834,7 @@
        |        auto result = cast(T) chunk.ptr;
        |
        |        // Initialize the object in its pre-ctor state
-       |        static if (__VERSION__ < 2071)
-       |                chunk[0 .. classSize] = typeid(T).init[];
-       |        else
-       |                chunk[0 .. classSize] = typeid(T).initializer[]; // Avoid deprecation warning
+       |        chunk[0 .. classSize] = typeid(T).initializer[]; // Avoid deprecation warning
        |
        |        // Call the ctor if any
        |        static if (is(typeof(result.__ctor(args))))
@@ -871,4 +868,4 @@
        |}
        |
        |private void logDebug_(ARGS...)(string msg, ARGS args) {}
-../../../.dub/packages/vibe-d-0.8.2/vibe-d/utils/vibe/internal/memory_legacy.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/utils/vibe/internal/memory_legacy.d is 0% covered

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Variable TTimeStamp.dateTime</title>
+		<title>Variable TTimeStamp._dateTime</title>
 		<link rel="stylesheet" href="../../../css/style.min.css"/>
 		<script type="text/javascript" src="../../../js/script.min.js"></script>
 	</head>
@@ -39,6 +39,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../../dpq2/conv/from_d_types.html">from_d_types</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dpq2/conv/geometric.html">geometric</a>
 						</div>
 					</li>
 					<li>
@@ -109,7 +114,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Variable TTimeStamp.dateTime</h1><p>date and time of TimeStamp
+				<h1>Variable TTimeStamp._dateTime</h1><p>Date and time of TimeStamp
 </p>
 				<div class="prototype">
 					<code class="lang-d">
@@ -122,7 +127,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</span>
 				&nbsp;&nbsp;<span class="com">// ...</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">DateTime</span> <span class="pln">dateTime</span>
+				&nbsp;&nbsp;<span class="typ">DateTime</span> <span class="pln">_dateTime</span>
 				<span class="pun">;</span>
 				<br/>
 				&nbsp;&nbsp;<span class="com">// ...</span>
@@ -131,7 +136,10 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</code>
 				</div>
-				
+				<section><p>If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max
+</p>
+</section>
+
 				
 			</div>
 			<footer>

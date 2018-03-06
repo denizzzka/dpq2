@@ -9,9 +9,9 @@ import dpq2.connection: Connection;
 import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
-import dpq2.conv.geometric : binaryValueAs, Box, Circle, Line, LineSegment, Path, Point, Polygon;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
+import dpq2.conv.geometric: binaryValueAs, Line;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;
@@ -32,20 +32,14 @@ alias PGreal =          float; /// real
 alias PGdouble_precision = double; /// double precision
 alias PGtext =          string; /// text
 alias PGnumeric =       string; /// numeric represented as string
-alias PGbytea =         const ubyte[]; /// bytea
+alias PGbytea =         immutable(ubyte)[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtimestamp = TimeStamp; /// Both date and time without time zone
 alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
 alias PGjson =          Json; /// json or jsonb
-alias PGpoint =         Point; /// Point
-alias PGline =          Line; /// LineSegment
-alias PGlseg =          LineSegment; /// LineSegment
-alias PGbox =           Box; /// Box
-alias PGpath =          Path; /// Path
-alias PGpolygon =       Polygon; /// Polygon
-alias PGcircle =        Circle; /// Circle
+alias PGline =          Line; /// Line (geometric type)
 
 private alias VF = ValueFormat;
 private alias AE = ValueConvException;
@@ -92,6 +86,15 @@ if(!is(T == string) && !is(T == Bson))
 
 package:
 
+/*
+ * Something was broken in DMD64 D Compiler v2.079.0-rc.1 so I made this "tunnel"
+ * TODO: remove it and replace by direct binaryValueAs calls
+ */
+auto tunnelForBinaryValueAsCalls(T)(in Value v)
+{
+    return binaryValueAs!T(v);
+}
+
 string valueAsString(in Value v) pure
 {
     if (v.isNull) return null;
@@ -100,10 +103,10 @@ string valueAsString(in Value v) pure
 
 /// Returns value as bytes from binary formatted field
 T binaryValueAs(T)(in Value v)
-if( is( T == const(ubyte[]) ) )
+if(is(T : const ubyte[]))
 {
     if(!(v.oidType == OidType.ByteArray))
-        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "immutable ubyte[] or string", __FILE__, __LINE__);
 
     return v.data;
 }
@@ -219,27 +222,36 @@ public void _integration_test( string connParam ) @system
             auto result = v.as!T;
 
             assert(result == nativeValue,
-                format("Received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
                 v.oidType, typeid(T), pgValue, nativeValue, result)
             );
 
-            //TODO: Implement toValue for all tested types and remove the condition
-            static if (!is(T == UUID) && !is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";
                 params.args = [nativeValue.toValue];
+
                 auto answer2 = conn.execParams(params);
                 auto v2 = answer2[0][0];
                 auto textResult = v2.as!string.strip(' ');
                 pgValue = pgValue.strip('\'');
 
+                // Special cases:
+                static if(is(T == PGbytea))
+                    pgValue = `\x442072756c65730021`; // Server formats its reply slightly different from the passed argument
+
+                static if(is(T == Json))
+                {
+                    // Reformatting by same way in the hope that the data will be sorted same in both cases
+                    pgValue = pgValue.parseJsonString.toString;
+                    textResult = textResult.parseJsonString.toString;
+                }
+
                 assert(textResult == pgValue,
-                    format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
+                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
                     v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
                 );
             }
-            else pragma(msg, T, " Is not tested in integration tests!");
         }
 
         alias C = testIt; // "C" means "case"
@@ -296,11 +308,20 @@ public void _integration_test( string connParam ) @system
 
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
+        {
+            import std.exception : assertThrown;
+
+            assertThrown!ValueConvException(
+                    C!PGdate(Date(0001, 01, 8), "date", "'5874897-12-31'")
+                );
+        }
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
-        C!PGtimestamp(PGtimestamp.max, "timestamp without time zone", "'infinity'");
-        C!PGtimestamp(PGtimestamp.min, "timestamp without time zone", "'-infinity'");
         C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
+        C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");
+        C!PGtimestamp(PGtimestamp.later, "timestamp", "'infinity'");
+        C!PGtimestamp(PGtimestamp.min, "timestamp", `'4713-01-01 00:00:00 BC'`);
+        C!PGtimestamp(PGtimestamp.max, "timestamp", `'294276-12-31 23:59:59.999999'`);
 
         // SysTime testing
         auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
@@ -317,13 +338,16 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        C!PGpoint(Point(1,2), "point", "'(1,2)'");
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
+        mixin GeometricInstancesForIntegrationTest;
+
+        C!Point(Point(1,2), "point", "'(1,2)'");
         C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
-        C!PGlseg(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
-        C!PGbox(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
-        C!PGpath(Path(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
-        C!PGpath(Path(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
-        C!PGpolygon(Polygon([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
-        C!PGcircle(Circle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+        C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
+        C!Box(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
+        C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
+        C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
+        C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
+        C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
     }
 }

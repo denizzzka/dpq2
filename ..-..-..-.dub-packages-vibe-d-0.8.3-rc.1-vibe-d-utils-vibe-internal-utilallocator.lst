@@ -1,14 +1,14 @@
        |module vibe.internal.utilallocator;
        |
-       |public import std.experimental.allocator : allocatorObject, CAllocatorImpl, dispose,
+       |public import stdx.allocator : allocatorObject, CAllocatorImpl, dispose,
        |           expandArray, IAllocator, make, makeArray, shrinkArray, theAllocator;
-       |public import std.experimental.allocator.mallocator;
-       |public import std.experimental.allocator.building_blocks.affix_allocator;
+       |public import stdx.allocator.mallocator;
+       |public import stdx.allocator.building_blocks.affix_allocator;
        |
        |// NOTE: this needs to be used instead of theAllocator due to Phobos issue 17564
        |@property IAllocator vibeThreadAllocator()
        |@safe nothrow @nogc {
-       |        import std.experimental.allocator.gc_allocator;
+       |        import stdx.allocator.gc_allocator;
 0000000|        static IAllocator s_threadAllocator;
 0000000|        if (!s_threadAllocator)
 0000000|                s_threadAllocator = () @trusted { return allocatorObject(GCAllocator.instance); } ();
@@ -20,10 +20,7 @@
        |        import std.algorithm.comparison : min, max;
        |        import std.conv : emplace;
        |
-       |        static if (__VERSION__ < 2072)
-       |                import std.experimental.allocator.common : Ternary;
-       |        else
-       |                import std.typecons : Ternary;
+       |        import std.typecons : Ternary;
        |
        |        static struct Pool { Pool* next; void[] data; void[] remaining; }
        |        private {
@@ -184,4 +181,4 @@
        |                return true;
        |        }
        |}
-../../../.dub/packages/vibe-d-0.8.2/vibe-d/utils/vibe/internal/utilallocator.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/utils/vibe/internal/utilallocator.d is 0% covered

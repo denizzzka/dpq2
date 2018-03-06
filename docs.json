@@ -619,7 +619,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 18,
+						"line": 21,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -627,13 +627,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 25,
+						"endline": 28,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 18,
+				"line": 21,
 				"comment": "Converts Nullable!T to Value\n",
 				"parameters": [
 					{
@@ -650,7 +650,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 28,
+						"line": 31,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -658,13 +658,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 32,
+						"endline": 35,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 28,
+				"line": 31,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -681,7 +681,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 35,
+						"line": 38,
 						"type": "@trusted Value(T v, ValueFormat valueFormat = ValueFormat.BINARY)",
 						"parameters": [
 							{
@@ -694,13 +694,13 @@
 								"default": "ValueFormat.BINARY"
 							}
 						],
-						"endline": 43,
+						"endline": 47,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 35,
+				"line": 38,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -717,7 +717,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 46,
+						"line": 50,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -725,21 +725,21 @@
 								"type": "T"
 							}
 						],
-						"endline": 50,
+						"endline": 54,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 46,
-				"comment": "\n",
+				"line": 50,
+				"comment": "Constructs Value from array of bytes\n",
 				"parameters": [
 					{
 						"name": "T",
 						"kind": "type"
 					}
 				],
-				"constraint": "is(T == ubyte[])",
+				"constraint": "is(T : immutable(ubyte[]))",
 				"char": 7,
 				"kind": "template"
 			},
@@ -748,7 +748,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 53,
+						"line": 57,
 						"type": "@trusted Value(T v)",
 						"parameters": [
 							{
@@ -756,13 +756,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 61,
+						"endline": 63,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 53,
+				"line": 57,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -780,7 +780,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 64,
+						"line": 66,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -788,13 +788,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 85,
+						"endline": 87,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 64,
+				"line": 66,
 				"comment": "Constructs Value from Date\n",
 				"parameters": [
 					{
@@ -811,7 +811,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 88,
+						"line": 90,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -819,13 +819,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 94,
+						"endline": 96,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 88,
+				"line": 90,
 				"comment": "Constructs Value from TimeOfDay\n",
 				"parameters": [
 					{
@@ -842,7 +842,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 97,
+						"line": 99,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -850,13 +850,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 109,
+						"endline": 120,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 97,
+				"line": 99,
 				"comment": "Constructs Value from TimeStamp or from TimeStampUTC\n",
 				"parameters": [
 					{
@@ -873,7 +873,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 115,
+						"line": 144,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -881,13 +881,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 119,
+						"endline": 148,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 115,
+				"line": 144,
 				"comment": "    Constructs Value from DateTime\n    It uses Timestamp without TZ as a resulting PG type\n",
 				"parameters": [
 					{
@@ -904,7 +904,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 127,
+						"line": 156,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -912,13 +912,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 133,
+						"endline": 162,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 127,
+				"line": 156,
 				"comment": "    Constructs Value from SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n",
 				"parameters": [
 					{
@@ -928,6 +928,331 @@
 				],
 				"constraint": "is(Unqual!T == SysTime)",
 				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 165,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 169,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 165,
+				"comment": "Constructs Value from UUID\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == UUID)",
+				"char": 7,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "toValue",
+						"line": 172,
+						"type": "Value(T v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "T"
+							}
+						],
+						"endline": 179,
+						"char": 7,
+						"kind": "function"
+					}
+				],
+				"name": "toValue",
+				"line": 172,
+				"comment": "Constructs Value from Json\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"constraint": "is(Unqual!T == Json)",
+				"char": 7,
+				"kind": "template"
+			}
+		],
+		"comment": "\n",
+		"kind": "module"
+	},
+	{
+		"file": "src/dpq2/conv/geometric.d",
+		"name": "dpq2.conv.geometric",
+		"members": [
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "isValidPointType",
+						"line": 25,
+						"type": "bool()",
+						"endline": 35,
+						"char": 6,
+						"kind": "function"
+					}
+				],
+				"name": "isValidPointType",
+				"line": 25,
+				"comment": "Checks that type have \"x\" and \"y\" members of returning type \"double\"\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"char": 6,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "isValidBoxType",
+						"line": 38,
+						"type": "bool()",
+						"endline": 48,
+						"char": 6,
+						"kind": "function"
+					}
+				],
+				"name": "isValidBoxType",
+				"line": 38,
+				"comment": "Checks that type have \"min\" and \"max\" members of suitable returning type of point\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"char": 6,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "isValidLineSegmentType",
+						"line": 51,
+						"type": "bool()",
+						"endline": 61,
+						"char": 6,
+						"kind": "function"
+					}
+				],
+				"name": "isValidLineSegmentType",
+				"line": 51,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"char": 6,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "isValidPolygon",
+						"line": 64,
+						"type": "bool()",
+						"endline": 67,
+						"char": 6,
+						"kind": "function"
+					}
+				],
+				"name": "isValidPolygon",
+				"line": 64,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "T",
+						"kind": "type"
+					}
+				],
+				"char": 6,
+				"kind": "template"
+			},
+			{
+				"name": "Line",
+				"line": 107,
+				"comment": "Infinite line - {A,B,C} (Ax + By + C = 0)\n",
+				"members": [
+					{
+						"offset": 0,
+						"name": "a",
+						"line": 109,
+						"comment": "\n",
+						"deco": "d",
+						"char": 12,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"offset": 8,
+						"name": "b",
+						"line": 110,
+						"comment": "\n",
+						"deco": "d",
+						"char": 12,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"offset": 16,
+						"name": "c",
+						"line": 111,
+						"comment": "\n",
+						"deco": "d",
+						"char": 12,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					}
+				],
+				"char": 1,
+				"kind": "struct"
+			},
+			{
+				"members": [
+					{
+						"name": "Path",
+						"line": 115,
+						"members": [
+							{
+								"name": "isClosed",
+								"line": 118,
+								"comment": "\n",
+								"deco": "b",
+								"char": 10,
+								"kind": "variable"
+							},
+							{
+								"name": "points",
+								"line": 119,
+								"comment": "\n",
+								"type": "Point[]",
+								"char": 13,
+								"kind": "variable"
+							}
+						],
+						"char": 1,
+						"kind": "struct"
+					}
+				],
+				"name": "Path",
+				"line": 115,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "Point",
+						"kind": "type"
+					}
+				],
+				"constraint": "isValidPointType!Point",
+				"char": 1,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"name": "Circle",
+						"line": 123,
+						"members": [
+							{
+								"name": "center",
+								"line": 126,
+								"comment": "\n",
+								"type": "Point",
+								"char": 11,
+								"kind": "variable"
+							},
+							{
+								"name": "radius",
+								"line": 127,
+								"comment": "\n",
+								"deco": "d",
+								"char": 12,
+								"kind": "variable"
+							}
+						],
+						"char": 1,
+						"kind": "struct"
+					}
+				],
+				"name": "Circle",
+				"line": 123,
+				"comment": "\n",
+				"parameters": [
+					{
+						"name": "Point",
+						"kind": "type"
+					}
+				],
+				"constraint": "isValidPointType!Point",
+				"char": 1,
+				"kind": "template"
+			},
+			{
+				"members": [
+					{
+						"endchar": 1,
+						"name": "binaryValueAs",
+						"line": 217,
+						"type": "Vec2Ddouble(in Value v)",
+						"parameters": [
+							{
+								"name": "v",
+								"type": "Value",
+								"storageClass": [
+									"in"
+								]
+							}
+						],
+						"endline": 230,
+						"char": 13,
+						"kind": "function"
+					}
+				],
+				"name": "binaryValueAs",
+				"line": 217,
+				"comment": "Convert to Point\n",
+				"parameters": [
+					{
+						"name": "Vec2Ddouble",
+						"kind": "type"
+					}
+				],
+				"constraint": "isValidPointType!Vec2Ddouble",
+				"char": 13,
 				"kind": "template"
 			}
 		],
@@ -950,7 +1275,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 31,
+						"line": 32,
 						"type": "@trusted SysTime(in Value v)",
 						"parameters": [
 							{
@@ -961,13 +1286,13 @@
 								]
 							}
 						],
-						"endline": 43,
+						"endline": 44,
 						"char": 9,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 31,
+				"line": 32,
 				"comment": "    Returns value timestamp with time zone as SysTime\n\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n\n    Because of these differences, it can happen that database value will not fit to the SysTime range of values.\n",
 				"parameters": [
 					{
@@ -984,7 +1309,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 48,
+						"line": 49,
 						"type": "@trusted Date(in Value v)",
 						"parameters": [
 							{
@@ -995,13 +1320,13 @@
 								]
 							}
 						],
-						"endline": 63,
+						"endline": 69,
 						"char": 6,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 48,
+				"line": 49,
 				"comment": "Returns value data as native Date\n",
 				"parameters": [
 					{
@@ -1018,7 +1343,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 66,
+						"line": 72,
 						"type": "@trusted TimeOfDay(in Value v)",
 						"parameters": [
 							{
@@ -1029,13 +1354,13 @@
 								]
 							}
 						],
-						"endline": 77,
+						"endline": 83,
 						"char": 11,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 66,
+				"line": 72,
 				"comment": "Returns value time without time zone as native TimeOfDay\n",
 				"parameters": [
 					{
@@ -1052,7 +1377,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 80,
+						"line": 86,
 						"type": "@trusted TimeStamp(in Value v)",
 						"parameters": [
 							{
@@ -1063,13 +1388,13 @@
 								]
 							}
 						],
-						"endline": 93,
+						"endline": 99,
 						"char": 11,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 80,
+				"line": 86,
 				"comment": "Returns value timestamp without time zone as TimeStamp\n",
 				"parameters": [
 					{
@@ -1086,7 +1411,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 96,
+						"line": 102,
 						"type": "@trusted TimeStampUTC(in Value v)",
 						"parameters": [
 							{
@@ -1097,13 +1422,13 @@
 								]
 							}
 						],
-						"endline": 109,
+						"endline": 115,
 						"char": 14,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 96,
+				"line": 102,
 				"comment": "Returns value timestamp with time zone as TimeStampUTC\n",
 				"parameters": [
 					{
@@ -1120,7 +1445,7 @@
 					{
 						"endchar": 1,
 						"name": "binaryValueAs",
-						"line": 112,
+						"line": 118,
 						"type": "@trusted DateTime(in Value v)",
 						"parameters": [
 							{
@@ -1131,13 +1456,13 @@
 								]
 							}
 						],
-						"endline": 116,
+						"endline": 122,
 						"char": 10,
 						"kind": "function"
 					}
 				],
 				"name": "binaryValueAs",
-				"line": 112,
+				"line": 118,
 				"comment": "Returns value timestamp without time zone as DateTime (it drops the fracSecs from the database value)\n",
 				"parameters": [
 					{
@@ -1152,33 +1477,95 @@
 			{
 				"members": [
 					{
+						"name": "NONE",
+						"line": 130,
+						"value": "cast(byte)0",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "INFINITY_MIN",
+						"line": 131,
+						"value": "cast(byte)-1",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					},
+					{
+						"name": "INFINITY_MAX",
+						"line": 132,
+						"value": "cast(byte)1",
+						"comment": "\n",
+						"char": 5,
+						"kind": "enum member"
+					}
+				],
+				"name": "InfinityState",
+				"line": 128,
+				"comment": "\n",
+				"baseDeco": "g",
+				"char": 1,
+				"kind": "enum"
+			},
+			{
+				"members": [
+					{
 						"name": "TTimeStamp",
-						"line": 121,
+						"line": 138,
 						"members": [
 							{
-								"name": "dateTime",
-								"line": 123,
-								"comment": "date and time of TimeStamp\n",
+								"name": "_dateTime",
+								"line": 145,
+								"comment": " Date and time of TimeStamp\n\n If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max\n",
 								"type": "DateTime",
-								"char": 14,
+								"char": 22,
 								"kind": "variable"
 							},
 							{
 								"name": "fracSec",
-								"line": 124,
-								"comment": "fractional seconds\n",
+								"line": 146,
+								"comment": "fractional seconds, 1 microsecond resolution\n",
 								"type": "Duration",
 								"char": 14,
 								"kind": "variable"
 							},
 							{
+								"name": "realYear",
+								"line": 151,
+								"comment": "Duplicates year value as int\n\nIssue 18552 - std.datetime.date.Date strips year int argument to short\nhttps://issues.dlang.org/show_bug.cgi?id=18552\n",
+								"deco": "i",
+								"char": 9,
+								"kind": "variable"
+							},
+							{
+								"endchar": 74,
+								"name": "isEarlier",
+								"line": 190,
+								"comment": "'-infinity'\n",
+								"type": "const pure bool()",
+								"endline": 190,
+								"char": 10,
+								"kind": "function"
+							},
+							{
+								"endchar": 70,
+								"name": "isLater",
+								"line": 191,
+								"comment": "'infinity'\n",
+								"type": "const pure bool()",
+								"endline": 191,
+								"char": 10,
+								"kind": "function"
+							},
+							{
 								"endchar": 5,
-								"name": "max",
-								"line": 137,
-								"comment": "Returns the TimeStamp farthest in the future which is representable by TimeStamp.\n",
-								"type": "()",
-								"endline": 140,
-								"char": 12,
+								"name": "min",
+								"line": 221,
+								"comment": "Returns the TimeStamp farthest in the past which is representable by TimeStamp.\n",
+								"type": "immutable(TTimeStamp)()",
+								"endline": 232,
+								"char": 34,
 								"kind": "function",
 								"storageClass": [
 									"static"
@@ -1186,12 +1573,38 @@
 							},
 							{
 								"endchar": 5,
-								"name": "min",
-								"line": 143,
-								"comment": "Returns the TimeStamp farthest in the past which is representable by TimeStamp.\n",
-								"type": "()",
-								"endline": 146,
-								"char": 12,
+								"name": "max",
+								"line": 235,
+								"comment": "Returns the TimeStamp farthest in the future which is representable by TimeStamp.\n",
+								"type": "immutable(TTimeStamp)()",
+								"endline": 240,
+								"char": 34,
+								"kind": "function",
+								"storageClass": [
+									"static"
+								]
+							},
+							{
+								"endchar": 5,
+								"name": "earlier",
+								"line": 243,
+								"comment": "'-infinity', earlier than all other time stamps\n",
+								"type": "pure immutable(TTimeStamp)()",
+								"endline": 247,
+								"char": 34,
+								"kind": "function",
+								"storageClass": [
+									"static"
+								]
+							},
+							{
+								"endchar": 82,
+								"name": "later",
+								"line": 250,
+								"comment": "'infinity', later than all other time stamps\n",
+								"type": "pure immutable(TTimeStamp)()",
+								"endline": 250,
+								"char": 34,
 								"kind": "function",
 								"storageClass": [
 									"static"
@@ -1200,10 +1613,10 @@
 							{
 								"endchar": 5,
 								"name": "toString",
-								"line": 149,
+								"line": 253,
 								"comment": "\n",
 								"type": "const string()",
-								"endline": 152,
+								"endline": 258,
 								"char": 12,
 								"kind": "function"
 							}
@@ -1213,7 +1626,7 @@
 					}
 				],
 				"name": "TTimeStamp",
-				"line": 121,
+				"line": 138,
 				"comment": "    Structure to represent PostgreSQL Timestamp with/without time zone\n",
 				"parameters": [
 					{
@@ -1227,7 +1640,7 @@
 			},
 			{
 				"name": "TimeStamp",
-				"line": 155,
+				"line": 261,
 				"comment": "Unknown TZ timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
 				"char": 1,
@@ -1235,7 +1648,7 @@
 			},
 			{
 				"name": "TimeStampUTC",
-				"line": 156,
+				"line": 262,
 				"comment": "Assumed that this is UTC timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
 				"char": 1,
@@ -1367,12 +1780,9 @@
 				"name": "PGbytea",
 				"line": 35,
 				"comment": "bytea\n",
-				"deco": "xAh",
+				"deco": "Ayh",
 				"char": 1,
-				"kind": "alias",
-				"storageClass": [
-					"const"
-				]
+				"kind": "alias"
 			},
 			{
 				"name": "PGuuid",
@@ -1423,58 +1833,10 @@
 				"kind": "alias"
 			},
 			{
-				"name": "PGpoint",
-				"line": 42,
-				"comment": "Point\n",
-				"deco": "S4dpq24conv9geometric5Point",
-				"char": 1,
-				"kind": "alias"
-			},
-			{
 				"name": "PGline",
-				"line": 43,
-				"comment": "LineSegment\n",
+				"line": 42,
+				"comment": "Line (geometric type)\n",
 				"deco": "S4dpq24conv9geometric4Line",
-				"char": 1,
-				"kind": "alias"
-			},
-			{
-				"name": "PGlseg",
-				"line": 44,
-				"comment": "LineSegment\n",
-				"deco": "S4dpq24conv9geometric11LineSegment",
-				"char": 1,
-				"kind": "alias"
-			},
-			{
-				"name": "PGbox",
-				"line": 45,
-				"comment": "Box\n",
-				"deco": "S4dpq24conv9geometric3Box",
-				"char": 1,
-				"kind": "alias"
-			},
-			{
-				"name": "PGpath",
-				"line": 46,
-				"comment": "Path\n",
-				"deco": "S4dpq24conv9geometric4Path",
-				"char": 1,
-				"kind": "alias"
-			},
-			{
-				"name": "PGpolygon",
-				"line": 47,
-				"comment": "Polygon\n",
-				"deco": "S4dpq24conv9geometric7Polygon",
-				"char": 1,
-				"kind": "alias"
-			},
-			{
-				"name": "PGcircle",
-				"line": 48,
-				"comment": "Circle\n",
-				"deco": "S4dpq24conv9geometric6Circle",
 				"char": 1,
 				"kind": "alias"
 			},
@@ -1483,7 +1845,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 55,
+						"line": 49,
 						"type": "pure @trusted string(in Value v)",
 						"parameters": [
 							{
@@ -1494,13 +1856,13 @@
 								]
 							}
 						],
-						"endline": 75,
+						"endline": 69,
 						"char": 8,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 55,
+				"line": 49,
 				"comment": "Returns cell value as native string type from text or binary formatted field\n",
 				"parameters": [
 					{
@@ -1517,7 +1879,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 78,
+						"line": 72,
 						"type": "T(in Value v)",
 						"parameters": [
 							{
@@ -1528,13 +1890,13 @@
 								]
 							}
 						],
-						"endline": 91,
+						"endline": 85,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 78,
+				"line": 72,
 				"comment": "Returns value as D type value from binary formatted field\n",
 				"parameters": [
 					{
@@ -3538,7 +3900,7 @@
 								"deco": "xm"
 							}
 						],
-						"endline": 361,
+						"endline": 358,
 						"originalType": "immutable immutable(Value)(in size_t col)",
 						"char": 23,
 						"kind": "function"
@@ -3546,7 +3908,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 364,
+						"line": 361,
 						"comment": "Returns cell value by field name\n",
 						"deco": "yFxAyaZyS4dpq25value5Value",
 						"parameters": [
@@ -3555,7 +3917,7 @@
 								"deco": "xAya"
 							}
 						],
-						"endline": 367,
+						"endline": 364,
 						"originalType": "immutable immutable(Value)(in string column)",
 						"char": 23,
 						"kind": "function"
@@ -3563,7 +3925,7 @@
 					{
 						"endchar": 5,
 						"name": "columnNum",
-						"line": 370,
+						"line": 367,
 						"comment": "Returns column number by field name\n",
 						"deco": "yFAyaZm",
 						"parameters": [
@@ -3572,7 +3934,7 @@
 								"deco": "Aya"
 							}
 						],
-						"endline": 373,
+						"endline": 370,
 						"originalType": "immutable size_t(string columnName)",
 						"char": 12,
 						"kind": "function"
@@ -3580,7 +3942,7 @@
 					{
 						"endchar": 5,
 						"name": "columnName",
-						"line": 376,
+						"line": 373,
 						"comment": "Returns column name by field number\n",
 						"deco": "yFxmZAya",
 						"parameters": [
@@ -3589,7 +3951,7 @@
 								"deco": "xm"
 							}
 						],
-						"endline": 379,
+						"endline": 376,
 						"originalType": "immutable string(in size_t colNum)",
 						"char": 12,
 						"kind": "function"
@@ -3597,10 +3959,10 @@
 					{
 						"endchar": 52,
 						"name": "length",
-						"line": 382,
+						"line": 379,
 						"comment": "Returns column count\n",
 						"deco": "yFZm",
-						"endline": 382,
+						"endline": 379,
 						"originalType": "immutable size_t()",
 						"char": 12,
 						"kind": "function"
@@ -3608,10 +3970,10 @@
 					{
 						"endchar": 5,
 						"name": "toString",
-						"line": 385,
+						"line": 382,
 						"comment": "\n",
 						"deco": "yFZAya",
-						"endline": 393,
+						"endline": 390,
 						"char": 12,
 						"kind": "function"
 					}
@@ -3622,7 +3984,7 @@
 			{
 				"endchar": 1,
 				"name": "asArray",
-				"line": 397,
+				"line": 394,
 				"comment": "Creates Array from appropriate Value\n",
 				"deco": "FyS4dpq25value5ValueZySQu6result5Array",
 				"parameters": [
@@ -3631,14 +3993,14 @@
 						"deco": "yS4dpq25value5Value"
 					}
 				],
-				"endline": 412,
+				"endline": 409,
 				"char": 19,
 				"kind": "function"
 			},
 			{
 				"endchar": 1,
 				"name": "toString",
-				"line": 415,
+				"line": 412,
 				"comment": "\n",
 				"deco": "FyS4dpq25value5ValueZAya",
 				"parameters": [
@@ -3647,20 +4009,20 @@
 						"deco": "yS4dpq25value5Value"
 					}
 				],
-				"endline": 420,
+				"endline": 417,
 				"originalType": "string(immutable Value v)",
 				"char": 8,
 				"kind": "function"
 			},
 			{
 				"name": "ArrayProperties",
-				"line": 436,
+				"line": 433,
 				"comment": "\n",
 				"members": [
 					{
 						"offset": 0,
 						"name": "OID",
-						"line": 438,
+						"line": 435,
 						"comment": "Oid\n",
 						"deco": "E4dpq24oids7OidType",
 						"init": "cast(OidType)0u",
@@ -3670,7 +4032,7 @@
 					{
 						"offset": 8,
 						"name": "dimsSize",
-						"line": 439,
+						"line": 436,
 						"comment": "Dimensions sizes info\n",
 						"deco": "Ai",
 						"char": 11,
@@ -3679,7 +4041,7 @@
 					{
 						"offset": 24,
 						"name": "nElems",
-						"line": 440,
+						"line": 437,
 						"comment": "Total elements\n",
 						"deco": "m",
 						"originalType": "size_t",
@@ -3692,13 +4054,13 @@
 			},
 			{
 				"name": "Array",
-				"line": 493,
+				"line": 490,
 				"comment": "Represents Value as array\n\nActually it is a reference to the cell value of the answer table\n",
 				"members": [
 					{
 						"offset": 0,
 						"name": "ap",
-						"line": 495,
+						"line": 492,
 						"comment": "\n",
 						"deco": "yS4dpq26result15ArrayProperties",
 						"originalType": "ArrayProperties",
@@ -3711,10 +4073,10 @@
 					{
 						"endchar": 5,
 						"name": "length",
-						"line": 542,
+						"line": 539,
 						"comment": "Returns number of elements in array\nUseful for one-dimensional arrays\n",
 						"deco": "yFZm",
-						"endline": 545,
+						"endline": 542,
 						"originalType": "immutable size_t()",
 						"char": 12,
 						"kind": "function"
@@ -3722,7 +4084,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 549,
+						"line": 546,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFmZyS4dpq25value5Value",
 						"parameters": [
@@ -3731,7 +4093,7 @@
 								"deco": "m"
 							}
 						],
-						"endline": 552,
+						"endline": 549,
 						"originalType": "immutable immutable(Value)(size_t n)",
 						"char": 23,
 						"kind": "function"
@@ -3739,7 +4101,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 556,
+						"line": 553,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFiZyS4dpq25value5Value",
 						"parameters": [
@@ -3748,27 +4110,27 @@
 								"deco": "i"
 							}
 						],
-						"endline": 559,
+						"endline": 556,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "getValue",
-						"line": 563,
+						"line": 560,
 						"comment": "Returns Value struct\nUseful for multidimensional arrays\n",
 						"deco": "yFYyS4dpq25value5Value",
-						"endline": 571,
+						"endline": 565,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "isNULL",
-						"line": 574,
+						"line": 568,
 						"comment": "Value NULL checking\n",
 						"deco": "yFYb",
-						"endline": 578,
+						"endline": 572,
 						"char": 10,
 						"kind": "function"
 					}
@@ -3778,36 +4140,36 @@
 			},
 			{
 				"name": "Notify",
-				"line": 623,
+				"line": 617,
 				"comment": "Notify\n",
 				"members": [
 					{
 						"endchar": 52,
 						"name": "name",
-						"line": 641,
+						"line": 635,
 						"comment": "Returns notification condition name\n",
 						"deco": "FZAya",
-						"endline": 641,
+						"endline": 635,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 51,
 						"name": "extra",
-						"line": 644,
+						"line": 638,
 						"comment": "Returns notification parameter\n",
 						"deco": "FZAya",
-						"endline": 644,
+						"endline": 638,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 37,
 						"name": "pid",
-						"line": 647,
+						"line": 641,
 						"comment": "Returns process ID of notifying server process\n",
 						"deco": "FZm",
-						"endline": 647,
+						"endline": 641,
 						"originalType": "size_t()",
 						"char": 12,
 						"kind": "function"
@@ -3819,7 +4181,7 @@
 			{
 				"members": [],
 				"name": "ResponseException",
-				"line": 651,
+				"line": 645,
 				"comment": "Covers errors of Answer creation when data was not received due to syntax errors, etc\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -3829,7 +4191,7 @@
 				"members": [
 					{
 						"name": "FATAL_ERROR",
-						"line": 670,
+						"line": 664,
 						"value": "0",
 						"comment": "\n",
 						"char": 5,
@@ -3837,7 +4199,7 @@
 					},
 					{
 						"name": "COLUMN_NOT_FOUND",
-						"line": 671,
+						"line": 665,
 						"value": "1",
 						"comment": "Column is not found\n",
 						"char": 5,
@@ -3845,7 +4207,7 @@
 					},
 					{
 						"name": "OUT_OF_RANGE",
-						"line": 672,
+						"line": 666,
 						"value": "2",
 						"comment": "\n",
 						"char": 5,
@@ -3853,7 +4215,7 @@
 					}
 				],
 				"name": "ExceptionType",
-				"line": 668,
+				"line": 662,
 				"comment": "Answer exception types\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -3864,7 +4226,7 @@
 					{
 						"offset": 76,
 						"name": "type",
-						"line": 678,
+						"line": 672,
 						"comment": "Exception type\n",
 						"deco": "xE4dpq26result13ExceptionType",
 						"originalType": "ExceptionType",
@@ -3876,7 +4238,7 @@
 					}
 				],
 				"name": "AnswerException",
-				"line": 676,
+				"line": 670,
 				"comment": "Covers errors of access to Answer data\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -3900,11 +4262,11 @@
 						"name": "this",
 						"line": 34,
 						"comment": "ctor\n",
-						"deco": "FNaNcNfAhxE4dpq24oids7OidTypebxEQv5value11ValueFormatZSQBsQy5Value",
+						"deco": "NgFNaNcNfAyhxE4dpq24oids7OidTypebxEQv5value11ValueFormatZNgSQBuQBa5Value",
 						"parameters": [
 							{
 								"name": "data",
-								"deco": "Ah"
+								"deco": "Ayh"
 							},
 							{
 								"name": "oidType",
@@ -3912,7 +4274,8 @@
 							},
 							{
 								"name": "isNull",
-								"deco": "b"
+								"deco": "b",
+								"default": "false"
 							},
 							{
 								"name": "format",
@@ -3921,7 +4284,7 @@
 							}
 						],
 						"endline": 40,
-						"originalType": "pure ref @safe (ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY)",
+						"originalType": "inout pure ref @safe (immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY)",
 						"char": 5,
 						"kind": "constructor"
 					},
@@ -4064,7 +4427,7 @@
 						"name": "SIZE_MISMATCH",
 						"line": 135,
 						"value": "4",
-						"comment": "Result value size is not matched to the received Postgres value\n",
+						"comment": "Value size is not matched to the Postgres value\n",
 						"char": 5,
 						"kind": "enum member"
 					},

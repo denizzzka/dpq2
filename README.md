@@ -29,6 +29,7 @@ Features
  * Some data and time types
  * JSON type (stored into vibe.data.json.Json)
  * JSONB type (ditto)
+ * Geometric types
 * Conversion of values to BSON (into vibe.data.bson.Bson)
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support

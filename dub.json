@@ -9,7 +9,7 @@
 	"targetPath": "bin",
 	"dependencies": {
 		"derelict-pq": "~>3.0.0-alpha.2",
-		"vibe-d:data": "~>0.8.2"
+		"vibe-d:data": "~>0.8.3-beta.1"
 	},
 	"targetType": "sourceLibrary",
 	"-ddoxTool": "scod",
@@ -28,7 +28,8 @@
 			"targetType": "executable",
 			"dependencies":
 			{
-				"dpq2": "*"
+				"dpq2": "*",
+				"gfm:math": "~>7.0.0"
 			},
 			"sourcePath": "integration_tests",
 			"versions": ["integration_tests"]

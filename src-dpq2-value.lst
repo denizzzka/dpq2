@@ -22,21 +22,21 @@
        |        ValueFormat _format;
        |    }
        |
-       |    package ubyte[] _data;
+       |    package immutable(ubyte)[] _data;
        |
        |    // FIXME:
        |    // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
        |    // One should not modify the data it points to, and one must explicitly copy the data into other
        |    // storage if it is to be used past the lifetime of the PGresult structure itself.
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
-       |
+       |    // (Also see DIP1000)
        |    /// ctor
-    310|    this(ubyte[] data, in OidType oidType, bool isNull, in ValueFormat format = ValueFormat.BINARY) pure
+    331|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
-    310|        this._data = data;
-    310|        this._format = format;
-    310|        this._oidType = oidType;
-    310|        this._isNull = isNull;
+    331|        this._data = data;
+    331|        this._format = format;
+    331|        this._oidType = oidType;
+    331|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
@@ -51,7 +51,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-    883|            return _isNull;
+    943|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -64,29 +64,29 @@
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    554|            return _oidType;
+    584|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    263|            return _format;
+    284|            return _format;
        |        }
        |    }
        |
        |    package void oidType(OidType type) @safe pure nothrow @nogc
        |    {
-      7|        _oidType = type;
+      9|        _oidType = type;
        |    }
        |
-       |    inout (ubyte[]) data() pure inout
+       |    immutable(ubyte)[] data() pure const
        |    {
        |        import std.exception;
        |        import core.exception;
        |
-    662|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    704|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    656|        return _data;
+    698|        return _data;
        |    }
        |
        |    ///
@@ -132,7 +132,7 @@
        |    NOT_BINARY, /// Format of the column isn't binary
        |    NOT_TEXT, /// Format of the column isn't text string
        |    NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
-       |    SIZE_MISMATCH, /// Result value size is not matched to the received Postgres value
+       |    SIZE_MISMATCH, /// Value size is not matched to the Postgres value
        |    CORRUPTED_JSONB, /// Corrupted JSONB value
        |    DATE_VALUE_OVERFLOW, /// Date value isn't fits to Postgres binary Date value
        |}
@@ -142,10 +142,10 @@
        |{
        |    const ConvExceptionType type; /// Exception type
        |
-     19|    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
+     22|    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
        |    {
-     19|        type = t;
-     19|        super(msg, file, line);
+     22|        type = t;
+     22|        super(msg, file, line);
        |    }
        |}
        |

@@ -9,15 +9,16 @@ module dpq2.conv.time;
 @safe:
 
 import dpq2.result;
-import dpq2.oids : OidType;
-import dpq2.conv.to_d_types: throwTypeComplaint;
+import dpq2.oids: OidType;
+import dpq2.value: throwTypeComplaint;
 
 import core.time;
 import std.datetime.date : Date, DateTime, TimeOfDay;
-import std.datetime.systime : LocalTime, SysTime, TimeZone, UTC;
+import std.datetime.systime: SysTime;
+import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.math;
-import core.stdc.time: time_t;
+import std.conv: to;
 
 /++
     Returns value timestamp with time zone as SysTime
@@ -58,6 +59,11 @@ if( is( T == Date ) )
     int jd = bigEndianToNative!uint(v.data.ptr[0..uint.sizeof]);
     int year, month, day;
     j2date(jd, year, month, day);
+
+    // TODO: support PG Date like TTimeStamp manner and remove this check
+    if(year > short.max)
+        throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+            "Year "~year.to!string~" is bigger than supported by std.datetime.Date", __FILE__, __LINE__);
 
     return Date(year, month, day);
 }
@@ -115,40 +121,140 @@ if( is( T == DateTime ) )
     return v.binaryValueAs!TimeStamp.dateTime;
 }
 
+private enum lowestPgYear = -4712;
+private enum biggestPgYear = 294276;
+
+///
+enum InfinityState : byte
+{
+    NONE = 0, ///
+    INFINITY_MIN = -1, ///
+    INFINITY_MAX = 1, ///
+}
+
 /++
     Structure to represent PostgreSQL Timestamp with/without time zone
 +/
 struct TTimeStamp(bool isWithTZ)
 {
-    DateTime dateTime; /// date and time of TimeStamp
-    Duration fracSec; /// fractional seconds
+    /**
+     * Date and time of TimeStamp
+     *
+     * If value is '-infinity' or '+infinity' it will be equal DateTime.min or DateTime.max
+     */
+    package DateTime _dateTime;
+    Duration fracSec; /// fractional seconds, 1 microsecond resolution
+    /// Duplicates year value as int
+    ///
+    /// Issue 18552 - std.datetime.date.Date strips year int argument to short
+    /// https://issues.dlang.org/show_bug.cgi?id=18552
+    int realYear;
 
-    alias dateTime this;
+    this(DateTime dt, Duration fractionalSeconds = Duration.zero, int year = 0) pure
+    {
+        _dateTime = dt;
+        fracSec = fractionalSeconds;
+
+        if(year)
+        {
+            realYear = year;
+            _dateTime.year = year;
+        }
+        else
+            realYear = _dateTime.year;
+    }
+
+    DateTime dateTime() const pure
+    {
+        if(infinity != InfinityState.NONE)
+            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+                "TTimeStamp value is "~infinity.to!string, __FILE__, __LINE__);
+
+        if(realYear > _dateTime.year)
+            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+                "Year "~realYear.to!string~" is bigger than supported by std.datetime.DateTime", __FILE__, __LINE__);
+
+        return _dateTime;
+    }
 
     invariant()
     {
-        import std.conv : to;
+        assert(realYear >= lowestPgYear, "Year too low: "~realYear.to!string);
+        assert(realYear <= biggestPgYear, "Year too big: "~realYear.to!string);
 
-        assert(fracSec >= Duration.zero, fracSec.to!string);
-        assert(fracSec < 1.seconds, fracSec.to!string);
+        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
+        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
+        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
     }
 
-    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
-    static max()
+    bool isEarlier() const pure { return _dateTime == earlier._dateTime; } /// '-infinity'
+    bool isLater() const pure { return _dateTime == later._dateTime; } /// 'infinity'
+
+    InfinityState infinity() const pure
     {
-        return TTimeStamp(DateTime.max, long.max.hnsecs);
+        with(InfinityState)
+        {
+            if(isEarlier) return INFINITY_MIN;
+            if(isLater) return INFINITY_MAX;
+
+            return NONE;
+        }
+    }
+
+    unittest
+    {
+        assert(TTimeStamp.min == TTimeStamp.min);
+        assert(TTimeStamp.max == TTimeStamp.max);
+        assert(TTimeStamp.min != TTimeStamp.max);
+
+        assert(TTimeStamp.earlier != TTimeStamp.later);
+        assert(TTimeStamp.min != TTimeStamp.earlier);
+        assert(TTimeStamp.max != TTimeStamp.later);
+
+        assert(TTimeStamp.min.infinity == InfinityState.NONE);
+        assert(TTimeStamp.max.infinity == InfinityState.NONE);
+        assert(TTimeStamp.earlier.infinity == InfinityState.INFINITY_MIN);
+        assert(TTimeStamp.later.infinity == InfinityState.INFINITY_MAX);
     }
 
     /// Returns the TimeStamp farthest in the past which is representable by TimeStamp.
-    static min()
+    static immutable(TTimeStamp) min()
     {
-        return TTimeStamp(DateTime.min, Duration.zero);
+        /*
+        Postgres low value is 4713 BC but here is used -4712 because
+        "Date uses the Proleptic Gregorian Calendar, so it assumes the
+        Gregorian leap year calculations for its entire length. As per
+        ISO 8601, it treats 1 B.C. as year 0, i.e. 1 B.C. is 0, 2 B.C.
+        is -1, etc." (Phobos docs). But Postgres isn't uses ISO 8601
+        for date calculation.
+        */
+        return TTimeStamp(DateTime(Date(lowestPgYear, 1, 1)), Duration.zero);
     }
+
+    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
+    static immutable(TTimeStamp) max()
+    {
+        enum maxFract = 1.seconds - 1.usecs;
+
+        return TTimeStamp(DateTime(123, 12, 31, 23, 59, 59), maxFract, biggestPgYear);
+    }
+
+    /// '-infinity', earlier than all other time stamps
+    static immutable(TTimeStamp) earlier() pure
+    {
+        // -1 prevents invariant "year too low" error
+        return TTimeStamp(DateTime.min, Duration.zero, -1);
+    }
+
+    /// 'infinity', later than all other time stamps
+    static immutable(TTimeStamp) later() pure { return TTimeStamp(DateTime.max); }
 
     ///
     string toString() const
     {
-        return dateTime.toString~" "~fracSec.toString;
+        import std.format;
+
+        return format("%04d-%02d-%02d %s %s", realYear, _dateTime.month, _dateTime.day, _dateTime.timeOfDay, fracSec.toString);
     }
 }
 
@@ -157,25 +263,38 @@ alias TimeStampUTC = TTimeStamp!true; /// Assumed that this is UTC timestamp
 
 unittest
 {
-    {
-        auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
-        assert(t.dateTime.hour == 14);
-    }
-    {
-        auto dt = DateTime(2017, 11, 13, 14, 29, 17);
-        auto t = TimeStamp(dt, 75_678.usecs);
+    auto t = TimeStamp(DateTime(2017, 11, 13, 14, 29, 17), 75_678.usecs);
+    assert(t.dateTime.hour == 14);
+}
 
-        assert(t == dt); // test the implicit conversion to DateTime
-    }
-    {
-        auto t = TimeStampUTC(
-                DateTime(2017, 11, 13, 14, 29, 17),
-                75_678.usecs
-            );
+unittest
+{
+    auto dt = DateTime(2017, 11, 13, 14, 29, 17);
+    auto t = TimeStamp(dt, 75_678.usecs);
 
-        assert(t.dateTime.hour == 14);
-        assert(t.fracSec == 75_678.usecs);
-    }
+    assert(t.dateTime == dt); // test the implicit conversion to DateTime
+}
+
+unittest
+{
+    auto t = TimeStampUTC(
+            DateTime(2017, 11, 13, 14, 29, 17),
+            75_678.usecs
+        );
+
+    assert(t.dateTime.hour == 14);
+    assert(t.fracSec == 75_678.usecs);
+}
+
+unittest
+{
+    import std.exception : assertThrown;
+
+    auto e = TimeStampUTC.earlier;
+    auto l = TimeStampUTC.later;
+
+    assertThrown!ValueConvException(e.dateTime.hour == 14);
+    assertThrown!ValueConvException(l.dateTime.hour == 14);
 }
 
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
@@ -187,8 +306,13 @@ private:
 T rawTimeStamp2nativeTime(T)(long raw)
 if(is(T == TimeStamp) || is(T == TimeStampUTC))
 {
-    if(raw >= time_t.max) return T.max;
-    if(raw <= time_t.min) return T.min;
+    import core.stdc.time: time_t;
+
+    static assert(raw.sizeof == time_t.min.sizeof);
+    static assert(raw.sizeof == time_t.max.sizeof);
+
+    if(raw == time_t.max) return T.later; // infinity
+    if(raw == time_t.min) return T.earlier; // -infinity
 
     pg_tm tm;
     fsec_t ts;
@@ -220,7 +344,7 @@ TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
 
     auto fracSec = dur!"usecs"(ts);
 
-    return TimeStamp(dateTime, fracSec);
+    return TimeStamp(dateTime, fracSec, tm.tm_year);
 }
 
 // Here is used names from the original Postgresql source

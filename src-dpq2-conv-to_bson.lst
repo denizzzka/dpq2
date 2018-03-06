@@ -103,27 +103,27 @@
      30|    switch(v.oidType)
        |    {
       2|        case OidType.Bool:
-      2|            bool n = v.binaryValueAs!PGboolean;
+      2|            bool n = v.tunnelForBinaryValueAsCalls!PGboolean;
       2|            res = Bson(n);
       2|            break;
        |
       1|        case Int2:
-      1|            auto n = to!int(v.binaryValueAs!PGsmallint);
+      1|            auto n = v.tunnelForBinaryValueAsCalls!PGsmallint.to!int;
       1|            res = Bson(n);
       1|            break;
        |
      12|        case Int4:
-     12|            int n = v.binaryValueAs!PGinteger;
+     12|            int n = v.tunnelForBinaryValueAsCalls!PGinteger;
      12|            res = Bson(n);
      12|            break;
        |
       1|        case Int8:
-      1|            long n = v.binaryValueAs!PGbigint;
+      1|            long n = v.tunnelForBinaryValueAsCalls!PGbigint;
       1|            res = Bson(n);
       1|            break;
        |
       1|        case Float8:
-      1|            double n = v.binaryValueAs!PGdouble_precision;
+      1|            double n = v.tunnelForBinaryValueAsCalls!PGdouble_precision;
       1|            res = Bson(n);
       1|            break;
        |
@@ -143,11 +143,11 @@
       1|            break;
        |
       1|        case UUID:
-      1|            res = Bson(v.binaryValueAs!PGuuid);
+      1|            res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
       1|            break;
        |
       1|        case TimeStamp:
-      1|            auto ts = v.binaryValueAs!(dpq2.conv.time.TimeStamp);
+      1|            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStamp);
       1|            auto time = BsonDate(SysTime(ts.dateTime, tz));
       1|            long usecs = ts.fracSec.total!"usecs";
       1|            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
@@ -155,7 +155,7 @@
        |
       1|        case Json:
       2|        case Jsonb:
-      2|            vibe.data.json.Json json = binaryValueAs!PGjson(v);
+      2|            vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
       2|            res = Bson(json);
       2|            break;
        |

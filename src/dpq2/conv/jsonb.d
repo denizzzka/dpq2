@@ -13,7 +13,7 @@ import std.string;
 import std.conv: to;
 
 ///
-Json jsonbValueToJson(in Value v) @trusted
+Json jsonbValueToJson(in Value v)
 {
     assert(v.oidType == OidType.Jsonb);
 
@@ -26,5 +26,5 @@ Json jsonbValueToJson(in Value v) @trusted
 
     string s = (cast(const(char[])) v._data[1 .. $]).to!string;
 
-    return parseJsonString(s); //TODO: make this @safe
+    return parseJsonString(s);
 }

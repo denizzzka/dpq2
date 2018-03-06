@@ -9,9 +9,9 @@
        |import dpq2.query: QueryParams;
        |import dpq2.result: msg_NOT_BINARY;
        |import dpq2.conv.from_d_types;
-       |import dpq2.conv.geometric : binaryValueAs, Box, Circle, Line, LineSegment, Path, Point, Polygon;
        |import dpq2.conv.numeric: rawValueToNumeric;
        |import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
+       |import dpq2.conv.geometric: binaryValueAs, Line;
        |
        |import vibe.data.json: Json, parseJsonString;
        |import vibe.data.bson: Bson;
@@ -32,20 +32,14 @@
        |alias PGdouble_precision = double; /// double precision
        |alias PGtext =          string; /// text
        |alias PGnumeric =       string; /// numeric represented as string
-       |alias PGbytea =         const ubyte[]; /// bytea
+       |alias PGbytea =         immutable(ubyte)[]; /// bytea
        |alias PGuuid =          UUID; /// UUID
        |alias PGdate =          Date; /// Date (no time of day)
        |alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
        |alias PGtimestamp = TimeStamp; /// Both date and time without time zone
        |alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
        |alias PGjson =          Json; /// json or jsonb
-       |alias PGpoint =         Point; /// Point
-       |alias PGline =          Line; /// LineSegment
-       |alias PGlseg =          LineSegment; /// LineSegment
-       |alias PGbox =           Box; /// Box
-       |alias PGpath =          Path; /// Path
-       |alias PGpolygon =       Polygon; /// Polygon
-       |alias PGcircle =        Circle; /// Circle
+       |alias PGline =          Line; /// Line (geometric type)
        |
        |private alias VF = ValueFormat;
        |private alias AE = ValueConvException;
@@ -55,9 +49,9 @@
        |string as(T)(in Value v) pure @trusted
        |if(is(T == string))
        |{
-     87|    if(v.format == VF.BINARY)
+     96|    if(v.format == VF.BINARY)
        |    {
-     83|        if(!(
+     92|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -67,18 +61,18 @@
        |        ))
       1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
        |
-     82|        if(v.oidType == OidType.Numeric)
+     91|        if(v.oidType == OidType.Numeric)
      23|            return rawValueToNumeric(v.data);
        |    }
        |
-     63|    return valueAsString(v);
+     72|    return valueAsString(v);
        |}
        |
        |/// Returns value as D type value from binary formatted field
        |T as(T)(in Value v)
        |if(!is(T == string) && !is(T == Bson))
        |{
-     54|    if(!(v.format == VF.BINARY))
+     57|    if(!(v.format == VF.BINARY))
 0000000|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
@@ -87,23 +81,32 @@
       3|        if (v.isNull) return T.init;
       1|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
        |    }
-     52|    else return binaryValueAs!T(v);
+     55|    else return binaryValueAs!T(v);
        |}
        |
        |package:
        |
+       |/*
+       | * Something was broken in DMD64 D Compiler v2.079.0-rc.1 so I made this "tunnel"
+       | * TODO: remove it and replace by direct binaryValueAs calls
+       | */
+       |auto tunnelForBinaryValueAsCalls(T)(in Value v)
+       |{
+     21|    return binaryValueAs!T(v);
+       |}
+       |
        |string valueAsString(in Value v) pure
        |{
-     78|    if (v.isNull) return null;
-     74|    return (cast(const(char[])) v.data).to!string;
+     87|    if (v.isNull) return null;
+     83|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
        |T binaryValueAs(T)(in Value v)
-       |if( is( T == const(ubyte[]) ) )
+       |if(is(T : const ubyte[]))
        |{
       2|    if(!(v.oidType == OidType.ByteArray))
-0000000|        throwTypeComplaint(v.oidType, "ubyte[] or string", __FILE__, __LINE__);
+0000000|        throwTypeComplaint(v.oidType, "immutable ubyte[] or string", __FILE__, __LINE__);
        |
       2|    return v.data;
        |}
@@ -212,34 +215,43 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    112|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     56|            params.args = null;
-     56|            auto answer = conn.execParams(params);
-     56|            immutable Value v = answer[0][0];
-     56|            auto result = v.as!T;
+    118|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     59|            params.args = null;
+     59|            auto answer = conn.execParams(params);
+     59|            immutable Value v = answer[0][0];
+     59|            auto result = v.as!T;
        |
-     69|            assert(result == nativeValue,
-       |                format("Received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+     64|            assert(result == nativeValue,
+       |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
        |
-       |            //TODO: Implement toValue for all tested types and remove the condition
-       |            static if (!is(T == UUID) && !is(T == const(ubyte[])) && !is(T == Json) && !is(T == TimeStamp))
        |            {
        |                // test binary to text conversion
-     49|                params.sqlCommand = "SELECT $1::text";
-     49|                params.args = [nativeValue.toValue];
-     49|                auto answer2 = conn.execParams(params);
-     49|                auto v2 = answer2[0][0];
-     49|                auto textResult = v2.as!string.strip(' ');
-     49|                pgValue = pgValue.strip('\'');
+     58|                params.sqlCommand = "SELECT $1::text";
+     58|                params.args = [nativeValue.toValue];
        |
-     49|                assert(textResult == pgValue,
-       |                    format("Received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
+     58|                auto answer2 = conn.execParams(params);
+     58|                auto v2 = answer2[0][0];
+     58|                auto textResult = v2.as!string.strip(' ');
+     58|                pgValue = pgValue.strip('\'');
+       |
+       |                // Special cases:
+       |                static if(is(T == PGbytea))
+      1|                    pgValue = `\x442072756c65730021`; // Server formats its reply slightly different from the passed argument
+       |
+       |                static if(is(T == Json))
+       |                {
+       |                    // Reformatting by same way in the hope that the data will be sorted same in both cases
+      2|                    pgValue = pgValue.parseJsonString.toString;
+      2|                    textResult = textResult.parseJsonString.toString;
+       |                }
+       |
+     58|                assert(textResult == pgValue,
+       |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
        |            }
-       |            else pragma(msg, T, " Is not tested in integration tests!");
        |        }
        |
       1|        alias C = testIt; // "C" means "case"
@@ -296,11 +308,20 @@
        |
        |        // date and time testing
       1|        C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
+       |        {
+       |            import std.exception : assertThrown;
+       |
+      1|            assertThrown!ValueConvException(
+      1|                    C!PGdate(Date(0001, 01, 8), "date", "'5874897-12-31'")
+       |                );
+       |        }
       1|        C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
       1|        C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
-      1|        C!PGtimestamp(PGtimestamp.max, "timestamp without time zone", "'infinity'");
-      1|        C!PGtimestamp(PGtimestamp.min, "timestamp without time zone", "'-infinity'");
       1|        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
+      1|        C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");
+      1|        C!PGtimestamp(PGtimestamp.later, "timestamp", "'infinity'");
+      1|        C!PGtimestamp(PGtimestamp.min, "timestamp", `'4713-01-01 00:00:00 BC'`);
+      1|        C!PGtimestamp(PGtimestamp.max, "timestamp", `'294276-12-31 23:59:59.999999'`);
        |
        |        // SysTime testing
       1|        auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
@@ -317,14 +338,17 @@
        |            `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
        |
        |        // Geometric
-      1|        C!PGpoint(Point(1,2), "point", "'(1,2)'");
+       |        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
+       |        mixin GeometricInstancesForIntegrationTest;
+       |
+      1|        C!Point(Point(1,2), "point", "'(1,2)'");
       1|        C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
-      1|        C!PGlseg(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
-      1|        C!PGbox(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
-      1|        C!PGpath(Path(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
-      1|        C!PGpath(Path(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
-      1|        C!PGpolygon(Polygon([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
-      1|        C!PGcircle(Circle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+      1|        C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
+      1|        C!Box(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
+      1|        C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
+      1|        C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
+      1|        C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
+      1|        C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
        |    }
        |}
 src/dpq2/conv/to_d_types.d is 90% covered

@@ -1,0 +1,646 @@
+       |/**
+       |  This module implements some abstract geometric shapes:
+       |  $(UL
+       |  $(LI Line segments.)
+       |  $(LI Triangle.)
+       |  $(LI Circles/spheres.)
+       |  $(LI Rays)
+       |  $(LI Planes)
+       |  $(LI Frustum)
+       |  )
+       | */
+       |module gfm.math.shapes;
+       |
+       |import std.math,
+       |       std.traits;
+       |
+       |import gfm.math.vector,
+       |       gfm.math.box;
+       |
+       |/// A Segment is 2 points.
+       |/// When considered like a vector, it represents the arrow from a to b.
+       |struct Segment(T, int N)
+       |{
+       |    public
+       |    {
+       |        alias Vector!(T, N) point_t;
+       |        point_t a, b;
+       |
+       |        static if (N == 3 && isFloatingPoint!T)
+       |        {
+       |            /// Segment vs plane intersection.
+       |            /// See_also: "Geometry for Computer Graphics: Formulae, Examples
+       |            ///     and Proofs", Vince (2005), p. 62
+       |            /// Returns: $(D true) if the segment crosses the plane exactly
+       |            ///     once, or $(D false) if the segment is parallel to or does
+       |            ///     not reach the plane
+       |            /// Params:
+       |            ///     plane = The plane to intersect.
+       |            ///     intersection = Point of intersection.
+       |            ///     progress = Set to the point's progress between endpoints
+       |            ///                $(D a) at 0.0 and $(D b) at 1.0, or T.infinity
+       |            ///                if parallel to the plane
+       |            @nogc bool intersect(Plane!T plane, out point_t intersection, out T progress) pure const nothrow
+       |            {
+       |                // direction vector from a to b
+0000000|                point_t dir = b-a;
+       |
+       |                // dot product will be 0 if angle to plane is 0
+0000000|                T dp = dot(plane.n, dir);
+0000000|                if (abs(dp) < T.epsilon)
+       |                {
+0000000|                    progress = T.infinity;
+0000000|                    return false; // parallel to plane
+       |                }
+       |
+       |                // relative distance along segment where intersection happens
+0000000|                progress = -(dot(plane.n, a) - plane.d) / dp;
+       |
+0000000|                intersection = progress*dir + a;
+0000000|                return progress >= 0 && progress <= 1;
+       |            }
+       |        }
+       |    }
+       |}
+       |
+       |alias Segment!(float, 2) seg2f;  /// 2D float segment.
+       |alias Segment!(float, 3) seg3f;  /// 3D float segment.
+       |alias Segment!(double, 2) seg2d; /// 2D double segment.
+       |alias Segment!(double, 3) seg3d; /// 3D double segment.
+       |alias Segment!(int, 2) seg2i;    /// 2D integer segment.
+       |alias Segment!(int, 3) seg3i;    /// 3D integer segment.
+       |
+       |/// A Triangle is 3 points.
+       |struct Triangle(T, int N)
+       |{
+       |    public
+       |    {
+       |        alias Vector!(T, N) point_t;
+       |        point_t a, b, c;
+       |
+       |        static if (N == 2)
+       |        {
+       |            /// Returns: Area of a 2D triangle.
+       |            @nogc T area() pure const nothrow
+       |            {
+0000000|                return abs(signedArea());
+       |            }
+       |
+       |            /// Returns: Signed area of a 2D triangle.
+       |            @nogc T signedArea() pure const nothrow
+       |            {
+0000000|                return ((b.x * a.y - a.x * b.y)
+       |                      + (c.x * b.y - b.x * c.y)
+       |                      + (a.x * c.y - c.x * a.y)) / 2;
+       |            }
+       |        }
+       |
+       |        static if (N == 3 && isFloatingPoint!T)
+       |        {
+       |            /// Returns: Triangle normal.
+       |            @nogc Vector!(T, 3) computeNormal() pure const nothrow
+       |            {
+0000000|                return cross(b - a, c - a).normalized();
+       |            }
+       |        }
+       |    }
+       |}
+       |
+       |alias Triangle!(float, 2) triangle2f;  /// 2D float triangle.
+       |alias Triangle!(float, 3) triangle3f;  /// 3D float triangle.
+       |alias Triangle!(double, 2) triangle2d; /// 2D double triangle.
+       |alias Triangle!(double, 3) triangle3d; /// 3D double triangle.
+       |
+       |/// A Sphere is a point + a radius.
+       |struct Sphere(T, int N)
+       |{
+       |    public nothrow
+       |    {
+       |        alias Vector!(T, N) point_t;
+       |        point_t center;
+       |        T radius;
+       |
+       |        /// Creates a sphere from a point and a radius.
+0000000|        @nogc this(in point_t center_, T radius_) pure nothrow
+       |        {
+0000000|            center = center_;
+0000000|            radius = radius_;
+       |        }
+       |
+       |        /// Sphere contains point test.
+       |        /// Returns: true if the point is inside the sphere.
+       |        @nogc bool contains(in Sphere s) pure const nothrow
+       |        {
+0000000|            if (s.radius > radius)
+0000000|                return false;
+       |
+0000000|            T innerRadius = radius - s.radius;
+0000000|            return squaredDistanceTo(s.center) < innerRadius * innerRadius;
+       |        }
+       |
+       |        /// Sphere vs point Euclidean distance squared.
+       |        @nogc T squaredDistanceTo(point_t p) pure const nothrow
+       |        {
+0000000|            return center.squaredDistanceTo(p);
+       |        }
+       |
+       |        /// Sphere vs sphere intersection.
+       |        /// Returns: true if the spheres intersect.
+       |        @nogc bool intersects(Sphere s) pure const nothrow
+       |        {
+0000000|            T outerRadius = radius + s.radius;
+0000000|            return squaredDistanceTo(s.center) < outerRadius * outerRadius;
+       |        }
+       |
+       |        static if (isFloatingPoint!T)
+       |        {
+       |            /// Sphere vs point Euclidean distance.
+       |            @nogc T distanceTo(point_t p) pure const nothrow
+       |            {
+0000000|                return center.distanceTo(p);
+       |            }
+       |
+       |            static if(N == 2)
+       |            {
+       |                /// Returns: Circle area.
+       |                @nogc T area() pure const nothrow
+       |                {
+0000000|                    return PI * (radius * radius);
+       |                }
+       |            }
+       |        }
+       |    }
+       |}
+       |
+       |alias Sphere!(float, 2) sphere2f;  /// 2D float sphere (ie. a circle).
+       |alias Sphere!(float, 3) sphere3f;  /// 3D float sphere.
+       |alias Sphere!(double, 2) sphere2d; /// 2D double sphere (ie. a circle).
+       |alias Sphere!(double, 3) sphere3d; /// 3D double sphere (ie. a circle).
+       |
+       |
+       |/// A Ray ir a point + a direction.
+       |struct Ray(T, int N)
+       |{
+       |nothrow:
+       |    public
+       |    {
+       |        alias Vector!(T, N) point_t;
+       |        point_t orig;
+       |        point_t dir;
+       |
+       |        /// Returns: A point further along the ray direction.
+       |        @nogc point_t progress(T t) pure const nothrow
+       |        {
+0000000|            return orig + dir * t;
+       |        }
+       |
+       |        static if (N == 3 && isFloatingPoint!T)
+       |        {
+       |            /// Ray vs triangle intersection.
+       |            /// See_also: "Fast, Minimum Storage Ray/Triangle intersection", Mommer & Trumbore (1997)
+       |            /// Returns: Barycentric coordinates, the intersection point is at $(D (1 - u - v) * A + u * B + v * C).
+       |            @nogc bool intersect(Triangle!(T, 3) triangle, out T t, out T u, out T v) pure const nothrow
+       |            {
+0000000|                point_t edge1 = triangle.b - triangle.a;
+0000000|                point_t edge2 = triangle.c - triangle.a;
+0000000|                point_t pvec = cross(dir, edge2);
+0000000|                T det = dot(edge1, pvec);
+0000000|                if (abs(det) < T.epsilon)
+0000000|                    return false; // no intersection
+0000000|                T invDet = 1 / det;
+       |
+       |                // calculate distance from triangle.a to ray origin
+0000000|                point_t tvec = orig - triangle.a;
+       |
+       |                // calculate U parameter and test bounds
+0000000|                u = dot(tvec, pvec) * invDet;
+0000000|                if (u < 0 || u > 1)
+0000000|                    return false;
+       |
+       |                // prepare to test V parameter
+0000000|                point_t qvec = cross(tvec, edge1);
+       |
+       |                // calculate V parameter and test bounds
+0000000|                v = dot(dir, qvec) * invDet;
+0000000|                if (v < 0.0 || u + v > 1.0)
+0000000|                    return false;
+       |
+       |                // calculate t, ray intersects triangle
+0000000|                t = dot(edge2, qvec) * invDet;
+0000000|                return true;
+       |            }
+       |
+       |            /// Ray vs plane intersection.
+       |            /// See_also: "Geometry for Computer Graphics: Formulae, Examples
+       |            ///     and Proofs", Vince (2005), p. 62
+       |            /// Returns: $(D true) if the ray crosses the plane exactly once,
+       |            ///     or $(D false) if the ray is parallel to or points away from
+       |            ///     the plane
+       |            /// Params:
+       |            ///     plane = Plane to intersect.
+       |            ///     intersection = Point of intersection.
+       |            ///     distance = set to the point's distance along the ray, or
+       |            ///                T.infinity if parallel to the plane
+       |            @nogc bool intersect(Plane!T plane, out point_t intersection, out T distance) pure const nothrow
+       |            {
+       |                // dot product will be 0 if angle to plane is 0
+0000000|                T dp = dot(plane.n, dir);
+0000000|                if (abs(dp) < T.epsilon)
+       |                {
+0000000|                    distance = T.infinity;
+0000000|                    return false; // parallel to plane
+       |                }
+       |
+       |                // distance along ray where intersection happens
+0000000|                distance = -(dot(plane.n, orig) - plane.d) / dp;
+       |
+0000000|                intersection = distance*dir + orig;
+0000000|                return distance >= 0;
+       |            }
+       |        }
+       |    }
+       |}
+       |
+       |alias Ray!(float, 2) ray2f;  /// 2D float ray.
+       |alias Ray!(float, 3) ray3f;  /// 3D float ray.
+       |alias Ray!(double, 2) ray2d; /// 2D double ray.
+       |alias Ray!(double, 3) ray3d; /// 3D double ray.
+       |
+       |
+       |/// 3D plane.
+       |/// See_also: Flipcode article by Nate Miller $(WEB www.flipcode.com/archives/Plane_Class.shtml).
+       |struct Plane(T) if (isFloatingPoint!T)
+       |{
+       |    public
+       |    {
+       |        vec3!T n; /// Normal (always stored normalized).
+       |        T d;
+       |
+       |        /// Create from four coordinates.
+0000000|        @nogc this(vec4!T abcd) pure nothrow
+       |        {
+0000000|            n = vec3!T(abcd.x, abcd.y, abcd.z).normalized();
+0000000|            d = abcd.w;
+       |        }
+       |
+       |        /// Create from a point and a normal.
+0000000|        @nogc this(vec3!T origin, vec3!T normal) pure nothrow
+       |        {
+0000000|            n = normal.normalized();
+0000000|            d = -dot(origin, n);
+       |        }
+       |
+       |        /// Create from 3 non-aligned points.
+0000000|        @nogc this(vec3!T A, vec3!T B, vec3!T C) pure nothrow
+       |        {
+0000000|            this(C, cross(B - A, C - A));
+       |        }
+       |
+       |        /// Assign a plane with another plane.
+       |        @nogc ref Plane opAssign(Plane other) pure nothrow
+       |        {
+0000000|            n = other.n;
+0000000|            d = other.d;
+0000000|            return this;
+       |        }
+       |
+       |        /// Returns: signed distance between a point and the plane.
+       |        @nogc T signedDistanceTo(vec3!T point) pure const nothrow
+       |        {
+0000000|            return dot(n, point) + d;
+       |        }
+       |
+       |        /// Returns: absolute distance between a point and the plane.
+       |        @nogc T distanceTo(vec3!T point) pure const nothrow
+       |        {
+0000000|            return abs(signedDistanceTo(point));
+       |        }
+       |
+       |        /// Returns: true if the point is in front of the plane.
+       |        @nogc bool isFront(vec3!T point) pure const nothrow
+       |        {
+0000000|            return signedDistanceTo(point) >= 0;
+       |        }
+       |
+       |        /// Returns: true if the point is in the back of the plane.
+       |        @nogc bool isBack(vec3!T point) pure const nothrow
+       |        {
+0000000|            return signedDistanceTo(point) < 0;
+       |        }
+       |
+       |        /// Returns: true if the point is on the plane, with a given epsilon.
+       |        @nogc bool isOn(vec3!T point, T epsilon) pure const nothrow
+       |        {
+0000000|            T sd = signedDistanceTo(point);
+0000000|            return (-epsilon < sd) && (sd < epsilon);
+       |        }
+       |    }
+       |}
+       |
+       |alias Plane!float planef;  /// 3D float plane.
+       |alias Plane!double planed; /// 3D double plane.
+       |
+       |unittest
+       |{
+       |    auto p = planed(vec4d(1.0, 2.0, 3.0, 4.0));
+       |    auto p2 = planed(vec3d(1.0, 0.0, 0.0),
+       |                     vec3d(0.0, 1.0, 0.0),
+       |                     vec3d(0.0, 0.0, 1.0));
+       |
+       |    assert(p2.isOn(vec3d(1.0, 0.0, 0.0), 1e-7));
+       |    assert(p2.isFront(vec3d(1.0, 1.0, 1.0)));
+       |    assert(p2.isBack(vec3d(0.0, 0.0, 0.0)));
+       |}
+       |
+       |/// Plane intersection tests
+       |@nogc pure nothrow unittest
+       |{
+       |    void testR(planed p, ray3d r, bool shouldIntersect, double expectedDistance, vec3d expectedPoint = vec3d.init) pure nothrow @nogc
+       |    {
+       |        vec3d point;
+       |        double distance;
+       |        assert(r.intersect(p, point, distance) == shouldIntersect);
+       |        assert(approxEqual(distance, expectedDistance));
+       |        if (shouldIntersect)
+       |            assert(approxEqual(point.v[], expectedPoint.v[]));
+       |    }
+       |    // ray facing plane
+       |    testR(planed(vec4d(1.0, 0.0, 0.0, 1.0)), ray3d(vec3d(2.0, 3.0, 4.0), vec3d(-1.0, 0.0, 0.0)),
+       |        true, 1.0, vec3d(1.0, 3.0, 4.0));
+       |    testR(planed(vec4d(1.0, 1.0, 1.0, -sqrt(3.0))), ray3d(vec3d(1.0, 1.0, 1.0), vec3d(-1.0, -1.0, -1.0).normalized()),
+       |        true, 2.0*sqrt(3.0), vec3d(-1.0, -1.0, -1.0));
+       |    // ray facing away
+       |    testR(planed(vec4d(1.0, 0.0, 0.0, 1.0)), ray3d(vec3d(2.0, 3.0, 4.0), vec3d(1.0, 0.0, 0.0)),
+       |        false, -1.0);
+       |    testR(planed(vec4d(1.0, 0.0, 0.0, 5.0)), ray3d(vec3d(2.0, 3.0, 4.0), vec3d(-1.0, 0.0, 0.0)),
+       |        false, -3.0);
+       |    // ray parallel
+       |    testR(planed(vec4d(0.0, 0.0, 1.0, 1.0)), ray3d(vec3d(1.0, 2.0, 3.0), vec3d(1.0, 0.0, 0.0)),
+       |        false, double.infinity);
+       |
+       |    void testS(planed p, seg3d s, bool shouldIntersect, double expectedProgress, vec3d expectedPoint = vec3d.init) pure nothrow @nogc
+       |    {
+       |        vec3d point;
+       |        double progress;
+       |        assert(s.intersect(p, point, progress) == shouldIntersect);
+       |        assert(approxEqual(progress, expectedProgress));
+       |        if (shouldIntersect)
+       |            assert(approxEqual(point.v[], expectedPoint.v[]));
+       |    }
+       |    // segment crossing plane
+       |    testS(planed(vec4d(1.0, 0.0, 0.0, 2.0)), seg3d(vec3d(1.0, 2.0, 3.0), vec3d(3.0, 4.0, 5.0)),
+       |        true, 0.5, vec3d(2.0, 3.0, 4.0));
+       |    // segment too short
+       |    testS(planed(vec4d(1.0, 0.0, 0.0, 0.0)), seg3d(vec3d(1.0, 2.0, 3.0), vec3d(3.0, 4.0, 5.0)),
+       |        false, -0.5);
+       |}
+       |
+       |
+       |/// 3D frustum.
+       |/// See_also: Flipcode article by Dion Picco $(WEB www.flipcode.com/archives/Frustum_Culling.shtml).
+       |/// Bugs: verify proper signedness of half-spaces
+       |struct Frustum(T) if (isFloatingPoint!T)
+       |{
+       |    public
+       |    {
+       |        enum int LEFT   = 0,
+       |                 RIGHT  = 1,
+       |                 TOP    = 2,
+       |                 BOTTOM = 3,
+       |                 NEAR   = 4,
+       |                 FAR    = 5;
+       |
+       |        Plane!T[6] planes;
+       |
+       |        /// Create a frustum from 6 planes.
+0000000|        @nogc this(Plane!T left, Plane!T right, Plane!T top, Plane!T bottom, Plane!T near, Plane!T far) pure nothrow
+       |        {
+0000000|            planes[LEFT] = left;
+0000000|            planes[RIGHT] = right;
+0000000|            planes[TOP] = top;
+0000000|            planes[BOTTOM] = bottom;
+0000000|            planes[NEAR] = near;
+0000000|            planes[FAR] = far;
+       |        }
+       |
+       |        enum : int
+       |        {
+       |            OUTSIDE,   /// object is outside the frustum
+       |            INTERSECT, /// object intersects with the frustum
+       |            INSIDE     /// object is inside the frustum
+       |        }
+       |
+       |        /// Point vs frustum intersection.
+       |        @nogc bool contains(vec3!T point) pure const nothrow
+       |        {
+0000000|            for(int i = 0; i < 6; ++i)
+       |            {
+0000000|                T distance = planes[i].signedDistanceTo(point);
+       |
+0000000|                if(distance < 0)
+0000000|                    return false;
+       |            }
+0000000|            return true;
+       |        }
+       |
+       |        /// Sphere vs frustum intersection.
+       |        /// Returns: Frustum.OUTSIDE, Frustum.INTERSECT or Frustum.INSIDE.
+       |        @nogc int contains(Sphere!(T, 3) sphere) pure const nothrow
+       |        {
+       |            // calculate our distances to each of the planes
+0000000|            for(int i = 0; i < 6; ++i)
+       |            {
+       |                // find the distance to this plane
+0000000|                T distance = planes[i].signedDistanceTo(sphere.center);
+       |
+0000000|                if(distance < -sphere.radius)
+0000000|                    return OUTSIDE;
+       |
+0000000|                else if (distance < sphere.radius)
+0000000|                    return INTERSECT;
+       |            }
+       |
+       |            // otherwise we are fully in view
+0000000|            return INSIDE;
+       |        }
+       |
+       |        /// AABB vs frustum intersection.
+       |        /// Returns: Frustum.OUTSIDE, Frustum.INTERSECT or Frustum.INSIDE.
+       |        @nogc int contains(box3!T box) pure const nothrow
+       |        {
+0000000|            vec3!T[8] corners;
+0000000|            int totalIn = 0;
+       |
+0000000|            for (int i = 0; i < 2; ++i)
+0000000|                for (int j = 0; j < 2; ++j)
+0000000|                    for (int k = 0; k < 2; ++k)
+       |                    {
+0000000|                        auto x = i == 0 ? box.min.x : box.max.x;
+0000000|                        auto y = j == 0 ? box.min.y : box.max.y;
+0000000|                        auto z = k == 0 ? box.min.z : box.max.z;
+0000000|                        corners[i*4 + j*2 + k] = vec3!T(x, y, z);
+       |                    }
+       |
+       |            // test all 8 corners against the 6 sides
+       |            // if all points are behind 1 specific plane, we are out
+       |            // if we are in with all points, then we are fully in
+0000000|            for(int p = 0; p < 6; ++p)
+       |            {
+0000000|                int inCount = 8;
+0000000|                int ptIn = 1;
+       |
+0000000|                for(int i = 0; i < 8; ++i)
+       |                {
+       |                    // test this point against the planes
+0000000|                    if (planes[p].isBack(corners[i]))
+       |                    {
+0000000|                        ptIn = 0;
+0000000|                        --inCount;
+       |                    }
+       |                }
+       |
+       |                // were all the points outside of plane p?
+0000000|                if (inCount == 0)
+0000000|                    return OUTSIDE;
+       |
+       |                // check if they were all on the right side of the plane
+0000000|                totalIn += ptIn;
+       |            }
+       |
+       |            // so if totalIn is 6, then all are inside the view
+0000000|            if(totalIn == 6)
+0000000|                return INSIDE;
+       |
+       |            // we must be partly in then otherwise
+0000000|            return INTERSECT;
+       |        }
+       |
+       |    }
+       |}
+       |
+       |unittest
+       |{
+       |    seg2f se;
+       |    triangle3f tr;
+       |    Frustum!double frust;
+       |    planed pl;
+       |}
+       |
+       |/// True if `T` is a kind of Segment
+       |enum isSegment(T) = is(T : Segment!U, U...);
+       |
+       |/// True if `T` is a kind of Triangle
+       |enum isTriangle(T) = is(T : Triangle!U, U...);
+       |
+       |/// True if `T` is a kind of Sphere
+       |enum isSphere(T) = is(T : Sphere!U, U...);
+       |
+       |/// True if `T` is a kind of Ray
+       |enum isRay(T) = is(T : Ray!U, U...);
+       |
+       |/// True if `T` is a kind of Plane
+       |enum isPlane(T) = is(T : Plane!U, U);
+       |
+       |/// True if `T` is a kind of Frustum
+       |enum isFrustum(T) = is(T : Frustum!U, U);
+       |
+       |/// True if `T` is a kind of 2 dimensional Segment
+       |enum isSegment2D(T) = is(T : Segment!(U, 2), U);
+       |
+       |/// True if `T` is a kind of 2 dimensional Triangle
+       |enum isTriangle2D(T) = is(T : Triangle!(U, 2), U);
+       |
+       |/// True if `T` is a kind of 2 dimensional Sphere
+       |enum isSphere2D(T) = is(T : Sphere!(U, 2), U);
+       |
+       |/// True if `T` is a kind of 2 dimensional Ray
+       |enum isRay2D(T) = is(T : Ray!(U, 2), U);
+       |
+       |/// True if `T` is a kind of 3 dimensional Segment
+       |enum isSegment3D(T) = is(T : Segment!(U, 3), U);
+       |
+       |/// True if `T` is a kind of 3 dimensional Triangle
+       |enum isTriangle3D(T) = is(T : Triangle!(U, 3), U);
+       |
+       |/// True if `T` is a kind of 3 dimensional Sphere
+       |enum isSphere3D(T) = is(T : Sphere!(U, 3), U);
+       |
+       |/// True if `T` is a kind of 3 dimensional Ray
+       |enum isRay3D(T) = is(T : Ray!(U, 3), U);
+       |
+       |unittest
+       |{
+       |    enum ShapeType
+       |    {
+       |        segment,
+       |        triangle,
+       |        sphere,
+       |        ray,
+       |        plane,
+       |        frustum
+       |    }
+       |
+       |    void test(T, ShapeType type, int dim)()
+       |    {
+       |        with (ShapeType)
+       |        {
+       |            static assert(isSegment!T  == (type == segment ));
+       |            static assert(isTriangle!T == (type == triangle));
+       |            static assert(isSphere!T   == (type == sphere  ));
+       |            static assert(isRay!T      == (type == ray     ));
+       |            static assert(isPlane!T    == (type == plane   ));
+       |            static assert(isFrustum!T  == (type == frustum ));
+       |
+       |            static assert(isSegment2D!T  == (type == segment  && dim == 2));
+       |            static assert(isTriangle2D!T == (type == triangle && dim == 2));
+       |            static assert(isSphere2D!T   == (type == sphere   && dim == 2));
+       |            static assert(isRay2D!T      == (type == ray      && dim == 2));
+       |
+       |            static assert(isSegment3D!T  == (type == segment  && dim == 3));
+       |            static assert(isTriangle3D!T == (type == triangle && dim == 3));
+       |            static assert(isSphere3D!T   == (type == sphere   && dim == 3));
+       |            static assert(isRay3D!T      == (type == ray      && dim == 3));
+       |        }
+       |    }
+       |
+       |    with (ShapeType)
+       |    {
+       |        //    test case         type      #dimensions
+       |        test!(seg2f           , segment , 2);
+       |        test!(seg3d           , segment , 3);
+       |        test!(triangle2d      , triangle, 2);
+       |        test!(triangle3f      , triangle, 3);
+       |        test!(sphere2d        , sphere  , 2);
+       |        test!(Sphere!(uint, 3), sphere  , 3);
+       |        test!(ray2f           , ray     , 2);
+       |        test!(Ray!(real, 3)   , ray     , 3);
+       |        test!(planed          , plane   , 0); // ignore dimension (always 3D)
+       |        test!(Plane!float     , plane   , 0);
+       |        test!(Frustum!double  , frustum , 0);
+       |    }
+       |}
+       |
+       |/// Get the numeric type used to measure a shape's dimensions.
+       |alias DimensionType(T : Segment!U, U...) = U[0];
+       |/// ditto
+       |alias DimensionType(T : Triangle!U, U...) = U[0];
+       |/// ditto
+       |alias DimensionType(T : Sphere!U, U...) = U[0];
+       |/// ditto
+       |alias DimensionType(T : Ray!U, U...) = U[0];
+       |/// ditto
+       |alias DimensionType(T : Plane!U, U) = U;
+       |/// ditto
+       |alias DimensionType(T : Frustum!U, U) = U;
+       |
+       |///
+       |unittest
+       |{
+       |    static assert(is(DimensionType!seg2i          == int));
+       |    static assert(is(DimensionType!triangle3d     == double));
+       |    static assert(is(DimensionType!sphere2d       == double));
+       |    static assert(is(DimensionType!ray3f          == float));
+       |    static assert(is(DimensionType!planed         == double));
+       |    static assert(is(DimensionType!(Frustum!real) == real));
+       |}
+../../../.dub/packages/gfm-7.0.0/gfm/math/gfm/math/shapes.d is 0% covered

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Alias PGpoint</title>
+		<title>Enum InfinityState</title>
 		<link rel="stylesheet" href="../../../css/style.min.css"/>
 		<script type="text/javascript" src="../../../js/script.min.js"></script>
 	</head>
@@ -43,11 +43,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
-							<a href="../../../dpq2/conv/jsonb.html">jsonb</a>
+							<a href="../../../dpq2/conv/geometric.html">geometric</a>
 						</div>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../../dpq2/conv/jsonb.html">jsonb</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
 							<a href="../../../dpq2/conv/time.html">time</a>
 						</div>
 					</li>
@@ -57,7 +62,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../../dpq2/conv/to_d_types.html">to_d_types</a>
 						</div>
 					</li>
@@ -109,23 +114,52 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Alias PGpoint</h1><p>Point
-</p>
+				<h1>Enum InfinityState</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">alias</span> <span class="pln">PGpoint</span>
-				 <span class="pun">=</span> <span class="pln">dpq2<wbr/></span><span class="pun">.</span><span class="pln">conv<wbr/></span><span class="pun">.</span><span class="pln">geometric<wbr/></span><span class="pun">.</span><span class="typ">Point</span><span class="pun">;</span>
+				<span class="kwd">enum</span> <span class="typ">InfinityState</span>
+				 <span class="pun">:</span> <span class="typ">byte</span> <span class="pun">{ ... }</span>
 						</div>
 					</code>
 				</div>
 				
+				<section><h2>Enum members</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td id="INFINITY_MAX">
+								<code>INFINITY_MAX</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td id="INFINITY_MIN">
+								<code>INFINITY_MIN</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td id="NONE">
+								<code>NONE</code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
 				
 			</div>
 			<footer>
 				<div id="license-info">
-					
-					
+					<p>NCrashed <ncrashed@gmail.com>
+</p>
+
+					<p>© 2014 DSoftOut
+</p>
+
 					
 				</div>
 			</footer>

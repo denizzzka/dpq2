@@ -50,19 +50,8 @@
        |        alias Key = TKey;
        |        alias Value = TValue;
        |
-       |        static if (__VERSION__ < 2074) {
-       |                struct AW { // work around AffixAllocator limitations
-       |                        import std.algorithm.comparison : max;
-       |                        IAllocator alloc;
-       |                        alias alloc this;
-       |                        enum alignment = max(Key.alignof, int.alignof);
-       |                        void[] resolveInternalPointer(void* p) { void[] ret; alloc.resolveInternalPointer(p, ret); return ret; }
-       |                }
-       |                alias AllocatorType = AffixAllocator!(AW, int);
-       |        } else {
-0000000|                IAllocator AW(IAllocator a) { return a; }
-       |                alias AllocatorType = AffixAllocator!(IAllocator, int);
-       |        }
+0000000|        IAllocator AW(IAllocator a) { return a; }
+       |        alias AllocatorType = AffixAllocator!(IAllocator, int);
        |
        |        struct TableEntry {
        |                UnConst!Key key = Traits.clearValue;
@@ -461,4 +450,4 @@
        |                alias UnConst = V;
        |        } else alias UnConst = T;
        |}
-../../../.dub/packages/vibe-d-0.8.2/vibe-d/utils/vibe/utils/hashmap.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/utils/vibe/utils/hashmap.d is 0% covered

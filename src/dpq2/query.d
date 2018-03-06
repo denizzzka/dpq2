@@ -182,7 +182,7 @@ mixin template Queries()
 
     // Waiting for completion of reading or writing
     // Returns: timeout is not occured
-    version(unittest)
+    version(integration_tests)
     bool waitEndOf(WaitType type, Duration timeout = Duration.zero)
     {
         import std.socket;
@@ -229,7 +229,7 @@ mixin template Queries()
     }
 }
 
-version(unittest)
+version(integration_tests)
 enum WaitType
 {
     READ,

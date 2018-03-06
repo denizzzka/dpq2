@@ -1721,4 +1721,4 @@
        |
        |/// private
        |package template isBsonSerializable(T) { enum isBsonSerializable = is(typeof(T.init.toBson()) == Bson) && is(typeof(T.fromBson(Bson())) == T); }
-../../../.dub/packages/vibe-d-0.8.2/vibe-d/data/vibe/data/bson.d is 40% covered
+../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/data/vibe/data/bson.d is 40% covered

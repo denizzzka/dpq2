@@ -186,7 +186,7 @@
        |
       3|    ret ~= rawValues;
        |
-      3|    return Value(ret, ap.OID.oidConvTo!"array", false, ValueFormat.BINARY);
+      3|    return Value(cast(immutable) ret, ap.OID.oidConvTo!"array", false, ValueFormat.BINARY);
        |}
        |
        |unittest

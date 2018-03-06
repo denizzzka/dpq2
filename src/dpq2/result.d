@@ -351,13 +351,10 @@ immutable struct Row
         // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
         // One should not modify the data it points to, and one must explicitly copy the data into other
         // storage if it is to be used past the lifetime of the PGresult structure itself.
-        const ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
+        immutable ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
         size_t s = size(col);
 
-        // it is legal to cast here because immutable value will be returned
-        Value r = Value(cast(ubyte[]) v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
-
-        return cast(immutable) r;
+        return immutable Value(v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
     }
 
     /// Returns cell value by field name
@@ -564,10 +561,7 @@ immutable struct Array
     {
         auto n = coords2Serial( _argptr, _arguments );
 
-        // it is legal to cast here because immutable value will be returned
-        Value r = Value(cast(ubyte[]) elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
-
-        return cast(immutable) r;
+        return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
     }
 
     /// Value NULL checking

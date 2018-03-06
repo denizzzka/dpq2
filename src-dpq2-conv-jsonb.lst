@@ -13,7 +13,7 @@
        |import std.conv: to;
        |
        |///
-       |Json jsonbValueToJson(in Value v) @trusted
+       |Json jsonbValueToJson(in Value v)
        |{
       2|    assert(v.oidType == OidType.Jsonb);
        |
@@ -26,6 +26,6 @@
        |
       2|    string s = (cast(const(char[])) v._data[1 .. $]).to!string;
        |
-      2|    return parseJsonString(s); //TODO: make this @safe
+      2|    return parseJsonString(s);
        |}
 src/dpq2/conv/jsonb.d is 80% covered

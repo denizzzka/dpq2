@@ -46,7 +46,7 @@
        |
        |    invariant
        |    {
-    435|        assert(conn !is null);
+    453|        assert(conn !is null);
        |    }
        |
        |    /// Makes a new connection to the database server
@@ -73,7 +73,7 @@
        |
        |    ~this()
        |    {
-      7|        PQfinish( conn );
+      1|        PQfinish( conn );
        |    }
        |
        |    mixin Queries;
@@ -216,9 +216,9 @@
        |    /// Get result after PQexec* functions or throw exception if pull is empty
        |    package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
        |    {
-    152|        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
+    164|        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
        |
-    150|        return new immutable ResultContainer(r);
+    162|        return new immutable ResultContainer(r);
        |    }
        |
        |    /// Select single-row mode for the currently-executing query

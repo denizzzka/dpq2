@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    185|    return cast(OidType)(oid);
+    197|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -159,12 +159,12 @@
        |    import std.traits : Unqual;
        |    static import dpq2.conv.time;
        |
-     86|    alias UT = Unqual!T;
+     89|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
-     38|        static if(is(UT == string)){ return Text; } else
-      1|        static if(is(UT == ubyte[])){ return ByteArray; } else
+     40|        static if(is(UT == string)){ return Text; } else
+      2|        static if(is(UT == ubyte[])){ return ByteArray; } else
      11|        static if(is(UT == bool)){ return Bool; } else
       2|        static if(is(UT == short)){ return Int2; } else
      29|        static if(is(UT == int)){ return Int4; } else

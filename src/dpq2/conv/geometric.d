@@ -1,109 +1,134 @@
+///
 module dpq2.conv.geometric;
 
-import dpq2.oids : OidType;
-import dpq2.value : ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
+import dpq2.oids: OidType;
+import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
-import std.exception : enforce;
+import std.traits;
+import std.range.primitives: ElementType;
 
 @safe:
 
-/// Point on a plane - (x,y)
-struct Point
+private template GetRvalueOfMember(T, string memberName)
 {
-    double x;
-    double y;
+    mixin("alias MemberType = typeof(T."~memberName~");");
 
-    private auto serialize(T)(T target)
+    static if(is(MemberType == function))
+        alias R = ReturnType!(MemberType);
+    else
+        alias R = MemberType;
+
+    alias GetRvalueOfMember = R;
+}
+
+/// Checks that type have "x" and "y" members of returning type "double"
+bool isValidPointType(T)()
+{
+    static if(__traits(compiles, typeof(T.x)) && __traits(compiles, typeof(T.y)))
     {
-        import std.algorithm : copy;
-
-        auto rem = x.nativeToBigEndian.copy(target);
-        rem = y.nativeToBigEndian.copy(rem);
-
-        return rem;
+        return
+            is(GetRvalueOfMember!(T, "x") == double) &&
+            is(GetRvalueOfMember!(T, "y") == double);
     }
+    else
+        return false;
+}
+
+/// Checks that type have "min" and "max" members of suitable returning type of point
+bool isValidBoxType(T)()
+{
+    static if(__traits(compiles, typeof(T.min)) && __traits(compiles, typeof(T.max)))
+    {
+        return
+            isValidPointType!(GetRvalueOfMember!(T, "min")) &&
+            isValidPointType!(GetRvalueOfMember!(T, "max"));
+    }
+    else
+        return false;
+}
+
+///
+bool isValidLineSegmentType(T)()
+{
+    static if(__traits(compiles, typeof(T.start)) && __traits(compiles, typeof(T.end)))
+    {
+        return
+            isValidPointType!(GetRvalueOfMember!(T, "start")) &&
+            isValidPointType!(GetRvalueOfMember!(T, "end"));
+    }
+    else
+        return false;
+}
+
+///
+bool isValidPolygon(T)()
+{
+    return isArray!T && isValidPointType!(ElementType!T);
+}
+
+private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)
+if(isValidPointType!Vec2Ddouble)
+{
+    import std.algorithm : copy;
+
+    auto rem = point.x.nativeToBigEndian.copy(target);
+    rem = point.y.nativeToBigEndian.copy(rem);
+
+    return rem;
+}
+
+Value toValue(Vec2Ddouble)(Vec2Ddouble pt)
+if(isValidPointType!Vec2Ddouble)
+{
+    ubyte[] data = new ubyte[16];
+    pt.serializePoint(data);
+
+    return createValue(data, OidType.Point);
+}
+
+private auto serializeBox(Box, T)(Box box, T target)
+{
+    auto rem = box.min.serializePoint(target);
+    rem = box.max.serializePoint(rem);
+
+    return rem;
+}
+
+Value toValue(Box)(Box box)
+if(isValidBoxType!Box)
+{
+    ubyte[] data = new ubyte[32];
+    box.serializeBox(data);
+
+    return createValue(data, OidType.Box);
 }
 
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
 struct Line
 {
-    double a;
-    double b;
-    double c;
+    double a; ///
+    double b; ///
+    double c; ///
 }
 
-/// Finite line segment - ((x1,y1),(x2,y2))
-struct LineSegment
+///
+struct Path(Point)
+if(isValidPointType!Point)
 {
-    Point start;
-    Point end;
+    bool isClosed; ///
+    Point[] points; ///
 }
 
-/// Rectangular box - ((x1,y1),(x2,y2))
-struct Box
+///
+struct Circle(Point)
+if(isValidPointType!Point)
 {
-    Point high;
-    Point low;
-
-    private auto serialize(T)(T target)
-    {
-        auto rem = high.serialize(target);
-        rem = low.serialize(rem);
-
-        return rem;
-    }
+    Point center; ///
+    double radius; ///
 }
 
-/// Closed path (similar to polygon) - ((x1,y1),...)
-struct Path
-{
-    bool closed;
-    Point[] points;
-}
-
-/// Polygon (similar to closed path) - ((x1,y1),...)
-struct Polygon
-{
-    Point[] points; /// Polygon's points
-
-    /// Polygon's bounding box
-    @property Box bbox()
-    {
-        import std.algorithm : map, max, min, reduce;
-        enforce(points.length, "No points defined");
-
-        auto lr = points.map!(a=>a.x).reduce!(min, max);
-        auto bt = points.map!(a=>a.y).reduce!(min, max);
-
-        return Box(Point(lr[1], bt[1]), Point(lr[0], bt[0]));
-    }
-
-    unittest
-    {
-        auto poly = Polygon([Point(1,1), Point(2,2), Point(3,3)]);
-        assert(poly.bbox == Box(Point(3,3), Point(1,1)));
-
-        poly = Polygon([Point(0,0), Point(1,1), Point(2,0)]);
-        assert(poly.bbox == Box(Point(2,1), Point(0,0)));
-    }
-}
-
-/// Circle - <(x,y),r> (center point and radius)
-struct Circle
-{
-    Point center;
-    double radius;
-}
-
-Value toValue(Point pt)
-{
-    ubyte[] data = new ubyte[16];
-    pt.serialize(data);
-
-    return Value(data, OidType.Point, false);
-}
-
-Value toValue(Line line)
+Value toValue(T)(T line)
+if(is(T == Line))
 {
     import std.algorithm : copy;
 
@@ -113,95 +138,101 @@ Value toValue(Line line)
     rem = line.b.nativeToBigEndian.copy(rem);
     rem = line.c.nativeToBigEndian.copy(rem);
 
-    return Value(data, OidType.Line, false);
+    return createValue(data, OidType.Line);
 }
 
-Value toValue(LineSegment lseg)
+Value toValue(LineSegment)(LineSegment lseg)
+if(isValidLineSegmentType!LineSegment)
 {
     ubyte[] data = new ubyte[32];
 
-    auto rem = lseg.start.serialize(data);
-    rem = lseg.end.serialize(rem);
+    auto rem = lseg.start.serializePoint(data);
+    rem = lseg.end.serializePoint(rem);
 
-    return Value(data, OidType.LineSegment, false);
+    return createValue(data, OidType.LineSegment);
 }
 
-Value toValue(Box box)
-{
-    ubyte[] data = new ubyte[32];
-    box.serialize(data);
-
-    return Value(data, OidType.Box, false);
-}
-
-Value toValue(Path path)
+Value toValue(T)(T path)
+if(isInstanceOf!(Path, T))
 {
     import std.algorithm : copy;
 
-    enforce(path.points.length >= 1, "At least one point is needed for Path");
+    if(path.points.length < 1)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "At least one point is needed for Path", __FILE__, __LINE__);
 
     ubyte[] data = new ubyte[path.points.length * 16 + 5];
 
-    auto rem = (cast(ubyte)(path.closed ? 1 : 0)).nativeToBigEndian.copy(data);
+    auto rem = (cast(ubyte)(path.isClosed ? 1 : 0)).nativeToBigEndian.copy(data);
     rem = (cast(int)path.points.length).nativeToBigEndian.copy(rem);
 
     foreach (ref p; path.points)
     {
-        rem = p.serialize(rem);
+        rem = p.serializePoint(rem);
     }
 
-    return Value(data, OidType.Path, false);
+    return createValue(data, OidType.Path);
 }
 
-Value toValue(Polygon poly)
+Value toValue(Polygon)(Polygon poly)
+if(isValidPolygon!Polygon)
 {
     import std.algorithm : copy;
 
-    enforce(poly.points.length >= 1, "At least one point is needed for Polygon");
+    if(poly.length < 1)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "At least one point is needed for Polygon", __FILE__, __LINE__);
 
-    ubyte[] data = new ubyte[poly.points.length * 16 + 4];
-    auto rem = (cast(int)poly.points.length).nativeToBigEndian.copy(data);
+    ubyte[] data = new ubyte[poly.length * 16 + 4];
+    auto rem = (cast(int)poly.length).nativeToBigEndian.copy(data);
 
-    foreach (ref p; poly.points)
-    {
-        rem = p.serialize(rem);
-    }
+    foreach (ref p; poly)
+        rem = p.serializePoint(rem);
 
-    return Value(data, OidType.Polygon, false);
+    return createValue(data, OidType.Polygon);
 }
 
-Value toValue(Circle c)
+Value toValue(T)(T c)
+if(isInstanceOf!(Circle, T))
 {
     import std.algorithm : copy;
 
     ubyte[] data = new ubyte[24];
-    auto rem = c.center.serialize(data);
+    auto rem = c.center.serializePoint(data);
     c.radius.nativeToBigEndian.copy(rem);
 
-    return Value(data, OidType.Circle, false);
+    return createValue(data, OidType.Circle);
+}
+
+/// Caller must ensure that reference to the data will not be passed to elsewhere
+private Value createValue(const ubyte[] data, OidType oid) pure @trusted
+{
+    return Value(cast(immutable) data, oid);
 }
 
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
-T binaryValueAs(T, V)(in V v)
-if (is(T == Point) && (is(V == Value) || is(V == const(ubyte)[])))
+/// Convert to Point
+Vec2Ddouble binaryValueAs(Vec2Ddouble)(in Value v)
+if(isValidPointType!Vec2Ddouble)
 {
-    static if (is(V == Value))
-    {
-        if(!(v.oidType == OidType.Point))
-            throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
+    if(!(v.oidType == OidType.Point))
+        throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
 
-        auto data = v.data;
-    }
-    else
-        auto data = v;
+    auto data = v.data;
 
     if(!(data.length == 16))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Point size", __FILE__, __LINE__);
 
-    return Point(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
+    return pointFromBytes!Vec2Ddouble(data[0..16]);
+}
+
+private Vec2Ddouble pointFromBytes(Vec2Ddouble)(in ubyte[16] data) pure
+if(isValidPointType!Vec2Ddouble)
+{
+    return Vec2Ddouble(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
 }
 
 T binaryValueAs(T)(in Value v)
@@ -217,9 +248,8 @@ if (is(T == Line))
     return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
 }
 
-
-T binaryValueAs(T)(in Value v)
-if (is(T == LineSegment))
+LineSegment binaryValueAs(LineSegment)(in Value v)
+if(isValidLineSegmentType!LineSegment)
 {
     if(!(v.oidType == OidType.LineSegment))
         throwTypeComplaint(v.oidType, "LineSegment", __FILE__, __LINE__);
@@ -228,11 +258,16 @@ if (is(T == LineSegment))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres LineSegment size", __FILE__, __LINE__);
 
-    return LineSegment(v.data[0..16].binaryValueAs!Point, v.data[16..$].binaryValueAs!Point);
+    alias Point = ReturnType!(LineSegment.start);
+
+    auto start = v.data[0..16].pointFromBytes!Point;
+    auto end = v.data[16..32].pointFromBytes!Point;
+
+    return LineSegment(start, end);
 }
 
-T binaryValueAs(T)(in Value v)
-if (is(T == Box))
+Box binaryValueAs(Box)(in Value v)
+if(isValidBoxType!Box)
 {
     if(!(v.oidType == OidType.Box))
         throwTypeComplaint(v.oidType, "Box", __FILE__, __LINE__);
@@ -241,11 +276,16 @@ if (is(T == Box))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Box size", __FILE__, __LINE__);
 
-    return Box(v.data[0..16].binaryValueAs!Point, v.data[16..$].binaryValueAs!Point);
+    alias Point = typeof(Box.min);
+
+    auto min = v.data[0..16].pointFromBytes!Point;
+    auto max = v.data[16..32].pointFromBytes!Point;
+
+    return Box(min, max);
 }
 
 T binaryValueAs(T)(in Value v)
-if (is(T == Path))
+if(isInstanceOf!(Path, T))
 {
     import std.array : uninitializedArray;
 
@@ -257,23 +297,26 @@ if (is(T == Path))
             "Value length isn't equal to Postgres Path size", __FILE__, __LINE__);
 
     T res;
-    res.closed = v.data[0..1].bigEndianToNative!byte == 1;
+    res.isClosed = v.data[0..1].bigEndianToNative!byte == 1;
     int len = v.data[1..5].bigEndianToNative!int;
 
     if (len != (v.data.length - 5)/16)
         throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
 
+    alias Point = typeof(T.points[0]);
+
     res.points = uninitializedArray!(Point[])(len);
     for (int i=0; i<len; i++)
     {
-        res.points[i] = v.data[(i*16+5)..(i*16+16+5)].binaryValueAs!Point;
+        const ubyte[] b = v.data[ i*16+5 .. i*16+5+16 ];
+        res.points[i] = b[0..16].pointFromBytes!Point;
     }
 
     return res;
 }
 
-T binaryValueAs(T)(in Value v)
-if (is(T == Polygon))
+Polygon binaryValueAs(Polygon)(in Value v)
+if(isValidPolygon!Polygon)
 {
     import std.array : uninitializedArray;
 
@@ -284,23 +327,26 @@ if (is(T == Polygon))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Polygon size", __FILE__, __LINE__);
 
-    T res;
+    Polygon res;
     int len = v.data[0..4].bigEndianToNative!int;
 
     if (len != (v.data.length - 4)/16)
         throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
 
-    res.points = uninitializedArray!(Point[])(len);
+    alias Point = ElementType!Polygon;
+
+    res = uninitializedArray!(Point[])(len);
     for (int i=0; i<len; i++)
     {
-        res.points[i] = v.data[(i*16+4)..(i*16+16+4)].binaryValueAs!Point;
+        const ubyte[] b = v.data[(i*16+4)..(i*16+16+4)];
+        res[i] = b[0..16].pointFromBytes!Point;
     }
 
     return res;
 }
 
 T binaryValueAs(T)(in Value v)
-if (is(T == Circle))
+if(isInstanceOf!(Circle, T))
 {
     if(!(v.oidType == OidType.Circle))
         throwTypeComplaint(v.oidType, "Circle", __FILE__, __LINE__);
@@ -309,14 +355,48 @@ if (is(T == Circle))
         throw new AE(ET.SIZE_MISMATCH,
             "Value length isn't equal to Postgres Circle size", __FILE__, __LINE__);
 
-    return Circle(
-        v.data[0..16].binaryValueAs!Point,
+    alias Point = typeof(T.center);
+
+    return T(
+        v.data[0..16].pointFromBytes!Point,
         v.data[16..24].bigEndianToNative!double
     );
 }
 
+version (integration_tests)
+package mixin template GeometricInstancesForIntegrationTest()
+{
+    @safe:
+
+    import gfm.math;
+    import dpq2.conv.geometric: Circle, Path;
+
+    alias Point = vec2d;
+    alias Box = box2d;
+    static struct LineSegment
+    {
+        seg2d seg;
+        alias seg this;
+
+        ref Point start(){ return a; }
+        ref Point end(){ return b; }
+
+        this(Point a, Point b)
+        {
+            seg.a = a;
+            seg.b = b;
+        }
+    }
+    alias TestPath = Path!Point;
+    alias Polygon = Point[];
+    alias TestCircle = Circle!Point;
+}
+
+version (integration_tests)
 unittest
 {
+    mixin GeometricInstancesForIntegrationTest;
+
     // binary write/read
     {
         auto pt = Point(1,2);
@@ -331,17 +411,17 @@ unittest
         auto b = Box(Point(2,2), Point(1,1));
         assert(b.toValue.binaryValueAs!Box == b);
 
-        auto p = Path(false, [Point(1,1), Point(2,2)]);
-        assert(p.toValue.binaryValueAs!Path == p);
+        auto p = TestPath(false, [Point(1,1), Point(2,2)]);
+        assert(p.toValue.binaryValueAs!TestPath == p);
 
-        p = Path(true, [Point(1,1), Point(2,2)]);
-        assert(p.toValue.binaryValueAs!Path == p);
+        p = TestPath(true, [Point(1,1), Point(2,2)]);
+        assert(p.toValue.binaryValueAs!TestPath == p);
 
-        auto poly = Polygon([Point(1,1), Point(2,2), Point(3,3)]);
+        Polygon poly = [Point(1,1), Point(2,2), Point(3,3)];
         assert(poly.toValue.binaryValueAs!Polygon == poly);
 
-        auto c = Circle(Point(1,2), 3);
-        assert(c.toValue.binaryValueAs!Circle == c);
+        auto c = TestCircle(Point(1,2), 3);
+        assert(c.toValue.binaryValueAs!TestCircle == c);
     }
 
     // Invalid OID tests
@@ -364,17 +444,17 @@ unittest
         v.oidType = OidType.Text;
         assertThrown!ValueConvException(v.binaryValueAs!Box);
 
-        v = Path(true, [Point(1,1), Point(2,2)]).toValue;
+        v = TestPath(true, [Point(1,1), Point(2,2)]).toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAs!Path);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPath);
 
-        v = Polygon([Point(1,1), Point(2,2)]).toValue;
+        v = [Point(1,1), Point(2,2)].toValue;
         v.oidType = OidType.Text;
         assertThrown!ValueConvException(v.binaryValueAs!Polygon);
 
-        v = Circle(Point(1,1), 3).toValue;
+        v = TestCircle(Point(1,1), 3).toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAs!Circle);
+        assertThrown!ValueConvException(v.binaryValueAs!TestCircle);
     }
 
     // Invalid data size
@@ -397,20 +477,20 @@ unittest
         v._data.length = 1;
         assertThrown!ValueConvException(v.binaryValueAs!Box);
 
-        v = Path(true, [Point(1,1), Point(2,2)]).toValue;
+        v = TestPath(true, [Point(1,1), Point(2,2)]).toValue;
         v._data.length -= 16;
-        assertThrown!ValueConvException(v.binaryValueAs!Path);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPath);
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAs!Path);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPath);
 
-        v = Polygon([Point(1,1), Point(2,2)]).toValue;
+        v = [Point(1,1), Point(2,2)].toValue;
         v._data.length -= 16;
         assertThrown!ValueConvException(v.binaryValueAs!Polygon);
         v._data.length = 1;
         assertThrown!ValueConvException(v.binaryValueAs!Polygon);
 
-        v = Circle(Point(1,1), 3).toValue;
+        v = TestCircle(Point(1,1), 3).toValue;
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAs!Circle);
+        assertThrown!ValueConvException(v.binaryValueAs!TestCircle);
     }
 }

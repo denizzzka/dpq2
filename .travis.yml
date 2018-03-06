@@ -4,7 +4,7 @@ language: d
 
 d:
   - dmd
-  #- dmd-beta https://github.com/vibe-d/vibe.d/issues/2075
+  - dmd-beta
   - ldc
   - ldc-beta
 
@@ -24,10 +24,11 @@ before_script:
 
 script:
   - dub run dpq2:integration_tests --build=unittest -- --conninfo="${CONN_STRING}"
+  - dub run dpq2:integration_tests --build=release -- --conninfo="${CONN_STRING}"
 
 matrix:
   include:
-    - d: dmd
+    - d: dmd-2.078.3
 
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"

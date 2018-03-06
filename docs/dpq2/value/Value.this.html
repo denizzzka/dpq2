@@ -43,6 +43,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dpq2/conv/geometric.html">geometric</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dpq2/conv/jsonb.html">jsonb</a>
 						</div>
 					</li>
@@ -128,14 +133,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">ref </span><span class="pln">this</span>
+				<span class="kwd">ref inout </span><span class="pln">this</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">ubyte</span><span class="pun">[]</span> <span class="pln">data</span><span class="pun">,</span>
+				&nbsp;&nbsp;<span class="kwd">immutable</span><span class="pun">(</span><span class="typ">ubyte</span><span class="pun">)</span><span class="pun">[]</span> <span class="pln">data</span><span class="pun">,</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dpq2/oids/OidType.html"><span class="typ">OidType</span></a><span class="pun">)</span> <span class="pln">oidType</span><span class="pun">,</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">isNull</span><span class="pun">,</span>
+				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">isNull</span> <span class="pun">=</span> <span class="kwd">false</span><span class="pun">,</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dpq2/value/ValueFormat.html"><span class="typ">ValueFormat</span></a><span class="pun">)</span> <span class="pln">format</span> <span class="pun">=</span> <span class="kwd">cast</span><span class="pun">(</span><span class="typ">ValueFormat</span><span class="pun">)</span><span class="lit">1</span>
 				<br/>
