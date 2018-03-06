@@ -132,12 +132,18 @@ enum InfinityState : byte
 ///
 struct PgDate
 {
-    int year;
-    ubyte month;
-    ubyte day;
+    int year; ///
+    ubyte month; ///
+    ubyte day; ///
 
-    static PgDate min() pure { return PgDate(int.min, ubyte.min, ubyte.min); }
-    static PgDate max() pure { return PgDate(int.max, ubyte.max, ubyte.max); }
+    /// '-infinity', earlier than all other dates
+    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
+
+    /// 'infinity', later than all other dates
+    static PgDate later() pure { return PgDate(int.max, 0, 0); }
+
+    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
+    bool isLater() const pure { return year == later.year; } /// 'infinity'
 }
 
 ///
@@ -201,10 +207,10 @@ struct TTimeStamp(bool isWithTZ)
         assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
     }
 
-    bool isEarlier() const pure { return date == earlier.date && time == earlier.time; } /// '-infinity'
-    bool isLater() const pure { return date == later.date && time == later.time; } /// 'infinity'
+    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
+    bool isLater() const pure { return date.isLater; } /// 'infinity'
 
-    ///
+    /// Returns infinity state
     InfinityState infinity() const pure
     {
         with(InfinityState)
@@ -255,10 +261,10 @@ struct TTimeStamp(bool isWithTZ)
     }
 
     /// '-infinity', earlier than all other time stamps
-    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.min, TimeOfDay.min, Duration.zero); }
+    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.earlier); }
 
     /// 'infinity', later than all other time stamps
-    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.max, TimeOfDay.max); }
+    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.later); }
 
     ///
     string toString() const
