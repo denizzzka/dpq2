@@ -42,6 +42,13 @@
 <url><loc>http://127.0.0.1/dpq2/conv/time/binaryValueAs.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/InfinityState.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.day.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.earlier.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.isEarlier.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.isLater.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.later.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.month.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/time/PgDate.year.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/TimeStamp.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/TimeStampUTC.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/time/toPgDate.html</loc></url>

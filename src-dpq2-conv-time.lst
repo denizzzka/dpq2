@@ -132,12 +132,18 @@
        |///
        |struct PgDate
        |{
-       |    int year;
-       |    ubyte month;
-       |    ubyte day;
+       |    int year; ///
+       |    ubyte month; ///
+       |    ubyte day; ///
        |
-     44|    static PgDate min() pure { return PgDate(int.min, ubyte.min, ubyte.min); }
-     41|    static PgDate max() pure { return PgDate(int.max, ubyte.max, ubyte.max); }
+       |    /// '-infinity', earlier than all other dates
+     39|    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
+       |
+       |    /// 'infinity', later than all other dates
+     36|    static PgDate later() pure { return PgDate(int.max, 0, 0); }
+       |
+     30|    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
+     27|    bool isLater() const pure { return year == later.year; } /// 'infinity'
        |}
        |
        |///
@@ -167,11 +173,11 @@
        |    }
        |
        |    ///
-    254|    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
+    120|    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
        |    {
-    127|        date = d;
-    127|        time = t;
-    127|        fracSec = fractionalSeconds;
+     60|        date = d;
+     60|        time = t;
+     60|        fracSec = fractionalSeconds;
        |    }
        |
        |    ///
@@ -196,15 +202,15 @@
        |
        |    invariant()
        |    {
-    338|        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
-    338|        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
-    338|        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
+    271|        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
+    271|        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
+    271|        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
        |    }
        |
-     65|    bool isEarlier() const pure { return date == earlier.date && time == earlier.time; } /// '-infinity'
-     59|    bool isLater() const pure { return date == later.date && time == later.time; } /// 'infinity'
+     60|    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
+     54|    bool isLater() const pure { return date.isLater; } /// 'infinity'
        |
-       |    ///
+       |    /// Returns infinity state
        |    InfinityState infinity() const pure
        |    {
        |        with(InfinityState)
@@ -255,10 +261,10 @@
        |    }
        |
        |    /// '-infinity', earlier than all other time stamps
-     44|    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.min, TimeOfDay.min, Duration.zero); }
+      9|    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.earlier); }
        |
        |    /// 'infinity', later than all other time stamps
-     41|    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.max, TimeOfDay.max); }
+      9|    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.later); }
        |
        |    ///
        |    string toString() const

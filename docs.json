@@ -1512,14 +1512,97 @@
 				"name": "PgDate",
 				"line": 133,
 				"comment": "\n",
-				"members": [],
+				"members": [
+					{
+						"offset": 0,
+						"name": "year",
+						"line": 135,
+						"comment": "\n",
+						"deco": "i",
+						"char": 9,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"offset": 4,
+						"name": "month",
+						"line": 136,
+						"comment": "\n",
+						"deco": "h",
+						"char": 11,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"offset": 5,
+						"name": "day",
+						"line": 137,
+						"comment": "\n",
+						"deco": "h",
+						"char": 11,
+						"kind": "variable",
+						"storageClass": [
+							"@safe"
+						]
+					},
+					{
+						"endchar": 66,
+						"name": "earlier",
+						"line": 140,
+						"comment": "'-infinity', earlier than all other dates\n",
+						"deco": "FNaNfZS4dpq24conv4time6PgDate",
+						"endline": 140,
+						"char": 19,
+						"kind": "function",
+						"storageClass": [
+							"static"
+						]
+					},
+					{
+						"endchar": 64,
+						"name": "later",
+						"line": 143,
+						"comment": "'infinity', later than all other dates\n",
+						"deco": "FNaNfZS4dpq24conv4time6PgDate",
+						"endline": 143,
+						"char": 19,
+						"kind": "function",
+						"storageClass": [
+							"static"
+						]
+					},
+					{
+						"endchar": 64,
+						"name": "isEarlier",
+						"line": 145,
+						"comment": "'-infinity'\n",
+						"deco": "xFNaNfZb",
+						"endline": 145,
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 60,
+						"name": "isLater",
+						"line": 146,
+						"comment": "'infinity'\n",
+						"deco": "xFNaNfZb",
+						"endline": 146,
+						"char": 10,
+						"kind": "function"
+					}
+				],
 				"char": 1,
 				"kind": "struct"
 			},
 			{
 				"endchar": 1,
 				"name": "toPgDate",
-				"line": 144,
+				"line": 150,
 				"comment": "\n",
 				"deco": "FNaNbNiNfS3std8datetime4date4DateZS4dpq24conv4time6PgDate",
 				"parameters": [
@@ -1528,7 +1611,7 @@
 						"deco": "S3std8datetime4date4Date"
 					}
 				],
-				"endline": 147,
+				"endline": 153,
 				"originalType": "pure @safe (Date d)",
 				"char": 8,
 				"kind": "function",
@@ -1540,11 +1623,11 @@
 				"members": [
 					{
 						"name": "TTimeStamp",
-						"line": 152,
+						"line": 158,
 						"members": [
 							{
 								"name": "date",
-								"line": 159,
+								"line": 165,
 								"comment": " Date and time of TimeStamp\n\n If value is '-infinity' or '+infinity' it will be equal PgDate.min or PgDate.max\n",
 								"type": "PgDate",
 								"char": 12,
@@ -1552,7 +1635,7 @@
 							},
 							{
 								"name": "time",
-								"line": 160,
+								"line": 166,
 								"comment": "\n",
 								"type": "TimeOfDay",
 								"char": 15,
@@ -1560,7 +1643,7 @@
 							},
 							{
 								"name": "fracSec",
-								"line": 161,
+								"line": 167,
 								"comment": "fractional seconds, 1 microsecond resolution\n",
 								"type": "Duration",
 								"char": 14,
@@ -1569,7 +1652,7 @@
 							{
 								"endchar": 5,
 								"name": "this",
-								"line": 164,
+								"line": 170,
 								"comment": "\n",
 								"type": "pure (DateTime dt, Duration fractionalSeconds = Duration.zero)",
 								"parameters": [
@@ -1583,14 +1666,14 @@
 										"default": "Duration.zero"
 									}
 								],
-								"endline": 167,
+								"endline": 173,
 								"char": 5,
 								"kind": "constructor"
 							},
 							{
 								"endchar": 5,
 								"name": "this",
-								"line": 170,
+								"line": 176,
 								"comment": "\n",
 								"type": "pure (PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero)",
 								"parameters": [
@@ -1609,67 +1692,67 @@
 										"default": "Duration.zero"
 									}
 								],
-								"endline": 175,
+								"endline": 181,
 								"char": 5,
 								"kind": "constructor"
 							},
 							{
 								"endchar": 5,
 								"name": "throwIfNotFitsToDate",
-								"line": 178,
+								"line": 184,
 								"comment": "\n",
 								"type": "const void()",
-								"endline": 183,
+								"endline": 189,
 								"char": 10,
 								"kind": "function"
 							},
 							{
 								"endchar": 5,
 								"name": "dateTime",
-								"line": 186,
+								"line": 192,
 								"comment": "\n",
 								"type": "const pure DateTime()",
-								"endline": 195,
+								"endline": 201,
 								"char": 14,
 								"kind": "function"
 							},
 							{
-								"endchar": 88,
+								"endchar": 58,
 								"name": "isEarlier",
-								"line": 204,
+								"line": 210,
 								"comment": "'-infinity'\n",
 								"type": "const pure bool()",
-								"endline": 204,
+								"endline": 210,
 								"char": 10,
 								"kind": "function"
 							},
 							{
-								"endchar": 82,
+								"endchar": 54,
 								"name": "isLater",
-								"line": 205,
+								"line": 211,
 								"comment": "'infinity'\n",
 								"type": "const pure bool()",
-								"endline": 205,
+								"endline": 211,
 								"char": 10,
 								"kind": "function"
 							},
 							{
 								"endchar": 5,
 								"name": "infinity",
-								"line": 208,
-								"comment": "\n",
+								"line": 214,
+								"comment": "Returns infinity state\n",
 								"type": "const pure InfinityState()",
-								"endline": 217,
+								"endline": 223,
 								"char": 19,
 								"kind": "function"
 							},
 							{
 								"endchar": 5,
 								"name": "min",
-								"line": 236,
+								"line": 242,
 								"comment": "Returns the TimeStamp farthest in the past which is representable by TimeStamp.\n",
 								"type": "immutable(TTimeStamp)()",
-								"endline": 247,
+								"endline": 253,
 								"char": 34,
 								"kind": "function",
 								"storageClass": [
@@ -1679,10 +1762,10 @@
 							{
 								"endchar": 5,
 								"name": "max",
-								"line": 250,
+								"line": 256,
 								"comment": "Returns the TimeStamp farthest in the future which is representable by TimeStamp.\n",
 								"type": "immutable(TTimeStamp)()",
-								"endline": 255,
+								"endline": 261,
 								"char": 34,
 								"kind": "function",
 								"storageClass": [
@@ -1690,12 +1773,12 @@
 								]
 							},
 							{
-								"endchar": 112,
+								"endchar": 86,
 								"name": "earlier",
-								"line": 258,
+								"line": 264,
 								"comment": "'-infinity', earlier than all other time stamps\n",
 								"type": "pure immutable(TTimeStamp)()",
-								"endline": 258,
+								"endline": 264,
 								"char": 34,
 								"kind": "function",
 								"storageClass": [
@@ -1703,12 +1786,12 @@
 								]
 							},
 							{
-								"endchar": 95,
+								"endchar": 82,
 								"name": "later",
-								"line": 261,
+								"line": 267,
 								"comment": "'infinity', later than all other time stamps\n",
 								"type": "pure immutable(TTimeStamp)()",
-								"endline": 261,
+								"endline": 267,
 								"char": 34,
 								"kind": "function",
 								"storageClass": [
@@ -1718,10 +1801,10 @@
 							{
 								"endchar": 5,
 								"name": "toString",
-								"line": 264,
+								"line": 270,
 								"comment": "\n",
 								"type": "const string()",
-								"endline": 269,
+								"endline": 275,
 								"char": 12,
 								"kind": "function"
 							}
@@ -1731,7 +1814,7 @@
 					}
 				],
 				"name": "TTimeStamp",
-				"line": 152,
+				"line": 158,
 				"comment": "    Structure to represent PostgreSQL Timestamp with/without time zone\n",
 				"parameters": [
 					{
@@ -1745,7 +1828,7 @@
 			},
 			{
 				"name": "TimeStamp",
-				"line": 272,
+				"line": 278,
 				"comment": "Unknown TZ timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
 				"char": 1,
@@ -1753,7 +1836,7 @@
 			},
 			{
 				"name": "TimeStampUTC",
-				"line": 273,
+				"line": 279,
 				"comment": "Assumed that this is UTC timestamp\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
 				"char": 1,
