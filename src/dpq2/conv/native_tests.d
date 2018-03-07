@@ -8,14 +8,11 @@ import vibe.data.bson: Bson;
 import std.uuid: UUID;
 import dpq2.conv.geometric: Line;
 
-import std.algorithm : endsWith;
-import std.array : replace;
-import std.format : format;
-import std.math : abs;
-
 version (integration_tests)
 public void _integration_test( string connParam ) @system
 {
+    import std.format: format;
+
     auto conn = new Connection(connParam);
 
     // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
