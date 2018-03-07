@@ -1,0 +1,167 @@
+       |module dpq2.conv.native_tests;
+       |
+       |import dpq2;
+       |import std.typecons: Nullable;
+       |import std.datetime;
+       |import vibe.data.json: Json, parseJsonString;
+       |import vibe.data.bson: Bson;
+       |import std.uuid: UUID;
+       |import dpq2.conv.geometric: Line;
+       |
+       |version (integration_tests)
+       |public void _integration_test( string connParam ) @system
+       |{
+       |    import std.format: format;
+       |
+      1|    auto conn = new Connection(connParam);
+       |
+       |    // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
+      1|    conn.exec("SET TIMEZONE TO +02");
+       |
+      1|    QueryParams params;
+      1|    params.resultFormat = ValueFormat.BINARY;
+       |
+       |    {
+      1|        void testIt(T)(T nativeValue, string pgType, string pgValue)
+       |        {
+       |            import std.algorithm : strip;
+       |            import std.string : representation;
+       |
+       |            // test string to native conversion
+    118|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     59|            params.args = null;
+     59|            auto answer = conn.execParams(params);
+     59|            immutable Value v = answer[0][0];
+     59|            auto result = v.as!T;
+       |
+     64|            assert(result == nativeValue,
+       |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+       |                v.oidType, typeid(T), pgValue, nativeValue, result)
+       |            );
+       |
+       |            {
+       |                // test binary to text conversion
+     58|                params.sqlCommand = "SELECT $1::text";
+     58|                params.args = [nativeValue.toValue];
+       |
+     58|                auto answer2 = conn.execParams(params);
+     58|                auto v2 = answer2[0][0];
+     58|                auto textResult = v2.as!string.strip(' ');
+     58|                pgValue = pgValue.strip('\'');
+       |
+       |                // Special cases:
+       |                static if(is(T == PGbytea))
+      1|                    pgValue = `\x442072756c65730021`; // Server formats its reply slightly different from the passed argument
+       |
+       |                static if(is(T == Json))
+       |                {
+       |                    // Reformatting by same way in the hope that the data will be sorted same in both cases
+      2|                    pgValue = pgValue.parseJsonString.toString;
+      2|                    textResult = textResult.parseJsonString.toString;
+       |                }
+       |
+     58|                assert(textResult == pgValue,
+       |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
+       |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
+       |                );
+       |            }
+       |        }
+       |
+      1|        alias C = testIt; // "C" means "case"
+       |
+      1|        C!PGboolean(true, "boolean", "true");
+      1|        C!PGboolean(false, "boolean", "false");
+      1|        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", null);
+      1|        C!(Nullable!PGboolean)(Nullable!PGboolean(true), "boolean", "true");
+      1|        C!PGsmallint(-32_761, "smallint", "-32761");
+      1|        C!PGinteger(-2_147_483_646, "integer", "-2147483646");
+      1|        C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
+      1|        C!PGreal(-12.3456f, "real", "-12.3456");
+      1|        C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
+      1|        C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
+      1|        C!PGtext("12345 ", "char(6)", "'12345'");
+      1|        C!PGtext("12345", "varchar(6)", "'12345'");
+      1|        C!PGtext(null, "text", null);
+      1|        C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
+       |            "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
+      1|        C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+       |
+       |        // numeric testing
+      1|        C!PGnumeric("NaN", "numeric", "'NaN'");
+       |
+      1|        const string[] numericTests = [
+       |            "42",
+       |            "-42",
+       |            "0",
+       |            "0.0146328",
+       |            "0.0007",
+       |            "0.007",
+       |            "0.07",
+       |            "0.7",
+       |            "7",
+       |            "70",
+       |            "700",
+       |            "7000",
+       |            "70000",
+       |
+       |            "7.0",
+       |            "70.0",
+       |            "700.0",
+       |            "7000.0",
+       |            "70000.000",
+       |
+       |            "2354877787627192443",
+       |            "2354877787627192443.0",
+       |            "2354877787627192443.00000",
+       |            "-2354877787627192443.00000"
+       |        ];
+       |
+     91|        foreach(i, s; numericTests)
+     22|            C!PGnumeric(s, "numeric", s);
+       |
+       |        // date and time testing
+      1|        C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
+       |        {
+       |            import std.exception : assertThrown;
+       |
+      1|            assertThrown!ValueConvException(
+      1|                    C!PGdate(Date(0001, 01, 8), "date", "'5874897-12-31'")
+       |                );
+       |        }
+      1|        C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
+      1|        C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+      1|        C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
+      1|        C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");
+      1|        C!PGtimestamp(PGtimestamp.later, "timestamp", "'infinity'");
+      1|        C!PGtimestamp(PGtimestamp.min, "timestamp", `'4713-01-01 00:00:00 BC'`);
+      1|        C!PGtimestamp(PGtimestamp.max, "timestamp", `'294276-12-31 23:59:59.999999'`);
+       |
+       |        // SysTime testing
+      1|        auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
+      1|        C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
+       |
+       |        // json
+      1|        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
+       |
+       |        // json as string
+      1|        C!string(`{"float_value": 123.456}`, "json", `'{"float_value": 123.456}'`);
+       |
+       |        // jsonb
+      1|        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string"), "abc": Json(["key": Json("value")])]), "jsonb",
+       |            `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
+       |
+       |        // Geometric
+       |        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
+       |        mixin GeometricInstancesForIntegrationTest;
+       |
+      1|        C!Point(Point(1,2), "point", "'(1,2)'");
+      1|        C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
+      1|        C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
+      1|        C!Box(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
+      1|        C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
+      1|        C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
+      1|        C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
+      1|        C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+       |    }
+       |}
+src/dpq2/conv/native_tests.d is 100% covered
