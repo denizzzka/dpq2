@@ -155,7 +155,7 @@ mixin template Queries()
                 toStringz(statementName),
                 toStringz(sqlStatement),
                 oids.length.to!int,
-                cast(Oid*)oids.ptr //const should be accepted here, see https://github.com/DerelictOrg/DerelictPQ/issues/21
+                oids.ptr
             );
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
