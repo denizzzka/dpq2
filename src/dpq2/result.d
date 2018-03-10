@@ -133,7 +133,7 @@ immutable class Answer : Result
      */
     string cmdStatus()
     {
-        return PQcmdStatus(result).to!string;
+        return (cast(PGresult*) result.result).PQcmdStatus.to!string;
     }
 
     /**

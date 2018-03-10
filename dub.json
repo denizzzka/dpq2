@@ -8,9 +8,9 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"derelict-pq": "~>3.0.0-alpha.2",
-		"vibe-d:data": "~>0.8.3-beta.1",
-		"vibe-core": "~>1.4.0-rc.1"
+		"derelict-pq": "~>4.0.0-alpha.2",
+		"vibe-d:data": "~>0.8.3",
+		"vibe-core": "~>1.4.0"
 	},
 	"targetType": "sourceLibrary",
 	"-ddoxTool": "scod",
