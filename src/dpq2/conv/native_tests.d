@@ -119,6 +119,9 @@ public void _integration_test( string connParam ) @system
         foreach(i, s; numericTests)
             C!PGnumeric(s, "numeric", s);
 
+        enum Foo { bar, baz }
+        C!Foo(Foo.baz, "Int4", "1");
+
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
         {
@@ -142,6 +145,7 @@ public void _integration_test( string connParam ) @system
 
         // json
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
+        C!(Nullable!PGjson)(Nullable!Json(Json(["foo": Json("bar")])), "json", `'{"foo":"bar"}'`);
 
         // json as string
         C!string(`{"float_value": 123.456}`, "json", `'{"float_value": 123.456}'`);

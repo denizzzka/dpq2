@@ -14,7 +14,7 @@ import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
 import std.uuid: UUID;
 import vibe.data.json: Json;
-import std.traits: isNumeric, TemplateArgsOf, Unqual;
+import std.traits: isNumeric, OriginalType, TemplateArgsOf, Unqual;
 import std.typecons : Nullable;
 
 /// Converts Nullable!T to Value
@@ -31,7 +31,15 @@ if (is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    static if (is(T == enum))
+    {
+        alias OType = OriginalType!T;
+        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+    }
+    else
+    {
+        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    }
 }
 
 ///
@@ -48,7 +56,7 @@ if(is(T == string))
 
 /// Constructs Value from array of bytes
 Value toValue(T)(T v)
-if(is(T : immutable ubyte[]))
+if(is(T : immutable(ubyte)[]))
 {
     return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
 }
