@@ -157,7 +157,7 @@ public void _integration_test( string connParam ) @system
         C!Point(Point(1,2), "point", "'(1,2)'");
         C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
         C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
-        C!Box(Box(Point(3,4), Point(1,2)), "box", "'(3,4),(1,2)'");
+        C!Box(Box(Point(1,2),Point(3,4)), "box", "'(3,4),(1,2)'"); // PG handles box ordered as upper right first and lower left next
         C!TestPath(TestPath(true, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'((1,1),(2,2),(3,3))'");
         C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
         C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
