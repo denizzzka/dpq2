@@ -868,4 +868,4 @@
        |}
        |
        |private void logDebug_(ARGS...)(string msg, ARGS args) {}
-../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/utils/vibe/internal/memory_legacy.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/utils/vibe/internal/memory_legacy.d is 0% covered

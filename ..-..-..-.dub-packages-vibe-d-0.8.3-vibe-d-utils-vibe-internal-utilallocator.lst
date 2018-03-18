@@ -181,4 +181,4 @@
        |                return true;
        |        }
        |}
-../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/utils/vibe/internal/utilallocator.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/utils/vibe/internal/utilallocator.d is 0% covered

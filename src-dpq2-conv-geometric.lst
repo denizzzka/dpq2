@@ -88,8 +88,8 @@
        |
        |private auto serializeBox(Box, T)(Box box, T target)
        |{
-      4|    auto rem = box.min.serializePoint(target);
-      4|    rem = box.max.serializePoint(rem);
+      4|    auto rem = box.max.serializePoint(target);
+      4|    rem = box.min.serializePoint(rem);
        |
       4|    return rem;
        |}
@@ -278,10 +278,11 @@
        |
       2|    alias Point = typeof(Box.min);
        |
-      2|    auto min = v.data[0..16].pointFromBytes!Point;
-      2|    auto max = v.data[16..32].pointFromBytes!Point;
+      2|    Box res;
+      2|    res.max = v.data[0..16].pointFromBytes!Point;
+      2|    res.min = v.data[16..32].pointFromBytes!Point;
        |
-      2|    return Box(min, max);
+      2|    return res;
        |}
        |
        |T binaryValueAs(T)(in Value v)

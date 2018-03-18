@@ -110,7 +110,7 @@
        |    alias da_PQexecPrepared = PGresult* function(PGconn*,const(char)*,int,const(char*)*,const(int)*,const(int)*,int);
        |    alias da_PQsendQuery = int function(PGconn*,const(char)*);
        |    alias da_PQsendQueryParams = int function(PGconn*,const(char)*,int,const(Oid)*,const(ubyte*)*,const(int)*,const(int)*,int);
-       |    alias da_PQsendPrepare = int function(PGconn*,const(char)*,const(char)*,int,Oid*);
+       |    alias da_PQsendPrepare = int function(PGconn*,const(char)*,const(char)*,int,const(Oid)*);
        |    alias da_PQsendQueryPrepared = int function(PGconn*,const(char)*,int,const(ubyte*)*,const(int)*,const(int)*,int);
        |    alias da_PQsetSingleRowMode = int function(PGconn*);
        |    alias da_PQgetResult = PGresult* function(PGconn*);
@@ -156,7 +156,7 @@
        |    alias da_PQftype = Oid function(const(PGresult)*,int);
        |    alias da_PQfsize = int function(const(PGresult)*,int);
        |    alias da_PQfmod = int function(const(PGresult)*,int);
-       |    alias da_PQcmdStatus = char* function(const(PGresult)*);
+       |    alias da_PQcmdStatus = char* function(PGresult*);
        |    alias da_PQoidStatus = char* function(PGresult*);
        |    alias da_PQoidValue = Oid function(const(PGresult)*);
        |    alias da_PQcmdTuples = char* function(PGresult*);
@@ -557,4 +557,4 @@
        |        enum libNames = "libpq.so";
        |    else
        |        static assert(0, "Need to implement PostgreSQL libNames for this operating system.");
-../../../.dub/packages/derelict-pq-3.0.0-beta.3/derelict-pq/source/derelict/pq/dynload.d is 100% covered
+../../../.dub/packages/derelict-pq-4.0.0-alpha.2/derelict-pq/source/derelict/pq/dynload.d is 100% covered

@@ -133,7 +133,7 @@
        |     */
        |    string cmdStatus()
        |    {
-      1|        return PQcmdStatus(result).to!string;
+      1|        return (cast(PGresult*) result.result).PQcmdStatus.to!string;
        |    }
        |
        |    /**

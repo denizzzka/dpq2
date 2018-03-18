@@ -1940,4 +1940,4 @@
        |        auto b = serialize!TestSerializer(a1);
        |        auto a2 = deserialize!(TestSerializer, A)(b);
        |}
-../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/data/vibe/data/serialization.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/data/vibe/data/serialization.d is 0% covered

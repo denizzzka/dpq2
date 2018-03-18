@@ -2622,4 +2622,4 @@
        |        assert(a.to!JSONValue.to!Json == a);
        |        assert(to!Json(to!JSONValue(a)) == a);
        |}
-../../../.dub/packages/vibe-d-0.8.3-rc.1/vibe-d/data/vibe/data/json.d is 37% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/data/vibe/data/json.d is 37% covered

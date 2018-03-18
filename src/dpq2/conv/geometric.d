@@ -88,8 +88,8 @@ if(isValidPointType!Vec2Ddouble)
 
 private auto serializeBox(Box, T)(Box box, T target)
 {
-    auto rem = box.min.serializePoint(target);
-    rem = box.max.serializePoint(rem);
+    auto rem = box.max.serializePoint(target);
+    rem = box.min.serializePoint(rem);
 
     return rem;
 }
@@ -278,10 +278,11 @@ if(isValidBoxType!Box)
 
     alias Point = typeof(Box.min);
 
-    auto min = v.data[0..16].pointFromBytes!Point;
-    auto max = v.data[16..32].pointFromBytes!Point;
+    Box res;
+    res.max = v.data[0..16].pointFromBytes!Point;
+    res.min = v.data[16..32].pointFromBytes!Point;
 
-    return Box(min, max);
+    return res;
 }
 
 T binaryValueAs(T)(in Value v)

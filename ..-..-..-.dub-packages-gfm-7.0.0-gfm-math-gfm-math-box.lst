@@ -25,10 +25,10 @@
        |
        |        /// Construct a box which extends between 2 points.
        |        /// Boundaries: min is inside the box, max is just outside.
-      6|        @nogc this(bound_t min_, bound_t max_) pure nothrow
+      4|        @nogc this(bound_t min_, bound_t max_) pure nothrow
        |        {
-      6|            min = min_;
-      6|            max = max_;
+      4|            min = min_;
+      4|            max = max_;
        |        }
        |
        |        static if (N == 1)
