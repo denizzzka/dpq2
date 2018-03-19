@@ -45,9 +45,9 @@ private alias VF = ValueFormat;
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
-/// Returns cell value as native string type from text or binary formatted field
-string as(T)(in Value v) pure @trusted
-if(is(T == string))
+/// Returns cell value as native string based type from text or binary formatted field
+T as(T)(in Value v) pure @trusted
+if(is(T : string))
 {
     if(v.format == VF.BINARY)
     {
@@ -62,15 +62,15 @@ if(is(T == string))
             throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
-            return rawValueToNumeric(v.data);
+            return rawValueToNumeric(v.data).to!T;
     }
 
-    return valueAsString(v);
+    return valueAsString(v).to!T;
 }
 
 /// Returns value as D type value from binary formatted field
 T as(T)(in Value v)
-if(!is(T == string) && !is(T == Bson))
+if(!is(T : string) && !is(T == Bson))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,
@@ -106,7 +106,7 @@ T binaryValueAs(T)(in Value v)
 if(is(T : const ubyte[]))
 {
     if(!(v.oidType == OidType.ByteArray))
-        throwTypeComplaint(v.oidType, "immutable ubyte[] or string", __FILE__, __LINE__);
+        throwTypeComplaint(v.oidType, "immutable ubyte[]", __FILE__, __LINE__);
 
     return v.data;
 }

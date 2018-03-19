@@ -12,10 +12,10 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
+import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, TemplateArgsOf, Unqual;
+import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
-import std.traits: isNumeric, OriginalType, TemplateArgsOf, Unqual;
-import std.typecons : Nullable;
 
 /// Converts Nullable!T to Value
 Value toValue(T)(T v)
@@ -44,14 +44,16 @@ if(isNumeric!(T))
 
 ///
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
-if(is(T == string))
+if(is(T : string))
 {
-    if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
+    import std.string : representation;
 
-    static assert(is(T == immutable(char)[]));
-    auto buf = cast(immutable(ubyte)[]) v;
+    static assert(isImplicitlyConvertible!(T, string));
+    auto buf = (cast(string) v).representation;
 
-    return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
+    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+
+    return Value(buf, OidType.Text, false, valueFormat);
 }
 
 /// Constructs Value from array of bytes

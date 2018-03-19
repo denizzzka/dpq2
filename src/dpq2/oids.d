@@ -176,7 +176,7 @@ OidType detectOidTypeFromNative(T)()
         static if(is(UT == TimeOfDay)){ return Time; } else
         static if(is(UT == SysTime)){ return TimeStampWithZone; } else
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
-        static if(is(UT == VibeJson)){ return Jsonb; } else
+        static if(is(UT == VibeJson)){ return Json; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }

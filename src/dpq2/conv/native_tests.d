@@ -119,8 +119,13 @@ public void _integration_test( string connParam ) @system
         foreach(i, s; numericTests)
             C!PGnumeric(s, "numeric", s);
 
+        // enums tests
         enum Foo { bar, baz }
+        enum LongFoo : long { bar, baz }
+        enum StringFoo : string { bar = "bar", baz = "baz" }
         C!Foo(Foo.baz, "Int4", "1");
+        C!LongFoo(LongFoo.baz, "Int8", "1");
+        C!StringFoo(StringFoo.baz, "text", "'baz'");
 
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
