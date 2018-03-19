@@ -357,3 +357,18 @@ unittest
     assert(v.oidType == OidType.TimeStamp);
     assert(v.as!TimeStamp == t);
 }
+
+unittest
+{
+    auto j = Json(["foo":Json("bar")]);
+    auto v = j.toValue;
+
+    assert(v.oidType == OidType.Json);
+    assert(v.as!Json == j);
+
+    auto nj = Nullable!Json(j);
+    auto nv = nj.toValue;
+    assert(nv.oidType == OidType.Json);
+    assert(!nv.as!(Nullable!Json).isNull);
+    assert(nv.as!(Nullable!Json).get == j);
+}
