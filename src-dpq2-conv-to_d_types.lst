@@ -45,13 +45,13 @@
        |private alias AE = ValueConvException;
        |private alias ET = ConvExceptionType;
        |
-       |/// Returns cell value as native string type from text or binary formatted field
-       |string as(T)(in Value v) pure @trusted
-       |if(is(T == string))
+       |/// Returns cell value as native string based type from text or binary formatted field
+       |T as(T)(in Value v) pure @trusted
+       |if(is(T : string))
        |{
-     96|    if(v.format == VF.BINARY)
+    101|    if(v.format == VF.BINARY)
        |    {
-     92|        if(!(
+     97|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -61,27 +61,27 @@
        |        ))
       1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
        |
-     91|        if(v.oidType == OidType.Numeric)
-     23|            return rawValueToNumeric(v.data);
+     96|        if(v.oidType == OidType.Numeric)
+     23|            return rawValueToNumeric(v.data).to!T;
        |    }
        |
-     72|    return valueAsString(v);
+     77|    return valueAsString(v).to!T;
        |}
        |
        |/// Returns value as D type value from binary formatted field
        |T as(T)(in Value v)
-       |if(!is(T == string) && !is(T == Bson))
+       |if(!is(T : string) && !is(T == Bson))
        |{
-     57|    if(!(v.format == VF.BINARY))
+     63|    if(!(v.format == VF.BINARY))
 0000000|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-      3|        if (v.isNull) return T.init;
-      1|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
+      6|        if (v.isNull) return T.init;
+      4|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
        |    }
-     55|    else return binaryValueAs!T(v);
+     58|    else return binaryValueAs!T(v);
        |}
        |
        |package:
@@ -97,8 +97,8 @@
        |
        |string valueAsString(in Value v) pure
        |{
-     87|    if (v.isNull) return null;
-     83|    return (cast(const(char[])) v.data).to!string;
+     96|    if (v.isNull) return null;
+     92|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -106,7 +106,7 @@
        |if(is(T : const ubyte[]))
        |{
       2|    if(!(v.oidType == OidType.ByteArray))
-0000000|        throwTypeComplaint(v.oidType, "immutable ubyte[] or string", __FILE__, __LINE__);
+0000000|        throwTypeComplaint(v.oidType, "immutable ubyte[]", __FILE__, __LINE__);
        |
       2|    return v.data;
        |}
@@ -118,21 +118,21 @@
        |if( isNumeric!(T) )
        |{
        |    static if(isIntegral!(T))
-     28|        if(!isNativeInteger(v.oidType))
+     30|        if(!isNativeInteger(v.oidType))
 0000000|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
        |
        |    static if(isFloatingPoint!(T))
       4|        if(!isNativeFloat(v.oidType))
 0000000|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
        |
-     32|    if(!(v.data.length == T.sizeof))
+     34|    if(!(v.data.length == T.sizeof))
 0000000|        throw new AE(ET.SIZE_MISMATCH,
        |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
        |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
        |            __FILE__, __LINE__);
        |
-     29|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
-     29|    return bigEndianToNative!(T)(s);
+     31|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     31|    return bigEndianToNative!(T)(s);
        |}
        |
        |/// Returns UUID as native UUID value
@@ -171,15 +171,15 @@
        |{
        |    import dpq2.conv.jsonb: jsonbValueToJson;
        |
-      4|    Json res;
+      8|    Json res;
        |
-      4|    switch(v.oidType)
+      8|    switch(v.oidType)
        |    {
-      2|        case OidType.Json:
+      6|        case OidType.Json:
        |            // represent value as text and parse it into Json
-      2|            string t = v.valueAsString;
-      2|            res = parseJsonString(t);
-      2|            break;
+      6|            string t = v.valueAsString;
+      6|            res = parseJsonString(t);
+      6|            break;
        |
       2|        case OidType.Jsonb:
       2|            res = v.jsonbValueToJson;
@@ -189,6 +189,6 @@
 0000000|            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
        |    }
        |
-      4|    return res;
+      8|    return res;
        |}
 src/dpq2/conv/to_d_types.d is 79% covered

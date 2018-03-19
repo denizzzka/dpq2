@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    197|    return cast(OidType)(oid);
+    205|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -55,12 +55,12 @@
        |bool isNativeInteger(OidType t) pure
        |{
        |    with(OidType)
-     28|    switch(t)
+     30|    switch(t)
        |    {
-      3|        case Int8:
-      7|        case Int2:
-     28|        case Int4:
-     28|            return true;
+      4|        case Int8:
+      8|        case Int2:
+     30|        case Int4:
+     30|            return true;
 0000000|        default:
 0000000|            break;
        |    }
@@ -158,23 +158,25 @@
        |    import std.datetime.systime : SysTime;
        |    import std.traits : Unqual;
        |    static import dpq2.conv.time;
+       |    import vibe.data.json : VibeJson = Json;
        |
-     89|    alias UT = Unqual!T;
+     51|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
-     40|        static if(is(UT == string)){ return Text; } else
+       |        static if(is(UT == string)){ return Text; } else
       2|        static if(is(UT == ubyte[])){ return ByteArray; } else
      11|        static if(is(UT == bool)){ return Bool; } else
       2|        static if(is(UT == short)){ return Int2; } else
-     29|        static if(is(UT == int)){ return Int4; } else
-      2|        static if(is(UT == long)){ return Int8; } else
+     30|        static if(is(UT == int)){ return Int4; } else
+      3|        static if(is(UT == long)){ return Int8; } else
       1|        static if(is(UT == float)){ return Float4; } else
       2|        static if(is(UT == double)){ return Float8; } else
        |        static if(is(UT == StdDate)){ return Date; } else
        |        static if(is(UT == TimeOfDay)){ return Time; } else
        |        static if(is(UT == SysTime)){ return TimeStampWithZone; } else
 0000000|        static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
+0000000|        static if(is(UT == VibeJson)){ return Json; } else
        |
        |        static assert(false, "Unsupported D type: "~T.stringof);
        |    }
@@ -352,4 +354,4 @@
        |    FDWHandler = 3115, ///
        |    AnyRange = 3831, ///
        |}
-src/dpq2/oids.d is 75% covered
+src/dpq2/oids.d is 74% covered

@@ -119,15 +119,15 @@
        |
        |                ref inout(T) getDataAs(T)() inout @trusted {
        |                        static assert(T.sizeof <= m_data.sizeof);
-    233|                        return (cast(inout(T)[1])m_data[0 .. T.sizeof])[0];
+    271|                        return (cast(inout(T)[1])m_data[0 .. T.sizeof])[0];
        |                }
        |
 0000000|                @property ref inout(BigInt) m_bigInt() inout { return getDataAs!BigInt(); }
 0000000|                @property ref inout(long) m_int() inout { return getDataAs!long(); }
      34|                @property ref inout(double) m_float() inout { return getDataAs!double(); }
 0000000|                @property ref inout(bool) m_bool() inout { return getDataAs!bool(); }
-     84|                @property ref inout(string) m_string() inout { return getDataAs!string(); }
-     43|                @property ref inout(Json[string]) m_object() inout { return getDataAs!(Json[string])(); }
+     99|                @property ref inout(string) m_string() inout { return getDataAs!string(); }
+     66|                @property ref inout(Json[string]) m_object() inout { return getDataAs!(Json[string])(); }
      72|                @property ref inout(Json[]) m_array() inout { return getDataAs!(Json[])(); }
        |
        |                Type m_type = Type.undefined;
@@ -196,11 +196,11 @@
        |        /// ditto
      12|        this(double v) @trusted { m_type = Type.float_; m_float = v; }
        |        /// ditto
-     45|        this(string v) @trusted { m_type = Type.string; m_string = v; }
+     51|        this(string v) @trusted { m_type = Type.string; m_string = v; }
        |        /// ditto
      60|        this(Json[] v) @trusted { m_type = Type.array; m_array = v; }
        |        /// ditto
-     15|        this(Json[string] v) @trusted { m_type = Type.object; m_object = v; }
+     21|        this(Json[string] v) @trusted { m_type = Type.object; m_object = v; }
        |
        |        /**
        |                Converts a std.json.JSONValue object to a vibe Json object.
@@ -234,11 +234,11 @@
        |        */
        |        ref Json opAssign(Json v)
        |        {
-     32|                if (v.type != Type.bigInt)
-     32|                        runDestructors();
-     32|                auto old_type = m_type;
-     32|                m_type = v.m_type;
-     32|                final switch(m_type){
+     36|                if (v.type != Type.bigInt)
+     36|                        runDestructors();
+     36|                auto old_type = m_type;
+     36|                m_type = v.m_type;
+     36|                final switch(m_type){
 0000000|                        case Type.undefined: m_string = null; break;
       6|                        case Type.null_: m_string = null; break;
 0000000|                        case Type.bool_: m_bool = v.m_bool; break;
@@ -251,9 +251,9 @@
 0000000|                        case Type.float_: m_float = v.m_float; break;
      30|                        case Type.string: m_string = v.m_string; break;
      48|                        case Type.array: opAssign(v.m_array); break;
-     12|                        case Type.object: opAssign(v.m_object); break;
+     24|                        case Type.object: opAssign(v.m_object); break;
        |                }
-     32|                return this;
+     36|                return this;
        |        }
        |        /// ditto
 0000000|        void opAssign(typeof(null)) { runDestructors(); m_type = Type.null_; m_string = null; }
@@ -275,7 +275,7 @@
        |        /// ditto
      36|        double opAssign(double v) { runDestructors(); m_type = Type.float_; m_float = v; return v; }
        |        /// ditto
-     48|        string opAssign(string v) { runDestructors(); m_type = Type.string; m_string = v; return v; }
+     64|        string opAssign(string v) { runDestructors(); m_type = Type.string; m_string = v; return v; }
        |        /// ditto
        |        Json[] opAssign(Json[] v) {
      16|                runDestructors();
@@ -290,11 +290,11 @@
        |        /// ditto
        |        Json[string] opAssign(Json[string] v)
        |        {
-     15|                runDestructors();
-     15|                m_type = Type.object;
-     15|                m_object = v;
+     23|                runDestructors();
+     23|                m_type = Type.object;
+     23|                m_object = v;
        |                version (VibeJsonFieldNames) { foreach (key, ref av; m_object) av.m_name = format("%s.%s", m_name, key); }
-     15|                return v;
+     23|                return v;
        |        }
        |
        |        /**
@@ -305,7 +305,7 @@
        |        /**
        |                The current type id of this JSON object.
        |        */
-    196|        @property Type type() const @safe { return m_type; }
+    217|        @property Type type() const @safe { return m_type; }
        |
        |        /**
        |                Clones a JSON value recursively.
@@ -496,7 +496,7 @@
        |        /// Iterates over all key/value pairs of an object.
 0000000|        @property auto byKeyValue() @trusted { checkType!(Json[string])("byKeyValue"); return m_object.byKeyValue.map!(kv => KeyValue(kv.key, kv.value)).trustedRange; }
        |        /// ditto
-     36|        @property auto byKeyValue() const @trusted { checkType!(Json[string])("byKeyValue"); return m_object.byKeyValue.map!(kv => const(KeyValue)(kv.key, kv.value)).trustedRange; }
+     45|        @property auto byKeyValue() const @trusted { checkType!(Json[string])("byKeyValue"); return m_object.byKeyValue.map!(kv => const(KeyValue)(kv.key, kv.value)).trustedRange; }
        |        /// Iterates over all index/value pairs of an array.
 0000000|        @property auto byIndexValue() { checkType!(Json[])("byIndexValue"); return zip(iota(0, m_array.length), m_array); }
        |        /// ditto
@@ -604,12 +604,12 @@
        |                static if (!is(T : bool) && is(T : long))
 0000000|                        checkType!(long, BigInt)();
        |                else
-     41|                        checkType!T();
+     44|                        checkType!T();
        |
 0000000|                static if (is(T == bool)) return m_bool;
      17|                else static if (is(T == double)) return m_float;
        |                else static if (is(T == float)) return cast(T)m_float;
-     24|                else static if (is(T == string)) return m_string;
+     27|                else static if (is(T == string)) return m_string;
        |                else static if (is(T == Json[])) return m_array;
        |                else static if (is(T == Json[string])) return m_object;
 0000000|                else static if (is(T == BigInt)) return m_type == Type.bigInt ? m_bigInt : BigInt(m_int);
@@ -996,17 +996,17 @@
        |
        |        bool opEquals(ref const Json other)
        |        const {
-      8|                if( m_type != other.m_type ) return false;
-      8|                final switch(m_type){
+     14|                if( m_type != other.m_type ) return false;
+     14|                final switch(m_type){
 0000000|                        case Type.undefined: return false;
 0000000|                        case Type.null_: return true;
 0000000|                        case Type.bool_: return m_bool == other.m_bool;
 0000000|                        case Type.int_: return m_int == other.m_int;
 0000000|                        case Type.bigInt: return m_bigInt == other.m_bigInt;
       4|                        case Type.float_: return m_float == other.m_float;
-      6|                        case Type.string: return m_string == other.m_string;
+     12|                        case Type.string: return m_string == other.m_string;
 0000000|                        case Type.array: return m_array == other.m_array;
-      6|                        case Type.object: return m_object == other.m_object;
+     12|                        case Type.object: return m_object == other.m_object;
        |                }
        |        }
        |        /// ditto
@@ -1065,9 +1065,9 @@
      17|                else static if( is(T == double) ) return Type.float_;
        |                else static if( is(T == float) ) return Type.float_;
 0000000|                else static if( is(T : long) ) return Type.int_;
-     29|                else static if( is(T == string) ) return Type.string;
+     32|                else static if( is(T == string) ) return Type.string;
      25|                else static if( is(T == Json[]) ) return Type.array;
-     38|                else static if( is(T == Json[string]) ) return Type.object;
+     41|                else static if( is(T == Json[string]) ) return Type.object;
 0000000|                else static if( is(T == BigInt) ) return Type.bigInt;
        |                else static assert(false, "Unsupported JSON type '"~T.stringof~"'. Only bool, long, std.bigint.BigInt, double, string, Json[] and Json[string] are allowed.");
        |        }
@@ -1084,9 +1084,9 @@
        |        const @trusted {
        |                // DMD BUG: this should actually be all @safe, but for some reason
        |                // @safe inference for writeJsonString doesn't work.
-     10|                auto ret = appender!string();
-     10|                writeJsonString(ret, this);
-     10|                return ret.data;
+     13|                auto ret = appender!string();
+     13|                writeJsonString(ret, this);
+     13|                return ret.data;
        |        }
        |        /// ditto
        |        void toString(scope void delegate(const(char)[]) @safe sink, FormatSpec!char fmt)
@@ -1144,9 +1144,9 @@
        |
        |        private void checkType(TYPES...)(string op = null)
        |        const {
-     79|                bool matched = false;
-    297|                foreach (T; TYPES) if (m_type == typeId!T) matched = true;
-    158|                if (matched) return;
+     85|                bool matched = false;
+    315|                foreach (T; TYPES) if (m_type == typeId!T) matched = true;
+    170|                if (matched) return;
        |
 0000000|                string name;
        |                version (VibeJsonFieldNames) {
@@ -1178,7 +1178,7 @@
        |
        |        private void runDestructors()
        |        {
-    168|                if (m_type != Type.bigInt) return;
+    200|                if (m_type != Type.bigInt) return;
        |
 0000000|                BigInt init_;
        |                // After swaping, init_ contains the real number from Json, and it
@@ -1223,19 +1223,19 @@
        |Json parseJson(R)(ref R range, int* line = null, string filename = null)
        |        if( is(R == string) )
        |{
-     32|        Json ret;
-     32|        enforceJson(!range.empty, "JSON string is empty.", filename, 0);
+     40|        Json ret;
+     40|        enforceJson(!range.empty, "JSON string is empty.", filename, 0);
        |
-     32|        skipWhitespace(range, line);
+     40|        skipWhitespace(range, line);
        |
-     32|        enforceJson(!range.empty, "JSON string contains only whitespaces.", filename, 0);
+     40|        enforceJson(!range.empty, "JSON string contains only whitespaces.", filename, 0);
        |
        |        version(JsonLineNumbers) {
        |                int curline = line ? *line : 0;
        |        }
        |
-     32|        bool minus = false;
-     32|        switch( range.front ){
+     40|        bool minus = false;
+     40|        switch( range.front ){
 0000000|                case 'f':
 0000000|                        enforceJson(range[1 .. $].startsWith("alse"), "Expected 'false', got '"~range[0 .. min(5, $)]~"'.", filename, line);
 0000000|                        range.popFrontN(5);
@@ -1265,9 +1265,9 @@
 0000000|                                ret = to!long(num);
        |                        }
       9|                        break;
-     12|                case '\"':
-     12|                        ret = skipJsonString(range);
-     12|                        break;
+     16|                case '\"':
+     16|                        ret = skipJsonString(range);
+     16|                        break;
 0000000|                case '[':
 0000000|                        auto arr = appender!(Json[]);
 0000000|                        range.popFront();
@@ -1286,38 +1286,38 @@
 0000000|                        range.popFront();
 0000000|                        ret = arr.data;
 0000000|                        break;
-     11|                case '{':
-     11|                        Json[string] obj;
-     11|                        range.popFront();
-     22|                        while (true) {
-     22|                                skipWhitespace(range, line);
-     22|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
-     22|                                if(range.front == '}') break;
-     22|                                string key = skipJsonString(range);
-     22|                                skipWhitespace(range, line);
-     22|                                enforceJson(range.startsWith(":"), "Expected ':' for key '" ~ key ~ "'", filename, line);
-     22|                                range.popFront();
-     22|                                skipWhitespace(range, line);
-     22|                                Json itm = parseJson(range, line, filename);
-     44|                                obj[key] = itm;
-     22|                                skipWhitespace(range, line);
-     22|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
-     33|                                enforceJson(range.front == ',' || range.front == '}',
+     15|                case '{':
+     15|                        Json[string] obj;
+     15|                        range.popFront();
+     26|                        while (true) {
+     26|                                skipWhitespace(range, line);
+     26|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
+     26|                                if(range.front == '}') break;
+     26|                                string key = skipJsonString(range);
+     26|                                skipWhitespace(range, line);
+     26|                                enforceJson(range.startsWith(":"), "Expected ':' for key '" ~ key ~ "'", filename, line);
+     26|                                range.popFront();
+     26|                                skipWhitespace(range, line);
+     26|                                Json itm = parseJson(range, line, filename);
+     52|                                obj[key] = itm;
+     26|                                skipWhitespace(range, line);
+     26|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
+     41|                                enforceJson(range.front == ',' || range.front == '}',
 0000000|                                        format("Expected '}' or ',' - got '%s'.", range.front), filename, line);
-     33|                                if (range.front == '}') break;
+     41|                                if (range.front == '}') break;
      11|                                else range.popFront();
        |                        }
-     11|                        range.popFront();
-     11|                        ret = obj;
-     11|                        break;
+     15|                        range.popFront();
+     15|                        ret = obj;
+     15|                        break;
 0000000|                default:
 0000000|                        enforceJson(false, format("Expected valid JSON token, got '%s'.", range[0 .. min(12, $)]), filename, line);
 0000000|                        assert(false);
        |        }
        |
-     32|        assert(ret.type != Json.Type.undefined);
+     40|        assert(ret.type != Json.Type.undefined);
        |        version(JsonLineNumbers) ret.line = curline;
-     32|        return ret;
+     40|        return ret;
        |}
        |
        |/**
@@ -1327,11 +1327,11 @@
        |*/
        |Json parseJsonString(string str, string filename = null)
        |@safe {
-     10|        auto strcopy = str;
-     10|        int line = 0;
-     20|        auto ret = parseJson(strcopy, () @trusted { return &line; } (), filename);
-     10|        enforceJson(strcopy.strip().length == 0, "Expected end of string after JSON value.", filename, line);
-     10|        return ret;
+     14|        auto strcopy = str;
+     14|        int line = 0;
+     28|        auto ret = parseJson(strcopy, () @trusted { return &line; } (), filename);
+     14|        enforceJson(strcopy.strip().length == 0, "Expected end of string after JSON value.", filename, line);
+     14|        return ret;
        |}
        |
        |@safe unittest {
@@ -2069,7 +2069,7 @@
        |void writeJsonString(R, bool pretty = false)(ref R dst, in Json json, size_t level = 0)
        |@safe //        if( isOutputRange!R && is(ElementEncodingType!R == char) )
        |{
-     56|        final switch( json.type ){
+     62|        final switch( json.type ){
 0000000|                case Json.Type.undefined: dst.put("null"); break;
       6|                case Json.Type.null_: dst.put("null"); break;
 0000000|                case Json.Type.bool_: dst.put(json.get!bool ? "true" : "false"); break;
@@ -2082,11 +2082,11 @@
        |                        else
       6|                                formattedWrite(dst, "%.16g", json.get!double);
       6|                        break;
-     19|                case Json.Type.string:
-     19|                        dst.put('\"');
-     19|                        jsonEscape(dst, json.get!string);
-     19|                        dst.put('\"');
-     19|                        break;
+     22|                case Json.Type.string:
+     22|                        dst.put('\"');
+     22|                        jsonEscape(dst, json.get!string);
+     22|                        dst.put('\"');
+     22|                        break;
      20|                case Json.Type.array:
      20|                        dst.put('[');
      20|                        bool first = true;
@@ -2108,21 +2108,21 @@
        |                        }
      20|                        dst.put(']');
      20|                        break;
-      9|                case Json.Type.object:
-      9|                        dst.put('{');
-      9|                        bool first = true;
-    108|                        foreach (string k, ref const Json e; json.byKeyValue) {
-     18|                                if( e.type == Json.Type.undefined ) continue;
-     27|                                if( !first ) dst.put(',');
-     18|                                first = false;
+     12|                case Json.Type.object:
+     12|                        dst.put('{');
+     12|                        bool first = true;
+    129|                        foreach (string k, ref const Json e; json.byKeyValue) {
+     21|                                if( e.type == Json.Type.undefined ) continue;
+     30|                                if( !first ) dst.put(',');
+     21|                                first = false;
        |                                static if (pretty) {
 0000000|                                        dst.put('\n');
 0000000|                                        foreach (tab; 0 .. level+1) dst.put('\t');
        |                                }
-     18|                                dst.put('\"');
-     18|                                jsonEscape(dst, k);
-     18|                                dst.put(pretty ? `": ` : `":`);
-     18|                                writeJsonString!(R, pretty)(dst, e, level+1);
+     21|                                dst.put('\"');
+     21|                                jsonEscape(dst, k);
+     21|                                dst.put(pretty ? `": ` : `":`);
+     21|                                writeJsonString!(R, pretty)(dst, e, level+1);
        |                        }
        |                        static if (pretty) {
 0000000|                                if (json.length > 0) {
@@ -2130,8 +2130,8 @@
 0000000|                                        foreach (tab; 0 .. level) dst.put('\t');
        |                                }
        |                        }
-      9|                        dst.put('}');
-      9|                        break;
+     12|                        dst.put('}');
+     12|                        break;
        |        }
        |}
        |
@@ -2237,20 +2237,20 @@
        |/// private
        |private void jsonEscape(bool escape_unicode = false, R)(ref R dst, string s)
        |{
-     37|        size_t startPos = 0;
+     43|        size_t startPos = 0;
        |
-     37|        void putInterval(size_t curPos)
+     43|        void putInterval(size_t curPos)
        |        {
-     37|                if (curPos > startPos)
-     37|                        dst.put(s[startPos..curPos]);
-     37|                startPos = curPos + 1;
+     43|                if (curPos > startPos)
+     43|                        dst.put(s[startPos..curPos]);
+     43|                startPos = curPos + 1;
        |        }
        |
-    532|        for (size_t pos = 0; pos < s.length; pos++) {
-    229|                immutable(char) ch = s[pos];
+    580|        for (size_t pos = 0; pos < s.length; pos++) {
+    247|                immutable(char) ch = s[pos];
        |
-    229|                switch (ch) {
-    229|                        default:
+    247|                switch (ch) {
+    247|                        default:
        |                                static if (escape_unicode) {
 0000000|                                        if (ch <= 0x20 || ch >= 0x80)
        |                                        {
@@ -2280,13 +2280,13 @@
        |                                }
        |                                else
        |                                {
-    229|                                        if (ch < 0x20)
+    247|                                        if (ch < 0x20)
        |                                        {
 0000000|                                                putInterval(pos);
 0000000|                                                dst.formattedWrite("\\u%04X", ch);
        |                                        }
        |                                }
-    229|                                break;
+    247|                                break;
 0000000|                        case '\\': putInterval(pos); dst.put("\\\\"); break;
 0000000|                        case '\r': putInterval(pos); dst.put("\\r"); break;
 0000000|                        case '\n': putInterval(pos); dst.put("\\n"); break;
@@ -2304,17 +2304,17 @@
        |                }
        |        }
        |        // last interval
-     37|        putInterval(s.length);
+     43|        putInterval(s.length);
        |}
        |
        |/// private
        |private string jsonUnescape(R)(ref R range)
        |{
-     34|        auto ret = appender!string();
-    324|        while(!range.empty){
-    324|                auto ch = range.front;
-    324|                switch( ch ){
-     68|                        case '"': return ret.data;
+     42|        auto ret = appender!string();
+    356|        while(!range.empty){
+    356|                auto ch = range.front;
+    356|                switch( ch ){
+     84|                        case '"': return ret.data;
 0000000|                        case '\\':
 0000000|                                range.popFront();
 0000000|                                enforceJson(!range.empty, "Unterminated string escape sequence.");
@@ -2367,10 +2367,10 @@
 0000000|                                                break;
        |                                }
 0000000|                                break;
-    290|                        default:
-    290|                                ret.put(ch);
-    290|                                range.popFront();
-    290|                                break;
+    314|                        default:
+    314|                                ret.put(ch);
+    314|                                range.popFront();
+    314|                                break;
        |                }
        |        }
 0000000|        return ret.data;
@@ -2468,20 +2468,20 @@
        |private string skipJsonString(R)(ref R s, int* line = null)
        |{
        |        // TODO: count or disallow any newlines inside of the string
-     68|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to start string.");
-     34|        s.popFront();
-     34|        string ret = jsonUnescape(s);
-     68|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to terminate string.");
-     34|        s.popFront();
-     34|        return ret;
+     84|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to start string.");
+     42|        s.popFront();
+     42|        string ret = jsonUnescape(s);
+     84|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to terminate string.");
+     42|        s.popFront();
+     42|        return ret;
        |}
        |
        |/// private
        |private void skipWhitespace(R)(ref R s, int* line = null)
        |{
-    141|        while (!s.empty) {
-    141|                switch (s.front) {
-    240|                        default: return;
+    165|        while (!s.empty) {
+    165|                switch (s.front) {
+    288|                        default: return;
      84|                        case ' ', '\t': s.popFront(); break;
 0000000|                        case '\n':
 0000000|                                s.popFront();
@@ -2510,28 +2510,28 @@
        |
        |private void enforceJson(string file = __FILE__, size_t line = __LINE__)(bool cond, lazy string message = "JSON exception")
        |{
-     77|        enforceEx!JSONException(cond, message, file, line);
+     93|        enforceEx!JSONException(cond, message, file, line);
        |}
        |
        |private void enforceJson(string file = __FILE__, size_t line = __LINE__)(bool cond, lazy string message, string err_file, int err_line)
        |{
-    162|        enforceEx!JSONException(cond, format("%s(%s): Error: %s", err_file, err_line+1, message), file, line);
+    198|        enforceEx!JSONException(cond, format("%s(%s): Error: %s", err_file, err_line+1, message), file, line);
        |}
        |
        |private void enforceJson(string file = __FILE__, size_t line = __LINE__)(bool cond, lazy string message, string err_file, int* err_line)
        |{
-    176|        enforceJson!(file, line)(cond, message, err_file, err_line ? *err_line : -1);
+    208|        enforceJson!(file, line)(cond, message, err_file, err_line ? *err_line : -1);
        |}
        |
        |private auto trustedRange(R)(R range)
        |{
-      9|        static struct Rng {
+     12|        static struct Rng {
        |                private R range;
-     27|                @property bool empty() @trusted { return range.empty; }
-     18|                @property auto front() @trusted { return range.front; }
-     18|                void popFront() @trusted { range.popFront(); }
+     33|                @property bool empty() @trusted { return range.empty; }
+     21|                @property auto front() @trusted { return range.front; }
+     21|                void popFront() @trusted { range.popFront(); }
        |        }
-      9|        return Rng(range);
+     12|        return Rng(range);
        |}
        |
        |// test for vibe.utils.DictionaryList

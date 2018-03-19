@@ -28,26 +28,26 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    118|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     59|            params.args = null;
-     59|            auto answer = conn.execParams(params);
-     59|            immutable Value v = answer[0][0];
-     59|            auto result = v.as!T;
+    126|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     63|            params.args = null;
+     63|            auto answer = conn.execParams(params);
+     63|            immutable Value v = answer[0][0];
+     63|            auto result = v.as!T;
        |
-     64|            assert(result == nativeValue,
+     68|            assert(result == nativeValue,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
        |
        |            {
        |                // test binary to text conversion
-     58|                params.sqlCommand = "SELECT $1::text";
-     58|                params.args = [nativeValue.toValue];
+     62|                params.sqlCommand = "SELECT $1::text";
+     62|                params.args = [nativeValue.toValue];
        |
-     58|                auto answer2 = conn.execParams(params);
-     58|                auto v2 = answer2[0][0];
-     58|                auto textResult = v2.as!string.strip(' ');
-     58|                pgValue = pgValue.strip('\'');
+     62|                auto answer2 = conn.execParams(params);
+     62|                auto v2 = answer2[0][0];
+     62|                auto textResult = v2.as!string.strip(' ');
+     62|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -60,7 +60,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     58|                assert(textResult == pgValue,
+     62|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -119,6 +119,14 @@
      91|        foreach(i, s; numericTests)
      22|            C!PGnumeric(s, "numeric", s);
        |
+       |        // enums tests
+      1|        enum Foo { bar, baz }
+      1|        enum LongFoo : long { bar, baz }
+      1|        enum StringFoo : string { bar = "bar", baz = "baz" }
+      1|        C!Foo(Foo.baz, "Int4", "1");
+      1|        C!LongFoo(LongFoo.baz, "Int8", "1");
+      1|        C!StringFoo(StringFoo.baz, "text", "'baz'");
+       |
        |        // date and time testing
       1|        C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
        |        {
@@ -142,6 +150,7 @@
        |
        |        // json
       1|        C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
+      1|        C!(Nullable!PGjson)(Nullable!Json(Json(["foo": Json("bar")])), "json", `'{"foo":"bar"}'`);
        |
        |        // json as string
       1|        C!string(`{"float_value": 123.456}`, "json", `'{"float_value": 123.456}'`);
