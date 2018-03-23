@@ -42,13 +42,18 @@ if(isNumeric!(T))
     }
 }
 
-///
+/**
+    Converts types implicitly convertible to string to PG Value.
+    Note that if string is null it is written as an empty string.
+    If NULL is a desired DB value, Nullable!string must be used instead.
+*/
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T : string))
 {
     import std.string : representation;
 
     static assert(isImplicitlyConvertible!(T, string));
+
     auto buf = (cast(string) v).representation;
 
     if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
@@ -213,6 +218,29 @@ unittest
 
     assert(v.oidType == OidType.Text);
     assert(v.as!string == "Test string");
+}
+
+// string Null values
+@system unittest
+{
+    {
+        import core.exception: AssertError;
+        import std.exception: assertThrown;
+
+        auto v = Nullable!string.init.toValue;
+        assert(v.oidType == OidType.Text);
+        assert(v.isNull);
+
+        assertThrown!AssertError(v.as!string);
+        assert(v.as!(Nullable!string).isNull);
+    }
+
+    {
+        string s;
+        auto v = s.toValue;
+        assert(v.oidType == OidType.Text);
+        assert(!v.isNull);
+    }
 }
 
 unittest

@@ -45,10 +45,15 @@ private alias VF = ValueFormat;
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
-/// Returns cell value as native string based type from text or binary formatted field
+/**
+    Returns cell value as native string based type from text or binary formatted field.
+    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+*/
 T as(T)(in Value v) pure @trusted
 if(is(T : string))
 {
+    static if (is(T == Nullable!R,R)) { if (v.isNull) return T.init; }
+
     if(v.format == VF.BINARY)
     {
         if(!(
@@ -57,9 +62,10 @@ if(is(T : string))
             v.oidType == OidType.VariableString ||
             v.oidType == OidType.Numeric ||
             v.oidType == OidType.Json ||
-            v.oidType == OidType.Jsonb
+            v.oidType == OidType.Jsonb ||
+            v.oidType == OidType.Name
         ))
-            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
+            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
 
         if(v.oidType == OidType.Numeric)
             return rawValueToNumeric(v.data).to!T;
@@ -68,7 +74,10 @@ if(is(T : string))
     return valueAsString(v).to!T;
 }
 
-/// Returns value as D type value from binary formatted field
+/**
+    Returns value as D type value from binary formatted field.
+    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+*/
 T as(T)(in Value v)
 if(!is(T : string) && !is(T == Bson))
 {
@@ -97,7 +106,10 @@ auto tunnelForBinaryValueAsCalls(T)(in Value v)
 
 string valueAsString(in Value v) pure
 {
-    if (v.isNull) return null;
+    import core.exception: AssertError;
+    import std.exception: enforceEx;
+
+    enforceEx!AssertError(!v.isNull, "Attempt to read NULL value", __FILE__, __LINE__);
     return (cast(const(char[])) v.data).to!string;
 }
 
