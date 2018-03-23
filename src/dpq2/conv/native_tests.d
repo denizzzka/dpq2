@@ -47,15 +47,9 @@ public void _integration_test( string connParam ) @system
                 auto answer2 = conn.execParams(params);
                 auto v2 = answer2[0][0];
 
-                string textResult;
-
-                {
-                    auto str = v2.as!(Nullable!string);
-                    if(str.isNull)
-                        textResult = "NULL";
-                    else
-                        textResult = str.get.strip(' ');
-                }
+                string textResult = v2.isNull
+                    ? "NULL"
+                    : v2.as!string.strip(' ');
 
                 pgValue = pgValue.strip('\'');
 
