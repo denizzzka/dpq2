@@ -36,7 +36,7 @@ if(isNumeric!(T))
     return Value(v.nativeToBigEndian.dup, detectOidFromNativeCareAboutEnums!T, false, ValueFormat.BINARY);
 }
 
-/// Detect Oid, takes care about enum types
+/// Detect Oid. For enums returns its base type.
 private OidType detectOidFromNativeCareAboutEnums(T)()
 {
     static if (is(T EnType == enum))
