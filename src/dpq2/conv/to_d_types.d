@@ -62,21 +62,27 @@ if(is(T : string) || is(T == Nullable!string))
             throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
     }
 
-    static if(is(T == Nullable!string))
+    static if(is(T == Nullable!R, R))
+    {
+        alias Ret = R;
+
         if (v.isNull)
             return T.init;
+    }
+    else
+        alias Ret = T;
 
-    string ret;
+    string r;
 
     if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
-        ret = rawValueToNumeric(v.data); // special case for 'numeric'
+        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
     else
-        ret = v.valueAsString;
+        r = v.valueAsString;
 
-    static if(is(T == Nullable!string))
+    const Ret ret = cast(Ret) r; // cast because it can be native string or enum : string
+
+    static if(is(T == Nullable!R2, R2))
         return T(ret);
-    else static if(is(T == enum))
-        return cast(T) ret;
     else
         return ret;
 }

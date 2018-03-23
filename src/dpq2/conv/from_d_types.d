@@ -21,8 +21,10 @@ import vibe.data.json: Json;
 Value toValue(T)(T v)
 if (is(T == Nullable!R, R))
 {
+    alias Orig = typeof(T.get);
+
     if (v.isNull)
-        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
+        return Value(ValueFormat.BINARY, detectOidFromNativeCareAboutEnums!Orig);
     else
         return toValue(v.get);
 }
@@ -31,18 +33,22 @@ if (is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    static if (is(T == enum))
+    return Value(v.nativeToBigEndian.dup, detectOidFromNativeCareAboutEnums!T, false, ValueFormat.BINARY);
+}
+
+/// Detect Oid, takes care about enum types
+private OidType detectOidFromNativeCareAboutEnums(T)()
+{
+    static if (is(T EnType == enum))
     {
-        alias OType = OriginalType!T;
+        alias R = EnType;
 
-        static assert(is(OType == int));
-
-        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+        static assert(is(R == int) || is(R == string), "Only int and string enums are supported");
     }
     else
-    {
-        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
-    }
+        alias R = T;
+
+    return detectOidTypeFromNative!R;
 }
 
 ///
