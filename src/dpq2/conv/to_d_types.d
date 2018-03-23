@@ -47,7 +47,7 @@ private alias ET = ConvExceptionType;
 
 /// Returns cell value as native string based type from text or binary formatted field
 T as(T)(in Value v) pure @trusted
-if(is(T : string) || is(T == Nullable!string))
+if(is(T : string))
 {
     if(v.format == VF.BINARY)
     {
@@ -101,12 +101,7 @@ if(is(T : string) || is(T == Nullable!string))
 
 /// Returns value as D type value from binary formatted field
 T as(T)(in Value v)
-if(!(
-    is(T : string) ||
-    is(T == Bson) ||
-    is(T == Nullable!string) ||
-    is(T == Nullable!Bson)
-))
+if(!is(T : string) && !is(T == Bson))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,
