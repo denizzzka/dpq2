@@ -12,7 +12,7 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
-import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, TemplateArgsOf, Unqual;
+import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, Unqual;
 import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
@@ -22,7 +22,7 @@ Value toValue(T)(T v)
 if (is(T == Nullable!R, R))
 {
     if (v.isNull)
-        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
     else
         return toValue(v.get);
 }
@@ -33,8 +33,7 @@ if(isNumeric!(T))
 {
     static if (is(T == enum))
     {
-        alias OType = OriginalType!T;
-        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+        return Value((cast(OriginalType!T)v).nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
     }
     else
     {

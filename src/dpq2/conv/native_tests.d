@@ -127,6 +127,8 @@ public void _integration_test( string connParam ) @system
         C!Foo(Foo.baz, "Int4", "1");
         C!LongFoo(LongFoo.baz, "Int8", "1");
         C!StringFoo(StringFoo.baz, "text", "'baz'");
+        C!(Nullable!Foo)(Nullable!Foo(Foo.baz), "Int4", "1");
+        C!(Nullable!Foo)(Nullable!Foo.init, "Int4", null);
 
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
