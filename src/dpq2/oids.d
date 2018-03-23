@@ -156,7 +156,7 @@ OidType detectOidTypeFromNative(T)()
 {
     import std.datetime.date : StdDate = Date, TimeOfDay;
     import std.datetime.systime : SysTime;
-    import std.traits : OriginalType, TemplateArgsOf, Unqual;
+    import std.traits : isIntegral, OriginalType, TemplateArgsOf, Unqual;
     import std.typecons : Nullable;
     static import dpq2.conv.time;
     import vibe.data.json : VibeJson = Json;
@@ -164,7 +164,10 @@ OidType detectOidTypeFromNative(T)()
     static if(is(Unqual!T == Nullable!R,R))
         return detectOidTypeFromNative!(TemplateArgsOf!T[0]); //remove Nullable from Type before test
     else static if (is(Unqual!T == enum))
+    {
+        static assert(isIntegral!T || is(OriginalType!T == string), "Only integral and string enums are supported");
         return detectOidTypeFromNative!(OriginalType!T); //enum is handled as it's base type
+    }
     else
     {
         alias UT = Unqual!T;
