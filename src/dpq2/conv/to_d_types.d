@@ -46,8 +46,8 @@ private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
 /// Returns cell value as native string type from text or binary formatted field
-string as(T)(in Value v) pure @trusted
-if(is(T == string))
+T as(T)(in Value v) pure @trusted
+if(is(T == string) || is(T == Nullable!string))
 {
     if(v.format == VF.BINARY)
     {
@@ -60,17 +60,45 @@ if(is(T == string))
             v.oidType == OidType.Jsonb
         ))
             throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
-
-        if(v.oidType == OidType.Numeric)
-            return rawValueToNumeric(v.data);
     }
 
-    return valueAsString(v);
+    static if(is(T == Nullable!string))
+        if (v.isNull)
+            return T.init;
+
+    string ret;
+
+    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+        ret = rawValueToNumeric(v.data); // special case for 'numeric'
+    else
+        ret = v.valueAsString;
+
+    static if(is(T == Nullable!string))
+        return T(ret);
+    else
+        return ret;
+}
+
+@system unittest
+{
+    import std.exception: assertThrown;
+    import core.exception: AssertError;
+
+    auto v = Value(ValueFormat.BINARY, OidType.Text);
+
+    assert(v.isNull);
+    assertThrown!AssertError(v.as!string == "");
+    assert(v.as!(Nullable!string).isNull == true);
 }
 
 /// Returns value as D type value from binary formatted field
 T as(T)(in Value v)
-if(!is(T == string) && !is(T == Bson))
+if(!(
+    is(T == string) ||
+    is(T == Bson) ||
+    is(T == Nullable!string) ||
+    is(T == Nullable!Bson)
+))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,
@@ -78,10 +106,13 @@ if(!is(T == string) && !is(T == Bson))
 
     static if (is(T == Nullable!R, R))
     {
-        if (v.isNull) return T.init;
-        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
+        if (v.isNull)
+            return T.init;
+        else
+            return T(binaryValueAs!R(v));
     }
-    else return binaryValueAs!T(v);
+    else
+        return binaryValueAs!T(v);
 }
 
 package:
@@ -97,7 +128,6 @@ auto tunnelForBinaryValueAsCalls(T)(in Value v)
 
 string valueAsString(in Value v) pure
 {
-    if (v.isNull) return null;
     return (cast(const(char[])) v.data).to!string;
 }
 
