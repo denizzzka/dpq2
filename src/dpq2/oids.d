@@ -158,6 +158,7 @@ OidType detectOidTypeFromNative(T)()
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
     static import dpq2.conv.time;
+    import vibe.data.json : VibeJson = Json;
 
     alias UT = Unqual!T;
 
@@ -175,6 +176,7 @@ OidType detectOidTypeFromNative(T)()
         static if(is(UT == TimeOfDay)){ return Time; } else
         static if(is(UT == SysTime)){ return TimeStampWithZone; } else
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
+        static if(is(UT == VibeJson)){ return Json; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }

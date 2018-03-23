@@ -12,10 +12,10 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
+import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, TemplateArgsOf, Unqual;
+import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
-import std.traits: isNumeric, TemplateArgsOf, Unqual;
-import std.typecons : Nullable;
 
 /// Converts Nullable!T to Value
 Value toValue(T)(T v)
@@ -31,24 +31,37 @@ if (is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    static if (is(T == enum))
+    {
+        alias OType = OriginalType!T;
+
+        static assert(is(OType == int));
+
+        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+    }
+    else
+    {
+        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    }
 }
 
 ///
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
-if(is(T == string))
+if(is(T : string))
 {
-    if(valueFormat == ValueFormat.TEXT) v = v~'\0'; // for prepareArgs only
+    import std.string : representation;
 
-    static assert(is(T == immutable(char)[]));
-    auto buf = cast(immutable(ubyte)[]) v;
+    static assert(isImplicitlyConvertible!(T, string));
+    auto buf = (cast(string) v).representation;
 
-    return Value(buf, detectOidTypeFromNative!T, false, valueFormat);
+    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+
+    return Value(buf, OidType.Text, false, valueFormat);
 }
 
 /// Constructs Value from array of bytes
 Value toValue(T)(T v)
-if(is(T : immutable ubyte[]))
+if(is(T : immutable(ubyte)[]))
 {
     return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
 }
@@ -346,4 +359,19 @@ unittest
 
     assert(v.oidType == OidType.TimeStamp);
     assert(v.as!TimeStamp == t);
+}
+
+unittest
+{
+    auto j = Json(["foo":Json("bar")]);
+    auto v = j.toValue;
+
+    assert(v.oidType == OidType.Json);
+    assert(v.as!Json == j);
+
+    auto nj = Nullable!Json(j);
+    auto nv = nj.toValue;
+    assert(nv.oidType == OidType.Json);
+    assert(!nv.as!(Nullable!Json).isNull);
+    assert(nv.as!(Nullable!Json).get == j);
 }
