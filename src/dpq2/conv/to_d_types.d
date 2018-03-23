@@ -52,8 +52,6 @@ private alias ET = ConvExceptionType;
 T as(T)(in Value v) pure @trusted
 if(is(T : string))
 {
-    static if (is(T == Nullable!R,R)) { if (v.isNull) return T.init; }
-
     if(v.format == VF.BINARY)
     {
         if(!(
@@ -66,12 +64,22 @@ if(is(T : string))
             v.oidType == OidType.Name
         ))
             throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
-
-        if(v.oidType == OidType.Numeric)
-            return rawValueToNumeric(v.data).to!T;
     }
 
-    return valueAsString(v).to!T;
+    static if (is(T == Nullable!R,R))
+    {
+        if (v.isNull) return T.init;
+        alias RT = typeof(T.get);
+    }
+    else alias RT = T;
+
+    T res;
+    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+        res = cast(RT)rawValueToNumeric(v.data); // cast because it can be native string or enum : string
+    else
+        res = cast(RT) v.valueAsString();
+
+    return res;
 }
 
 /**
@@ -109,7 +117,6 @@ string valueAsString(in Value v) pure
     import core.exception: AssertError;
     import std.exception: enforceEx;
 
-    enforceEx!AssertError(!v.isNull, "Attempt to read NULL value", __FILE__, __LINE__);
     return (cast(const(char[])) v.data).to!string;
 }
 

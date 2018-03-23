@@ -31,14 +31,7 @@ if (is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    static if (is(T == enum))
-    {
-        return Value((cast(OriginalType!T)v).nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
-    }
-    else
-    {
-        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
-    }
+    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
 /**
