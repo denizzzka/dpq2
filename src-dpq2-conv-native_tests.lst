@@ -28,26 +28,30 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    126|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     63|            params.args = null;
-     63|            auto answer = conn.execParams(params);
-     63|            immutable Value v = answer[0][0];
-     63|            auto result = v.as!T;
+    132|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     66|            params.args = null;
+     66|            auto answer = conn.execParams(params);
+     66|            immutable Value v = answer[0][0];
+     66|            auto result = v.as!T;
        |
-     68|            assert(result == nativeValue,
+     71|            assert(result == nativeValue,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
        |
        |            {
        |                // test binary to text conversion
-     62|                params.sqlCommand = "SELECT $1::text";
-     62|                params.args = [nativeValue.toValue];
+     65|                params.sqlCommand = "SELECT $1::text";
+     65|                params.args = [nativeValue.toValue];
        |
-     62|                auto answer2 = conn.execParams(params);
-     62|                auto v2 = answer2[0][0];
-     62|                auto textResult = v2.as!string.strip(' ');
-     62|                pgValue = pgValue.strip('\'');
+     65|                auto answer2 = conn.execParams(params);
+     65|                auto v2 = answer2[0][0];
+       |
+     65|                string textResult = v2.isNull
+      4|                    ? "NULL"
+     61|                    : v2.as!string.strip(' ');
+       |
+     65|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -60,7 +64,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     62|                assert(textResult == pgValue,
+     65|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -71,7 +75,7 @@
        |
       1|        C!PGboolean(true, "boolean", "true");
       1|        C!PGboolean(false, "boolean", "false");
-      1|        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", null);
+      1|        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", "NULL");
       1|        C!(Nullable!PGboolean)(Nullable!PGboolean(true), "boolean", "true");
       1|        C!PGsmallint(-32_761, "smallint", "-32761");
       1|        C!PGinteger(-2_147_483_646, "integer", "-2147483646");
@@ -81,7 +85,7 @@
       1|        C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
       1|        C!PGtext("12345 ", "char(6)", "'12345'");
       1|        C!PGtext("12345", "varchar(6)", "'12345'");
-      1|        C!PGtext(null, "text", null);
+      1|        C!(Nullable!PGtext)(Nullable!PGtext.init, "text", "NULL");
       1|        C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
        |            "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
       1|        C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
@@ -119,13 +123,17 @@
      91|        foreach(i, s; numericTests)
      22|            C!PGnumeric(s, "numeric", s);
        |
-       |        // enums tests
+       |        // enum : int test
       1|        enum Foo { bar, baz }
-      1|        enum LongFoo : long { bar, baz }
-      1|        enum StringFoo : string { bar = "bar", baz = "baz" }
       1|        C!Foo(Foo.baz, "Int4", "1");
-      1|        C!LongFoo(LongFoo.baz, "Int8", "1");
+      1|        C!(Nullable!Foo)(Nullable!Foo(Foo.baz), "Int4", "1");
+      1|        C!(Nullable!Foo)((Nullable!Foo).init, "Int4", "NULL");
+       |
+       |        // enum : string test
+      1|        enum StringFoo : string { bar = "bar", baz = "baz" }
       1|        C!StringFoo(StringFoo.baz, "text", "'baz'");
+      1|        C!(Nullable!StringFoo)(Nullable!StringFoo(StringFoo.baz), "text", "'baz'");
+      1|        C!(Nullable!StringFoo)((Nullable!StringFoo).init, "text", "NULL");
        |
        |        // date and time testing
       1|        C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");

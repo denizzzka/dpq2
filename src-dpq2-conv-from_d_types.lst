@@ -21,25 +21,34 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R))
        |{
-      7|    if (v.isNull)
-      2|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
+     12|    alias Orig = typeof(T.get);
+       |
+     12|    if (v.isNull)
+      5|        return Value(ValueFormat.BINARY, detectOidFromNativeCareAboutEnums!Orig);
        |    else
-      5|        return toValue(v.get);
+      7|        return toValue(v.get);
        |}
        |
        |///
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-       |    static if (is(T == enum))
+     38|    return Value(v.nativeToBigEndian.dup, detectOidFromNativeCareAboutEnums!T, false, ValueFormat.BINARY);
+       |}
+       |
+       |/// Detect Oid. For enums returns its base type.
+       |private OidType detectOidFromNativeCareAboutEnums(T)()
+       |{
+       |    static if (is(T EnType == enum))
        |    {
-      2|        alias OType = OriginalType!T;
-      2|        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+      4|        alias R = EnType;
+       |
+       |        static assert(is(R == int) || is(R == string), "Only int and string enums are supported");
        |    }
        |    else
-       |    {
-     36|        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
-       |    }
+     39|        alias R = T;
+       |
+     43|    return detectOidTypeFromNative!R;
        |}
        |
        |///

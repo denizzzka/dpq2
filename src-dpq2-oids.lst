@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    205|    return cast(OidType)(oid);
+    211|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -57,8 +57,8 @@
        |    with(OidType)
      30|    switch(t)
        |    {
-      4|        case Int8:
-      8|        case Int2:
+      3|        case Int8:
+      7|        case Int2:
      30|        case Int4:
      30|            return true;
 0000000|        default:
@@ -160,16 +160,16 @@
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
        |
-     51|    alias UT = Unqual!T;
+     54|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
-       |        static if(is(UT == string)){ return Text; } else
+      2|        static if(is(UT == string)){ return Text; } else
       2|        static if(is(UT == ubyte[])){ return ByteArray; } else
      11|        static if(is(UT == bool)){ return Bool; } else
       2|        static if(is(UT == short)){ return Int2; } else
-     30|        static if(is(UT == int)){ return Int4; } else
-      3|        static if(is(UT == long)){ return Int8; } else
+     32|        static if(is(UT == int)){ return Int4; } else
+      2|        static if(is(UT == long)){ return Int8; } else
       1|        static if(is(UT == float)){ return Float4; } else
       2|        static if(is(UT == double)){ return Float8; } else
        |        static if(is(UT == StdDate)){ return Date; } else

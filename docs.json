@@ -627,7 +627,7 @@
 								"type": "T"
 							}
 						],
-						"endline": 28,
+						"endline": 30,
 						"char": 7,
 						"kind": "function"
 					}
@@ -650,7 +650,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 31,
+						"line": 33,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -658,13 +658,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 43,
+						"endline": 37,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 31,
+				"line": 33,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -681,7 +681,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 46,
+						"line": 55,
 						"type": "@trusted Value(T v, ValueFormat valueFormat = ValueFormat.BINARY)",
 						"parameters": [
 							{
@@ -694,13 +694,13 @@
 								"default": "ValueFormat.BINARY"
 							}
 						],
-						"endline": 57,
+						"endline": 66,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 46,
+				"line": 55,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -717,7 +717,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 60,
+						"line": 69,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -725,13 +725,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 64,
+						"endline": 73,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 60,
+				"line": 69,
 				"comment": "Constructs Value from array of bytes\n",
 				"parameters": [
 					{
@@ -748,7 +748,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 67,
+						"line": 76,
 						"type": "@trusted Value(T v)",
 						"parameters": [
 							{
@@ -756,13 +756,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 73,
+						"endline": 82,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 67,
+				"line": 76,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -780,7 +780,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 76,
+						"line": 85,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -788,13 +788,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 97,
+						"endline": 106,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 76,
+				"line": 85,
 				"comment": "Constructs Value from Date\n",
 				"parameters": [
 					{
@@ -811,7 +811,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 100,
+						"line": 109,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -819,13 +819,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 106,
+						"endline": 115,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 100,
+				"line": 109,
 				"comment": "Constructs Value from TimeOfDay\n",
 				"parameters": [
 					{
@@ -842,7 +842,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 109,
+						"line": 118,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -850,13 +850,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 130,
+						"endline": 139,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 109,
+				"line": 118,
 				"comment": "Constructs Value from TimeStamp or from TimeStampUTC\n",
 				"parameters": [
 					{
@@ -873,7 +873,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 154,
+						"line": 163,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -881,13 +881,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 158,
+						"endline": 167,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 154,
+				"line": 163,
 				"comment": "    Constructs Value from DateTime\n    It uses Timestamp without TZ as a resulting PG type\n",
 				"parameters": [
 					{
@@ -904,7 +904,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 166,
+						"line": 175,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -912,13 +912,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 172,
+						"endline": 181,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 166,
+				"line": 175,
 				"comment": "    Constructs Value from SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n",
 				"parameters": [
 					{
@@ -935,7 +935,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 175,
+						"line": 184,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -943,13 +943,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 179,
+						"endline": 188,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 175,
+				"line": 184,
 				"comment": "Constructs Value from UUID\n",
 				"parameters": [
 					{
@@ -966,7 +966,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 182,
+						"line": 191,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -974,13 +974,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 189,
+						"endline": 198,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 182,
+				"line": 191,
 				"comment": "Constructs Value from Json\n",
 				"parameters": [
 					{
@@ -2044,7 +2044,7 @@
 								]
 							}
 						],
-						"endline": 69,
+						"endline": 88,
 						"char": 3,
 						"kind": "function"
 					}
@@ -2067,7 +2067,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 72,
+						"line": 103,
 						"type": "T(in Value v)",
 						"parameters": [
 							{
@@ -2078,13 +2078,13 @@
 								]
 							}
 						],
-						"endline": 85,
+						"endline": 119,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 72,
+				"line": 103,
 				"comment": "Returns value as D type value from binary formatted field\n",
 				"parameters": [
 					{
