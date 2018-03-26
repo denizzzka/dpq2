@@ -60,12 +60,43 @@ if(is(T : string))
             v.oidType == OidType.Jsonb
         ))
             throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
-
-        if(v.oidType == OidType.Numeric)
-            return rawValueToNumeric(v.data).to!T;
     }
 
-    return valueAsString(v).to!T;
+    static if(is(T == Nullable!R, R))
+    {
+        alias Ret = R;
+
+        if (v.isNull)
+            return T.init;
+    }
+    else
+        alias Ret = T;
+
+    string r;
+
+    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
+    else
+        r = v.valueAsString;
+
+    const Ret ret = cast(Ret) r; // cast because it can be native string or enum : string
+
+    static if(is(T == Nullable!R2, R2))
+        return T(ret);
+    else
+        return ret;
+}
+
+@system unittest
+{
+    import std.exception: assertThrown;
+    import core.exception: AssertError;
+
+    auto v = Value(ValueFormat.BINARY, OidType.Text);
+
+    assert(v.isNull);
+    assertThrown!AssertError(v.as!string == "");
+    assert(v.as!(Nullable!string).isNull == true);
 }
 
 /// Returns value as D type value from binary formatted field
@@ -78,10 +109,13 @@ if(!is(T : string) && !is(T == Bson))
 
     static if (is(T == Nullable!R, R))
     {
-        if (v.isNull) return T.init;
-        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
+        if (v.isNull)
+            return T.init;
+        else
+            return T(binaryValueAs!R(v));
     }
-    else return binaryValueAs!T(v);
+    else
+        return binaryValueAs!T(v);
 }
 
 package:
@@ -97,7 +131,6 @@ auto tunnelForBinaryValueAsCalls(T)(in Value v)
 
 string valueAsString(in Value v) pure
 {
-    if (v.isNull) return null;
     return (cast(const(char[])) v.data).to!string;
 }
 
