@@ -46,7 +46,7 @@ public void _integration_test( string connParam ) @system
 
                 auto answer2 = conn.execParams(params);
                 auto v2 = answer2[0][0];
-                auto textResult = v2.isNull ? "NULL" : v2.as!string.strip(' ');
+                auto textResult = v2.as!string.strip(' ');
                 pgValue = pgValue.strip('\'');
 
                 // Special cases:
@@ -71,7 +71,7 @@ public void _integration_test( string connParam ) @system
 
         C!PGboolean(true, "boolean", "true");
         C!PGboolean(false, "boolean", "false");
-        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", "NULL");
+        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", null);
         C!(Nullable!PGboolean)(Nullable!PGboolean(true), "boolean", "true");
         C!PGsmallint(-32_761, "smallint", "-32761");
         C!PGinteger(-2_147_483_646, "integer", "-2147483646");
@@ -81,8 +81,7 @@ public void _integration_test( string connParam ) @system
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
         C!PGtext("12345 ", "char(6)", "'12345'");
         C!PGtext("12345", "varchar(6)", "'12345'");
-        C!PGtext(null, "text", "''");
-        C!(Nullable!PGtext)(Nullable!string.init, "text", "NULL");
+        C!PGtext(null, "text", null);
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
@@ -120,22 +119,13 @@ public void _integration_test( string connParam ) @system
         foreach(i, s; numericTests)
             C!PGnumeric(s, "numeric", s);
 
-        // numeric enums test
+        // enums tests
         enum Foo { bar, baz }
-        enum ShortFoo :short { bar, baz }
         enum LongFoo : long { bar, baz }
-
-        C!Foo(Foo.baz, "Int4", "1");
-        C!ShortFoo(ShortFoo.baz, "Int2", "1");
-        C!LongFoo(LongFoo.baz, "Int8", "1");
-        C!(Nullable!Foo)(Nullable!Foo(Foo.baz), "Int4", "1");
-        C!(Nullable!LongFoo)(Nullable!LongFoo.init, "Int8", "NULL");
-
-        // emum : string test
         enum StringFoo : string { bar = "bar", baz = "baz" }
+        C!Foo(Foo.baz, "Int4", "1");
+        C!LongFoo(LongFoo.baz, "Int8", "1");
         C!StringFoo(StringFoo.baz, "text", "'baz'");
-        C!(Nullable!StringFoo)(Nullable!StringFoo(StringFoo.baz), "text", "'baz'");
-        C!(Nullable!StringFoo)(Nullable!StringFoo.init, "text", "NULL");
 
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
