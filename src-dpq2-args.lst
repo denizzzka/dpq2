@@ -21,13 +21,13 @@
        |    /// SQL command arguments
        |    @property void args(Value[] vargs)
        |    {
-    141|        _args = vargs;
+    129|        _args = vargs;
        |    }
        |
        |    /// ditto
        |    @property ref inout (Value[]) args() inout pure
        |    {
-   1457|        return _args;
+   1364|        return _args;
        |    }
        |
        |    /// Fills out arguments from array
@@ -86,31 +86,31 @@
        |
        |    ValueFormat resultFormat;
        |
-    171|    this(in QueryParams* qp) pure
+    159|    this(in QueryParams* qp) pure
        |    {
-    171|        sqlCommand = &qp.sqlCommand;
-    171|        resultFormat = qp.resultFormat;
+    159|        sqlCommand = &qp.sqlCommand;
+    159|        resultFormat = qp.resultFormat;
        |
-    171|        oids = new Oid[qp.args.length];
-    171|        formats = new int[qp.args.length];
-    171|        lengths = new int[qp.args.length];
-    171|        values = new const(ubyte)* [qp.args.length];
+    159|        oids = new Oid[qp.args.length];
+    159|        formats = new int[qp.args.length];
+    159|        lengths = new int[qp.args.length];
+    159|        values = new const(ubyte)* [qp.args.length];
        |
-    516|        for(int i = 0; i < qp.args.length; ++i)
+    480|        for(int i = 0; i < qp.args.length; ++i)
        |        {
-     87|            oids[i] = qp.args[i].oidType;
-     87|            formats[i] = qp.args[i].format;
+     81|            oids[i] = qp.args[i].oidType;
+     81|            formats[i] = qp.args[i].format;
        |
-     87|            if(!qp.args[i].isNull)
+     81|            if(!qp.args[i].isNull)
        |            {
-     81|                lengths[i] = qp.args[i].data.length.to!int;
+     78|                lengths[i] = qp.args[i].data.length.to!int;
        |
-     81|                immutable ubyte[] zeroLengthArg = [123]; // fake value, isn't used as argument
+     78|                immutable ubyte[] zeroLengthArg = [123]; // fake value, isn't used as argument
        |
-     81|                if(qp.args[i].data.length == 0)
+     78|                if(qp.args[i].data.length == 0)
       2|                    values[i] = &zeroLengthArg[0];
        |                else
-     79|                    values[i] = &qp.args[i].data[0];
+     76|                    values[i] = &qp.args[i].data[0];
        |            }
        |        }
        |    }
@@ -118,7 +118,7 @@
        |    /// Values used by PQexecParams-like functions
        |    const(char)* command() pure const
        |    {
-    171|        return cast(const(char)*) (*sqlCommand).toStringz;
+    159|        return cast(const(char)*) (*sqlCommand).toStringz;
        |    }
        |
        |    /// ditto
@@ -130,43 +130,43 @@
        |    /// ditto
        |    int nParams() pure const
        |    {
-    171|        return values.length.to!int;
+    159|        return values.length.to!int;
        |    }
        |
        |    /// ditto
        |    const(Oid)* paramTypes() pure
        |    {
-    159|        if(oids.length == 0)
-     89|            return null;
+    147|        if(oids.length == 0)
+     83|            return null;
        |        else
-     70|            return &oids[0];
+     64|            return &oids[0];
        |    }
        |
        |    /// ditto
        |    const(ubyte*)* paramValues() pure
        |    {
-    171|        if(values.length == 0)
-     89|            return null;
+    159|        if(values.length == 0)
+     83|            return null;
        |        else
-     82|            return &values[0];
+     76|            return &values[0];
        |    }
        |
        |    /// ditto
        |    const(int)* paramLengths() pure
        |    {
-    171|        if(lengths.length == 0)
-     89|            return null;
+    159|        if(lengths.length == 0)
+     83|            return null;
        |        else
-     82|            return &lengths[0];
+     76|            return &lengths[0];
        |    }
        |
        |    /// ditto
        |    const(int)* paramFormats() pure
        |    {
-    171|        if(formats.length == 0)
-     89|            return null;
+    159|        if(formats.length == 0)
+     83|            return null;
        |        else
-     82|            return &formats[0];
+     76|            return &formats[0];
        |    }
        |}
 src/dpq2/args.d is 97% covered

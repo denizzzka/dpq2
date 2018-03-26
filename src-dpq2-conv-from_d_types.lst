@@ -12,7 +12,7 @@
        |import std.datetime.date: Date, DateTime, TimeOfDay;
        |import std.datetime.systime: SysTime;
        |import std.datetime.timezone: LocalTime, TimeZone, UTC;
-       |import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, Unqual;
+       |import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, TemplateArgsOf, Unqual;
        |import std.typecons : Nullable;
        |import std.uuid: UUID;
        |import vibe.data.json: Json;
@@ -21,36 +21,39 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R))
        |{
-     13|    if (v.isNull)
-      6|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+      7|    if (v.isNull)
+      2|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
        |    else
-      7|        return toValue(v.get);
+      5|        return toValue(v.get);
        |}
        |
        |///
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-     40|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+       |    static if (is(T == enum))
+       |    {
+      2|        alias OType = OriginalType!T;
+      2|        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+       |    }
+       |    else
+       |    {
+     36|        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+       |    }
        |}
        |
-       |/**
-       |    Converts types implicitly convertible to string to PG Value.
-       |    Note that if string is null it is written as an empty string.
-       |    If NULL is a desired DB value, Nullable!string must be used instead.
-       |*/
+       |///
        |Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
        |if(is(T : string))
        |{
        |    import std.string : representation;
        |
        |    static assert(isImplicitlyConvertible!(T, string));
+     44|    auto buf = (cast(string) v).representation;
        |
-     46|    auto buf = (cast(string) v).representation;
+     46|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     48|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
-       |
-     46|    return Value(buf, OidType.Text, false, valueFormat);
+     44|    return Value(buf, OidType.Text, false, valueFormat);
        |}
        |
        |/// Constructs Value from array of bytes
@@ -210,29 +213,6 @@
        |
       1|    assert(v.oidType == OidType.Text);
       1|    assert(v.as!string == "Test string");
-       |}
-       |
-       |// string Null values
-       |@system unittest
-       |{
-       |    {
-       |        import core.exception: AssertError;
-       |        import std.exception: assertThrown;
-       |
-      1|        auto v = Nullable!string.init.toValue;
-      1|        assert(v.oidType == OidType.Text);
-      1|        assert(v.isNull);
-       |
-      2|        assertThrown!AssertError(v.as!string);
-      1|        assert(v.as!(Nullable!string).isNull);
-       |    }
-       |
-       |    {
-      1|        string s;
-      1|        auto v = s.toValue;
-      1|        assert(v.oidType == OidType.Text);
-      1|        assert(!v.isNull);
-       |    }
        |}
        |
        |unittest
