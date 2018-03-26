@@ -12,7 +12,7 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
-import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, Unqual;
+import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, TemplateArgsOf, Unqual;
 import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
@@ -22,7 +22,7 @@ Value toValue(T)(T v)
 if (is(T == Nullable!R, R))
 {
     if (v.isNull)
-        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(TemplateArgsOf!T[0]));
     else
         return toValue(v.get);
 }
@@ -31,21 +31,24 @@ if (is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    static if (is(T == enum))
+    {
+        alias OType = OriginalType!T;
+        return Value((cast(OType)v).nativeToBigEndian.dup, detectOidTypeFromNative!OType, false, ValueFormat.BINARY);
+    }
+    else
+    {
+        return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+    }
 }
 
-/**
-    Converts types implicitly convertible to string to PG Value.
-    Note that if string is null it is written as an empty string.
-    If NULL is a desired DB value, Nullable!string must be used instead.
-*/
+///
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T : string))
 {
     import std.string : representation;
 
     static assert(isImplicitlyConvertible!(T, string));
-
     auto buf = (cast(string) v).representation;
 
     if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
@@ -210,29 +213,6 @@ unittest
 
     assert(v.oidType == OidType.Text);
     assert(v.as!string == "Test string");
-}
-
-// string Null values
-@system unittest
-{
-    {
-        import core.exception: AssertError;
-        import std.exception: assertThrown;
-
-        auto v = Nullable!string.init.toValue;
-        assert(v.oidType == OidType.Text);
-        assert(v.isNull);
-
-        assertThrown!AssertError(v.as!string);
-        assert(v.as!(Nullable!string).isNull);
-    }
-
-    {
-        string s;
-        auto v = s.toValue;
-        assert(v.oidType == OidType.Text);
-        assert(!v.isNull);
-    }
 }
 
 unittest
