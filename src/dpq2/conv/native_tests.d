@@ -121,10 +121,10 @@ public void _integration_test( string connParam ) @system
 
         // enums tests
         enum Foo { bar, baz }
-        enum LongFoo : long { bar, baz }
+        enum LongFoo : long { bar, baz = 9_000_000_000_000_000_000L }
         enum StringFoo : string { bar = "bar", baz = "baz" }
         C!Foo(Foo.baz, "Int4", "1");
-        C!LongFoo(LongFoo.baz, "Int8", "1");
+        C!LongFoo(LongFoo.baz, "Int8", "9000000000000000000");
         C!StringFoo(StringFoo.baz, "text", "'baz'");
 
         // date and time testing
