@@ -45,43 +45,60 @@
        |private alias AE = ValueConvException;
        |private alias ET = ConvExceptionType;
        |
-       |/// Returns cell value as native string based type from text or binary formatted field
+       |/**
+       |    Returns cell value as native string based type from text or binary formatted field.
+       |    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+       |*/
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    101|    if(v.format == VF.BINARY)
+    108|    if(v.format == VF.BINARY)
        |    {
-     97|        if(!(
+    104|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
      25|            v.oidType == OidType.Numeric ||
       2|            v.oidType == OidType.Json ||
-      1|            v.oidType == OidType.Jsonb
+      1|            v.oidType == OidType.Jsonb ||
+      1|            v.oidType == OidType.Name
        |        ))
-      1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Numeric, Json or Jsonb", __FILE__, __LINE__);
-       |
-     96|        if(v.oidType == OidType.Numeric)
-     23|            return rawValueToNumeric(v.data).to!T;
+      1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
        |    }
        |
-     77|    return valueAsString(v).to!T;
+       |    static if (is(T == Nullable!R,R))
+       |    {
+      7|        if (v.isNull) return T.init;
+      1|        alias RT = typeof(T.get);
+       |    }
+    103|    else alias RT = T;
+       |
+    104|    T res;
+    204|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+     23|        res = cast(RT)rawValueToNumeric(v.data); // cast because it can be native string or enum : string
+       |    else
+     81|        res = cast(RT) v.valueAsString();
+       |
+    103|    return res;
        |}
        |
-       |/// Returns value as D type value from binary formatted field
+       |/**
+       |    Returns value as D type value from binary formatted field.
+       |    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+       |*/
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     63|    if(!(v.format == VF.BINARY))
+     66|    if(!(v.format == VF.BINARY))
 0000000|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-      6|        if (v.isNull) return T.init;
-      4|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
+      9|        if (v.isNull) return T.init;
+      5|        return T(binaryValueAs!(TemplateArgsOf!T[0])(v));
        |    }
-     58|    else return binaryValueAs!T(v);
+     59|    else return binaryValueAs!T(v);
        |}
        |
        |package:
@@ -97,8 +114,10 @@
        |
        |string valueAsString(in Value v) pure
        |{
-     96|    if (v.isNull) return null;
-     92|    return (cast(const(char[])) v.data).to!string;
+       |    import core.exception: AssertError;
+       |    import std.exception: enforceEx;
+       |
+     98|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -118,21 +137,21 @@
        |if( isNumeric!(T) )
        |{
        |    static if(isIntegral!(T))
-     30|        if(!isNativeInteger(v.oidType))
+     32|        if(!isNativeInteger(v.oidType))
 0000000|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
        |
        |    static if(isFloatingPoint!(T))
       4|        if(!isNativeFloat(v.oidType))
 0000000|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
        |
-     34|    if(!(v.data.length == T.sizeof))
+     36|    if(!(v.data.length == T.sizeof))
 0000000|        throw new AE(ET.SIZE_MISMATCH,
        |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
        |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
        |            __FILE__, __LINE__);
        |
-     31|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
-     31|    return bigEndianToNative!(T)(s);
+     33|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     33|    return bigEndianToNative!(T)(s);
        |}
        |
        |/// Returns UUID as native UUID value
@@ -191,4 +210,4 @@
        |
       8|    return res;
        |}
-src/dpq2/conv/to_d_types.d is 79% covered
+src/dpq2/conv/to_d_types.d is 81% covered
