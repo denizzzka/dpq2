@@ -266,7 +266,8 @@
        |
        |import std.range.primitives;
        |import std.traits;
-       |import std.typecons;
+       |import stdx.allocator.internal : Ternary;
+       |import std.typecons : Flag, Yes, No;
        |
        |/**
        |Dynamic allocator interface. Code that defines allocators ultimately implements
@@ -2543,4 +2544,4 @@
        |}
        |
        |__EOF__
-../../../.dub/packages/stdx-allocator-2.77.0/stdx-allocator/source/stdx/allocator/package.d is 0% covered
+../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/package.d is 0% covered

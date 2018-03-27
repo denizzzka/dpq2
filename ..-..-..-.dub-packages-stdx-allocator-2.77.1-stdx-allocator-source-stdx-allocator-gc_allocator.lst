@@ -8,7 +8,7 @@
        |struct GCAllocator
        |{
        |    import core.memory : GC;
-       |    import std.typecons : Ternary;
+       |    import stdx.allocator.internal : Ternary;
        |    @system unittest { testAllocator!(() => GCAllocator.instance); }
        |
        |    /**
@@ -137,7 +137,7 @@
        |@system unittest
        |{
        |    import core.memory : GC;
-       |    import std.typecons : Ternary;
+       |    import stdx.allocator.internal : Ternary;
        |
        |    // test allocation sizes
        |    assert(GCAllocator.instance.goodAllocSize(1) == 16);
@@ -165,4 +165,4 @@
        |    // anything above a page is simply rounded up to next page
        |    assert(GCAllocator.instance.goodAllocSize(4096 * 4 + 1) == 4096 * 5);
        |}
-../../../.dub/packages/stdx-allocator-2.77.0/stdx-allocator/source/stdx/allocator/gc_allocator.d is 0% covered
+../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/gc_allocator.d is 0% covered

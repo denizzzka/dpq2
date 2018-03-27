@@ -77,4 +77,4 @@
        |    assert(p.length == 100);
        |    alloc.deallocate(p);
        |}
-../../../.dub/packages/stdx-allocator-2.77.0/stdx-allocator/source/stdx/allocator/mmap_allocator.d is 0% covered
+../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/mmap_allocator.d is 0% covered

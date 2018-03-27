@@ -385,4 +385,4 @@
        |        _aligned_free(m);
        |    }
        |}
-../../../.dub/packages/stdx-allocator-2.77.0/stdx-allocator/source/stdx/allocator/mallocator.d is 0% covered
+../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/mallocator.d is 0% covered

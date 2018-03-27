@@ -114,7 +114,7 @@
        |@safe @nogc nothrow pure
        |package size_t roundUpToAlignment(size_t n, uint alignment)
        |{
-       |    import std.math : isPowerOf2;
+       |    import stdx.allocator.internal : isPowerOf2;
 0000000|    assert(alignment.isPowerOf2);
 0000000|    immutable uint slack = cast(uint) n & (alignment - 1);
 0000000|    const result = slack
@@ -139,7 +139,7 @@
        |@safe @nogc nothrow pure
        |package size_t roundDownToAlignment(size_t n, uint alignment)
        |{
-       |    import std.math : isPowerOf2;
+       |    import stdx.allocator.internal : isPowerOf2;
 0000000|    assert(alignment.isPowerOf2);
 0000000|    return n & ~size_t(alignment - 1);
        |}
@@ -303,7 +303,7 @@
        |@nogc nothrow pure
        |package void* alignDownTo(void* ptr, uint alignment)
        |{
-       |    import std.math : isPowerOf2;
+       |    import stdx.allocator.internal : isPowerOf2;
 0000000|    assert(alignment.isPowerOf2);
 0000000|    return cast(void*) (cast(size_t) ptr & ~(alignment - 1UL));
        |}
@@ -315,7 +315,7 @@
        |@nogc nothrow pure
        |package void* alignUpTo(void* ptr, uint alignment)
        |{
-       |    import std.math : isPowerOf2;
+       |    import stdx.allocator.internal : isPowerOf2;
 0000000|    assert(alignment.isPowerOf2);
 0000000|    immutable uint slack = cast(size_t) ptr & (alignment - 1U);
 0000000|    return slack ? ptr + alignment - slack : ptr;
@@ -324,14 +324,14 @@
        |@safe @nogc nothrow pure
        |package bool isGoodStaticAlignment(uint x)
        |{
-       |    import std.math : isPowerOf2;
+       |    import stdx.allocator.internal : isPowerOf2;
 0000000|    return x.isPowerOf2;
        |}
        |
        |@safe @nogc nothrow pure
        |package bool isGoodDynamicAlignment(uint x)
        |{
-       |    import std.math : isPowerOf2;
+       |    import stdx.allocator.internal : isPowerOf2;
 0000000|    return x.isPowerOf2 && x >= (void*).sizeof;
        |}
        |
@@ -424,9 +424,9 @@
        |    package void testAllocator(alias make)()
        |    {
        |        import std.conv : text;
-       |        import std.math : isPowerOf2;
+       |        import stdx.allocator.internal : isPowerOf2;
        |        import std.stdio : writeln, stderr;
-       |        import std.typecons : Ternary;
+       |        import stdx.allocator.internal : Ternary;
        |        alias A = typeof(make());
        |        scope(failure) stderr.writeln("testAllocator failed for ", A.stringof);
        |
@@ -550,9 +550,9 @@
        |            || is (AllocInterface : shared ISharedAllocator))
        |    {
        |        import std.conv : text;
-       |        import std.math : isPowerOf2;
+       |        import stdx.allocator.internal : isPowerOf2;
        |        import std.stdio : writeln, stderr;
-       |        import std.typecons : Ternary;
+       |        import stdx.allocator.internal : Ternary;
        |        scope(failure) stderr.writeln("testAllocatorObject failed for ",
        |                AllocInterface.stringof);
        |
@@ -681,4 +681,4 @@
        |        }
        |    }
        |}
-../../../.dub/packages/stdx-allocator-2.77.0/stdx-allocator/source/stdx/allocator/common.d is 0% covered
+../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/common.d is 0% covered
