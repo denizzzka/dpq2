@@ -31,19 +31,19 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    351|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    344|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
-    351|        this._data = data;
-    351|        this._format = format;
-    351|        this._oidType = oidType;
-    351|        this._isNull = isNull;
+    344|        this._data = data;
+    344|        this._format = format;
+    344|        this._oidType = oidType;
+    344|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
-      9|    this(in ValueFormat format, in OidType oidType) pure
+      7|    this(in ValueFormat format, in OidType oidType) pure
        |    {
-      9|        this._format = format;
-      9|        this._oidType = oidType;
+      7|        this._format = format;
+      7|        this._oidType = oidType;
        |    }
        |
        |    @safe const pure nothrow @nogc
@@ -51,7 +51,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-    968|            return _isNull;
+    934|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -64,13 +64,13 @@
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    612|            return _oidType;
+    607|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    406|            return _format;
+    385|            return _format;
        |        }
        |    }
        |
@@ -84,9 +84,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    733|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    715|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    725|        return _data;
+    707|        return _data;
        |    }
        |
        |    ///
@@ -142,16 +142,16 @@
        |{
        |    const ConvExceptionType type; /// Exception type
        |
-     22|    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
+     32|    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
        |    {
-     22|        type = t;
-     22|        super(msg, file, line);
+     32|        type = t;
+     32|        super(msg, file, line);
        |    }
        |}
        |
        |package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
        |{
-      8|    throw new ValueConvException(
+     14|    throw new ValueConvException(
        |            ConvExceptionType.NOT_IMPLEMENTED,
        |            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
        |            file, line

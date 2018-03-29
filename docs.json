@@ -681,7 +681,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 55,
+						"line": 40,
 						"type": "@trusted Value(T v, ValueFormat valueFormat = ValueFormat.BINARY)",
 						"parameters": [
 							{
@@ -694,13 +694,13 @@
 								"default": "ValueFormat.BINARY"
 							}
 						],
-						"endline": 66,
+						"endline": 51,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 55,
+				"line": 40,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -717,7 +717,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 69,
+						"line": 54,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -725,13 +725,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 73,
+						"endline": 58,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 69,
+				"line": 54,
 				"comment": "Constructs Value from array of bytes\n",
 				"parameters": [
 					{
@@ -748,7 +748,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 76,
+						"line": 61,
 						"type": "@trusted Value(T v)",
 						"parameters": [
 							{
@@ -756,13 +756,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 82,
+						"endline": 67,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 76,
+				"line": 61,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -780,7 +780,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 85,
+						"line": 70,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -788,13 +788,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 106,
+						"endline": 91,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 85,
+				"line": 70,
 				"comment": "Constructs Value from Date\n",
 				"parameters": [
 					{
@@ -811,7 +811,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 109,
+						"line": 94,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -819,13 +819,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 115,
+						"endline": 100,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 109,
+				"line": 94,
 				"comment": "Constructs Value from TimeOfDay\n",
 				"parameters": [
 					{
@@ -842,7 +842,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 118,
+						"line": 103,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -850,13 +850,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 139,
+						"endline": 124,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 118,
+				"line": 103,
 				"comment": "Constructs Value from TimeStamp or from TimeStampUTC\n",
 				"parameters": [
 					{
@@ -873,7 +873,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 163,
+						"line": 148,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -881,13 +881,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 167,
+						"endline": 152,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 163,
+				"line": 148,
 				"comment": "    Constructs Value from DateTime\n    It uses Timestamp without TZ as a resulting PG type\n",
 				"parameters": [
 					{
@@ -904,7 +904,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 175,
+						"line": 160,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -912,13 +912,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 181,
+						"endline": 166,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 175,
+				"line": 160,
 				"comment": "    Constructs Value from SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n",
 				"parameters": [
 					{
@@ -935,7 +935,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 184,
+						"line": 169,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -943,13 +943,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 188,
+						"endline": 173,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 184,
+				"line": 169,
 				"comment": "Constructs Value from UUID\n",
 				"parameters": [
 					{
@@ -966,7 +966,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 191,
+						"line": 176,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -974,13 +974,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 198,
+						"endline": 183,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 191,
+				"line": 176,
 				"comment": "Constructs Value from Json\n",
 				"parameters": [
 					{
@@ -1902,7 +1902,7 @@
 		"members": [
 			{
 				"name": "PGboolean",
-				"line": 27,
+				"line": 28,
 				"comment": "boolean\n",
 				"deco": "b",
 				"char": 1,
@@ -1910,7 +1910,7 @@
 			},
 			{
 				"name": "PGsmallint",
-				"line": 28,
+				"line": 29,
 				"comment": "smallint\n",
 				"deco": "s",
 				"char": 1,
@@ -1918,7 +1918,7 @@
 			},
 			{
 				"name": "PGinteger",
-				"line": 29,
+				"line": 30,
 				"comment": "integer\n",
 				"deco": "i",
 				"char": 1,
@@ -1926,7 +1926,7 @@
 			},
 			{
 				"name": "PGbigint",
-				"line": 30,
+				"line": 31,
 				"comment": "bigint\n",
 				"deco": "l",
 				"char": 1,
@@ -1934,7 +1934,7 @@
 			},
 			{
 				"name": "PGreal",
-				"line": 31,
+				"line": 32,
 				"comment": "real\n",
 				"deco": "f",
 				"char": 1,
@@ -1942,7 +1942,7 @@
 			},
 			{
 				"name": "PGdouble_precision",
-				"line": 32,
+				"line": 33,
 				"comment": "double precision\n",
 				"deco": "d",
 				"char": 1,
@@ -1950,7 +1950,7 @@
 			},
 			{
 				"name": "PGtext",
-				"line": 33,
+				"line": 34,
 				"comment": "text\n",
 				"deco": "Aya",
 				"char": 1,
@@ -1958,7 +1958,7 @@
 			},
 			{
 				"name": "PGnumeric",
-				"line": 34,
+				"line": 35,
 				"comment": "numeric represented as string\n",
 				"deco": "Aya",
 				"char": 1,
@@ -1966,7 +1966,7 @@
 			},
 			{
 				"name": "PGbytea",
-				"line": 35,
+				"line": 36,
 				"comment": "bytea\n",
 				"deco": "Ayh",
 				"char": 1,
@@ -1974,7 +1974,7 @@
 			},
 			{
 				"name": "PGuuid",
-				"line": 36,
+				"line": 37,
 				"comment": "UUID\n",
 				"deco": "S3std4uuid4UUID",
 				"char": 1,
@@ -1982,7 +1982,7 @@
 			},
 			{
 				"name": "PGdate",
-				"line": 37,
+				"line": 38,
 				"comment": "Date (no time of day)\n",
 				"deco": "S3std8datetime4date4Date",
 				"char": 1,
@@ -1990,7 +1990,7 @@
 			},
 			{
 				"name": "PGtime_without_time_zone",
-				"line": 38,
+				"line": 39,
 				"comment": "Time of day (no date)\n",
 				"deco": "S3std8datetime4date9TimeOfDay",
 				"char": 1,
@@ -1998,7 +1998,7 @@
 			},
 			{
 				"name": "PGtimestamp",
-				"line": 39,
+				"line": 40,
 				"comment": "Both date and time without time zone\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi0ZQr",
 				"char": 1,
@@ -2006,7 +2006,7 @@
 			},
 			{
 				"name": "PGtimestamptz",
-				"line": 40,
+				"line": 41,
 				"comment": "Both date and time stored in UTC time zone\n",
 				"deco": "S4dpq24conv4time__T10TTimeStampVbi1ZQr",
 				"char": 1,
@@ -2014,7 +2014,7 @@
 			},
 			{
 				"name": "PGjson",
-				"line": 41,
+				"line": 42,
 				"comment": "json or jsonb\n",
 				"deco": "S4vibe4data4json4Json",
 				"char": 1,
@@ -2022,7 +2022,7 @@
 			},
 			{
 				"name": "PGline",
-				"line": 42,
+				"line": 43,
 				"comment": "Line (geometric type)\n",
 				"deco": "S4dpq24conv9geometric4Line",
 				"char": 1,
@@ -2033,7 +2033,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 49,
+						"line": 50,
 						"type": "pure @trusted T(in Value v)",
 						"parameters": [
 							{
@@ -2044,13 +2044,13 @@
 								]
 							}
 						],
-						"endline": 88,
+						"endline": 87,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 49,
+				"line": 50,
 				"comment": "Returns cell value as native string based type from text or binary formatted field\n",
 				"parameters": [
 					{
@@ -2067,7 +2067,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 103,
+						"line": 101,
 						"type": "T(in Value v)",
 						"parameters": [
 							{
@@ -2078,13 +2078,13 @@
 								]
 							}
 						],
-						"endline": 119,
+						"endline": 117,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 103,
+				"line": 101,
 				"comment": "Returns value as D type value from binary formatted field\n",
 				"parameters": [
 					{

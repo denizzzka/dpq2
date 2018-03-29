@@ -21,34 +21,19 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R))
        |{
-     12|    alias Orig = typeof(T.get);
+      8|    alias Orig = typeof(T.get);
        |
-     12|    if (v.isNull)
-      5|        return Value(ValueFormat.BINARY, detectOidFromNativeCareAboutEnums!Orig);
+      8|    if (v.isNull)
+      3|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!Orig);
        |    else
-      7|        return toValue(v.get);
+      5|        return toValue(v.get);
        |}
        |
        |///
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-     38|    return Value(v.nativeToBigEndian.dup, detectOidFromNativeCareAboutEnums!T, false, ValueFormat.BINARY);
-       |}
-       |
-       |/// Detect Oid. For enums returns its base type.
-       |private OidType detectOidFromNativeCareAboutEnums(T)()
-       |{
-       |    static if (is(T EnType == enum))
-       |    {
-      4|        alias R = EnType;
-       |
-       |        static assert(is(R == int) || is(R == string), "Only int and string enums are supported");
-       |    }
-       |    else
-     39|        alias R = T;
-       |
-     43|    return detectOidTypeFromNative!R;
+     36|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |///
@@ -58,11 +43,11 @@
        |    import std.string : representation;
        |
        |    static assert(isImplicitlyConvertible!(T, string));
-     44|    auto buf = (cast(string) v).representation;
+     42|    auto buf = (cast(string) v).representation;
        |
-     46|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+     44|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     44|    return Value(buf, OidType.Text, false, valueFormat);
+     42|    return Value(buf, OidType.Text, false, valueFormat);
        |}
        |
        |/// Constructs Value from array of bytes

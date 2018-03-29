@@ -22,6 +22,7 @@
        |import std.typecons : Nullable;
        |import std.bitmanip: bigEndianToNative;
        |import std.conv: to;
+       |version (unittest) import std.exception : assertThrown;
        |
        |// Supported PostgreSQL binary types
        |alias PGboolean =       bool; /// boolean
@@ -49,9 +50,9 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    104|    if(v.format == VF.BINARY)
+     97|    if(v.format == VF.BINARY)
        |    {
-    100|        if(!(
+     93|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -64,32 +65,29 @@
        |
        |    static if(is(T == Nullable!R, R))
        |    {
-      4|        alias Ret = R;
+      2|        alias Ret = R;
        |
-      4|        if (v.isNull)
-      3|            return T.init;
+      2|        if (v.isNull)
+      2|            return T.init;
        |    }
        |    else
-     99|        alias Ret = T;
+     94|        alias Ret = T;
        |
-    100|    string r;
+     94|    Ret r;
        |
-    196|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    184|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     77|        r = v.valueAsString;
-       |
-     99|    const Ret ret = cast(Ret) r; // cast because it can be native string or enum : string
+     71|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
-      1|        return T(ret);
+0000000|        return T(r);
        |    else
-     98|        return ret;
+     93|        return r;
        |}
        |
        |@system unittest
        |{
-       |    import std.exception: assertThrown;
        |    import core.exception: AssertError;
        |
       1|    auto v = Value(ValueFormat.BINARY, OidType.Text);
@@ -103,19 +101,25 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     64|    if(!(v.format == VF.BINARY))
-0000000|        throw new AE(ET.NOT_BINARY,
+     62|    if(!(v.format == VF.BINARY))
+      1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-      7|        if (v.isNull)
-      2|            return T.init;
+      5|        if (v.isNull)
+      1|            return T.init;
        |        else
-      5|            return T(binaryValueAs!R(v));
+      4|            return T(binaryValueAs!R(v));
        |    }
        |    else
-     57|        return binaryValueAs!T(v);
+     56|        return binaryValueAs!T(v);
+       |}
+       |
+       |@system unittest
+       |{
+      1|    auto v = Value([1], OidType.Int4, false, ValueFormat.TEXT);
+      2|    assertThrown!AE(v.as!int);
        |}
        |
        |package:
@@ -131,17 +135,23 @@
        |
        |string valueAsString(in Value v) pure
        |{
-     94|    return (cast(const(char[])) v.data).to!string;
+     88|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
        |T binaryValueAs(T)(in Value v)
        |if(is(T : const ubyte[]))
        |{
-      2|    if(!(v.oidType == OidType.ByteArray))
-0000000|        throwTypeComplaint(v.oidType, "immutable ubyte[]", __FILE__, __LINE__);
+      3|    if(!(v.oidType == OidType.ByteArray))
+      1|        throwTypeComplaint(v.oidType, "immutable ubyte[]", __FILE__, __LINE__);
        |
       2|    return v.data;
+       |}
+       |
+       |@system unittest
+       |{
+      1|    auto v = Value([1], OidType.Bool);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!(const ubyte[]));
        |}
        |
        |/// Returns cell value as native integer or decimal values
@@ -152,31 +162,41 @@
        |{
        |    static if(isIntegral!(T))
      30|        if(!isNativeInteger(v.oidType))
-0000000|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
+      1|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
        |
        |    static if(isFloatingPoint!(T))
-      4|        if(!isNativeFloat(v.oidType))
-0000000|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
+      5|        if(!isNativeFloat(v.oidType))
+      1|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
        |
-     34|    if(!(v.data.length == T.sizeof))
-0000000|        throw new AE(ET.SIZE_MISMATCH,
+     33|    if(!(v.data.length == T.sizeof))
+      1|        throw new AE(ET.SIZE_MISMATCH,
        |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
        |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
        |            __FILE__, __LINE__);
        |
-     31|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
-     31|    return bigEndianToNative!(T)(s);
+     29|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     29|    return bigEndianToNative!(T)(s);
+       |}
+       |
+       |@system unittest
+       |{
+      1|    auto v = Value([1], OidType.Bool);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!int);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!float);
+       |
+      1|    v = Value([1], OidType.Int4);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!int);
        |}
        |
        |/// Returns UUID as native UUID value
        |UUID binaryValueAs(T)(in Value v)
        |if( is( T == UUID ) )
        |{
-      2|    if(!(v.oidType == OidType.UUID))
-0000000|        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
+      4|    if(!(v.oidType == OidType.UUID))
+      1|        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
        |
-      2|    if(!(v.data.length == 16))
-0000000|        throw new AE(ET.SIZE_MISMATCH,
+      3|    if(!(v.data.length == 16))
+      1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
        |
       2|    UUID r;
@@ -184,18 +204,36 @@
       2|    return r;
        |}
        |
+       |@system unittest
+       |{
+      1|    auto v = Value([1], OidType.Int4);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!UUID);
+       |
+      1|    v = Value([1], OidType.UUID);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!UUID);
+       |}
+       |
        |/// Returns boolean as native bool value
        |bool binaryValueAs(T : bool)(in Value v)
        |if (!is(T == Nullable!R, R))
        |{
-      9|    if(!(v.oidType == OidType.Bool))
-0000000|        throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
+     11|    if(!(v.oidType == OidType.Bool))
+      1|        throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
        |
-      9|    if(!(v.data.length == 1))
-0000000|        throw new AE(ET.SIZE_MISMATCH,
+     10|    if(!(v.data.length == 1))
+      1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
        |
       9|    return v.data[0] != 0;
+       |}
+       |
+       |@system unittest
+       |{
+      1|    auto v = Value([1], OidType.Int4);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!bool);
+       |
+      1|    v = Value([1,2], OidType.Bool);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!bool);
        |}
        |
        |/// Returns Vibe.d's Json
@@ -204,9 +242,9 @@
        |{
        |    import dpq2.conv.jsonb: jsonbValueToJson;
        |
-      8|    Json res;
+      9|    Json res;
        |
-      8|    switch(v.oidType)
+      9|    switch(v.oidType)
        |    {
       6|        case OidType.Json:
        |            // represent value as text and parse it into Json
@@ -218,10 +256,16 @@
       2|            res = v.jsonbValueToJson;
       2|            break;
        |
-0000000|        default:
-0000000|            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
+      1|        default:
+      1|            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
        |    }
        |
       8|    return res;
        |}
-src/dpq2/conv/to_d_types.d is 83% covered
+       |
+       |@system unittest
+       |{
+      1|    auto v = Value([1], OidType.Int4);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!Json);
+       |}
+src/dpq2/conv/to_d_types.d is 98% covered
