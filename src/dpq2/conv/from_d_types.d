@@ -24,7 +24,7 @@ if (is(T == Nullable!R, R))
     alias Orig = typeof(T.get);
 
     if (v.isNull)
-        return Value(ValueFormat.BINARY, detectOidFromNativeCareAboutEnums!Orig);
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!Orig);
     else
         return toValue(v.get);
 }
@@ -33,22 +33,7 @@ if (is(T == Nullable!R, R))
 Value toValue(T)(T v)
 if(isNumeric!(T))
 {
-    return Value(v.nativeToBigEndian.dup, detectOidFromNativeCareAboutEnums!T, false, ValueFormat.BINARY);
-}
-
-/// Detect Oid. For enums returns its base type.
-private OidType detectOidFromNativeCareAboutEnums(T)()
-{
-    static if (is(T EnType == enum))
-    {
-        alias R = EnType;
-
-        static assert(is(R == int) || is(R == string), "Only int and string enums are supported");
-    }
-    else
-        alias R = T;
-
-    return detectOidTypeFromNative!R;
+    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
 ///

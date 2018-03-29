@@ -123,18 +123,6 @@ public void _integration_test( string connParam ) @system
         foreach(i, s; numericTests)
             C!PGnumeric(s, "numeric", s);
 
-        // enum : int test
-        enum Foo { bar, baz }
-        C!Foo(Foo.baz, "Int4", "1");
-        C!(Nullable!Foo)(Nullable!Foo(Foo.baz), "Int4", "1");
-        C!(Nullable!Foo)((Nullable!Foo).init, "Int4", "NULL");
-
-        // enum : string test
-        enum StringFoo : string { bar = "bar", baz = "baz" }
-        C!StringFoo(StringFoo.baz, "text", "'baz'");
-        C!(Nullable!StringFoo)(Nullable!StringFoo(StringFoo.baz), "text", "'baz'");
-        C!(Nullable!StringFoo)((Nullable!StringFoo).init, "text", "NULL");
-
         // date and time testing
         C!PGdate(Date(2016, 01, 8), "date", "'2016-01-08'");
         {

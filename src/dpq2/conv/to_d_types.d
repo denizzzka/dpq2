@@ -72,19 +72,17 @@ if(is(T : string))
     else
         alias Ret = T;
 
-    string r;
+    Ret r;
 
     if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
         r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
     else
         r = v.valueAsString;
 
-    const Ret ret = cast(Ret) r; // cast because it can be native string or enum : string
-
     static if(is(T == Nullable!R2, R2))
-        return T(ret);
+        return T(r);
     else
-        return ret;
+        return r;
 }
 
 @system unittest
