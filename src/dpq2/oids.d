@@ -92,7 +92,7 @@ private struct AppropriateArrOid
     OidType array;
 }
 
-private immutable AppropriateArrOid[] appropriateArrOid;
+private static immutable AppropriateArrOid[] appropriateArrOid;
 
 shared static this()
 {
@@ -157,28 +157,33 @@ OidType detectOidTypeFromNative(T)()
     import std.datetime.date : StdDate = Date, TimeOfDay;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
+    import std.typecons : Nullable;
     static import dpq2.conv.time;
     import vibe.data.json : VibeJson = Json;
 
-    alias UT = Unqual!T;
-
-    with(OidType)
+    static if (is(T == Nullable!R,R)) return detectOidTypeFromNative!(typeof(T.get)); // special case for Nullable types
+    else
     {
-        static if(is(UT == string)){ return Text; } else
-        static if(is(UT == ubyte[])){ return ByteArray; } else
-        static if(is(UT == bool)){ return Bool; } else
-        static if(is(UT == short)){ return Int2; } else
-        static if(is(UT == int)){ return Int4; } else
-        static if(is(UT == long)){ return Int8; } else
-        static if(is(UT == float)){ return Float4; } else
-        static if(is(UT == double)){ return Float8; } else
-        static if(is(UT == StdDate)){ return Date; } else
-        static if(is(UT == TimeOfDay)){ return Time; } else
-        static if(is(UT == SysTime)){ return TimeStampWithZone; } else
-        static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
-        static if(is(UT == VibeJson)){ return Json; } else
+        alias UT = Unqual!T;
 
-        static assert(false, "Unsupported D type: "~T.stringof);
+        with(OidType)
+        {
+            static if(is(UT == string)){ return Text; } else
+            static if(is(UT == ubyte[])){ return ByteArray; } else
+            static if(is(UT == bool)){ return Bool; } else
+            static if(is(UT == short)){ return Int2; } else
+            static if(is(UT == int)){ return Int4; } else
+            static if(is(UT == long)){ return Int8; } else
+            static if(is(UT == float)){ return Float4; } else
+            static if(is(UT == double)){ return Float8; } else
+            static if(is(UT == StdDate)){ return Date; } else
+            static if(is(UT == TimeOfDay)){ return Time; } else
+            static if(is(UT == SysTime)){ return TimeStampWithZone; } else
+            static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
+            static if(is(UT == VibeJson)){ return Json; } else
+
+            static assert(false, "Unsupported D type: "~T.stringof);
+        }
     }
 }
 
