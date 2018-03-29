@@ -681,7 +681,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 40,
+						"line": 44,
 						"type": "@trusted Value(T v, ValueFormat valueFormat = ValueFormat.BINARY)",
 						"parameters": [
 							{
@@ -694,14 +694,14 @@
 								"default": "ValueFormat.BINARY"
 							}
 						],
-						"endline": 51,
+						"endline": 55,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 40,
-				"comment": "\n",
+				"line": 44,
+				"comment": "    Converts types implicitly convertible to string to PG Value.\n    Note that if string is null it is written as an empty string.\n    If NULL is a desired DB value, Nullable!string can be used instead.\n",
 				"parameters": [
 					{
 						"name": "T",
@@ -717,7 +717,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 54,
+						"line": 58,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -725,13 +725,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 58,
+						"endline": 62,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 54,
+				"line": 58,
 				"comment": "Constructs Value from array of bytes\n",
 				"parameters": [
 					{
@@ -748,7 +748,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 61,
+						"line": 65,
 						"type": "@trusted Value(T v)",
 						"parameters": [
 							{
@@ -756,13 +756,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 67,
+						"endline": 71,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 61,
+				"line": 65,
 				"comment": "\n",
 				"parameters": [
 					{
@@ -780,7 +780,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 70,
+						"line": 74,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -788,13 +788,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 91,
+						"endline": 95,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 70,
+				"line": 74,
 				"comment": "Constructs Value from Date\n",
 				"parameters": [
 					{
@@ -811,7 +811,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 94,
+						"line": 98,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -819,13 +819,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 100,
+						"endline": 104,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 94,
+				"line": 98,
 				"comment": "Constructs Value from TimeOfDay\n",
 				"parameters": [
 					{
@@ -842,7 +842,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 103,
+						"line": 107,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -850,13 +850,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 124,
+						"endline": 128,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 103,
+				"line": 107,
 				"comment": "Constructs Value from TimeStamp or from TimeStampUTC\n",
 				"parameters": [
 					{
@@ -873,7 +873,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 148,
+						"line": 152,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -881,13 +881,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 152,
+						"endline": 156,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 148,
+				"line": 152,
 				"comment": "    Constructs Value from DateTime\n    It uses Timestamp without TZ as a resulting PG type\n",
 				"parameters": [
 					{
@@ -904,7 +904,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 160,
+						"line": 164,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -912,13 +912,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 166,
+						"endline": 170,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 160,
+				"line": 164,
 				"comment": "    Constructs Value from SysTime\n    Note that SysTime has a precision in hnsecs and PG TimeStamp in usecs.\n    It means that PG value will have 10 times lower precision.\n    And as both types are using long for internal storage it also means that PG TimeStamp can store greater range of values than SysTime.\n",
 				"parameters": [
 					{
@@ -935,7 +935,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 169,
+						"line": 173,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -943,13 +943,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 173,
+						"endline": 177,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 169,
+				"line": 173,
 				"comment": "Constructs Value from UUID\n",
 				"parameters": [
 					{
@@ -966,7 +966,7 @@
 					{
 						"endchar": 1,
 						"name": "toValue",
-						"line": 176,
+						"line": 180,
 						"type": "Value(T v)",
 						"parameters": [
 							{
@@ -974,13 +974,13 @@
 								"type": "T"
 							}
 						],
-						"endline": 183,
+						"endline": 187,
 						"char": 7,
 						"kind": "function"
 					}
 				],
 				"name": "toValue",
-				"line": 176,
+				"line": 180,
 				"comment": "Constructs Value from Json\n",
 				"parameters": [
 					{
@@ -2033,7 +2033,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 50,
+						"line": 53,
 						"type": "pure @trusted T(in Value v)",
 						"parameters": [
 							{
@@ -2044,14 +2044,14 @@
 								]
 							}
 						],
-						"endline": 87,
+						"endline": 91,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 50,
-				"comment": "Returns cell value as native string based type from text or binary formatted field\n",
+				"line": 53,
+				"comment": "    Returns cell value as a native string based type from text or binary formatted field.\n    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value\n",
 				"parameters": [
 					{
 						"name": "T",
@@ -2067,7 +2067,7 @@
 					{
 						"endchar": 1,
 						"name": "as",
-						"line": 101,
+						"line": 108,
 						"type": "T(in Value v)",
 						"parameters": [
 							{
@@ -2078,14 +2078,14 @@
 								]
 							}
 						],
-						"endline": 117,
+						"endline": 124,
 						"char": 3,
 						"kind": "function"
 					}
 				],
 				"name": "as",
-				"line": 101,
-				"comment": "Returns value as D type value from binary formatted field\n",
+				"line": 108,
+				"comment": "    Returns value as D type value from binary formatted field.\n    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value\n",
 				"parameters": [
 					{
 						"name": "T",

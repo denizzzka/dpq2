@@ -160,11 +160,11 @@
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
        |
-     50|    alias UT = Unqual!T;
+     51|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
-      1|        static if(is(UT == string)){ return Text; } else
+      2|        static if(is(UT == string)){ return Text; } else
       2|        static if(is(UT == ubyte[])){ return ByteArray; } else
      11|        static if(is(UT == bool)){ return Bool; } else
       2|        static if(is(UT == short)){ return Int2; } else

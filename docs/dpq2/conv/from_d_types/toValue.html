@@ -211,7 +211,10 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="2">Function toValue</h2><p></p>
+				<h2 id="2">Function toValue</h2><p>Converts types implicitly convertible to string to PG Value.
+    Note that if string is null it is written as an empty string.
+    If NULL is a desired DB value, Nullable!string can be used instead.
+</p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
