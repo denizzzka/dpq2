@@ -54,7 +54,7 @@ private OidType detectOidFromNativeCareAboutEnums(T)()
 /**
     Converts types implicitly convertible to string to PG Value.
     Note that if string is null it is written as an empty string.
-    If NULL is a desired DB value, Nullable!string must be used instead.
+    If NULL is a desired DB value, Nullable!string can be used instead.
 */
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T : string))
