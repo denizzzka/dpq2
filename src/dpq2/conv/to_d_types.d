@@ -22,6 +22,7 @@ import std.traits: isScalarType;
 import std.typecons : Nullable;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
+version (unittest) import std.exception : assertThrown;
 
 // Supported PostgreSQL binary types
 alias PGboolean =       bool; /// boolean
@@ -87,7 +88,6 @@ if(is(T : string))
 
 @system unittest
 {
-    import std.exception: assertThrown;
     import core.exception: AssertError;
 
     auto v = Value(ValueFormat.BINARY, OidType.Text);
@@ -116,6 +116,12 @@ if(!is(T : string) && !is(T == Bson))
         return binaryValueAs!T(v);
 }
 
+@system unittest
+{
+    auto v = Value([1], OidType.Int4, false, ValueFormat.TEXT);
+    assertThrown!AE(v.as!int);
+}
+
 package:
 
 /*
@@ -142,6 +148,12 @@ if(is(T : const ubyte[]))
     return v.data;
 }
 
+@system unittest
+{
+    auto v = Value([1], OidType.Bool);
+    assertThrown!ValueConvException(v.binaryValueAs!(const ubyte[]));
+}
+
 /// Returns cell value as native integer or decimal values
 ///
 /// Postgres type "numeric" is oversized and not supported by now
@@ -166,6 +178,16 @@ if( isNumeric!(T) )
     return bigEndianToNative!(T)(s);
 }
 
+@system unittest
+{
+    auto v = Value([1], OidType.Bool);
+    assertThrown!ValueConvException(v.binaryValueAs!int);
+    assertThrown!ValueConvException(v.binaryValueAs!float);
+
+    v = Value([1], OidType.Int4);
+    assertThrown!ValueConvException(v.binaryValueAs!int);
+}
+
 /// Returns UUID as native UUID value
 UUID binaryValueAs(T)(in Value v)
 if( is( T == UUID ) )
@@ -182,6 +204,15 @@ if( is( T == UUID ) )
     return r;
 }
 
+@system unittest
+{
+    auto v = Value([1], OidType.Int4);
+    assertThrown!ValueConvException(v.binaryValueAs!UUID);
+
+    v = Value([1], OidType.UUID);
+    assertThrown!ValueConvException(v.binaryValueAs!UUID);
+}
+
 /// Returns boolean as native bool value
 bool binaryValueAs(T : bool)(in Value v)
 if (!is(T == Nullable!R, R))
@@ -194,6 +225,15 @@ if (!is(T == Nullable!R, R))
             "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
 
     return v.data[0] != 0;
+}
+
+@system unittest
+{
+    auto v = Value([1], OidType.Int4);
+    assertThrown!ValueConvException(v.binaryValueAs!bool);
+
+    v = Value([1,2], OidType.Bool);
+    assertThrown!ValueConvException(v.binaryValueAs!bool);
 }
 
 /// Returns Vibe.d's Json
@@ -221,4 +261,10 @@ if( is( T == Json ) )
     }
 
     return res;
+}
+
+@system unittest
+{
+    auto v = Value([1], OidType.Int4);
+    assertThrown!ValueConvException(v.binaryValueAs!Json);
 }
