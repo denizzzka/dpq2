@@ -12,7 +12,7 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
-import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, TemplateArgsOf, Unqual;
+import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, Unqual;
 import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
@@ -51,7 +51,11 @@ private OidType detectOidFromNativeCareAboutEnums(T)()
     return detectOidTypeFromNative!R;
 }
 
-///
+/**
+    Converts types implicitly convertible to string to PG Value.
+    Note that if string is null it is written as an empty string.
+    If NULL is a desired DB value, Nullable!string must be used instead.
+*/
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
 if(is(T : string))
 {
@@ -222,6 +226,29 @@ unittest
 
     assert(v.oidType == OidType.Text);
     assert(v.as!string == "Test string");
+}
+
+// string Null values
+@system unittest
+{
+    {
+        import core.exception: AssertError;
+        import std.exception: assertThrown;
+
+        auto v = Nullable!string.init.toValue;
+        assert(v.oidType == OidType.Text);
+        assert(v.isNull);
+
+        assertThrown!AssertError(v.as!string);
+        assert(v.as!(Nullable!string).isNull);
+    }
+
+    {
+        string s;
+        auto v = s.toValue;
+        assert(v.oidType == OidType.Text);
+        assert(!v.isNull);
+    }
 }
 
 unittest
