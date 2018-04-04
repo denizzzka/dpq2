@@ -31,19 +31,19 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    345|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    403|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
-    345|        this._data = data;
-    345|        this._format = format;
-    345|        this._oidType = oidType;
-    345|        this._isNull = isNull;
+    403|        this._data = data;
+    403|        this._format = format;
+    403|        this._oidType = oidType;
+    403|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
-      8|    this(in ValueFormat format, in OidType oidType) pure
+      9|    this(in ValueFormat format, in OidType oidType) pure
        |    {
-      8|        this._format = format;
-      8|        this._oidType = oidType;
+      9|        this._format = format;
+      9|        this._oidType = oidType;
        |    }
        |
        |    @safe const pure nothrow @nogc
@@ -51,26 +51,26 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-    938|            return _isNull;
+   1078|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
        |        bool isArray()
        |        {
-     69|            return dpq2.oids.isSupportedArray(oidType);
+     83|            return dpq2.oids.isSupportedArray(oidType);
        |        }
        |        alias isSupportedArray = isArray; //TODO: deprecate
        |
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    613|            return _oidType;
+    669|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    388|            return _format;
+    431|            return _format;
        |        }
        |    }
        |
@@ -84,9 +84,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    717|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    815|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    707|        return _data;
+    805|        return _data;
        |    }
        |
        |    ///

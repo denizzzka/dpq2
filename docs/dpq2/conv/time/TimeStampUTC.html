@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<ul class="tree-view">
 					<li>
 						<div class="module ">
+							<a href="../../../dpq2/conv/arrays.html">arrays</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../../dpq2/conv/from_bson.html">from_bson</a>
 						</div>
 					</li>
@@ -125,7 +130,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				
+				<section><h2>Example</h2>
+<p>Oid tests
+</p>
+<pre class="code"><code class="lang-d"><span class="kwd">assert</span><span class="pun">(</span><span class="pln">detectOidTypeFromNative</span><span class="pun">!<a href="../../../dpq2/conv/time/TimeStamp.html"></span><span class="typ">TimeStamp</span></a><span class="pln"> </span><span class="pun">== </span><span class="typ">OidType<wbr/></span><span class="pun">.</span><span class="typ">TimeStamp</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">detectOidTypeFromNative</span><span class="pun">!</span><span class="typ">TimeStampUTC </span><span class="pun">== </span><span class="typ">OidType<wbr/></span><span class="pun">.</span><span class="typ">TimeStampWithZone</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">detectOidTypeFromNative</span><span class="pun">!</span><span class="typ">SysTime </span><span class="pun">== </span><span class="typ">OidType<wbr/></span><span class="pun">.</span><span class="typ">TimeStampWithZone</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">detectOidTypeFromNative</span><span class="pun">!</span><span class="typ">Date </span><span class="pun">== </span><span class="typ">OidType<wbr/></span><span class="pun">.</span><span class="typ">Date</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">detectOidTypeFromNative</span><span class="pun">!</span><span class="typ">TimeOfDay </span><span class="pun">== </span><span class="typ">OidType<wbr/></span><span class="pun">.</span><span class="typ">Time</span><span class="pun">);
+</span></code></pre>
+</section>
+
 			</div>
 			<footer>
 				<div id="license-info">

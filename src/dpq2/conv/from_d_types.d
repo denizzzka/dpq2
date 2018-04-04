@@ -3,7 +3,8 @@ module dpq2.conv.from_d_types;
 
 @safe:
 
-import dpq2.conv.geometric : toValue;
+public import dpq2.conv.arrays : toValue;
+public import dpq2.conv.geometric : toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, OidType;
 import dpq2.value : Value, ValueFormat;
@@ -21,10 +22,8 @@ import vibe.data.json: Json;
 Value toValue(T)(T v)
 if (is(T == Nullable!R, R))
 {
-    alias Orig = typeof(T.get);
-
     if (v.isNull)
-        return Value(ValueFormat.BINARY, detectOidTypeFromNative!Orig);
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
     else
         return toValue(v.get);
 }

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Function isNativeInteger</title>
+		<title>Module dpq2.conv.arrays</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -27,12 +27,12 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dpq2.html">dpq2</a>
 						</div>
 				<ul class="tree-view">
-					<li class="tree-view collapsed">
+					<li class="tree-view ">
 						<div class="package ">conv
 						</div>
 				<ul class="tree-view">
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dpq2/conv/arrays.html">arrays</a>
 						</div>
 					</li>
@@ -89,7 +89,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dpq2/oids.html">oids</a>
 						</div>
 					</li>
@@ -119,31 +119,32 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function isNativeInteger</h1><p>Checks if Oid type can be mapped to native D integer
+				<h1>Module dpq2.conv.arrays</h1><p>Module to handle PostgreSQL array types
 </p>
-				<div class="prototype">
-					<code class="lang-d">
-						<div class="single-prototype">
-				<span class="typ">bool</span> <span class="pln">isNativeInteger</span>
-				<span class="pun">(</span>
-				<br/>
-				&nbsp;&nbsp;<a href="../../dpq2/oids/OidType.html"><span class="typ">OidType</span></a> <span class="pln">t</span>
-				<br/>
-				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure @safe</span><span class="pun">;</span>
-						</div>
-					</code>
-				</div>
-				
-				
+				<section></section>
+				<section>
+					<h2>Functions</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="toValue" class="public" href="../../dpq2/conv/arrays/toValue.html">toValue</a><span class="decoration">(v)</span>
+								</code>
+							</td>
+							<td>Converts dynamic or static array of supported types to the coresponding PG array type value
+</td>
+						</tr>
+					</table>
+				</section>
 			</div>
 			<footer>
 				<div id="license-info">
-					<p>NCrashed <ncrashed@gmail.com>
-</p>
-
-					<p>© 2014 DSoftOut
-</p>
-
+					
+					
 					
 				</div>
 			</footer>

@@ -314,6 +314,16 @@
       2|    assertThrown!ValueConvException(l.dateTime.hour == 14);
        |}
        |
+       |/// Oid tests
+       |unittest
+       |{
+      1|    assert(detectOidTypeFromNative!TimeStamp == OidType.TimeStamp);
+      1|    assert(detectOidTypeFromNative!TimeStampUTC == OidType.TimeStampWithZone);
+      1|    assert(detectOidTypeFromNative!SysTime == OidType.TimeStampWithZone);
+      1|    assert(detectOidTypeFromNative!Date == OidType.Date);
+      1|    assert(detectOidTypeFromNative!TimeOfDay == OidType.Time);
+       |}
+       |
        |package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
        |package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
        |static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
@@ -483,4 +493,4 @@
       9|    sec = cast(int)(time / USECS_PER_SEC);
       9|    fsec = cast(int)(time - sec*USECS_PER_SEC);
        |}
-src/dpq2/conv/time.d is 90% covered
+src/dpq2/conv/time.d is 91% covered

@@ -3,7 +3,8 @@
        |
        |@safe:
        |
-       |import dpq2.conv.geometric : toValue;
+       |public import dpq2.conv.arrays : toValue;
+       |public import dpq2.conv.geometric : toValue;
        |import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
        |import dpq2.oids : detectOidTypeFromNative, OidType;
        |import dpq2.value : Value, ValueFormat;
@@ -21,19 +22,17 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R))
        |{
-      9|    alias Orig = typeof(T.get);
-       |
-      9|    if (v.isNull)
-      4|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!Orig);
+     12|    if (v.isNull)
+      5|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
        |    else
-      5|        return toValue(v.get);
+      7|        return toValue(v.get);
        |}
        |
        |///
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-     36|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+     52|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/**
@@ -47,11 +46,11 @@
        |    import std.string : representation;
        |
        |    static assert(isImplicitlyConvertible!(T, string));
-     43|    auto buf = (cast(string) v).representation;
+     54|    auto buf = (cast(string) v).representation;
        |
-     45|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+     56|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     43|    return Value(buf, OidType.Text, false, valueFormat);
+     54|    return Value(buf, OidType.Text, false, valueFormat);
        |}
        |
        |/// Constructs Value from array of bytes

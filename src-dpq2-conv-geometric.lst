@@ -26,12 +26,25 @@
        |{
        |    static if(__traits(compiles, typeof(T.x)) && __traits(compiles, typeof(T.y)))
        |    {
-       |        return
+      2|        return
        |            is(GetRvalueOfMember!(T, "x") == double) &&
        |            is(GetRvalueOfMember!(T, "y") == double);
        |    }
        |    else
-       |        return false;
+      1|        return false;
+       |}
+       |
+       |unittest
+       |{
+       |    {
+      1|        struct PT {double x; double y;}
+      1|        assert(isValidPointType!PT);
+       |    }
+       |
+       |    {
+      1|        struct InvalidPT {double x;}
+      1|        assert(!isValidPointType!InvalidPT);
+       |    }
        |}
        |
        |/// Checks that type have "min" and "max" members of suitable returning type of point
@@ -63,7 +76,14 @@
        |///
        |bool isValidPolygon(T)()
        |{
-       |    return isArray!T && isValidPointType!(ElementType!T);
+      2|    return isArray!T && isValidPointType!(ElementType!T);
+       |}
+       |
+       |unittest
+       |{
+      1|    struct PT {double x; double y;}
+      1|    assert(isValidPolygon!(PT[]));
+      1|    assert(!isValidPolygon!(PT));
        |}
        |
        |private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)

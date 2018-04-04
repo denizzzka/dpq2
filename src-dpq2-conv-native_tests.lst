@@ -1,12 +1,13 @@
        |module dpq2.conv.native_tests;
        |
        |import dpq2;
-       |import std.typecons: Nullable;
-       |import std.datetime;
-       |import vibe.data.json: Json, parseJsonString;
-       |import vibe.data.bson: Bson;
-       |import std.uuid: UUID;
+       |import dpq2.conv.arrays : isArrayType;
        |import dpq2.conv.geometric: Line;
+       |import std.datetime;
+       |import std.typecons: Nullable;
+       |import std.uuid: UUID;
+       |import vibe.data.bson: Bson, deserializeBson;
+       |import vibe.data.json: Json, parseJsonString;
        |
        |version (integration_tests)
        |public void _integration_test( string connParam ) @system
@@ -28,30 +29,31 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    120|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     60|            params.args = null;
-     60|            auto answer = conn.execParams(params);
-     60|            immutable Value v = answer[0][0];
-     60|            auto result = v.as!T;
+    124|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     62|            params.args = null;
+     62|            auto answer = conn.execParams(params);
+     62|            immutable Value v = answer[0][0];
+      2|            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
+     60|            else auto result = v.as!T;
        |
-     65|            assert(result == nativeValue,
+     67|            assert(result == nativeValue,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
        |
        |            {
        |                // test binary to text conversion
-     59|                params.sqlCommand = "SELECT $1::text";
-     59|                params.args = [nativeValue.toValue];
+     61|                params.sqlCommand = "SELECT $1::text";
+     61|                params.args = [nativeValue.toValue];
        |
-     59|                auto answer2 = conn.execParams(params);
-     59|                auto v2 = answer2[0][0];
+     61|                auto answer2 = conn.execParams(params);
+     61|                auto v2 = answer2[0][0];
        |
-     59|                string textResult = v2.isNull
+     61|                string textResult = v2.isNull
       2|                    ? "NULL"
-     57|                    : v2.as!string.strip(' ');
+     59|                    : v2.as!string.strip(' ');
        |
-     59|                pgValue = pgValue.strip('\'');
+     61|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -64,7 +66,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     59|                assert(textResult == pgValue,
+     61|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -156,7 +158,7 @@
        |            `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
        |
        |        // Geometric
-       |        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
+       |        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
        |        mixin GeometricInstancesForIntegrationTest;
        |
       1|        C!Point(Point(1,2), "point", "'(1,2)'");
@@ -167,6 +169,11 @@
       1|        C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
       1|        C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
       1|        C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+       |
+       |        //Arrays
+      1|        C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
+       |        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //doesn't work due to call of Null.get on value comparisons
+      1|        C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
        |    }
        |}
 src/dpq2/conv/native_tests.d is 100% covered

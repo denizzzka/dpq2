@@ -53,9 +53,9 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-     99|    if(v.format == VF.BINARY)
+    109|    if(v.format == VF.BINARY)
        |    {
-     95|        if(!(
+    105|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -75,19 +75,19 @@
       3|            return T.init;
        |    }
        |    else
-     95|        alias Ret = T;
+    105|        alias Ret = T;
        |
-     95|    Ret r;
+    105|    Ret r;
        |
-    186|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    206|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     72|        r = v.valueAsString;
+     82|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
 0000000|        return T(r);
        |    else
-     93|        return r;
+    103|        return r;
        |}
        |
        |@system unittest
@@ -108,7 +108,7 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     62|    if(!(v.format == VF.BINARY))
+     66|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
@@ -120,7 +120,7 @@
       4|            return T(binaryValueAs!R(v));
        |    }
        |    else
-     56|        return binaryValueAs!T(v);
+     60|        return binaryValueAs!T(v);
        |}
        |
        |@system unittest
@@ -137,12 +137,12 @@
        | */
        |auto tunnelForBinaryValueAsCalls(T)(in Value v)
        |{
-     21|    return binaryValueAs!T(v);
+     25|    return binaryValueAs!T(v);
        |}
        |
        |string valueAsString(in Value v) pure
        |{
-     89|    return (cast(const(char[])) v.data).to!string;
+    102|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -168,21 +168,21 @@
        |if( isNumeric!(T) )
        |{
        |    static if(isIntegral!(T))
-     30|        if(!isNativeInteger(v.oidType))
+     38|        if(!isNativeInteger(v.oidType))
       1|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
        |
        |    static if(isFloatingPoint!(T))
       5|        if(!isNativeFloat(v.oidType))
       1|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
        |
-     33|    if(!(v.data.length == T.sizeof))
+     41|    if(!(v.data.length == T.sizeof))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
        |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
        |            __FILE__, __LINE__);
        |
-     29|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
-     29|    return bigEndianToNative!(T)(s);
+     37|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     37|    return bigEndianToNative!(T)(s);
        |}
        |
        |@system unittest
