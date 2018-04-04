@@ -92,7 +92,7 @@ private struct AppropriateArrOid
     OidType array;
 }
 
-private immutable AppropriateArrOid[] appropriateArrOid;
+private static immutable AppropriateArrOid[] appropriateArrOid;
 
 shared static this()
 {
@@ -154,6 +154,16 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
 
 OidType detectOidTypeFromNative(T)()
 {
+    import std.typecons : Nullable;
+
+    static if(is(T == Nullable!R,R))
+        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
+    else
+        return detectOidTypeNotCareAboutNullable!T;
+}
+
+private OidType detectOidTypeNotCareAboutNullable(T)()
+{
     import std.datetime.date : StdDate = Date, TimeOfDay;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
@@ -176,6 +186,7 @@ OidType detectOidTypeFromNative(T)()
         static if(is(UT == TimeOfDay)){ return Time; } else
         static if(is(UT == SysTime)){ return TimeStampWithZone; } else
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
+        static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
         static if(is(UT == VibeJson)){ return Json; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);

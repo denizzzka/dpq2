@@ -34,6 +34,19 @@ bool isValidPointType(T)()
         return false;
 }
 
+unittest
+{
+    {
+        struct PT {double x; double y;}
+        assert(isValidPointType!PT);
+    }
+
+    {
+        struct InvalidPT {double x;}
+        assert(!isValidPointType!InvalidPT);
+    }
+}
+
 /// Checks that type have "min" and "max" members of suitable returning type of point
 bool isValidBoxType(T)()
 {
@@ -64,6 +77,13 @@ bool isValidLineSegmentType(T)()
 bool isValidPolygon(T)()
 {
     return isArray!T && isValidPointType!(ElementType!T);
+}
+
+unittest
+{
+    struct PT {double x; double y;}
+    assert(isValidPolygon!(PT[]));
+    assert(!isValidPolygon!(PT));
 }
 
 private auto serializePoint(Vec2Ddouble, T)(Vec2Ddouble point, T target)

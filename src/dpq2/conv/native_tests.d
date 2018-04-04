@@ -1,12 +1,13 @@
 module dpq2.conv.native_tests;
 
 import dpq2;
-import std.typecons: Nullable;
-import std.datetime;
-import vibe.data.json: Json, parseJsonString;
-import vibe.data.bson: Bson;
-import std.uuid: UUID;
+import dpq2.conv.arrays : isArrayType;
 import dpq2.conv.geometric: Line;
+import std.datetime;
+import std.typecons: Nullable;
+import std.uuid: UUID;
+import vibe.data.bson: Bson, deserializeBson;
+import vibe.data.json: Json, parseJsonString;
 
 version (integration_tests)
 public void _integration_test( string connParam ) @system
@@ -32,7 +33,8 @@ public void _integration_test( string connParam ) @system
             params.args = null;
             auto answer = conn.execParams(params);
             immutable Value v = answer[0][0];
-            auto result = v.as!T;
+            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
+            else auto result = v.as!T;
 
             assert(result == nativeValue,
                 format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
@@ -156,7 +158,7 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest, toValue;
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
         mixin GeometricInstancesForIntegrationTest;
 
         C!Point(Point(1,2), "point", "'(1,2)'");
@@ -167,5 +169,10 @@ public void _integration_test( string connParam ) @system
         C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
         C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
         C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+
+        //Arrays
+        C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
+        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //doesn't work due to call of Null.get on value comparisons
+        C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
     }
 }

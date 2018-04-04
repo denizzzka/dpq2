@@ -314,6 +314,16 @@ unittest
     assertThrown!ValueConvException(l.dateTime.hour == 14);
 }
 
+/// Oid tests
+unittest
+{
+    assert(detectOidTypeFromNative!TimeStamp == OidType.TimeStamp);
+    assert(detectOidTypeFromNative!TimeStampUTC == OidType.TimeStampWithZone);
+    assert(detectOidTypeFromNative!SysTime == OidType.TimeStampWithZone);
+    assert(detectOidTypeFromNative!Date == OidType.Date);
+    assert(detectOidTypeFromNative!TimeOfDay == OidType.Time);
+}
+
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
 static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
