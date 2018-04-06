@@ -153,6 +153,13 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
             break;
 
+        case TimeStampWithZone:
+            auto ts = v.tunnelForBinaryValueAsCalls!SysTime;
+            auto time = BsonDate(tz is null ? ts.toLocalTime : ts.toOtherTZ(tz));
+            long usecs = ts.fracSecs.total!"usecs";
+            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
+            break;
+
         case Json:
         case Jsonb:
             vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
@@ -162,7 +169,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
         default:
             throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Value to Bson converter",
+                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") isn't supported by Value to Bson converter",
                     __FILE__, __LINE__
                 );
     }
