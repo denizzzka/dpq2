@@ -112,7 +112,8 @@ shared static this()
             A(Date, DateArray),
             A(Time, TimeArray),
             A(TimeStampWithZone, TimeStampWithZoneArray),
-            A(TimeStamp, TimeStampArray)
+            A(TimeStamp, TimeStampArray),
+            A(Json, JsonArray)
         ];
 
         appropriateArrOid = a;
@@ -284,8 +285,8 @@ public enum OidType : Oid
 
     // Arrays
     XmlArray = 143, ///
-    JsonArray = 3807, ///
-    JsonbArray = 199, ///
+    JsonbArray = 3807, ///
+    JsonArray = 199, ///
     BoolArray = 1000, ///
     ByteArrayArray = 1001, ///
     CharArray = 1002, ///
