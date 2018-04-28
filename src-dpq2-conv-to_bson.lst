@@ -16,16 +16,16 @@
        |Bson as(T)(in Value v, immutable TimeZone tz = null)
        |if(is(T == Bson))
        |{
-     50|    if(v.isNull)
+     52|    if(v.isNull)
        |    {
       2|        return Bson(null);
        |    }
        |    else
        |    {
-     55|        if(v.isSupportedArray && ValueFormat.BINARY)
-      7|            return arrayValueToBson(v, tz);
+     58|        if(v.isSupportedArray && ValueFormat.BINARY)
+      8|            return arrayValueToBson(v, tz);
        |        else
-     41|            return rawValueToBson(v, tz);
+     42|            return rawValueToBson(v, tz);
        |    }
        |}
        |
@@ -33,58 +33,58 @@
        |
        |Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
        |{
-      7|    const ap = ArrayProperties(cell);
+      8|    const ap = ArrayProperties(cell);
        |
        |    // empty array
-      8|    if(ap.dimsSize.length == 0) return Bson.emptyArray;
+      9|    if(ap.dimsSize.length == 0) return Bson.emptyArray;
        |
-      6|    size_t curr_offset = ap.dataOffset;
+      7|    size_t curr_offset = ap.dataOffset;
        |
-      6|    Bson recursive(size_t dimNum)
+      7|    Bson recursive(size_t dimNum)
        |    {
-     20|        const dimSize = ap.dimsSize[dimNum];
-     20|        Bson[] res = new Bson[dimSize];
+     21|        const dimSize = ap.dimsSize[dimNum];
+     21|        Bson[] res = new Bson[dimSize];
        |
-    192|        foreach(elemNum; 0..dimSize)
+    198|        foreach(elemNum; 0..dimSize)
        |        {
-     44|            if(dimNum < ap.dimsSize.length - 1)
+     45|            if(dimNum < ap.dimsSize.length - 1)
        |            {
      14|                res[elemNum] = recursive(dimNum + 1);
        |            }
        |            else
        |            {
-     30|                ubyte[int.sizeof] size_net; // network byte order
-     30|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
-     30|                uint size = bigEndianToNative!uint( size_net );
+     31|                ubyte[int.sizeof] size_net; // network byte order
+     31|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
+     31|                uint size = bigEndianToNative!uint( size_net );
        |
-     30|                curr_offset += size_net.sizeof;
+     31|                curr_offset += size_net.sizeof;
        |
-     30|                Bson b;
-     30|                if(size == size.max) // NULL magic number
+     31|                Bson b;
+     31|                if(size == size.max) // NULL magic number
        |                {
       7|                    b = Bson(null);
       7|                    size = 0;
        |                }
        |                else
        |                {
-     23|                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
-     23|                    b = v.as!Bson(tz);
+     24|                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
+     24|                    b = v.as!Bson(tz);
        |                }
        |
-     30|                curr_offset += size;
-     30|                res[elemNum] = b;
+     31|                curr_offset += size;
+     31|                res[elemNum] = b;
        |            }
        |        }
        |
-     20|        return Bson(res);
+     21|        return Bson(res);
        |    }
        |
-      6|    return recursive(0);
+      7|    return recursive(0);
        |}
        |
        |Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
        |{
-     41|    if(v.format == ValueFormat.TEXT)
+     42|    if(v.format == ValueFormat.TEXT)
        |    {
       4|        const text = v.valueAsString;
        |
@@ -96,11 +96,11 @@
       2|        return Bson(text);
        |    }
        |
-     37|    Bson res;
+     38|    Bson res;
        |
        |    with(OidType)
        |    with(Bson.Type)
-     37|    switch(v.oidType)
+     38|    switch(v.oidType)
        |    {
       2|        case OidType.Bool:
       2|            bool n = v.tunnelForBinaryValueAsCalls!PGboolean;
@@ -153,11 +153,11 @@
       1|            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
       1|            break;
        |
-      1|        case Json:
-      2|        case Jsonb:
-      2|            vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
-      2|            res = Bson(json);
-      2|            break;
+      2|        case Json:
+      3|        case Jsonb:
+      3|            vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
+      3|            res = Bson(json);
+      3|            break;
        |
 0000000|        default:
 0000000|            throw new ValueConvException(
@@ -167,7 +167,7 @@
        |                );
        |    }
        |
-     37|    return res;
+     38|    return res;
        |}
        |
        |version (integration_tests)

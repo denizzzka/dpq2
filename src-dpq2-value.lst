@@ -31,12 +31,12 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    403|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    408|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
-    403|        this._data = data;
-    403|        this._format = format;
-    403|        this._oidType = oidType;
-    403|        this._isNull = isNull;
+    408|        this._data = data;
+    408|        this._format = format;
+    408|        this._oidType = oidType;
+    408|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
@@ -51,32 +51,32 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1078|            return _isNull;
+   1091|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
        |        bool isArray()
        |        {
-     83|            return dpq2.oids.isSupportedArray(oidType);
+     85|            return dpq2.oids.isSupportedArray(oidType);
        |        }
        |        alias isSupportedArray = isArray; //TODO: deprecate
        |
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    669|            return _oidType;
+    676|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    431|            return _format;
+    435|            return _format;
        |        }
        |    }
        |
        |    package void oidType(OidType type) @safe pure nothrow @nogc
        |    {
-     12|        _oidType = type;
+     13|        _oidType = type;
        |    }
        |
        |    immutable(ubyte)[] data() pure const
@@ -84,9 +84,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    815|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    823|        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    805|        return _data;
+    813|        return _data;
        |    }
        |
        |    ///

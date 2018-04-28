@@ -53,9 +53,9 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    109|    if(v.format == VF.BINARY)
+    110|    if(v.format == VF.BINARY)
        |    {
-    105|        if(!(
+    106|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -75,19 +75,19 @@
       3|            return T.init;
        |    }
        |    else
-    105|        alias Ret = T;
+    106|        alias Ret = T;
        |
-    105|    Ret r;
+    106|    Ret r;
        |
-    206|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    208|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     82|        r = v.valueAsString;
+     83|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
 0000000|        return T(r);
        |    else
-    103|        return r;
+    104|        return r;
        |}
        |
        |@system unittest
@@ -137,12 +137,12 @@
        | */
        |auto tunnelForBinaryValueAsCalls(T)(in Value v)
        |{
-     25|    return binaryValueAs!T(v);
+     26|    return binaryValueAs!T(v);
        |}
        |
        |string valueAsString(in Value v) pure
        |{
-    102|    return (cast(const(char[])) v.data).to!string;
+    104|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -249,15 +249,15 @@
        |{
        |    import dpq2.conv.jsonb: jsonbValueToJson;
        |
-      9|    Json res;
+     10|    Json res;
        |
-      9|    switch(v.oidType)
+     10|    switch(v.oidType)
        |    {
-      6|        case OidType.Json:
+      7|        case OidType.Json:
        |            // represent value as text and parse it into Json
-      6|            string t = v.valueAsString;
-      6|            res = parseJsonString(t);
-      6|            break;
+      7|            string t = v.valueAsString;
+      7|            res = parseJsonString(t);
+      7|            break;
        |
       2|        case OidType.Jsonb:
       2|            res = v.jsonbValueToJson;
@@ -267,7 +267,7 @@
       1|            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
        |    }
        |
-      8|    return res;
+      9|    return res;
        |}
        |
        |@system unittest

@@ -46,11 +46,11 @@
        |    import std.string : representation;
        |
        |    static assert(isImplicitlyConvertible!(T, string));
-     54|    auto buf = (cast(string) v).representation;
+     55|    auto buf = (cast(string) v).representation;
        |
-     56|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+     57|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     54|    return Value(buf, OidType.Text, false, valueFormat);
+     55|    return Value(buf, OidType.Text, false, valueFormat);
        |}
        |
        |/// Constructs Value from array of bytes
@@ -179,10 +179,10 @@
        |Value toValue(T)(T v)
        |if (is(Unqual!T == Json))
        |{
-      5|    auto r = toValue(v.toString);
-      5|    r.oidType = OidType.Json;
+      6|    auto r = toValue(v.toString);
+      6|    r.oidType = OidType.Json;
        |
-      5|    return r;
+      6|    return r;
        |}
        |
        |version(unittest)

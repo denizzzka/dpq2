@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    210|    return cast(OidType)(oid);
+    213|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -24,12 +24,12 @@
        | */
        |OidType oidConvTo(string s)(OidType type)
        |{
-     94|    foreach(ref a; appropriateArrOid)
+    131|    foreach(ref a; appropriateArrOid)
        |    {
        |        static if(s == "array")
        |        {
-     28|            if(a.value == type)
-     10|                return a.array;
+     40|            if(a.value == type)
+     11|                return a.array;
        |        }
        |        else
        |        static if(s == "element")
@@ -112,7 +112,8 @@
        |            A(Date, DateArray),
        |            A(Time, TimeArray),
        |            A(TimeStampWithZone, TimeStampWithZoneArray),
-       |            A(TimeStamp, TimeStampArray)
+       |            A(TimeStamp, TimeStampArray),
+       |            A(Json, JsonArray)
        |        ];
        |
       1|        appropriateArrOid = a;
@@ -124,7 +125,7 @@
        |bool isSupportedArray(OidType t) pure nothrow @nogc
        |{
        |    with(OidType)
-     85|    switch(t)
+     87|    switch(t)
        |    {
 0000000|        case BoolArray:
 0000000|        case ByteArrayArray:
@@ -142,14 +143,14 @@
      28|        case TimeWithZoneArray:
      28|        case NumericArray:
      28|        case UUIDArray:
-     28|        case JsonArray:
-     28|        case JsonbArray:
-     28|            return true;
-     57|        default:
-     57|            break;
+     29|        case JsonArray:
+     29|        case JsonbArray:
+     29|            return true;
+     58|        default:
+     58|            break;
        |    }
        |
-     57|    return false;
+     58|    return false;
        |}
        |
        |OidType detectOidTypeFromNative(T)()
@@ -284,8 +285,8 @@
        |
        |    // Arrays
        |    XmlArray = 143, ///
-       |    JsonArray = 3807, ///
-       |    JsonbArray = 199, ///
+       |    JsonbArray = 3807, ///
+       |    JsonArray = 199, ///
        |    BoolArray = 1000, ///
        |    ByteArrayArray = 1001, ///
        |    CharArray = 1002, ///

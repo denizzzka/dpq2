@@ -29,31 +29,31 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    124|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     62|            params.args = null;
-     62|            auto answer = conn.execParams(params);
-     62|            immutable Value v = answer[0][0];
-      2|            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
+    126|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     63|            params.args = null;
+     63|            auto answer = conn.execParams(params);
+     63|            immutable Value v = answer[0][0];
+      3|            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
      60|            else auto result = v.as!T;
        |
-     67|            assert(result == nativeValue,
+     68|            assert(result == nativeValue,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
        |
        |            {
        |                // test binary to text conversion
-     61|                params.sqlCommand = "SELECT $1::text";
-     61|                params.args = [nativeValue.toValue];
+     62|                params.sqlCommand = "SELECT $1::text";
+     62|                params.args = [nativeValue.toValue];
        |
-     61|                auto answer2 = conn.execParams(params);
-     61|                auto v2 = answer2[0][0];
+     62|                auto answer2 = conn.execParams(params);
+     62|                auto v2 = answer2[0][0];
        |
-     61|                string textResult = v2.isNull
+     62|                string textResult = v2.isNull
       2|                    ? "NULL"
-     59|                    : v2.as!string.strip(' ');
+     60|                    : v2.as!string.strip(' ');
        |
-     61|                pgValue = pgValue.strip('\'');
+     62|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -66,7 +66,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     61|                assert(textResult == pgValue,
+     62|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -174,6 +174,7 @@
       1|        C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
        |        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //doesn't work due to call of Null.get on value comparisons
       1|        C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
+      1|        C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
        |    }
        |}
 src/dpq2/conv/native_tests.d is 100% covered

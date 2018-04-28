@@ -119,15 +119,15 @@
        |
        |                ref inout(T) getDataAs(T)() inout @trusted {
        |                        static assert(T.sizeof <= m_data.sizeof);
-    271|                        return (cast(inout(T)[1])m_data[0 .. T.sizeof])[0];
+    291|                        return (cast(inout(T)[1])m_data[0 .. T.sizeof])[0];
        |                }
        |
 0000000|                @property ref inout(BigInt) m_bigInt() inout { return getDataAs!BigInt(); }
-0000000|                @property ref inout(long) m_int() inout { return getDataAs!long(); }
+     11|                @property ref inout(long) m_int() inout { return getDataAs!long(); }
      34|                @property ref inout(double) m_float() inout { return getDataAs!double(); }
 0000000|                @property ref inout(bool) m_bool() inout { return getDataAs!bool(); }
      99|                @property ref inout(string) m_string() inout { return getDataAs!string(); }
-     66|                @property ref inout(Json[string]) m_object() inout { return getDataAs!(Json[string])(); }
+     75|                @property ref inout(Json[string]) m_object() inout { return getDataAs!(Json[string])(); }
      72|                @property ref inout(Json[]) m_array() inout { return getDataAs!(Json[])(); }
        |
        |                Type m_type = Type.undefined;
@@ -186,11 +186,11 @@
        |        /// ditto
 0000000|        this(ushort v) { this(cast(long)v); }
        |        /// ditto
-0000000|        this(int v) { this(cast(long)v); }
+      2|        this(int v) { this(cast(long)v); }
        |        /// ditto
 0000000|        this(uint v) { this(cast(long)v); }
        |        /// ditto
-0000000|        this(long v) @trusted { m_type = Type.int_; m_int = v; }
+      6|        this(long v) @trusted { m_type = Type.int_; m_int = v; }
        |        /// ditto
 0000000|        this(BigInt v) @trusted { m_type = Type.bigInt; initBigInt(); m_bigInt = v; }
        |        /// ditto
@@ -200,7 +200,7 @@
        |        /// ditto
      60|        this(Json[] v) @trusted { m_type = Type.array; m_array = v; }
        |        /// ditto
-     21|        this(Json[string] v) @trusted { m_type = Type.object; m_object = v; }
+     27|        this(Json[string] v) @trusted { m_type = Type.object; m_object = v; }
        |
        |        /**
        |                Converts a std.json.JSONValue object to a vibe Json object.
@@ -234,11 +234,11 @@
        |        */
        |        ref Json opAssign(Json v)
        |        {
-     36|                if (v.type != Type.bigInt)
-     36|                        runDestructors();
-     36|                auto old_type = m_type;
-     36|                m_type = v.m_type;
-     36|                final switch(m_type){
+     37|                if (v.type != Type.bigInt)
+     37|                        runDestructors();
+     37|                auto old_type = m_type;
+     37|                m_type = v.m_type;
+     37|                final switch(m_type){
 0000000|                        case Type.undefined: m_string = null; break;
       6|                        case Type.null_: m_string = null; break;
 0000000|                        case Type.bool_: m_bool = v.m_bool; break;
@@ -251,9 +251,9 @@
 0000000|                        case Type.float_: m_float = v.m_float; break;
      30|                        case Type.string: m_string = v.m_string; break;
      48|                        case Type.array: opAssign(v.m_array); break;
-     24|                        case Type.object: opAssign(v.m_object); break;
+     27|                        case Type.object: opAssign(v.m_object); break;
        |                }
-     36|                return this;
+     37|                return this;
        |        }
        |        /// ditto
 0000000|        void opAssign(typeof(null)) { runDestructors(); m_type = Type.null_; m_string = null; }
@@ -262,7 +262,7 @@
        |        /// ditto
 0000000|        int opAssign(int v) { runDestructors(); m_type = Type.int_; m_int = v; return v; }
        |        /// ditto
-0000000|        long opAssign(long v) { runDestructors(); m_type = Type.int_; m_int = v; return v; }
+      4|        long opAssign(long v) { runDestructors(); m_type = Type.int_; m_int = v; return v; }
        |        /// ditto
        |        BigInt opAssign(BigInt v)
        |        {
@@ -290,11 +290,11 @@
        |        /// ditto
        |        Json[string] opAssign(Json[string] v)
        |        {
-     23|                runDestructors();
-     23|                m_type = Type.object;
-     23|                m_object = v;
+     25|                runDestructors();
+     25|                m_type = Type.object;
+     25|                m_object = v;
        |                version (VibeJsonFieldNames) { foreach (key, ref av; m_object) av.m_name = format("%s.%s", m_name, key); }
-     23|                return v;
+     25|                return v;
        |        }
        |
        |        /**
@@ -305,7 +305,7 @@
        |        /**
        |                The current type id of this JSON object.
        |        */
-    217|        @property Type type() const @safe { return m_type; }
+    227|        @property Type type() const @safe { return m_type; }
        |
        |        /**
        |                Clones a JSON value recursively.
@@ -483,12 +483,12 @@
        |        /// ditto
        |        int opApply(scope int delegate(ref string idx, ref const Json obj) del)
        |        const @system {
-      4|                checkType!(Json[string])("opApply");
-      4|                foreach( idx, ref v; m_object )
-      8|                        if( v.type != Type.undefined )
-      8|                                if( auto ret = del(idx, v) )
+      5|                checkType!(Json[string])("opApply");
+      5|                foreach( idx, ref v; m_object )
+      9|                        if( v.type != Type.undefined )
+      9|                                if( auto ret = del(idx, v) )
 0000000|                                        return ret;
-      4|                return 0;
+      5|                return 0;
        |        }
        |
        |        private alias KeyValue = Tuple!(string, "key", Json, "value");
@@ -496,7 +496,7 @@
        |        /// Iterates over all key/value pairs of an object.
 0000000|        @property auto byKeyValue() @trusted { checkType!(Json[string])("byKeyValue"); return m_object.byKeyValue.map!(kv => KeyValue(kv.key, kv.value)).trustedRange; }
        |        /// ditto
-     45|        @property auto byKeyValue() const @trusted { checkType!(Json[string])("byKeyValue"); return m_object.byKeyValue.map!(kv => const(KeyValue)(kv.key, kv.value)).trustedRange; }
+     48|        @property auto byKeyValue() const @trusted { checkType!(Json[string])("byKeyValue"); return m_object.byKeyValue.map!(kv => const(KeyValue)(kv.key, kv.value)).trustedRange; }
        |        /// Iterates over all index/value pairs of an array.
 0000000|        @property auto byIndexValue() { checkType!(Json[])("byIndexValue"); return zip(iota(0, m_array.length), m_array); }
        |        /// ditto
@@ -597,12 +597,12 @@
        |
        |                See_Also: `opt`, `to`, `deserializeJson`
        |        */
-     10|        inout(T) opCast(T)() inout if (!is(T == JSONValue)) { return get!T; }
+     11|        inout(T) opCast(T)() inout if (!is(T == JSONValue)) { return get!T; }
        |        /// ditto
        |        @property inout(T) get(T)()
        |        inout @trusted {
        |                static if (!is(T : bool) && is(T : long))
-0000000|                        checkType!(long, BigInt)();
+      2|                        checkType!(long, BigInt)();
        |                else
      44|                        checkType!T();
        |
@@ -614,12 +614,12 @@
        |                else static if (is(T == Json[string])) return m_object;
 0000000|                else static if (is(T == BigInt)) return m_type == Type.bigInt ? m_bigInt : BigInt(m_int);
        |                else static if (is(T : long)) {
-0000000|                        if (m_type == Type.bigInt) {
+      2|                        if (m_type == Type.bigInt) {
 0000000|                                enforceJson(m_bigInt <= T.max && m_bigInt >= T.min, "Integer conversion out of bounds error");
 0000000|                                return cast(T)m_bigInt.toLong();
        |                        } else {
-0000000|                                enforceJson(m_int <= T.max && m_int >= T.min, "Integer conversion out of bounds error");
-0000000|                                return cast(T)m_int;
+      4|                                enforceJson(m_int <= T.max && m_int >= T.min, "Integer conversion out of bounds error");
+      2|                                return cast(T)m_int;
        |                        }
        |                }
        |                else static assert(0, "JSON can only be cast to (bool, long, std.bigint.BigInt, double, string, Json[] or Json[string]. Not "~T.stringof~".");
@@ -996,17 +996,17 @@
        |
        |        bool opEquals(ref const Json other)
        |        const {
-     14|                if( m_type != other.m_type ) return false;
-     14|                final switch(m_type){
+     16|                if( m_type != other.m_type ) return false;
+     16|                final switch(m_type){
 0000000|                        case Type.undefined: return false;
 0000000|                        case Type.null_: return true;
 0000000|                        case Type.bool_: return m_bool == other.m_bool;
-0000000|                        case Type.int_: return m_int == other.m_int;
+      2|                        case Type.int_: return m_int == other.m_int;
 0000000|                        case Type.bigInt: return m_bigInt == other.m_bigInt;
       4|                        case Type.float_: return m_float == other.m_float;
      12|                        case Type.string: return m_string == other.m_string;
 0000000|                        case Type.array: return m_array == other.m_array;
-     12|                        case Type.object: return m_object == other.m_object;
+     14|                        case Type.object: return m_object == other.m_object;
        |                }
        |        }
        |        /// ditto
@@ -1064,11 +1064,11 @@
 0000000|                else static if( is(T == bool) ) return Type.bool_;
      17|                else static if( is(T == double) ) return Type.float_;
        |                else static if( is(T == float) ) return Type.float_;
-0000000|                else static if( is(T : long) ) return Type.int_;
+      2|                else static if( is(T : long) ) return Type.int_;
      32|                else static if( is(T == string) ) return Type.string;
      25|                else static if( is(T == Json[]) ) return Type.array;
-     41|                else static if( is(T == Json[string]) ) return Type.object;
-0000000|                else static if( is(T == BigInt) ) return Type.bigInt;
+     43|                else static if( is(T == Json[string]) ) return Type.object;
+      2|                else static if( is(T == BigInt) ) return Type.bigInt;
        |                else static assert(false, "Unsupported JSON type '"~T.stringof~"'. Only bool, long, std.bigint.BigInt, double, string, Json[] and Json[string] are allowed.");
        |        }
        |
@@ -1084,9 +1084,9 @@
        |        const @trusted {
        |                // DMD BUG: this should actually be all @safe, but for some reason
        |                // @safe inference for writeJsonString doesn't work.
-     13|                auto ret = appender!string();
-     13|                writeJsonString(ret, this);
-     13|                return ret.data;
+     14|                auto ret = appender!string();
+     14|                writeJsonString(ret, this);
+     14|                return ret.data;
        |        }
        |        /// ditto
        |        void toString(scope void delegate(const(char)[]) @safe sink, FormatSpec!char fmt)
@@ -1144,9 +1144,9 @@
        |
        |        private void checkType(TYPES...)(string op = null)
        |        const {
-     85|                bool matched = false;
-    315|                foreach (T; TYPES) if (m_type == typeId!T) matched = true;
-    170|                if (matched) return;
+     89|                bool matched = false;
+    331|                foreach (T; TYPES) if (m_type == typeId!T) matched = true;
+    178|                if (matched) return;
        |
 0000000|                string name;
        |                version (VibeJsonFieldNames) {
@@ -1178,7 +1178,7 @@
        |
        |        private void runDestructors()
        |        {
-    200|                if (m_type != Type.bigInt) return;
+    208|                if (m_type != Type.bigInt) return;
        |
 0000000|                BigInt init_;
        |                // After swaping, init_ contains the real number from Json, and it
@@ -1223,19 +1223,19 @@
        |Json parseJson(R)(ref R range, int* line = null, string filename = null)
        |        if( is(R == string) )
        |{
-     40|        Json ret;
-     40|        enforceJson(!range.empty, "JSON string is empty.", filename, 0);
+     42|        Json ret;
+     42|        enforceJson(!range.empty, "JSON string is empty.", filename, 0);
        |
-     40|        skipWhitespace(range, line);
+     42|        skipWhitespace(range, line);
        |
-     40|        enforceJson(!range.empty, "JSON string contains only whitespaces.", filename, 0);
+     42|        enforceJson(!range.empty, "JSON string contains only whitespaces.", filename, 0);
        |
        |        version(JsonLineNumbers) {
        |                int curline = line ? *line : 0;
        |        }
        |
-     40|        bool minus = false;
-     40|        switch( range.front ){
+     42|        bool minus = false;
+     42|        switch( range.front ){
 0000000|                case 'f':
 0000000|                        enforceJson(range[1 .. $].startsWith("alse"), "Expected 'false', got '"~range[0 .. min(5, $)]~"'.", filename, line);
 0000000|                        range.popFrontN(5);
@@ -1253,18 +1253,18 @@
 0000000|                        break;
        |
 0000000|                case '-':
-    153|                case '0': .. case '9':
-      9|                        bool is_long_overflow;
-      9|                        bool is_float;
-      9|                        auto num = skipNumber(range, is_float, is_long_overflow);
-      9|                        if( is_float ) {
+    164|                case '0': .. case '9':
+     10|                        bool is_long_overflow;
+     10|                        bool is_float;
+     10|                        auto num = skipNumber(range, is_float, is_long_overflow);
+     10|                        if( is_float ) {
       9|                                ret = to!double(num);
-0000000|                        } else if (is_long_overflow) {
+      1|                        } else if (is_long_overflow) {
 0000000|                                ret = () @trusted { return BigInt(num.to!string); } ();
        |                        } else {
-0000000|                                ret = to!long(num);
+      1|                                ret = to!long(num);
        |                        }
-      9|                        break;
+     10|                        break;
      16|                case '\"':
      16|                        ret = skipJsonString(range);
      16|                        break;
@@ -1286,38 +1286,38 @@
 0000000|                        range.popFront();
 0000000|                        ret = arr.data;
 0000000|                        break;
-     15|                case '{':
-     15|                        Json[string] obj;
-     15|                        range.popFront();
-     26|                        while (true) {
-     26|                                skipWhitespace(range, line);
-     26|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
-     26|                                if(range.front == '}') break;
-     26|                                string key = skipJsonString(range);
-     26|                                skipWhitespace(range, line);
-     26|                                enforceJson(range.startsWith(":"), "Expected ':' for key '" ~ key ~ "'", filename, line);
-     26|                                range.popFront();
-     26|                                skipWhitespace(range, line);
-     26|                                Json itm = parseJson(range, line, filename);
-     52|                                obj[key] = itm;
-     26|                                skipWhitespace(range, line);
-     26|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
-     41|                                enforceJson(range.front == ',' || range.front == '}',
+     16|                case '{':
+     16|                        Json[string] obj;
+     16|                        range.popFront();
+     27|                        while (true) {
+     27|                                skipWhitespace(range, line);
+     27|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
+     27|                                if(range.front == '}') break;
+     27|                                string key = skipJsonString(range);
+     27|                                skipWhitespace(range, line);
+     27|                                enforceJson(range.startsWith(":"), "Expected ':' for key '" ~ key ~ "'", filename, line);
+     27|                                range.popFront();
+     27|                                skipWhitespace(range, line);
+     27|                                Json itm = parseJson(range, line, filename);
+     54|                                obj[key] = itm;
+     27|                                skipWhitespace(range, line);
+     27|                                enforceJson(!range.empty, "Missing '}' before EOF.", filename, line);
+     43|                                enforceJson(range.front == ',' || range.front == '}',
 0000000|                                        format("Expected '}' or ',' - got '%s'.", range.front), filename, line);
-     41|                                if (range.front == '}') break;
+     43|                                if (range.front == '}') break;
      11|                                else range.popFront();
        |                        }
-     15|                        range.popFront();
-     15|                        ret = obj;
-     15|                        break;
+     16|                        range.popFront();
+     16|                        ret = obj;
+     16|                        break;
 0000000|                default:
 0000000|                        enforceJson(false, format("Expected valid JSON token, got '%s'.", range[0 .. min(12, $)]), filename, line);
 0000000|                        assert(false);
        |        }
        |
-     40|        assert(ret.type != Json.Type.undefined);
+     42|        assert(ret.type != Json.Type.undefined);
        |        version(JsonLineNumbers) ret.line = curline;
-     40|        return ret;
+     42|        return ret;
        |}
        |
        |/**
@@ -1327,11 +1327,11 @@
        |*/
        |Json parseJsonString(string str, string filename = null)
        |@safe {
-     14|        auto strcopy = str;
-     14|        int line = 0;
-     28|        auto ret = parseJson(strcopy, () @trusted { return &line; } (), filename);
-     14|        enforceJson(strcopy.strip().length == 0, "Expected end of string after JSON value.", filename, line);
-     14|        return ret;
+     15|        auto strcopy = str;
+     15|        int line = 0;
+     30|        auto ret = parseJson(strcopy, () @trusted { return &line; } (), filename);
+     15|        enforceJson(strcopy.strip().length == 0, "Expected end of string after JSON value.", filename, line);
+     15|        return ret;
        |}
        |
        |@safe unittest {
@@ -2069,11 +2069,11 @@
        |void writeJsonString(R, bool pretty = false)(ref R dst, in Json json, size_t level = 0)
        |@safe //        if( isOutputRange!R && is(ElementEncodingType!R == char) )
        |{
-     62|        final switch( json.type ){
+     64|        final switch( json.type ){
 0000000|                case Json.Type.undefined: dst.put("null"); break;
       6|                case Json.Type.null_: dst.put("null"); break;
 0000000|                case Json.Type.bool_: dst.put(json.get!bool ? "true" : "false"); break;
-0000000|                case Json.Type.int_: formattedWrite(dst, "%d", json.get!long); break;
+      3|                case Json.Type.int_: formattedWrite(dst, "%d", json.get!long); break;
 0000000|                case Json.Type.bigInt: () @trusted { formattedWrite(dst, "%d", json.get!BigInt); } (); break;
       6|                case Json.Type.float_:
       6|                        auto d = json.get!double;
@@ -2108,21 +2108,21 @@
        |                        }
      20|                        dst.put(']');
      20|                        break;
-     12|                case Json.Type.object:
-     12|                        dst.put('{');
-     12|                        bool first = true;
-    129|                        foreach (string k, ref const Json e; json.byKeyValue) {
-     21|                                if( e.type == Json.Type.undefined ) continue;
-     30|                                if( !first ) dst.put(',');
-     21|                                first = false;
+     13|                case Json.Type.object:
+     13|                        dst.put('{');
+     13|                        bool first = true;
+    136|                        foreach (string k, ref const Json e; json.byKeyValue) {
+     22|                                if( e.type == Json.Type.undefined ) continue;
+     31|                                if( !first ) dst.put(',');
+     22|                                first = false;
        |                                static if (pretty) {
 0000000|                                        dst.put('\n');
 0000000|                                        foreach (tab; 0 .. level+1) dst.put('\t');
        |                                }
-     21|                                dst.put('\"');
-     21|                                jsonEscape(dst, k);
-     21|                                dst.put(pretty ? `": ` : `":`);
-     21|                                writeJsonString!(R, pretty)(dst, e, level+1);
+     22|                                dst.put('\"');
+     22|                                jsonEscape(dst, k);
+     22|                                dst.put(pretty ? `": ` : `":`);
+     22|                                writeJsonString!(R, pretty)(dst, e, level+1);
        |                        }
        |                        static if (pretty) {
 0000000|                                if (json.length > 0) {
@@ -2130,8 +2130,8 @@
 0000000|                                        foreach (tab; 0 .. level) dst.put('\t');
        |                                }
        |                        }
-     12|                        dst.put('}');
-     12|                        break;
+     13|                        dst.put('}');
+     13|                        break;
        |        }
        |}
        |
@@ -2237,20 +2237,20 @@
        |/// private
        |private void jsonEscape(bool escape_unicode = false, R)(ref R dst, string s)
        |{
-     43|        size_t startPos = 0;
+     44|        size_t startPos = 0;
        |
-     43|        void putInterval(size_t curPos)
+     44|        void putInterval(size_t curPos)
        |        {
-     43|                if (curPos > startPos)
-     43|                        dst.put(s[startPos..curPos]);
-     43|                startPos = curPos + 1;
+     44|                if (curPos > startPos)
+     44|                        dst.put(s[startPos..curPos]);
+     44|                startPos = curPos + 1;
        |        }
        |
-    580|        for (size_t pos = 0; pos < s.length; pos++) {
-    247|                immutable(char) ch = s[pos];
+    588|        for (size_t pos = 0; pos < s.length; pos++) {
+    250|                immutable(char) ch = s[pos];
        |
-    247|                switch (ch) {
-    247|                        default:
+    250|                switch (ch) {
+    250|                        default:
        |                                static if (escape_unicode) {
 0000000|                                        if (ch <= 0x20 || ch >= 0x80)
        |                                        {
@@ -2280,13 +2280,13 @@
        |                                }
        |                                else
        |                                {
-    247|                                        if (ch < 0x20)
+    250|                                        if (ch < 0x20)
        |                                        {
 0000000|                                                putInterval(pos);
 0000000|                                                dst.formattedWrite("\\u%04X", ch);
        |                                        }
        |                                }
-    247|                                break;
+    250|                                break;
 0000000|                        case '\\': putInterval(pos); dst.put("\\\\"); break;
 0000000|                        case '\r': putInterval(pos); dst.put("\\r"); break;
 0000000|                        case '\n': putInterval(pos); dst.put("\\n"); break;
@@ -2304,17 +2304,17 @@
        |                }
        |        }
        |        // last interval
-     43|        putInterval(s.length);
+     44|        putInterval(s.length);
        |}
        |
        |/// private
        |private string jsonUnescape(R)(ref R range)
        |{
-     42|        auto ret = appender!string();
-    356|        while(!range.empty){
-    356|                auto ch = range.front;
-    356|                switch( ch ){
-     84|                        case '"': return ret.data;
+     43|        auto ret = appender!string();
+    360|        while(!range.empty){
+    360|                auto ch = range.front;
+    360|                switch( ch ){
+     86|                        case '"': return ret.data;
 0000000|                        case '\\':
 0000000|                                range.popFront();
 0000000|                                enforceJson(!range.empty, "Unterminated string escape sequence.");
@@ -2367,10 +2367,10 @@
 0000000|                                                break;
        |                                }
 0000000|                                break;
-    314|                        default:
-    314|                                ret.put(ch);
-    314|                                range.popFront();
-    314|                                break;
+    317|                        default:
+    317|                                ret.put(ch);
+    317|                                range.popFront();
+    317|                                break;
        |                }
        |        }
 0000000|        return ret.data;
@@ -2379,49 +2379,49 @@
        |private auto skipNumber(R)(ref R s, out bool is_float, out bool is_long_overflow) @safe
        |        if (isNarrowString!R)
        |{
-      9|        auto r = s.representation;
-     18|        version (assert) auto rEnd = (() @trusted => r.ptr + r.length - 1)();
-      9|        auto res = skipNumber(r, is_float, is_long_overflow);
-     18|        version (assert) assert(rEnd == (() @trusted => r.ptr + r.length - 1)()); // check nothing taken off the end
-      9|        s = s[$ - r.length .. $];
-      9|        return res.assumeUTF();
+     10|        auto r = s.representation;
+     20|        version (assert) auto rEnd = (() @trusted => r.ptr + r.length - 1)();
+     10|        auto res = skipNumber(r, is_float, is_long_overflow);
+     20|        version (assert) assert(rEnd == (() @trusted => r.ptr + r.length - 1)()); // check nothing taken off the end
+     10|        s = s[$ - r.length .. $];
+     10|        return res.assumeUTF();
        |}
        |
        |/// private
        |private auto skipNumber(R)(ref R s, out bool is_float, out bool is_long_overflow)
        |        if (!isNarrowString!R && isForwardRange!R)
        |{
-      9|        auto sOrig = s.save;
-      9|        size_t idx = 0;
-      9|        is_float = false;
-      9|        is_long_overflow = false;
-      9|        ulong int_part = 0;
-      9|        if (s.front == '-') {
+     10|        auto sOrig = s.save;
+     10|        size_t idx = 0;
+     10|        is_float = false;
+     10|        is_long_overflow = false;
+     10|        ulong int_part = 0;
+     10|        if (s.front == '-') {
 0000000|                s.popFront(); ++idx;
        |        }
-      9|        if (s.front == '0') {
+     10|        if (s.front == '0') {
 0000000|                s.popFront(); ++idx;
        |        }
        |        else {
-      9|                enforceJson(isDigit(s.front), "Digit expected at beginning of number.");
-      9|                int_part = s.front - '0';
-     18|                s.popFront(); ++idx;
-     54|                while( !s.empty && isDigit(s.front) ) {
-     18|                        if (!is_long_overflow) {
-     18|                                auto dig = s.front - '0';
-     18|                                if ((long.max / 10) > int_part || ((long.max / 10) == int_part && (long.max % 10) >= dig)) {
-     18|                                        int_part *= 10;
-     18|                                        int_part += dig;
+     10|                enforceJson(isDigit(s.front), "Digit expected at beginning of number.");
+     10|                int_part = s.front - '0';
+     20|                s.popFront(); ++idx;
+     58|                while( !s.empty && isDigit(s.front) ) {
+     19|                        if (!is_long_overflow) {
+     19|                                auto dig = s.front - '0';
+     19|                                if ((long.max / 10) > int_part || ((long.max / 10) == int_part && (long.max % 10) >= dig)) {
+     19|                                        int_part *= 10;
+     19|                                        int_part += dig;
        |                                }
        |                                else {
 0000000|                                        is_long_overflow = true;
        |                                }
        |                        }
-     36|                        s.popFront(); ++idx;
+     38|                        s.popFront(); ++idx;
        |                }
        |        }
        |
-     18|        if( !s.empty && s.front == '.' ) {
+     20|        if( !s.empty && s.front == '.' ) {
      18|                s.popFront(); ++idx;
       9|                is_float = true;
      71|                while( !s.empty && isDigit(s.front) ) {
@@ -2429,7 +2429,7 @@
        |                }
        |        }
        |
-     25|        if( !s.empty && (s.front == 'e' || s.front == 'E') ) {
+     28|        if( !s.empty && (s.front == 'e' || s.front == 'E') ) {
 0000000|                s.popFront(); ++idx;
 0000000|                is_float = true;
 0000000|                if( !s.empty && (s.front == '+' || s.front == '-') ) {
@@ -2442,7 +2442,7 @@
        |                }
        |        }
        |
-      9|        return sOrig.takeExactly(idx);
+     10|        return sOrig.takeExactly(idx);
        |}
        |
        |unittest
@@ -2468,20 +2468,20 @@
        |private string skipJsonString(R)(ref R s, int* line = null)
        |{
        |        // TODO: count or disallow any newlines inside of the string
-     84|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to start string.");
-     42|        s.popFront();
-     42|        string ret = jsonUnescape(s);
-     84|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to terminate string.");
-     42|        s.popFront();
-     42|        return ret;
+     86|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to start string.");
+     43|        s.popFront();
+     43|        string ret = jsonUnescape(s);
+     86|        enforceJson(!s.empty && s.front == '"', "Expected '\"' to terminate string.");
+     43|        s.popFront();
+     43|        return ret;
        |}
        |
        |/// private
        |private void skipWhitespace(R)(ref R s, int* line = null)
        |{
-    165|        while (!s.empty) {
-    165|                switch (s.front) {
-    288|                        default: return;
+    171|        while (!s.empty) {
+    171|                switch (s.front) {
+    300|                        default: return;
      84|                        case ' ', '\t': s.popFront(); break;
 0000000|                        case '\n':
 0000000|                                s.popFront();
@@ -2497,7 +2497,7 @@
        |        }
        |}
        |
-    129|private bool isDigit(dchar ch) @safe nothrow pure { return ch >= '0' && ch <= '9'; }
+    135|private bool isDigit(dchar ch) @safe nothrow pure { return ch >= '0' && ch <= '9'; }
        |
        |private string underscoreStrip(string field_name)
        |@safe nothrow pure {
@@ -2510,28 +2510,28 @@
        |
        |private void enforceJson(string file = __FILE__, size_t line = __LINE__)(bool cond, lazy string message = "JSON exception")
        |{
-     93|        enforceEx!JSONException(cond, message, file, line);
+     98|        enforceEx!JSONException(cond, message, file, line);
        |}
        |
        |private void enforceJson(string file = __FILE__, size_t line = __LINE__)(bool cond, lazy string message, string err_file, int err_line)
        |{
-    198|        enforceEx!JSONException(cond, format("%s(%s): Error: %s", err_file, err_line+1, message), file, line);
+    207|        enforceEx!JSONException(cond, format("%s(%s): Error: %s", err_file, err_line+1, message), file, line);
        |}
        |
        |private void enforceJson(string file = __FILE__, size_t line = __LINE__)(bool cond, lazy string message, string err_file, int* err_line)
        |{
-    208|        enforceJson!(file, line)(cond, message, err_file, err_line ? *err_line : -1);
+    216|        enforceJson!(file, line)(cond, message, err_file, err_line ? *err_line : -1);
        |}
        |
        |private auto trustedRange(R)(R range)
        |{
-     12|        static struct Rng {
+     13|        static struct Rng {
        |                private R range;
-     33|                @property bool empty() @trusted { return range.empty; }
-     21|                @property auto front() @trusted { return range.front; }
-     21|                void popFront() @trusted { range.popFront(); }
+     35|                @property bool empty() @trusted { return range.empty; }
+     22|                @property auto front() @trusted { return range.front; }
+     22|                void popFront() @trusted { range.popFront(); }
        |        }
-     12|        return Rng(range);
+     13|        return Rng(range);
        |}
        |
        |// test for vibe.utils.DictionaryList
@@ -2622,4 +2622,4 @@
        |        assert(a.to!JSONValue.to!Json == a);
        |        assert(to!Json(to!JSONValue(a)) == a);
        |}
-../../../.dub/packages/vibe-d-0.8.3/vibe-d/data/vibe/data/json.d is 37% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/data/vibe/data/json.d is 39% covered
