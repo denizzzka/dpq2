@@ -153,6 +153,14 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
             break;
 
+        case TimeStampWithZone:
+            import std.datetime.timezone : UTC;
+            auto ts = v.tunnelForBinaryValueAsCalls!SysTime;
+            auto time = BsonDate(tz is null || tz == UTC() ? ts : ts.toOtherTZ(tz));
+            long usecs = ts.fracSecs.total!"usecs";
+            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
+            break;
+
         case Json:
         case Jsonb:
             vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
@@ -162,7 +170,7 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
         default:
             throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Value to Bson converter",
+                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") isn't supported by Value to Bson converter",
                     __FILE__, __LINE__
                 );
     }
@@ -255,6 +263,7 @@ public void _integration_test( string connParam )
         C(Bson.emptyArray, "text[]", "'{}'");
 
         C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp with time zone", "'1997-12-17T07:37:16.000012Z'");
 
         C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
 
