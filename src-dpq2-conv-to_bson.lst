@@ -8,12 +8,12 @@
        |import dpq2.conv.numeric: rawValueToNumeric;
        |import vibe.data.bson;
        |import std.uuid;
-       |import std.datetime: SysTime, dur, TimeZone;
+       |import std.datetime: SysTime, dur, TimeZone, UTC;
        |import std.bitmanip: bigEndianToNative;
        |import std.conv: to;
        |
        |///
-       |Bson as(T)(in Value v, immutable TimeZone tz = null)
+       |Bson as(T)(in Value v)
        |if(is(T == Bson))
        |{
      52|    if(v.isNull)
@@ -23,15 +23,15 @@
        |    else
        |    {
      58|        if(v.isSupportedArray && ValueFormat.BINARY)
-      8|            return arrayValueToBson(v, tz);
+      8|            return arrayValueToBson(v);
        |        else
-     42|            return rawValueToBson(v, tz);
+     42|            return rawValueToBson(v);
        |    }
        |}
        |
        |private:
        |
-       |Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
+       |Bson arrayValueToBson(in Value cell)
        |{
       8|    const ap = ArrayProperties(cell);
        |
@@ -68,7 +68,7 @@
        |                else
        |                {
      24|                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
-     24|                    b = v.as!Bson(tz);
+     24|                    b = v.as!Bson;
        |                }
        |
      31|                curr_offset += size;
@@ -82,7 +82,7 @@
       7|    return recursive(0);
        |}
        |
-       |Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
+       |Bson rawValueToBson(in Value v)
        |{
      42|    if(v.format == ValueFormat.TEXT)
        |    {
@@ -146,9 +146,9 @@
       1|            res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
       1|            break;
        |
-      1|        case TimeStamp:
-      1|            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStamp);
-      1|            auto time = BsonDate(SysTime(ts.dateTime, tz));
+      1|        case TimeStampWithZone:
+      1|            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStampUTC);
+      1|            auto time = BsonDate(SysTime(ts.dateTime, UTC()));
       1|            long usecs = ts.fracSec.total!"usecs";
       1|            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
       1|            break;
@@ -208,7 +208,7 @@
      18|            auto answer = conn.execParams(params);
        |
      18|            immutable Value v = answer[0][0];
-     18|            Bson bsonRes = v.as!Bson(UTC());
+     18|            Bson bsonRes = v.as!Bson;
        |
      34|            if(v.isNull || !v.isSupportedArray) // standalone
        |            {
@@ -254,7 +254,7 @@
        |
       1|        C(Bson.emptyArray, "text[]", "'{}'");
        |
-      1|        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+      1|        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp with time zone", "'1997-12-17 07:37:16.000012 UTC'");
        |
       1|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
        |

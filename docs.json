@@ -1899,7 +1899,7 @@
 						"endchar": 1,
 						"name": "as",
 						"line": 16,
-						"type": "Bson(in Value v, immutable TimeZone tz = null)",
+						"type": "Bson(in Value v)",
 						"parameters": [
 							{
 								"name": "v",
@@ -1907,14 +1907,6 @@
 								"storageClass": [
 									"in"
 								]
-							},
-							{
-								"name": "tz",
-								"type": "TimeZone",
-								"storageClass": [
-									"immutable"
-								],
-								"default": "null"
 							}
 						],
 						"endline": 30,

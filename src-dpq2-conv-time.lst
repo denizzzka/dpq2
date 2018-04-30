@@ -86,14 +86,14 @@
        |TimeStamp binaryValueAs(T)(in Value v) @trusted
        |if( is( T == TimeStamp ) )
        |{
-      8|    if(!(v.oidType == OidType.TimeStamp))
+      7|    if(!(v.oidType == OidType.TimeStamp))
 0000000|        throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
        |
-      8|    if(!(v.data.length == long.sizeof))
+      7|    if(!(v.data.length == long.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
        |
-      8|    return rawTimeStamp2nativeTime!TimeStamp(
+      7|    return rawTimeStamp2nativeTime!TimeStamp(
        |        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
        |    );
        |}
@@ -102,14 +102,14 @@
        |TimeStampUTC binaryValueAs(T)(in Value v) @trusted
        |if( is( T == TimeStampUTC ) )
        |{
-      1|    if(!(v.oidType == OidType.TimeStampWithZone))
+      2|    if(!(v.oidType == OidType.TimeStampWithZone))
 0000000|        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
        |
-      1|    if(!(v.data.length == long.sizeof))
+      2|    if(!(v.data.length == long.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
        |
-      1|    return rawTimeStamp2nativeTime!TimeStampUTC(
+      2|    return rawTimeStamp2nativeTime!TimeStampUTC(
        |        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
        |    );
        |}
@@ -137,19 +137,19 @@
        |    ubyte day; ///
        |
        |    /// '-infinity', earlier than all other dates
-     39|    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
+     40|    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
        |
        |    /// 'infinity', later than all other dates
-     36|    static PgDate later() pure { return PgDate(int.max, 0, 0); }
+     37|    static PgDate later() pure { return PgDate(int.max, 0, 0); }
        |
-     30|    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
-     27|    bool isLater() const pure { return year == later.year; } /// 'infinity'
+     31|    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
+     28|    bool isLater() const pure { return year == later.year; } /// 'infinity'
        |}
        |
        |///
        |static toPgDate(Date d) pure
        |{
-     11|    return PgDate(d.year, d.month, d.day);
+     12|    return PgDate(d.year, d.month, d.day);
        |}
        |
        |/++
@@ -167,23 +167,23 @@
        |    Duration fracSec; /// fractional seconds, 1 microsecond resolution
        |
        |    ///
-     22|    this(DateTime dt, Duration fractionalSeconds = Duration.zero) pure
+     24|    this(DateTime dt, Duration fractionalSeconds = Duration.zero) pure
        |    {
-     11|        this(dt.date.toPgDate, dt.timeOfDay, fractionalSeconds);
+     12|        this(dt.date.toPgDate, dt.timeOfDay, fractionalSeconds);
        |    }
        |
        |    ///
-    120|    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
+    122|    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
        |    {
-     60|        date = d;
-     60|        time = t;
-     60|        fracSec = fractionalSeconds;
+     61|        date = d;
+     61|        time = t;
+     61|        fracSec = fractionalSeconds;
        |    }
        |
        |    ///
        |    void throwIfNotFitsToDate() const
        |    {
-     10|        if(date.year > short.max)
+     11|        if(date.year > short.max)
 0000000|            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
        |                "Year "~date.year.to!string~" is bigger than supported by std.datetime", __FILE__, __LINE__);
        |    }
@@ -191,34 +191,34 @@
        |    ///
        |    DateTime dateTime() const pure
        |    {
-     12|        if(infinity != InfinityState.NONE)
+     13|        if(infinity != InfinityState.NONE)
       2|            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
        |                "TTimeStamp value is "~infinity.to!string, __FILE__, __LINE__);
        |
-     10|        throwIfNotFitsToDate();
+     11|        throwIfNotFitsToDate();
        |
-     20|        return DateTime(Date(date.year, date.month, date.day), time);
+     22|        return DateTime(Date(date.year, date.month, date.day), time);
        |    }
        |
        |    invariant()
        |    {
-    271|        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
-    271|        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
-    271|        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
+    283|        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
+    283|        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
+    283|        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
        |    }
        |
-     60|    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
-     54|    bool isLater() const pure { return date.isLater; } /// 'infinity'
+     62|    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
+     56|    bool isLater() const pure { return date.isLater; } /// 'infinity'
        |
        |    /// Returns infinity state
        |    InfinityState infinity() const pure
        |    {
        |        with(InfinityState)
        |        {
-     30|            if(isEarlier) return INFINITY_MIN;
-     26|            if(isLater) return INFINITY_MAX;
+     31|            if(isEarlier) return INFINITY_MIN;
+     27|            if(isLater) return INFINITY_MAX;
        |
-     28|            return NONE;
+     30|            return NONE;
        |        }
        |    }
        |
@@ -353,9 +353,9 @@
       9|    TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);
        |
        |    static if(is(T == TimeStamp))
-      6|        return ret;
+      5|        return ret;
        |    else
-      3|        return TimeStampUTC(ret.dateTime, ret.fracSec);
+      4|        return TimeStampUTC(ret.dateTime, ret.fracSec);
        |}
        |
        |TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)

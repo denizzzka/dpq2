@@ -8,12 +8,12 @@ import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import vibe.data.bson;
 import std.uuid;
-import std.datetime: SysTime, dur, TimeZone;
+import std.datetime: SysTime, dur, TimeZone, UTC;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 
 ///
-Bson as(T)(in Value v, immutable TimeZone tz = null)
+Bson as(T)(in Value v)
 if(is(T == Bson))
 {
     if(v.isNull)
@@ -23,15 +23,15 @@ if(is(T == Bson))
     else
     {
         if(v.isSupportedArray && ValueFormat.BINARY)
-            return arrayValueToBson(v, tz);
+            return arrayValueToBson(v);
         else
-            return rawValueToBson(v, tz);
+            return rawValueToBson(v);
     }
 }
 
 private:
 
-Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
+Bson arrayValueToBson(in Value cell)
 {
     const ap = ArrayProperties(cell);
 
@@ -68,7 +68,7 @@ Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
                 else
                 {
                     auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
-                    b = v.as!Bson(tz);
+                    b = v.as!Bson;
                 }
 
                 curr_offset += size;
@@ -82,7 +82,7 @@ Bson arrayValueToBson(in Value cell, immutable TimeZone tz)
     return recursive(0);
 }
 
-Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
+Bson rawValueToBson(in Value v)
 {
     if(v.format == ValueFormat.TEXT)
     {
@@ -146,9 +146,9 @@ Bson rawValueToBson(in Value v, immutable TimeZone tz = null)
             res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
             break;
 
-        case TimeStamp:
-            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStamp);
-            auto time = BsonDate(SysTime(ts.dateTime, tz));
+        case TimeStampWithZone:
+            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStampUTC);
+            auto time = BsonDate(SysTime(ts.dateTime, UTC()));
             long usecs = ts.fracSec.total!"usecs";
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
             break;
@@ -208,7 +208,7 @@ public void _integration_test( string connParam )
             auto answer = conn.execParams(params);
 
             immutable Value v = answer[0][0];
-            Bson bsonRes = v.as!Bson(UTC());
+            Bson bsonRes = v.as!Bson;
 
             if(v.isNull || !v.isSupportedArray) // standalone
             {
@@ -254,7 +254,7 @@ public void _integration_test( string connParam )
 
         C(Bson.emptyArray, "text[]", "'{}'");
 
-        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
+        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp with time zone", "'1997-12-17 07:37:16.000012 UTC'");
 
         C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
 
