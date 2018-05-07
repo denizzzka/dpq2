@@ -22,10 +22,10 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R))
        |{
-     12|    if (v.isNull)
+     13|    if (v.isNull)
       5|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
        |    else
-      7|        return toValue(v.get);
+      8|        return toValue(v.get);
        |}
        |
        |///
@@ -172,7 +172,7 @@
        |Value toValue(T)(T v)
        |if (is(Unqual!T == UUID))
        |{
-      1|    return Value(v.data.dup, OidType.UUID);
+      2|    return Value(v.data.dup, OidType.UUID);
        |}
        |
        |/// Constructs Value from Json

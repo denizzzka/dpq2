@@ -91,6 +91,7 @@ public void _integration_test( string connParam ) @system
         C!PGbytea([0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21],
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+        C!(Nullable!PGuuid)(Nullable!UUID(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");

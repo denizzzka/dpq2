@@ -53,9 +53,9 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    110|    if(v.format == VF.BINARY)
+    111|    if(v.format == VF.BINARY)
        |    {
-    106|        if(!(
+    107|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -75,19 +75,19 @@
       3|            return T.init;
        |    }
        |    else
-    106|        alias Ret = T;
+    107|        alias Ret = T;
        |
-    106|    Ret r;
+    107|    Ret r;
        |
-    208|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    210|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     83|        r = v.valueAsString;
+     84|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
 0000000|        return T(r);
        |    else
-    104|        return r;
+    105|        return r;
        |}
        |
        |@system unittest
@@ -108,16 +108,16 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     66|    if(!(v.format == VF.BINARY))
+     67|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-      5|        if (v.isNull)
+      6|        if (v.isNull)
       1|            return T.init;
        |        else
-      4|            return T(binaryValueAs!R(v));
+      5|            return T(binaryValueAs!R(v));
        |    }
        |    else
      60|        return binaryValueAs!T(v);
@@ -142,7 +142,7 @@
        |
        |string valueAsString(in Value v) pure
        |{
-    104|    return (cast(const(char[])) v.data).to!string;
+    105|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -199,16 +199,16 @@
        |UUID binaryValueAs(T)(in Value v)
        |if( is( T == UUID ) )
        |{
-      4|    if(!(v.oidType == OidType.UUID))
+      5|    if(!(v.oidType == OidType.UUID))
       1|        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
        |
-      3|    if(!(v.data.length == 16))
+      4|    if(!(v.data.length == 16))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
        |
-      2|    UUID r;
-      2|    r.data = v.data;
-      2|    return r;
+      3|    UUID r;
+      3|    r.data = v.data;
+      3|    return r;
        |}
        |
        |@system unittest

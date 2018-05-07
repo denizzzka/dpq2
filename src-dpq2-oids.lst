@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    213|    return cast(OidType)(oid);
+    215|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -168,6 +168,7 @@
        |    import std.datetime.date : StdDate = Date, TimeOfDay;
        |    import std.datetime.systime : SysTime;
        |    import std.traits : Unqual;
+       |    import std.uuid : StdUUID = UUID;
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
        |
@@ -189,6 +190,7 @@
       1|        static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
       1|        static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
 0000000|        static if(is(UT == VibeJson)){ return Json; } else
+0000000|        static if(is(UT == StdUUID)){ return UUID; } else
        |
        |        static assert(false, "Unsupported D type: "~T.stringof);
        |    }
@@ -366,4 +368,4 @@
        |    FDWHandler = 3115, ///
        |    AnyRange = 3831, ///
        |}
-src/dpq2/oids.d is 87% covered
+src/dpq2/oids.d is 86% covered
