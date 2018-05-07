@@ -168,6 +168,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     import std.datetime.date : StdDate = Date, TimeOfDay;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
+    import std.uuid : StdUUID = UUID;
     static import dpq2.conv.time;
     import vibe.data.json : VibeJson = Json;
 
@@ -189,6 +190,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
         static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
         static if(is(UT == VibeJson)){ return Json; } else
+        static if(is(UT == StdUUID)){ return UUID; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
