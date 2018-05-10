@@ -13,7 +13,7 @@ import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception: enforceEx;
+import std.exception: enforce;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
@@ -623,7 +623,7 @@ class Notify
         assert(pgn != null);
 
         n = pgn;
-        cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
+        cast(void) enforce!OutOfMemoryError(n, "Can't write notify");
     }
 
     ~this()
