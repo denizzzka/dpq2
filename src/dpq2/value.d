@@ -84,7 +84,7 @@ struct Value
         import std.exception;
         import core.exception;
 
-        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
 
         return _data;
     }
