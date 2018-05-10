@@ -84,7 +84,7 @@ struct Value
         import std.exception;
         import core.exception;
 
-        enforceEx!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
 
         return _data;
     }
@@ -142,14 +142,14 @@ class ValueConvException : ConvException
 {
     const ConvExceptionType type; /// Exception type
 
-    this(ConvExceptionType t, string msg, string file, size_t line) pure @safe
+    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
     {
         type = t;
         super(msg, file, line);
     }
 }
 
-package void throwTypeComplaint(OidType receivedType, string expectedType, string file, size_t line) pure
+package void throwTypeComplaint(OidType receivedType, string expectedType, string file = __FILE__, size_t line = __LINE__) pure
 {
     throw new ValueConvException(
             ConvExceptionType.NOT_IMPLEMENTED,

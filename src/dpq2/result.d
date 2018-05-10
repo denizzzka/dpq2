@@ -13,7 +13,7 @@ import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception: enforceEx;
+import std.exception: enforce;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
@@ -623,7 +623,7 @@ class Notify
         assert(pgn != null);
 
         n = pgn;
-        cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
+        cast(void) enforce!OutOfMemoryError(n, "Can't write notify");
     }
 
     ~this()
@@ -647,7 +647,7 @@ class ResponseException : Dpq2Exception
     immutable(Result) result;
     alias result this;
 
-    this(immutable(Result) result, string file, size_t line)
+    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
     {
         this.result = result;
 
@@ -671,7 +671,7 @@ class AnswerException : Dpq2Exception
 {
     const ExceptionType type; /// Exception type
 
-    this(ExceptionType t, string msg, string file, size_t line) pure @safe
+    this(ExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
     {
         type = t;
         super(msg, file, line);

@@ -14,7 +14,7 @@
        |import derelict.pq.pq;
        |import std.conv: to;
        |import std.string: toStringz, fromStringz;
-       |import std.exception: enforce, enforceEx;
+       |import std.exception: enforce;
        |import std.range;
        |import std.stdio: File;
        |import std.socket;
@@ -54,7 +54,7 @@
        |    {
       6|        conn = PQconnectdb(toStringz(connString));
        |
-      6|        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+      6|        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
        |
       6|        if(status != CONNECTION_OK)
 0000000|            throw new ConnectionException(this, __FILE__, __LINE__);
@@ -65,7 +65,7 @@
        |    {
       1|        conn = PQconnectStart(toStringz(connString));
        |
-      1|        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+      1|        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
        |
       1|        if( status == CONNECTION_BAD )
       1|            throw new ConnectionException(this, __FILE__, __LINE__);
@@ -358,7 +358,7 @@
        |
       2|    if(r is null)
        |    {
-      1|        enforceEx!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
+      1|        enforce!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
        |    }
        |    else
        |    {
@@ -435,7 +435,7 @@
        |///
        |class CancellationException : Dpq2Exception
        |{
-0000000|    this(string msg, string file, size_t line)
+0000000|    this(string msg, string file = __FILE__, size_t line = __LINE__)
        |    {
 0000000|        super(msg, file, line);
        |    }
@@ -444,12 +444,12 @@
        |/// Connection exception
        |class ConnectionException : Dpq2Exception
        |{
-      2|    this(in Connection c, string file, size_t line)
+      2|    this(in Connection c, string file = __FILE__, size_t line = __LINE__)
        |    {
       2|        super(c.errorMessage(), file, line);
        |    }
        |
-      1|    this(string msg, string file, size_t line)
+      1|    this(string msg, string file = __FILE__, size_t line = __LINE__)
        |    {
       1|        super(msg, file, line);
        |    }

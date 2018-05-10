@@ -13,7 +13,7 @@
        |
        |import core.vararg;
        |import std.string: toStringz;
-       |import std.exception: enforceEx;
+       |import std.exception: enforce;
        |import core.exception: OutOfMemoryError;
        |import std.bitmanip: bigEndianToNative;
        |import std.conv: to;
@@ -623,7 +623,7 @@
       1|        assert(pgn != null);
        |
       1|        n = pgn;
-      1|        cast(void) enforceEx!OutOfMemoryError(n, "Can't write notify");
+      1|        cast(void) enforce!OutOfMemoryError(n, "Can't write notify");
        |    }
        |
        |    ~this()
@@ -647,7 +647,7 @@
        |    immutable(Result) result;
        |    alias result this;
        |
-      1|    this(immutable(Result) result, string file, size_t line)
+      1|    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
        |    {
       1|        this.result = result;
        |
@@ -671,7 +671,7 @@
        |{
        |    const ExceptionType type; /// Exception type
        |
-0000000|    this(ExceptionType t, string msg, string file, size_t line) pure @safe
+0000000|    this(ExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
        |    {
 0000000|        type = t;
 0000000|        super(msg, file, line);

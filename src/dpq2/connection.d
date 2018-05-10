@@ -14,7 +14,7 @@ import dpq2.exception;
 import derelict.pq.pq;
 import std.conv: to;
 import std.string: toStringz, fromStringz;
-import std.exception: enforce, enforceEx;
+import std.exception: enforce;
 import std.range;
 import std.stdio: File;
 import std.socket;
@@ -54,7 +54,7 @@ class Connection
     {
         conn = PQconnectdb(toStringz(connString));
 
-        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 
         if(status != CONNECTION_OK)
             throw new ConnectionException(this, __FILE__, __LINE__);
@@ -65,7 +65,7 @@ class Connection
     {
         conn = PQconnectStart(toStringz(connString));
 
-        enforceEx!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 
         if( status == CONNECTION_BAD )
             throw new ConnectionException(this, __FILE__, __LINE__);
@@ -358,7 +358,7 @@ void connStringCheck(string connString)
 
     if(r is null)
     {
-        enforceEx!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
+        enforce!OutOfMemoryError(errmsg, "Unable to allocate libpq conninfo data");
     }
     else
     {
@@ -435,7 +435,7 @@ class Cancellation
 ///
 class CancellationException : Dpq2Exception
 {
-    this(string msg, string file, size_t line)
+    this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line);
     }
@@ -444,12 +444,12 @@ class CancellationException : Dpq2Exception
 /// Connection exception
 class ConnectionException : Dpq2Exception
 {
-    this(in Connection c, string file, size_t line)
+    this(in Connection c, string file = __FILE__, size_t line = __LINE__)
     {
         super(c.errorMessage(), file, line);
     }
 
-    this(string msg, string file, size_t line)
+    this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line);
     }
