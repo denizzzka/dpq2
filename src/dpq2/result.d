@@ -647,7 +647,7 @@ class ResponseException : Dpq2Exception
     immutable(Result) result;
     alias result this;
 
-    this(immutable(Result) result, string file, size_t line)
+    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
     {
         this.result = result;
 
@@ -671,7 +671,7 @@ class AnswerException : Dpq2Exception
 {
     const ExceptionType type; /// Exception type
 
-    this(ExceptionType t, string msg, string file, size_t line) pure @safe
+    this(ExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
     {
         type = t;
         super(msg, file, line);

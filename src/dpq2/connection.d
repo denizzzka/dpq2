@@ -435,7 +435,7 @@ class Cancellation
 ///
 class CancellationException : Dpq2Exception
 {
-    this(string msg, string file, size_t line)
+    this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line);
     }
@@ -444,12 +444,12 @@ class CancellationException : Dpq2Exception
 /// Connection exception
 class ConnectionException : Dpq2Exception
 {
-    this(in Connection c, string file, size_t line)
+    this(in Connection c, string file = __FILE__, size_t line = __LINE__)
     {
         super(c.errorMessage(), file, line);
     }
 
-    this(string msg, string file, size_t line)
+    this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line);
     }
