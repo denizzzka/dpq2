@@ -143,7 +143,9 @@ Bson rawValueToBson(in Value v)
             break;
 
         case UUID:
-            res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
+            // See: https://github.com/vibe-d/vibe.d/issues/2161
+            // res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
+            res = serializeToBson(v.tunnelForBinaryValueAsCalls!PGuuid);
             break;
 
         case TimeStampWithZone:
@@ -244,7 +246,10 @@ public void _integration_test( string connParam )
                 )),
                 "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
 
-        C(Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
+        //See: https://github.com/vibe-d/vibe.d/issues/2161
+        // C(Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
+        //         "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+        C(serializeToBson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
                 "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
 
         C(Bson([
