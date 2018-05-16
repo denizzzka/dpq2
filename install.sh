@@ -551,7 +551,7 @@ install_compiler() {
 
         download_and_unpack_without_verify "$ROOT/$compiler" "$url"
 
-        url=https://raw.githubusercontent.com/D-Programming-GDC/GDMD/130f552ca43a77ee5c638fcc5a106f41dac607b9/dmd-script
+        url=https://raw.githubusercontent.com/D-Programming-GDC/GDMD/a67179d54611ae8cfb1d791cf7ab8e36c3224b76/dmd-script
         log "Downloading gdmd $url"
         download_without_verify "$ROOT/$1/bin/gdmd" "$url"
         chmod +x "$ROOT/$1/bin/gdmd"
@@ -769,19 +769,25 @@ install_dub() {
         log "no dub binaries available for $OS"
         return
     fi
-    local url=http://code.dlang.org/download/LATEST
-    logV "Determining latest dub version ($url)."
-    dub="dub-$(fetch $url)"
+    local latestMirrors=(
+        "http://dlang.github.io/dub/LATEST"
+        "http://code.dlang.org/download/LATEST"
+    )
+    logV "Determining latest dub version (${latestMirrors[0]})."
+    dubVersion="$(fetch "${latestMirrors[@]}")"
+    dub="dub-${dubVersion}"
     if [ -d "$ROOT/$dub" ]; then
         log "$dub already installed"
         return
     fi
     local tmp url
     tmp=$(mkdtemp)
-    url="http://code.dlang.org/files/$dub-$OS-$ARCH.tar.gz"
-
-    log "Downloading and unpacking $url"
-    download_without_verify "$tmp/dub.tar.gz" "$url"
+    local mirrors=(
+        "https://github.com/dlang/dub/releases/download/${dubVersion}/$dub-$OS-$ARCH.tar.gz"
+        "http://code.dlang.org/files/$dub-$OS-$ARCH.tar.gz"
+    )
+    log "Downloading and unpacking ${mirrors[0]}"
+    download_without_verify "$tmp/dub.tar.gz" "${mirrors[@]}"
     tar -C "$tmp" -zxf "$tmp/dub.tar.gz"
     logV "Removing old dub versions"
     rm -rf "$ROOT/dub" "$ROOT/dub-*"

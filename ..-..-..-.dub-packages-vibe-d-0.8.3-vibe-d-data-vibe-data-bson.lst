@@ -148,17 +148,17 @@
        |                A slice of the first bytes of `data` is stored, containg the data related to the value. An
        |                exception is thrown if `data` is too short.
        |        */
-    118|        this(Type type, bdata_t data)
+    123|        this(Type type, bdata_t data)
        |        {
-    118|                m_type = type;
-    118|                m_data = data;
-    118|                final switch(type){
+    123|                m_type = type;
+    123|                m_data = data;
+    123|                final switch(type){
 0000000|                        case Type.end: m_data = null; break;
 0000000|                        case Type.double_: m_data = m_data[0 .. 8]; break;
      69|                        case Type.string: m_data = m_data[0 .. 4 + fromBsonData!int(m_data)]; break;
-      3|                        case Type.object: m_data = m_data[0 .. fromBsonData!int(m_data)]; break;
+     15|                        case Type.object: m_data = m_data[0 .. fromBsonData!int(m_data)]; break;
     138|                        case Type.array: m_data = m_data[0 .. fromBsonData!int(m_data)]; break;
-0000000|                        case Type.binData: m_data = m_data[0 .. 5 + fromBsonData!int(m_data)]; break;
+      3|                        case Type.binData: m_data = m_data[0 .. 5 + fromBsonData!int(m_data)]; break;
 0000000|                        case Type.undefined: m_data = null; break;
 0000000|                        case Type.objectID: m_data = m_data[0 .. 12]; break;
 0000000|                        case Type.bool_: m_data = m_data[0 .. 1]; break;
@@ -196,7 +196,7 @@
        |        /// ditto
       4|        this(in Bson[string] value) { opAssign(value); }
        |        /// ditto
-     84|        this(in Bson[] value) { opAssign(value); }
+     86|        this(in Bson[] value) { opAssign(value); }
        |        /// ditto
       4|        this(in BsonBinData value) { opAssign(value); }
        |        /// ditto
@@ -218,15 +218,15 @@
        |        /// ditto
      14|        this(in Json value) { opAssign(value); }
        |        /// ditto
-      4|        this(in UUID value) { opAssign(value); }
+0000000|        this(in UUID value) { opAssign(value); }
        |
        |        /**
        |                Assigns a D type to a BSON value.
        |        */
        |        void opAssign(in Bson other)
        |        {
-    247|                m_data = other.m_data;
-    247|                m_type = other.m_type;
+    256|                m_data = other.m_data;
+    256|                m_type = other.m_type;
        |        }
        |        /// ditto
        |        void opAssign(double value)
@@ -266,30 +266,30 @@
        |        /// ditto
        |        void opAssign(in Bson[] value)
        |        {
-     42|                auto app = appender!bdata_t();
-    466|                foreach( i, ref v; value ){
-     85|                        app.put(v.type);
-     85|                        putCString(app, to!string(i));
-     85|                        app.put(v.data);
+     43|                auto app = appender!bdata_t();
+    473|                foreach( i, ref v; value ){
+     86|                        app.put(v.type);
+     86|                        putCString(app, to!string(i));
+     86|                        app.put(v.data);
        |                }
        |
-     42|                auto dapp = appender!bdata_t();
-     42|                dapp.put(toBsonData(cast(int)app.data.length+5));
-     42|                dapp.put(app.data);
-     42|                dapp.put(cast(ubyte)0);
-     42|                m_data = dapp.data;
-     42|                m_type = Type.array;
+     43|                auto dapp = appender!bdata_t();
+     43|                dapp.put(toBsonData(cast(int)app.data.length+5));
+     43|                dapp.put(app.data);
+     43|                dapp.put(cast(ubyte)0);
+     43|                m_data = dapp.data;
+     43|                m_type = Type.array;
        |        }
        |        /// ditto
        |        void opAssign(in BsonBinData value)
        |        {
-      4|                auto app = appender!bdata_t();
-      4|                app.put(toBsonData(cast(int)value.rawData.length));
-      4|                app.put(value.type);
-      4|                app.put(value.rawData);
+      2|                auto app = appender!bdata_t();
+      2|                app.put(toBsonData(cast(int)value.rawData.length));
+      2|                app.put(value.type);
+      2|                app.put(value.rawData);
        |
-      4|                m_data = app.data;
-      4|                m_type = Type.binData;
+      2|                m_data = app.data;
+      2|                m_type = Type.binData;
        |        }
        |        /// ditto
        |        void opAssign(in BsonObjectID value)
@@ -352,20 +352,20 @@
        |        /// ditto
        |        void opAssign(in UUID value)
        |        {
-      2|                opAssign(BsonBinData(BsonBinData.Type.uuid, value.data.idup));
+0000000|                opAssign(BsonBinData(BsonBinData.Type.uuid, value.data.idup));
        |        }
        |
        |        /**
        |                Returns the BSON type of this value.
        |        */
-    184|        @property Type type() const { return m_type; }
+    187|        @property Type type() const { return m_type; }
        |
 0000000|        bool isNull() const { return m_type == Type.null_; }
        |
        |        /**
        |                Returns the raw data representing this BSON value (not including the field name and type).
        |        */
-    207|        @property bdata_t data() const { return m_data; }
+    210|        @property bdata_t data() const { return m_data; }
        |
        |        /**
        |                Converts the BSON value to a D value.
@@ -712,43 +712,43 @@
        |        }
        |
        |        /// Iterates over all values of an object or array.
-    158|        auto byValue() const { checkType(Type.array, Type.object); return byKeyValueImpl().map!(t => t[1]); }
+    162|        auto byValue() const { checkType(Type.array, Type.object); return byKeyValueImpl().map!(t => t[1]); }
        |        /// Iterates over all index/value pairs of an array.
      68|        auto byIndexValue() const { checkType(Type.array); return byKeyValueImpl().map!(t => Tuple!(size_t, "key", Bson, "value")(t[0].to!size_t, t[1])); }
        |        /// Iterates over all key/value pairs of an object.
-      2|        auto byKeyValue() const { checkType(Type.object); return byKeyValueImpl(); }
+      4|        auto byKeyValue() const { checkType(Type.object); return byKeyValueImpl(); }
        |
        |        private auto byKeyValueImpl()
        |        const {
-     65|                checkType(Type.object, Type.array);
+     67|                checkType(Type.object, Type.array);
        |
-     65|                alias T = Tuple!(string, "key", Bson, "value");
+     67|                alias T = Tuple!(string, "key", Bson, "value");
        |
-     65|                static struct Rng {
+     67|                static struct Rng {
        |                        private {
        |                                immutable(ubyte)[] data;
        |                                string key;
        |                                Bson value;
        |                        }
        |
-    361|                        @property bool empty() const { return data.length == 0; }
-     64|                        @property T front() { return T(key, value); }
+    367|                        @property bool empty() const { return data.length == 0; }
+     66|                        @property T front() { return T(key, value); }
 0000000|                        @property Rng save() const { return this; }
        |
        |                        void popFront()
        |                        {
-    182|                                auto tp = cast(Type)data[0];
-    182|                                data = data[1 .. $];
-    246|                                if (tp == Type.end) return;
-    118|                                key = skipCString(data);
-    118|                                value = Bson(tp, data);
-    118|                                data = data[value.data.length .. $];
+    186|                                auto tp = cast(Type)data[0];
+    186|                                data = data[1 .. $];
+    252|                                if (tp == Type.end) return;
+    120|                                key = skipCString(data);
+    120|                                value = Bson(tp, data);
+    120|                                data = data[value.data.length .. $];
        |                        }
        |                }
        |
-     65|                auto ret = Rng(m_data[4 .. $]);
-     65|                ret.popFront();
-     65|                return ret;
+     67|                auto ret = Rng(m_data[4 .. $]);
+     67|                ret.popFront();
+     67|                return ret;
        |        }
        |
        |        ///
@@ -764,9 +764,9 @@
        |
        |        private void checkType(in Type[] valid_types...)
        |        const {
-    852|                foreach( t; valid_types )
-    229|                        if( m_type == t )
-    165|                                return;
+    875|                foreach( t; valid_types )
+    235|                        if( m_type == t )
+    170|                                return;
 0000000|                throw new Exception("BSON value is type '"~to!string(m_type)~"', expected to be one of "~to!string(valid_types));
        |        }
        |}
@@ -799,14 +799,14 @@
        |                bdata_t m_data;
        |        }
        |
-      4|        this(Type type, immutable(ubyte)[] data)
+      6|        this(Type type, immutable(ubyte)[] data)
        |        {
-      4|                m_type = type;
-      4|                m_data = data;
+      6|                m_type = type;
+      6|                m_data = data;
        |        }
        |
-      4|        @property Type type() const { return m_type; }
-      8|        @property bdata_t rawData() const { return m_data; }
+      5|        @property Type type() const { return m_type; }
+     11|        @property bdata_t rawData() const { return m_data; }
        |}
        |
        |
@@ -1370,15 +1370,15 @@
        |                size_t m_entryIndex = size_t.max;
        |        }
        |
-      3|        this(Bson input)
+      4|        this(Bson input)
        |        @safe {
-      3|                m_inputData = input;
+      4|                m_inputData = input;
        |        }
        |
-0000000|        this(ubyte[] buffer)
+      3|        this(ubyte[] buffer)
        |        @safe {
        |                import vibe.internal.utilallocator;
-0000000|                m_dst = () @trusted { return AllocAppender!(ubyte[])(vibeThreadAllocator(), buffer); } ();
+      6|                m_dst = () @trusted { return AllocAppender!(ubyte[])(vibeThreadAllocator(), buffer); } ();
        |        }
        |
        |        @disable this(this);
@@ -1390,10 +1390,10 @@
        |        //
        |        Bson getSerializedResult()
        |        @safe {
-0000000|                auto ret = Bson(m_type, () @trusted { return cast(immutable)m_dst.data; } ());
-0000000|                () @trusted { m_dst.reset(); } ();
-0000000|                m_type = Bson.Type.null_;
-0000000|                return ret;
+      6|                auto ret = Bson(m_type, () @trusted { return cast(immutable)m_dst.data; } ());
+      6|                () @trusted { m_dst.reset(); } ();
+      3|                m_type = Bson.Type.null_;
+      3|                return ret;
        |        }
        |
        |        void beginWriteDictionary(Traits)()
@@ -1457,16 +1457,16 @@
        |
        |        private void writeCompositeEntryHeader(Bson.Type tp)
        |        @safe {
-0000000|                if (!m_compositeStack.length) {
-0000000|                        assert(m_type == Bson.Type.null_, "Overwriting root item.");
-0000000|                        m_type = tp;
+      6|                if (!m_compositeStack.length) {
+      3|                        assert(m_type == Bson.Type.null_, "Overwriting root item.");
+      3|                        m_type = tp;
        |                }
        |
-0000000|                if (m_entryName !is null) {
-0000000|                        m_dst.put(tp);
-0000000|                        m_dst.putCString(m_entryName);
-0000000|                        m_entryName = null;
-0000000|                } else if (m_entryIndex != size_t.max) {
+      6|                if (m_entryName !is null) {
+      3|                        m_dst.put(tp);
+      3|                        m_dst.putCString(m_entryName);
+      3|                        m_entryName = null;
+      3|                } else if (m_entryIndex != size_t.max) {
        |                        import std.format;
 0000000|                        m_dst.put(tp);
 0000000|                        static struct Wrapper {
@@ -1669,17 +1669,17 @@
        |
        |private string skipCString(ref bdata_t data)
        |@safe {
-    118|        auto idx = data.countUntil(0);
-    118|        enforce(idx >= 0, "Unterminated BSON C-string.");
-    118|        auto ret = data[0 .. idx];
-    118|        data = data[idx+1 .. $];
-    118|        return cast(string)ret;
+    120|        auto idx = data.countUntil(0);
+    120|        enforce(idx >= 0, "Unterminated BSON C-string.");
+    120|        auto ret = data[0 .. idx];
+    120|        data = data[idx+1 .. $];
+    120|        return cast(string)ret;
        |}
        |
        |private void putCString(R)(ref R dst, string str)
        |{
-     98|        dst.put(cast(bdata_t)str);
-     98|        dst.put(cast(ubyte)0);
+    102|        dst.put(cast(bdata_t)str);
+    102|        dst.put(cast(ubyte)0);
        |}
        |
        |ubyte[] toBsonData(T)(T v)
@@ -1687,11 +1687,11 @@
        |        /*static T tmp;
        |        tmp = nativeToLittleEndian(v);
        |        return cast(ubyte[])((&tmp)[0 .. 1]);*/
-    132|        if (__ctfe) return nativeToLittleEndian(v).dup;
+     15|        if (__ctfe) return nativeToLittleEndian(v).dup;
        |        else {
-    132|                static ubyte[T.sizeof] ret;
-    132|                ret = nativeToLittleEndian(v);
-    132|                return ret;
+     15|                static ubyte[T.sizeof] ret;
+     15|                ret = nativeToLittleEndian(v);
+     15|                return ret;
        |        }
        |}
        |
@@ -1721,4 +1721,4 @@
        |
        |/// private
        |package template isBsonSerializable(T) { enum isBsonSerializable = is(typeof(T.init.toBson()) == Bson) && is(typeof(T.fromBson(Bson())) == T); }
-../../../.dub/packages/vibe-d-0.8.3/vibe-d/data/vibe/data/bson.d is 44% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/data/vibe/data/bson.d is 47% covered

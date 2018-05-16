@@ -9,10 +9,10 @@
        |@property IAllocator vibeThreadAllocator()
        |@safe nothrow @nogc {
        |        import stdx.allocator.gc_allocator;
-0000000|        static IAllocator s_threadAllocator;
-0000000|        if (!s_threadAllocator)
-0000000|                s_threadAllocator = () @trusted { return allocatorObject(GCAllocator.instance); } ();
-0000000|        return s_threadAllocator;
+      3|        static IAllocator s_threadAllocator;
+      3|        if (!s_threadAllocator)
+      2|                s_threadAllocator = () @trusted { return allocatorObject(GCAllocator.instance); } ();
+      3|        return s_threadAllocator;
        |}
        |
        |final class RegionListAllocator(Allocator, bool leak = false) : IAllocator {
@@ -181,4 +181,4 @@
        |                return true;
        |        }
        |}
-../../../.dub/packages/vibe-d-0.8.3/vibe-d/utils/vibe/internal/utilallocator.d is 0% covered
+../../../.dub/packages/vibe-d-0.8.3/vibe-d/utils/vibe/internal/utilallocator.d is 100% covered

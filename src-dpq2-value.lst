@@ -31,12 +31,12 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    411|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    416|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
-    411|        this._data = data;
-    411|        this._format = format;
-    411|        this._oidType = oidType;
-    411|        this._isNull = isNull;
+    416|        this._data = data;
+    416|        this._format = format;
+    416|        this._oidType = oidType;
+    416|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
@@ -51,26 +51,26 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1100|            return _isNull;
+   1114|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
        |        bool isArray()
        |        {
-     85|            return dpq2.oids.isSupportedArray(oidType);
+     87|            return dpq2.oids.isSupportedArray(oidType);
        |        }
        |        alias isSupportedArray = isArray; //TODO: deprecate
        |
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    680|            return _oidType;
+    687|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    439|            return _format;
+    443|            return _format;
        |        }
        |    }
        |
@@ -84,9 +84,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    829|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    838|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    819|        return _data;
+    828|        return _data;
        |    }
        |
        |    ///

@@ -24,9 +24,9 @@
        |    */
        |    pure nothrow @trusted void[] allocate(size_t bytes) shared
        |    {
-0000000|        if (!bytes) return null;
-0000000|        auto p = GC.malloc(bytes);
-0000000|        return p ? p[0 .. bytes] : null;
+      3|        if (!bytes) return null;
+      3|        auto p = GC.malloc(bytes);
+      6|        return p ? p[0 .. bytes] : null;
        |    }
        |
        |    /// Ditto
@@ -58,15 +58,15 @@
        |        import core.exception : OutOfMemoryError;
        |        try
        |        {
-0000000|            auto p = cast(ubyte*) GC.realloc(b.ptr, newSize);
-0000000|            b = p[0 .. newSize];
+      3|            auto p = cast(ubyte*) GC.realloc(b.ptr, newSize);
+      3|            b = p[0 .. newSize];
        |        }
        |        catch (OutOfMemoryError)
        |        {
        |            // leave the block in place, tell caller
 0000000|            return false;
        |        }
-0000000|        return true;
+      3|        return true;
        |    }
        |
        |    /// Ditto
@@ -165,4 +165,4 @@
        |    // anything above a page is simply rounded up to next page
        |    assert(GCAllocator.instance.goodAllocSize(4096 * 4 + 1) == 4096 * 5);
        |}
-../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/gc_allocator.d is 0% covered
+../../../.dub/packages/stdx-allocator-2.77.1/stdx-allocator/source/stdx/allocator/gc_allocator.d is 17% covered

@@ -113,7 +113,8 @@ shared static this()
             A(Time, TimeArray),
             A(TimeStampWithZone, TimeStampWithZoneArray),
             A(TimeStamp, TimeStampArray),
-            A(Json, JsonArray)
+            A(Json, JsonArray),
+            A(UUID, UUIDArray)
         ];
 
         appropriateArrOid = a;

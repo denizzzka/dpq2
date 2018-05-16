@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    215|    return cast(OidType)(oid);
+    218|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -24,12 +24,12 @@
        | */
        |OidType oidConvTo(string s)(OidType type)
        |{
-    131|    foreach(ref a; appropriateArrOid)
+    171|    foreach(ref a; appropriateArrOid)
        |    {
        |        static if(s == "array")
        |        {
-     40|            if(a.value == type)
-     11|                return a.array;
+     53|            if(a.value == type)
+     12|                return a.array;
        |        }
        |        else
        |        static if(s == "element")
@@ -113,7 +113,8 @@
        |            A(Time, TimeArray),
        |            A(TimeStampWithZone, TimeStampWithZoneArray),
        |            A(TimeStamp, TimeStampArray),
-       |            A(Json, JsonArray)
+       |            A(Json, JsonArray),
+       |            A(UUID, UUIDArray)
        |        ];
        |
       1|        appropriateArrOid = a;
@@ -125,7 +126,7 @@
        |bool isSupportedArray(OidType t) pure nothrow @nogc
        |{
        |    with(OidType)
-     87|    switch(t)
+     89|    switch(t)
        |    {
 0000000|        case BoolArray:
 0000000|        case ByteArrayArray:
@@ -142,15 +143,15 @@
      28|        case TimeArray:
      28|        case TimeWithZoneArray:
      28|        case NumericArray:
-     28|        case UUIDArray:
-     29|        case JsonArray:
-     29|        case JsonbArray:
-     29|            return true;
-     58|        default:
-     58|            break;
+     29|        case UUIDArray:
+     30|        case JsonArray:
+     30|        case JsonbArray:
+     30|            return true;
+     59|        default:
+     59|            break;
        |    }
        |
-     58|    return false;
+     59|    return false;
        |}
        |
        |OidType detectOidTypeFromNative(T)()
