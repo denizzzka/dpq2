@@ -335,11 +335,8 @@ if(is(T == TimeStamp) || is(T == TimeStampUTC))
 {
     import core.stdc.time: time_t;
 
-    static assert(raw.sizeof == time_t.min.sizeof);
-    static assert(raw.sizeof == time_t.max.sizeof);
-
-    if(raw == time_t.max) return T.later; // infinity
-    if(raw == time_t.min) return T.earlier; // -infinity
+    if(raw == long.max) return T.later; // infinity
+    if(raw == long.min) return T.earlier; // -infinity
 
     pg_tm tm;
     fsec_t ts;

@@ -335,11 +335,8 @@
        |{
        |    import core.stdc.time: time_t;
        |
-       |    static assert(raw.sizeof == time_t.min.sizeof);
-       |    static assert(raw.sizeof == time_t.max.sizeof);
-       |
-     12|    if(raw == time_t.max) return T.later; // infinity
-     11|    if(raw == time_t.min) return T.earlier; // -infinity
+     12|    if(raw == long.max) return T.later; // infinity
+     11|    if(raw == long.min) return T.earlier; // -infinity
        |
       9|    pg_tm tm;
       9|    fsec_t ts;
