@@ -154,11 +154,11 @@ class Connection
     }
 
     /// Obtains duplicate file descriptor number of the connection socket to the server
-    socket_t posixSocketDuplicate()()
+    socket_t posixSocketDuplicate()
     {
         version(Windows)
         {
-            static assert(false, "FIXME: implement socket duplication");
+            assert(false, "FIXME: implement socket duplication");
         }
         else // Posix OS
         {
@@ -172,7 +172,7 @@ class Connection
     ///
     /// Due to a limitation of Socket actually for the Socket creation
     /// duplicate of internal posix socket will be used.
-    Socket socket()()
+    Socket socket()
     {
         return new Socket(posixSocketDuplicate, AddressFamily.UNSPEC);
     }
