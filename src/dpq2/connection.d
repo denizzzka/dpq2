@@ -158,7 +158,7 @@ class Connection
     {
         version(Windows)
         {
-            static assert(false, "FIXME: implement socket duplication");
+            assert(false, "FIXME: implement socket duplication");
         }
         else // Posix OS
         {
