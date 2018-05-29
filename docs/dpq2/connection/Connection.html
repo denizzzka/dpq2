@@ -370,6 +370,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
+								<a href="../../dpq2/connection/Connection.transactionStatus.html" class="public">
+									<code>transactionStatus</code>
+								</a>
+							</td>
+							<td>Returns the current in-transaction status of the server.
+        The status can be:
+ PQTRANS_IDLE    - currently idle
+ PQTRANS_ACTIVE  - a command is in progress (reported only when a query has been sent to the server and not yet completed)
+ PQTRANS_INTRANS - idle, in a valid transaction block
+ PQTRANS_INERROR - idle, in a failed transaction block
+ PQTRANS_UNKNOWN - reported if the connection is bad
+</td>
+						</tr>
+						<tr>
+							<td>
 								<a href="../../dpq2/connection/Connection.untrace.html" class="public">
 									<code>untrace</code>
 								</a>

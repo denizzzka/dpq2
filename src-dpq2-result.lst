@@ -34,14 +34,14 @@
        |
        |    nothrow invariant()
        |    {
-    181|        assert( result != null );
+    184|        assert( result != null );
        |    }
        |
-    362|    package this(immutable PGresult* r)
+    368|    package this(immutable PGresult* r)
        |    {
-    181|        assert(r);
+    184|        assert(r);
        |
-    181|        result = r;
+    184|        result = r;
        |    }
        |
        |    ~this()
@@ -57,15 +57,15 @@
        |{
        |    private ResultContainer result;
        |
-    184|    package this(immutable ResultContainer r)
+    187|    package this(immutable ResultContainer r)
        |    {
-    184|        result = r;
+    187|        result = r;
        |    }
        |
        |    /// Returns the result status of the command.
        |    ExecStatusType status() nothrow
        |    {
-    178|        return PQresultStatus(result);
+    181|        return PQresultStatus(result);
        |    }
        |
        |    /// Text description of result status.
@@ -77,7 +77,7 @@
        |    /// Returns the error message associated with the command, or an empty string if there was no error.
        |    string resultErrorMessage()
        |    {
-      1|        return PQresultErrorMessage(result).to!string;
+      2|        return PQresultErrorMessage(result).to!string;
        |    }
        |
        |    /// Returns an individual field of an error report.
@@ -106,23 +106,23 @@
        |/// Contains result of query with valid data answer
        |immutable class Answer : Result
        |{
-    174|    package this(immutable ResultContainer r)
+    176|    package this(immutable ResultContainer r)
        |    {
-    175|        super(r);
+    178|        super(r);
        |
-    175|        checkAnswerForErrors();
+    178|        checkAnswerForErrors();
        |    }
        |
        |    private void checkAnswerForErrors()
        |    {
-    175|        switch(status)
+    178|        switch(status)
        |        {
-     17|            case PGRES_COMMAND_OK:
-    174|            case PGRES_TUPLES_OK:
-    174|                break;
+     19|            case PGRES_COMMAND_OK:
+    176|            case PGRES_TUPLES_OK:
+    176|                break;
        |
-      1|            default:
-      1|                throw new ResponseException(this, __FILE__, __LINE__);
+      2|            default:
+      2|                throw new ResponseException(this, __FILE__, __LINE__);
        |        }
        |    }
        |
@@ -647,11 +647,11 @@
        |    immutable(Result) result;
        |    alias result this;
        |
-      1|    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
+      2|    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
        |    {
-      1|        this.result = result;
+      2|        this.result = result;
        |
-      1|        super(result.resultErrorMessage(), file, line);
+      2|        super(result.resultErrorMessage(), file, line);
        |    }
        |}
        |

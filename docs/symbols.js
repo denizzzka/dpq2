@@ -114,6 +114,7 @@ var symbols = [
 {name: 'dpq2.connection.Connection.status', kind: "functiondeclaration", path: './dpq2/connection/Connection.status.html', attributes: []},
 {name: 'dpq2.connection.Connection.this', kind: "functiondeclaration", path: './dpq2/connection/Connection.this.html', attributes: []},
 {name: 'dpq2.connection.Connection.trace', kind: "functiondeclaration", path: './dpq2/connection/Connection.trace.html', attributes: []},
+{name: 'dpq2.connection.Connection.transactionStatus', kind: "functiondeclaration", path: './dpq2/connection/Connection.transactionStatus.html', attributes: []},
 {name: 'dpq2.connection.Connection.untrace', kind: "functiondeclaration", path: './dpq2/connection/Connection.untrace.html', attributes: []},
 {name: 'dpq2.connection.ConnectionException', kind: "classdeclaration", path: './dpq2/connection/ConnectionException.html', attributes: []},
 {name: 'dpq2.connection.ConnectionStart', kind: "structdeclaration", path: './dpq2/connection/ConnectionStart.html', attributes: []},

@@ -133,6 +133,7 @@
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.this.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.this.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.trace.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/connection/Connection.transactionStatus.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.untrace.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/ConnectionException.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/ConnectionStart.html</loc></url>

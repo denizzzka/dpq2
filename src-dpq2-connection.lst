@@ -46,17 +46,17 @@
        |
        |    invariant
        |    {
-    477|        assert(conn !is null);
+    493|        assert(conn !is null);
        |    }
        |
        |    /// Makes a new connection to the database server
-     12|    this(string connString)
+     14|    this(string connString)
        |    {
-      6|        conn = PQconnectdb(toStringz(connString));
+      7|        conn = PQconnectdb(toStringz(connString));
        |
-      6|        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+      7|        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
        |
-      6|        if(status != CONNECTION_OK)
+      7|        if(status != CONNECTION_OK)
 0000000|            throw new ConnectionException(this, __FILE__, __LINE__);
        |    }
        |
@@ -119,7 +119,21 @@
        |    /// Returns the status of the connection
        |    ConnStatusType status() nothrow
        |    {
-     20|        return PQstatus(conn);
+     22|        return PQstatus(conn);
+       |    }
+       |
+       |    /**
+       |        Returns the current in-transaction status of the server.
+       |        The status can be:
+       |            * PQTRANS_IDLE    - currently idle
+       |            * PQTRANS_ACTIVE  - a command is in progress (reported only when a query has been sent to the server and not yet completed)
+       |            * PQTRANS_INTRANS - idle, in a valid transaction block
+       |            * PQTRANS_INERROR - idle, in a failed transaction block
+       |            * PQTRANS_UNKNOWN - reported if the connection is bad
+       |     */
+       |    PGTransactionStatusType transactionStatus() nothrow
+       |    {
+      8|        return PQtransactionStatus(conn);
        |    }
        |
        |    /// If input is available from the server, consume it
@@ -216,9 +230,9 @@
        |    /// Get result after PQexec* functions or throw exception if pull is empty
        |    package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
        |    {
-    176|        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
+    179|        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
        |
-    174|        return new immutable ResultContainer(r);
+    177|        return new immutable ResultContainer(r);
        |    }
        |
        |    /// Select single-row mode for the currently-executing query
@@ -501,5 +515,21 @@
       1|        c.setClientEncoding("WIN866");
       1|        assert(c.exec("show client_encoding")[0][0].as!string == "WIN866");
        |    }
+       |
+       |    {
+      1|        auto c = new Connection(connParam);
+       |
+      1|        assert(c.transactionStatus == PQTRANS_IDLE);
+       |
+      1|        c.exec("BEGIN");
+      1|        assert(c.transactionStatus == PQTRANS_INTRANS);
+       |
+      1|        try c.exec("DISCARD ALL");
+       |        catch (Exception) {}
+      1|        assert(c.transactionStatus == PQTRANS_INERROR);
+       |
+      1|        c.exec("ROLLBACK");
+      1|        assert(c.transactionStatus == PQTRANS_IDLE);
+       |    }
        |}
-src/dpq2/connection.d is 65% covered
+src/dpq2/connection.d is 68% covered
