@@ -122,6 +122,20 @@ class Connection
         return PQstatus(conn);
     }
 
+    /**
+        Returns the current in-transaction status of the server.
+        The status can be:
+            * PQTRANS_IDLE    - currently idle
+            * PQTRANS_ACTIVE  - a command is in progress (reported only when a query has been sent to the server and not yet completed)
+            * PQTRANS_INTRANS - idle, in a valid transaction block
+            * PQTRANS_INERROR - idle, in a failed transaction block
+            * PQTRANS_UNKNOWN - reported if the connection is bad
+     */
+    PGTransactionStatusType transactionStatus() nothrow
+    {
+        return PQtransactionStatus(conn);
+    }
+
     /// If input is available from the server, consume it
     ///
     /// Useful only for non-blocking operations.
@@ -500,5 +514,21 @@ void _integration_test( string connParam )
 
         c.setClientEncoding("WIN866");
         assert(c.exec("show client_encoding")[0][0].as!string == "WIN866");
+    }
+
+    {
+        auto c = new Connection(connParam);
+
+        assert(c.transactionStatus == PQTRANS_IDLE);
+
+        c.exec("BEGIN");
+        assert(c.transactionStatus == PQTRANS_INTRANS);
+
+        try c.exec("DISCARD ALL");
+        catch (Exception) {}
+        assert(c.transactionStatus == PQTRANS_INERROR);
+
+        c.exec("ROLLBACK");
+        assert(c.transactionStatus == PQTRANS_IDLE);
     }
 }
