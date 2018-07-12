@@ -165,6 +165,7 @@ if (isArrayType!T)
 
         auto v = arr.toValue();
         assert(v.oidType == OidType.TextArray);
+        assert(!v.isNull);
 
         auto varr = v.asArray;
         assert(varr.length == 0);
