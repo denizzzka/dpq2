@@ -64,12 +64,6 @@ if (isArrayType!T)
     enum elemOid = detectOidTypeFromNative!ET;
     auto arrOid = oidConvTo!("array")(elemOid); //TODO: check in CT for supported array types
 
-    // check for null value
-    static if (!isStaticArray!T)
-    {
-        if (v is null) return Value(ValueFormat.BINARY, arrOid);
-    }
-
     // check for null element
     static if (__traits(compiles, v[0] is null) || is(ET == Nullable!R,R))
     {
@@ -164,6 +158,16 @@ if (isArrayType!T)
         assert(varr[0].as!string == "foo");
         assert(varr[1].as!string == "");
         assert(varr[2].as!string == "baz");
+    }
+
+    {
+        string[] arr;
+
+        auto v = arr.toValue();
+        assert(v.oidType == OidType.TextArray);
+
+        auto varr = v.asArray;
+        assert(varr.length == 0);
     }
 
     {

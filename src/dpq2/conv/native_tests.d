@@ -173,7 +173,8 @@ public void _integration_test( string connParam ) @system
 
         //Arrays
         C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
-        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //doesn't work due to call of Null.get on value comparisons
+        C!(int[])([], "int[]", "'{}'"); // empty array test
+        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //FIXME: doesn't work due to call of Null.get on value comparisons
         C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
