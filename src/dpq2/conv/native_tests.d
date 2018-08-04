@@ -204,6 +204,7 @@ public void _integration_test( string connParam ) @system
 
         //Arrays
         C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
+        C!(int[])([], "int[]", "'{}'"); // empty array test
         C!((Nullable!string)[])([Nullable!string("foo"), Nullable!string.init], "text[]", "'{foo,NULL}'");
         C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
