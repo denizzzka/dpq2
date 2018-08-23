@@ -22,10 +22,10 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R))
        |{
-     13|    if (v.isNull)
-      5|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+     15|    if (v.isNull)
+      6|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
        |    else
-      8|        return toValue(v.get);
+      9|        return toValue(v.get);
        |}
        |
        |///
@@ -46,11 +46,11 @@
        |    import std.string : representation;
        |
        |    static assert(isImplicitlyConvertible!(T, string));
-     55|    auto buf = (cast(string) v).representation;
+     56|    auto buf = (cast(string) v).representation;
        |
-     57|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+     58|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     55|    return Value(buf, OidType.Text, false, valueFormat);
+     56|    return Value(buf, OidType.Text, false, valueFormat);
        |}
        |
        |/// Constructs Value from array of bytes

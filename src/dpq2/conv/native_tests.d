@@ -10,6 +10,31 @@ import vibe.data.bson: Bson, deserializeBson;
 import vibe.data.json: Json, parseJsonString;
 
 version (integration_tests)
+private bool compareArrays(A, B)(A _a, B _b)
+{
+    static assert(is(A == B));
+
+    import std.algorithm.comparison : equal;
+    import std.traits: isInstanceOf;
+
+    return equal!(
+        (a, b)
+        {
+            static if(isInstanceOf!(Nullable, A))
+            {
+                if(a.isNull != b.isNull)
+                    return false;
+
+                if(a.isNull)
+                    return true;
+            }
+
+            return a == b;
+        }
+    )(_a, _b);
+}
+
+version (integration_tests)
 public void _integration_test( string connParam ) @system
 {
     import std.format: format;
@@ -36,7 +61,13 @@ public void _integration_test( string connParam ) @system
             static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
             else auto result = v.as!T;
 
-            assert(result == nativeValue,
+            static if(isArrayType!T)
+                const bool assertResult = compareArrays(result, nativeValue);
+            else
+                const bool assertResult = result == nativeValue;
+
+            assert(
+                assertResult,
                 format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
                 v.oidType, typeid(T), pgValue, nativeValue, result)
             );
@@ -173,7 +204,8 @@ public void _integration_test( string connParam ) @system
 
         //Arrays
         C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
-        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //doesn't work due to call of Null.get on value comparisons
+        C!(int[])([], "int[]", "'{}'"); // empty array test
+        C!((Nullable!string)[])([Nullable!string("foo"), Nullable!string.init], "text[]", "'{foo,NULL}'");
         C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");

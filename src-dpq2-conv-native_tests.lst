@@ -10,6 +10,31 @@
        |import vibe.data.json: Json, parseJsonString;
        |
        |version (integration_tests)
+       |private bool compareArrays(A, B)(A _a, B _b)
+       |{
+       |    static assert(is(A == B));
+       |
+       |    import std.algorithm.comparison : equal;
+       |    import std.traits: isInstanceOf;
+       |
+      6|    return equal!(
+       |        (a, b)
+       |        {
+       |            static if(isInstanceOf!(Nullable, A))
+       |            {
+       |                if(a.isNull != b.isNull)
+       |                    return false;
+       |
+       |                if(a.isNull)
+       |                    return true;
+       |            }
+       |
+      9|            return a == b;
+       |        }
+       |    )(_a, _b);
+       |}
+       |
+       |version (integration_tests)
        |public void _integration_test( string connParam ) @system
        |{
        |    import std.format: format;
@@ -29,31 +54,37 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    130|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     65|            params.args = null;
-     65|            auto answer = conn.execParams(params);
-     65|            immutable Value v = answer[0][0];
-      4|            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
+    134|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     67|            params.args = null;
+     67|            auto answer = conn.execParams(params);
+     67|            immutable Value v = answer[0][0];
+      6|            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
      61|            else auto result = v.as!T;
        |
-     70|            assert(result == nativeValue,
+       |            static if(isArrayType!T)
+      6|                const bool assertResult = compareArrays(result, nativeValue);
+       |            else
+     66|                const bool assertResult = result == nativeValue;
+       |
+     66|            assert(
+       |                assertResult,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
        |            );
        |
        |            {
        |                // test binary to text conversion
-     64|                params.sqlCommand = "SELECT $1::text";
-     64|                params.args = [nativeValue.toValue];
+     66|                params.sqlCommand = "SELECT $1::text";
+     66|                params.args = [nativeValue.toValue];
        |
-     64|                auto answer2 = conn.execParams(params);
-     64|                auto v2 = answer2[0][0];
+     66|                auto answer2 = conn.execParams(params);
+     66|                auto v2 = answer2[0][0];
        |
-     64|                string textResult = v2.isNull
+     66|                string textResult = v2.isNull
       2|                    ? "NULL"
-     62|                    : v2.as!string.strip(' ');
+     64|                    : v2.as!string.strip(' ');
        |
-     64|                pgValue = pgValue.strip('\'');
+     66|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -66,7 +97,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     64|                assert(textResult == pgValue,
+     66|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -173,7 +204,8 @@
        |
        |        //Arrays
       1|        C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
-       |        //C!(Nullable!string[])([Nullable!string("foo"),Nullable!string.init], "text[]", "'{foo,NULL}'"); //doesn't work due to call of Null.get on value comparisons
+      1|        C!(int[])([], "int[]", "'{}'"); // empty array test
+      1|        C!((Nullable!string)[])([Nullable!string("foo"), Nullable!string.init], "text[]", "'{foo,NULL}'");
       1|        C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
       1|        C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
       1|        C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");

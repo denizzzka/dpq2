@@ -34,14 +34,14 @@
        |
        |    nothrow invariant()
        |    {
-    184|        assert( result != null );
+    188|        assert( result != null );
        |    }
        |
-    368|    package this(immutable PGresult* r)
+    376|    package this(immutable PGresult* r)
        |    {
-    184|        assert(r);
+    188|        assert(r);
        |
-    184|        result = r;
+    188|        result = r;
        |    }
        |
        |    ~this()
@@ -57,15 +57,15 @@
        |{
        |    private ResultContainer result;
        |
-    187|    package this(immutable ResultContainer r)
+    191|    package this(immutable ResultContainer r)
        |    {
-    187|        result = r;
+    191|        result = r;
        |    }
        |
        |    /// Returns the result status of the command.
        |    ExecStatusType status() nothrow
        |    {
-    181|        return PQresultStatus(result);
+    185|        return PQresultStatus(result);
        |    }
        |
        |    /// Text description of result status.
@@ -106,20 +106,20 @@
        |/// Contains result of query with valid data answer
        |immutable class Answer : Result
        |{
-    176|    package this(immutable ResultContainer r)
+    180|    package this(immutable ResultContainer r)
        |    {
-    178|        super(r);
+    182|        super(r);
        |
-    178|        checkAnswerForErrors();
+    182|        checkAnswerForErrors();
        |    }
        |
        |    private void checkAnswerForErrors()
        |    {
-    178|        switch(status)
+    182|        switch(status)
        |        {
      19|            case PGRES_COMMAND_OK:
-    176|            case PGRES_TUPLES_OK:
-    176|                break;
+    180|            case PGRES_TUPLES_OK:
+    180|                break;
        |
       2|            default:
       2|                throw new ResponseException(this, __FILE__, __LINE__);
@@ -150,25 +150,25 @@
        |    }
        |
        |    /// Returns row count
-    362|    size_t length() nothrow { return PQntuples(result); }
+    370|    size_t length() nothrow { return PQntuples(result); }
        |
        |    /// Returns column count
-    941|    size_t columnCount() nothrow { return PQnfields(result); }
+    961|    size_t columnCount() nothrow { return PQnfields(result); }
        |
        |    /// Returns column format
        |    ValueFormat columnFormat( const size_t colNum )
        |    {
-    189|        assertCol( colNum );
+    193|        assertCol( colNum );
        |
-    189|        return cast(ValueFormat) PQfformat(result, to!int(colNum));
+    193|        return cast(ValueFormat) PQfformat(result, to!int(colNum));
        |    }
        |
        |    /// Returns column Oid
        |    OidType OID( size_t colNum )
        |    {
-    190|        assertCol( colNum );
+    194|        assertCol( colNum );
        |
-    190|        return PQftype(result, to!int(colNum)).oid2oidType;
+    194|        return PQftype(result, to!int(colNum)).oid2oidType;
        |    }
        |
        |    /// Checks if column type is array
@@ -218,7 +218,7 @@
        |    /// Returns row of cells
        |    immutable (Row) opIndex(in size_t row)
        |    {
-    177|        return immutable Row(this, row);
+    181|        return immutable Row(this, row);
        |    }
        |
        |    /**
@@ -262,7 +262,7 @@
        |
        |    private void assertCol( const size_t c )
        |    {
-    931|        if(!(c < columnCount))
+    951|        if(!(c < columnCount))
 0000000|            throw new AnswerException(
        |                ExceptionType.OUT_OF_RANGE,
        |                "Column "~to!string(c)~" is out of range 0.."~to!string(columnCount)~" of result columns",
@@ -272,7 +272,7 @@
        |
        |    private void assertRow( const size_t r )
        |    {
-    359|        if(!(r < length))
+    367|        if(!(r < length))
 0000000|            throw new AnswerException(
        |                ExceptionType.OUT_OF_RANGE,
        |                "Row "~to!string(r)~" is out of range 0.."~to!string(length)~" of result rows",
@@ -282,8 +282,8 @@
        |
        |     private void assertCoords( const Coords c )
        |    {
-    182|        assertRow( c.row );
-    182|        assertCol( c.col );
+    186|        assertRow( c.row );
+    186|        assertCol( c.col );
        |    }
        |}
        |
@@ -317,20 +317,20 @@
        |    private size_t row;
        |
        |    ///
-    177|    this(immutable Answer answer, in size_t row)
+    181|    this(immutable Answer answer, in size_t row)
        |    {
-    177|        answer.assertRow( row );
+    181|        answer.assertRow( row );
        |
-    177|        this.answer = answer;
-    177|        this.row = row;
+    181|        this.answer = answer;
+    181|        this.row = row;
        |    }
        |
        |    /// Returns the actual length of a cell value in bytes.
        |    size_t size( const size_t col )
        |    {
-    182|        answer.assertCol(col);
+    186|        answer.assertCol(col);
        |
-    182|        return PQgetlength(answer.result, to!int(row), to!int(col));
+    186|        return PQgetlength(answer.result, to!int(row), to!int(col));
        |    }
        |
        |    /// Checks if value is NULL
@@ -338,23 +338,23 @@
        |    /// Do not confuse it with Nullable's isNull method
        |    bool isNULL( const size_t col )
        |    {
-    186|        answer.assertCol(col);
+    190|        answer.assertCol(col);
        |
-    186|        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
+    190|        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
        |    }
        |
        |    /// Returns cell value by column number
        |    immutable (Value) opIndex(in size_t col)
        |    {
-    182|        answer.assertCoords( Coords( row, col ) );
+    186|        answer.assertCoords( Coords( row, col ) );
        |
        |        // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
        |        // One should not modify the data it points to, and one must explicitly copy the data into other
        |        // storage if it is to be used past the lifetime of the PGresult structure itself.
-    182|        immutable ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
-    182|        size_t s = size(col);
+    186|        immutable ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
+    186|        size_t s = size(col);
        |
-    182|        return immutable Value(v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
+    186|        return immutable Value(v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
        |    }
        |
        |    /// Returns cell value by field name
@@ -393,19 +393,19 @@
        |/// Creates Array from appropriate Value
        |immutable (Array) asArray(immutable(Value) v)
        |{
-     15|    if(v.format == ValueFormat.TEXT)
+     16|    if(v.format == ValueFormat.TEXT)
 0000000|        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
        |            "Value internal format is text",
        |            __FILE__, __LINE__
        |        );
        |
-     15|    if(!v.isSupportedArray)
+     16|    if(!v.isSupportedArray)
 0000000|        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
        |            "Format of the value is "~to!string(v.oidType)~", isn't supported array",
        |            __FILE__, __LINE__
        |        );
        |
-     15|    return immutable Array(v);
+     16|    return immutable Array(v);
        |}
        |
        |///
@@ -437,47 +437,47 @@
        |    size_t nElems; /// Total elements
        |    package size_t dataOffset;
        |
-     24|    this(in Value cell)
+     27|    this(in Value cell)
        |    {
-     24|        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
-     24|        int nDims = bigEndianToNative!int(h.ndims);
-     24|        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
+     27|        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
+     27|        int nDims = bigEndianToNative!int(h.ndims);
+     27|        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
        |
-     24|        if(nDims < 0)
+     27|        if(nDims < 0)
 0000000|            throw new AnswerException(ExceptionType.FATAL_ERROR,
        |                "Array dimensions number is negative ("~to!string(nDims)~")",
        |                __FILE__, __LINE__
        |            );
        |
-     24|        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
+     27|        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
        |
-     24|        dimsSize = new int[nDims];
+     27|        dimsSize = new int[nDims];
        |
        |        // Recognize dimensions of array
-    114|        for( auto i = 0; i < nDims; ++i )
+    124|        for( auto i = 0; i < nDims; ++i )
        |        {
-     33|            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+     35|            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
        |
-     33|            const dim_size = bigEndianToNative!int(d.dim_size);
-     33|            const lbound = bigEndianToNative!int(d.lbound);
+     35|            const dim_size = bigEndianToNative!int(d.dim_size);
+     35|            const lbound = bigEndianToNative!int(d.lbound);
        |
-     33|            if(dim_size < 0)
+     35|            if(dim_size < 0)
 0000000|                throw new AnswerException(ExceptionType.FATAL_ERROR,
        |                    "Dimension size is negative ("~to!string(dim_size)~")",
        |                    __FILE__, __LINE__
        |                );
        |
        |            // FIXME: What is lbound in postgresql array reply?
-     33|            if(!(lbound == 1))
+     35|            if(!(lbound == 1))
 0000000|                throw new AnswerException(ExceptionType.FATAL_ERROR,
        |                    "Please report if you came across this error! lbound=="~to!string(lbound),
        |                    __FILE__, __LINE__
        |                );
        |
-     33|            dimsSize[i] = dim_size;
+     35|            dimsSize[i] = dim_size;
        |
-     33|            if(i == 0) // first dimension
-     20|                nElems = dim_size;
+     35|            if(i == 0) // first dimension
+     22|                nElems = dim_size;
        |            else
      13|                nElems *= dim_size;
        |        }
@@ -495,22 +495,22 @@
        |    private ubyte[][] elements;
        |    private bool[] elementIsNULL;
        |
-     15|    this(immutable Value cell)
+     16|    this(immutable Value cell)
        |    {
-     15|        if(!(cell.format == ValueFormat.BINARY))
+     16|        if(!(cell.format == ValueFormat.BINARY))
 0000000|            throw new ValueConvException(ConvExceptionType.NOT_BINARY,
        |                msg_NOT_BINARY, __FILE__, __LINE__);
        |
-     15|        ap = cast(immutable) ArrayProperties(cell);
+     16|        ap = cast(immutable) ArrayProperties(cell);
        |
        |        // Looping through all elements and fill out index of them
        |        {
-     15|            auto elements = new immutable (ubyte)[][ nElems ];
-     15|            auto elementIsNULL = new bool[ nElems ];
+     16|            auto elements = new immutable (ubyte)[][ nElems ];
+     16|            auto elementIsNULL = new bool[ nElems ];
        |
-     15|            size_t curr_offset = ap.dataOffset;
+     16|            size_t curr_offset = ap.dataOffset;
        |
-    184|            for(uint i = 0; i < nElems; ++i)
+    186|            for(uint i = 0; i < nElems; ++i)
        |            {
      77|                ubyte[int.sizeof] size_net; // network byte order
      77|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
@@ -529,8 +529,8 @@
      77|                curr_offset += size;
        |            }
        |
-     15|            this.elements = elements.idup;
-     15|            this.elementIsNULL = elementIsNULL.idup;
+     16|            this.elements = elements.idup;
+     16|            this.elementIsNULL = elementIsNULL.idup;
        |        }
        |    }
        |
@@ -538,7 +538,7 @@
        |    /// Useful for one-dimensional arrays
        |    size_t length()
        |    {
-      8|        return nElems;
+      9|        return nElems;
        |    }
        |
        |    /// Returns Value struct by index

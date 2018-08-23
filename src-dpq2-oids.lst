@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    218|    return cast(OidType)(oid);
+    225|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -24,12 +24,12 @@
        | */
        |OidType oidConvTo(string s)(OidType type)
        |{
-    171|    foreach(ref a; appropriateArrOid)
+    192|    foreach(ref a; appropriateArrOid)
        |    {
        |        static if(s == "array")
        |        {
-     53|            if(a.value == type)
-     12|                return a.array;
+     59|            if(a.value == type)
+     15|                return a.array;
        |        }
        |        else
        |        static if(s == "element")
@@ -126,32 +126,32 @@
        |bool isSupportedArray(OidType t) pure nothrow @nogc
        |{
        |    with(OidType)
-     89|    switch(t)
+     93|    switch(t)
        |    {
 0000000|        case BoolArray:
 0000000|        case ByteArrayArray:
 0000000|        case CharArray:
 0000000|        case Int2Array:
-     15|        case Int4Array:
-     28|        case TextArray:
-     28|        case Int8Array:
-     28|        case Float4Array:
-     28|        case Float8Array:
-     28|        case TimeStampArray:
-     28|        case TimeStampWithZoneArray:
-     28|        case DateArray:
-     28|        case TimeArray:
-     28|        case TimeWithZoneArray:
-     28|        case NumericArray:
-     29|        case UUIDArray:
-     30|        case JsonArray:
-     30|        case JsonbArray:
-     30|            return true;
-     59|        default:
-     59|            break;
+     16|        case Int4Array:
+     31|        case TextArray:
+     31|        case Int8Array:
+     31|        case Float4Array:
+     31|        case Float8Array:
+     31|        case TimeStampArray:
+     31|        case TimeStampWithZoneArray:
+     31|        case DateArray:
+     31|        case TimeArray:
+     31|        case TimeWithZoneArray:
+     31|        case NumericArray:
+     32|        case UUIDArray:
+     33|        case JsonArray:
+     33|        case JsonbArray:
+     33|            return true;
+     60|        default:
+     60|            break;
        |    }
        |
-     59|    return false;
+     60|    return false;
        |}
        |
        |OidType detectOidTypeFromNative(T)()
@@ -159,7 +159,7 @@
        |    import std.typecons : Nullable;
        |
        |    static if(is(T == Nullable!R,R))
-      5|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
+      6|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
        |    else
      68|        return detectOidTypeNotCareAboutNullable!T;
        |}
@@ -173,11 +173,11 @@
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
        |
-     73|    alias UT = Unqual!T;
+     74|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
-      3|        static if(is(UT == string)){ return Text; } else
+      4|        static if(is(UT == string)){ return Text; } else
       2|        static if(is(UT == ubyte[])){ return ByteArray; } else
      11|        static if(is(UT == bool)){ return Bool; } else
       2|        static if(is(UT == short)){ return Int2; } else
