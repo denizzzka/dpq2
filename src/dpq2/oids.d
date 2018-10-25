@@ -193,7 +193,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == VibeJson)){ return Json; } else
         static if(is(UT == StdUUID)){ return UUID; } else
 
-        static assert(false, "Unsupported D type: "~T.stringof);
+        static assert(false, "Unsupported D type: "~UT.stringof);
     }
 }
 

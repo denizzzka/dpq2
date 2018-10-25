@@ -58,7 +58,8 @@ public void _integration_test( string connParam ) @system
             params.args = null;
             auto answer = conn.execParams(params);
             immutable Value v = answer[0][0];
-            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
+            static if (isArrayType!T || (is(T==Nullable!R, R) && isArrayType!R))
+                auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
             else auto result = v.as!T;
 
             static if(isArrayType!T)
@@ -209,5 +210,6 @@ public void _integration_test( string connParam ) @system
         C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
+        C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
     }
 }
