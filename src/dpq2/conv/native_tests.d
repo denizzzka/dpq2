@@ -211,5 +211,6 @@ public void _integration_test( string connParam ) @system
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
+        C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
     }
 }
