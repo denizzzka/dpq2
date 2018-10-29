@@ -32,13 +32,12 @@ if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))))
 Value toValue(T)(T v)
 if (is(T == Nullable!R, R) && (isArrayType!(typeof(v.get))))
 {
-    import dpq2.conv.arrays : arrToValue = toValue; // deprecation import workaround
     import std.range : ElementType;
 
     if (v.isNull)
         return Value(ValueFormat.BINARY, detectOidTypeFromNative!(ElementType!(typeof(v.get))).oidConvTo!"array");
     else
-        return arrToValue(v.get);
+        return toValue(v.get);
 }
 
 ///
