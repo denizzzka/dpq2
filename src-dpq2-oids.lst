@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    225|    return cast(OidType)(oid);
+    230|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -24,12 +24,12 @@
        | */
        |OidType oidConvTo(string s)(OidType type)
        |{
-    192|    foreach(ref a; appropriateArrOid)
+    218|    foreach(ref a; appropriateArrOid)
        |    {
        |        static if(s == "array")
        |        {
-     59|            if(a.value == type)
-     15|                return a.array;
+     67|            if(a.value == type)
+     17|                return a.array;
        |        }
        |        else
        |        static if(s == "element")
@@ -55,12 +55,12 @@
        |bool isNativeInteger(OidType t) pure
        |{
        |    with(OidType)
-     38|    switch(t)
+     41|    switch(t)
        |    {
       3|        case Int8:
       7|        case Int2:
-     37|        case Int4:
-     37|            return true;
+     40|        case Int4:
+     40|            return true;
       1|        default:
       1|            break;
        |    }
@@ -126,32 +126,32 @@
        |bool isSupportedArray(OidType t) pure nothrow @nogc
        |{
        |    with(OidType)
-     93|    switch(t)
+     97|    switch(t)
        |    {
 0000000|        case BoolArray:
 0000000|        case ByteArrayArray:
 0000000|        case CharArray:
 0000000|        case Int2Array:
-     16|        case Int4Array:
-     31|        case TextArray:
-     31|        case Int8Array:
-     31|        case Float4Array:
-     31|        case Float8Array:
-     31|        case TimeStampArray:
-     31|        case TimeStampWithZoneArray:
-     31|        case DateArray:
-     31|        case TimeArray:
-     31|        case TimeWithZoneArray:
-     31|        case NumericArray:
-     32|        case UUIDArray:
-     33|        case JsonArray:
-     33|        case JsonbArray:
-     33|            return true;
-     60|        default:
-     60|            break;
+     17|        case Int4Array:
+     32|        case TextArray:
+     32|        case Int8Array:
+     32|        case Float4Array:
+     32|        case Float8Array:
+     32|        case TimeStampArray:
+     32|        case TimeStampWithZoneArray:
+     32|        case DateArray:
+     32|        case TimeArray:
+     32|        case TimeWithZoneArray:
+     32|        case NumericArray:
+     33|        case UUIDArray:
+     34|        case JsonArray:
+     34|        case JsonbArray:
+     34|            return true;
+     63|        default:
+     63|            break;
        |    }
        |
-     60|    return false;
+     63|    return false;
        |}
        |
        |OidType detectOidTypeFromNative(T)()
@@ -161,7 +161,7 @@
        |    static if(is(T == Nullable!R,R))
       6|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
        |    else
-     68|        return detectOidTypeNotCareAboutNullable!T;
+     72|        return detectOidTypeNotCareAboutNullable!T;
        |}
        |
        |private OidType detectOidTypeNotCareAboutNullable(T)()
@@ -173,7 +173,7 @@
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
        |
-     74|    alias UT = Unqual!T;
+     78|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
@@ -181,7 +181,7 @@
       2|        static if(is(UT == ubyte[])){ return ByteArray; } else
      11|        static if(is(UT == bool)){ return Bool; } else
       2|        static if(is(UT == short)){ return Int2; } else
-     45|        static if(is(UT == int)){ return Int4; } else
+     49|        static if(is(UT == int)){ return Int4; } else
       2|        static if(is(UT == long)){ return Int8; } else
       1|        static if(is(UT == float)){ return Float4; } else
       2|        static if(is(UT == double)){ return Float8; } else
@@ -193,7 +193,7 @@
 0000000|        static if(is(UT == VibeJson)){ return Json; } else
 0000000|        static if(is(UT == StdUUID)){ return UUID; } else
        |
-       |        static assert(false, "Unsupported D type: "~T.stringof);
+       |        static assert(false, "Unsupported D type: "~UT.stringof);
        |    }
        |}
        |

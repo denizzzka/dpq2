@@ -195,7 +195,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<br/>
 				<span class="pun">)</span>
 				<br/>
-				<span class="kwd">if</span> <span class="pun">(</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Nullable</span><span class="pun">!</span><span class="pln">R</span><span class="pun">, </span><span class="pln">R</span><span class="pun">)</span><span class="pun">);</span>
+				<span class="kwd">if</span> <span class="pun">(</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Nullable</span><span class="pun">!</span><span class="pln">R</span><span class="pun">, </span><span class="pln">R</span><span class="pun">) &amp;&amp; !</span><span class="pln">isArrayType</span><span class="pun">!(</span><span class="kwd">typeof</span><span class="pun">(</span><span class="pln">v<wbr/></span><span class="pun">.</span><span class="pln">get</span><span class="pun">))</span><span class="pun">);</span>
+				<br/>
+				<br/>
+				<a href="../../../dpq2/value/Value.html"><span class="typ">Value</span></a> <span class="pln">toValue</span>(T)
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="pln">T</span> <span class="pln">v</span>
+				<br/>
+				<span class="pun">)</span>
+				<br/>
+				<span class="kwd">if</span> <span class="pun">(</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Nullable</span><span class="pun">!</span><span class="pln">R</span><span class="pun">, </span><span class="pln">R</span><span class="pun">) &amp;&amp; </span><span class="pln">isArrayType</span><span class="pun">!(</span><span class="kwd">typeof</span><span class="pun">(</span><span class="pln">v<wbr/></span><span class="pun">.</span><span class="pln">get</span><span class="pun">))</span><span class="pun">);</span>
 						</div>
 					</code>
 				</div>

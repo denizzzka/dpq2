@@ -3,10 +3,10 @@ module dpq2.conv.from_d_types;
 
 @safe:
 
-public import dpq2.conv.arrays : toValue;
+public import dpq2.conv.arrays : isArrayType, toValue;
 public import dpq2.conv.geometric : toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
-import dpq2.oids : detectOidTypeFromNative, OidType;
+import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
 import std.bitmanip: nativeToBigEndian;
@@ -20,12 +20,25 @@ import vibe.data.json: Json;
 
 /// Converts Nullable!T to Value
 Value toValue(T)(T v)
-if (is(T == Nullable!R, R))
+if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))))
 {
     if (v.isNull)
         return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
     else
         return toValue(v.get);
+}
+
+/// ditto
+Value toValue(T)(T v)
+if (is(T == Nullable!R, R) && (isArrayType!(typeof(v.get))))
+{
+    import dpq2.conv.arrays : arrToValue = toValue; // deprecation import workaround
+    import std.range : ElementType;
+
+    if (v.isNull)
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(ElementType!(typeof(v.get))).oidConvTo!"array");
+    else
+        return arrToValue(v.get);
 }
 
 ///

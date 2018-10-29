@@ -54,19 +54,20 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    134|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     67|            params.args = null;
-     67|            auto answer = conn.execParams(params);
-     67|            immutable Value v = answer[0][0];
-      6|            static if (isArrayType!T) auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
+    138|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     69|            params.args = null;
+     69|            auto answer = conn.execParams(params);
+     69|            immutable Value v = answer[0][0];
+       |            static if (isArrayType!T || (is(T==Nullable!R, R) && isArrayType!R))
+      8|                auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
      61|            else auto result = v.as!T;
        |
        |            static if(isArrayType!T)
       6|                const bool assertResult = compareArrays(result, nativeValue);
        |            else
-     66|                const bool assertResult = result == nativeValue;
+     68|                const bool assertResult = result == nativeValue;
        |
-     66|            assert(
+     68|            assert(
        |                assertResult,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
@@ -74,17 +75,17 @@
        |
        |            {
        |                // test binary to text conversion
-     66|                params.sqlCommand = "SELECT $1::text";
-     66|                params.args = [nativeValue.toValue];
+     68|                params.sqlCommand = "SELECT $1::text";
+     68|                params.args = [nativeValue.toValue];
        |
-     66|                auto answer2 = conn.execParams(params);
-     66|                auto v2 = answer2[0][0];
+     68|                auto answer2 = conn.execParams(params);
+     68|                auto v2 = answer2[0][0];
        |
-     66|                string textResult = v2.isNull
-      2|                    ? "NULL"
-     64|                    : v2.as!string.strip(' ');
+     68|                string textResult = v2.isNull
+      3|                    ? "NULL"
+     65|                    : v2.as!string.strip(' ');
        |
-     66|                pgValue = pgValue.strip('\'');
+     68|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -97,7 +98,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     66|                assert(textResult == pgValue,
+     68|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -209,6 +210,8 @@
       1|        C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
       1|        C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
       1|        C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
+      1|        C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
+      1|        C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
        |    }
        |}
 src/dpq2/conv/native_tests.d is 100% covered
