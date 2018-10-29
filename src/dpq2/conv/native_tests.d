@@ -60,7 +60,8 @@ public void _integration_test( string connParam ) @system
             immutable Value v = answer[0][0];
             static if (isArrayType!T || (is(T==Nullable!R, R) && isArrayType!R))
                 auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
-            else auto result = v.as!T;
+            else
+                auto result = v.as!T;
 
             static if(isArrayType!T)
                 const bool assertResult = compareArrays(result, nativeValue);
