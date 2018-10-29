@@ -60,7 +60,8 @@
      69|            immutable Value v = answer[0][0];
        |            static if (isArrayType!T || (is(T==Nullable!R, R) && isArrayType!R))
       8|                auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
-     61|            else auto result = v.as!T;
+       |            else
+     61|                auto result = v.as!T;
        |
        |            static if(isArrayType!T)
       6|                const bool assertResult = compareArrays(result, nativeValue);

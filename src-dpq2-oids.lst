@@ -193,7 +193,7 @@
 0000000|        static if(is(UT == VibeJson)){ return Json; } else
 0000000|        static if(is(UT == StdUUID)){ return UUID; } else
        |
-       |        static assert(false, "Unsupported D type: "~UT.stringof);
+       |        static assert(false, "Unsupported D type: "~T.stringof);
        |    }
        |}
        |
