@@ -21,6 +21,7 @@ package OidType oid2oidType(Oid oid) pure
  *
  * Params:
  *  s = "array" or "element"
+ *  type = source object type
  */
 OidType oidConvTo(string s)(OidType type)
 {
