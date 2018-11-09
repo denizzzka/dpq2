@@ -23,7 +23,12 @@ Value toValue(T)(T v)
 if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))))
 {
     if (v.isNull)
-        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+    {
+        static if(is(T == Nullable!DateTime))
+            return Value(ValueFormat.BINARY, detectOidTypeFromNative!TimeStamp);
+        else
+            return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+    }
     else
         return toValue(v.get);
 }
@@ -356,6 +361,22 @@ unittest
 
     assert(v.oidType == OidType.TimeStamp);
     assert(v.as!DateTime == d);
+}
+
+unittest
+{
+    // Nullable!DateTime
+    import std.typecons : nullable;
+    auto d = nullable(DateTime(2018, 2, 20, 1, 2, 3));
+    auto v = toValue(d);
+
+    assert(v.oidType == OidType.TimeStamp);
+    assert(v.as!(Nullable!DateTime) == d);
+
+    d.nullify();
+    v = toValue(d);
+    assert(v.oidType == OidType.TimeStamp);
+    assert(v.as!(Nullable!DateTime).isNull);
 }
 
 unittest
