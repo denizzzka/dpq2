@@ -160,21 +160,21 @@
        |    import std.typecons : Nullable;
        |
        |    static if(is(T == Nullable!R,R))
-      6|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
+      7|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
        |    else
      72|        return detectOidTypeNotCareAboutNullable!T;
        |}
        |
        |private OidType detectOidTypeNotCareAboutNullable(T)()
        |{
-       |    import std.datetime.date : StdDate = Date, TimeOfDay;
+       |    import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
        |    import std.datetime.systime : SysTime;
        |    import std.traits : Unqual;
        |    import std.uuid : StdUUID = UUID;
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
        |
-     78|    alias UT = Unqual!T;
+     79|    alias UT = Unqual!T;
        |
        |    with(OidType)
        |    {
@@ -188,6 +188,7 @@
       2|        static if(is(UT == double)){ return Float8; } else
       1|        static if(is(UT == StdDate)){ return Date; } else
       1|        static if(is(UT == TimeOfDay)){ return Time; } else
+      1|        static if(is(UT == DateTime)){ return TimeStamp; } else
       1|        static if(is(UT == SysTime)){ return TimeStampWithZone; } else
       1|        static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
       1|        static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else

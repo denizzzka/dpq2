@@ -108,16 +108,16 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     67|    if(!(v.format == VF.BINARY))
+     69|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-      6|        if (v.isNull)
-      1|            return T.init;
+      8|        if (v.isNull)
+      2|            return T.init;
        |        else
-      5|            return T(binaryValueAs!R(v));
+      6|            return T(binaryValueAs!R(v));
        |    }
        |    else
      60|        return binaryValueAs!T(v);

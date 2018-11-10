@@ -139,9 +139,10 @@ if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
         );
 }
 
-// Wikipedia's magic
 private auto modJulianDayForIntYear(const int year, const ubyte month, const short day) pure
 {
+    // Wikipedia magic:
+
     const a = (14 - month) / 12;
     const y = year + 4800 - a;
     const m = month + a * 12 - 3;
@@ -356,6 +357,22 @@ unittest
 
     assert(v.oidType == OidType.TimeStamp);
     assert(v.as!DateTime == d);
+}
+
+unittest
+{
+    // Nullable!DateTime
+    import std.typecons : nullable;
+    auto d = nullable(DateTime(2018, 2, 20, 1, 2, 3));
+    auto v = toValue(d);
+
+    assert(v.oidType == OidType.TimeStamp);
+    assert(v.as!(Nullable!DateTime) == d);
+
+    d.nullify();
+    v = toValue(d);
+    assert(v.oidType == OidType.TimeStamp);
+    assert(v.as!(Nullable!DateTime).isNull);
 }
 
 unittest

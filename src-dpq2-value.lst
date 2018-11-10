@@ -31,19 +31,19 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    436|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    437|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
-    436|        this._data = data;
-    436|        this._format = format;
-    436|        this._oidType = oidType;
-    436|        this._isNull = isNull;
+    437|        this._data = data;
+    437|        this._format = format;
+    437|        this._oidType = oidType;
+    437|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
-     11|    this(in ValueFormat format, in OidType oidType) pure
+     12|    this(in ValueFormat format, in OidType oidType) pure
        |    {
-     11|        this._format = format;
-     11|        this._oidType = oidType;
+     12|        this._format = format;
+     12|        this._oidType = oidType;
        |    }
        |
        |    @safe const pure nothrow @nogc
@@ -51,7 +51,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1168|            return _isNull;
+   1172|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -64,13 +64,13 @@
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    713|            return _oidType;
+    716|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    459|            return _format;
+    461|            return _format;
        |        }
        |    }
        |
@@ -84,9 +84,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    870|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    872|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    860|        return _data;
+    862|        return _data;
        |    }
        |
        |    ///
