@@ -166,7 +166,7 @@ OidType detectOidTypeFromNative(T)()
 
 private OidType detectOidTypeNotCareAboutNullable(T)()
 {
-    import std.datetime.date : StdDate = Date, TimeOfDay;
+    import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
     import std.uuid : StdUUID = UUID;
@@ -187,6 +187,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == double)){ return Float8; } else
         static if(is(UT == StdDate)){ return Date; } else
         static if(is(UT == TimeOfDay)){ return Time; } else
+        static if(is(UT == DateTime)){ return TimeStamp; } else
         static if(is(UT == SysTime)){ return TimeStampWithZone; } else
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
         static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
