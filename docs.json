@@ -3850,7 +3850,7 @@
 						"endchar": 5,
 						"name": "cmdTuples",
 						"line": 147,
-						"comment": " Returns the number of rows affected by the SQL command.\n This function returns a string containing the number of rows affected by the SQL statement\n that generated the Answer. This function can only be used following the execution of\n a SELECT, CREATE TABLE AS, INSERT, UPDATE, DELETE, MOVE, FETCH, or COPY statement,\n or an EXECUTE of a prepared query that contains an INSERT, UPDATE, or DELETE statement.\n If the command that generated the Anser was anything else, cmdTuples returns an empty string.\n",
+						"comment": " Returns the number of rows affected by the SQL command.\n This function returns a string containing the number of rows affected by the SQL statement\n that generated the Answer. This function can only be used following the execution of\n a SELECT, CREATE TABLE AS, INSERT, UPDATE, DELETE, MOVE, FETCH, or COPY statement,\n or an EXECUTE of a prepared query that contains an INSERT, UPDATE, or DELETE statement.\n If the command that generated the Anwser was anything else, cmdTuples returns an empty string.\n",
 						"deco": "yFZAya",
 						"endline": 150,
 						"char": 12,
