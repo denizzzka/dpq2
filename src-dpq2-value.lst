@@ -33,6 +33,11 @@
        |    /// ctor
     437|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
+       |        import std.exception: enforce;
+       |
+       |        //TODO: it is possible to skip this check for fixed-size values?
+    437|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
+       |
     437|        this._data = data;
     437|        this._format = format;
     437|        this._oidType = oidType;

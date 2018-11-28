@@ -4548,7 +4548,7 @@
 								"default": "cast(ValueFormat)1"
 							}
 						],
-						"endline": 40,
+						"endline": 45,
 						"originalType": "inout pure ref @safe (immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY)",
 						"char": 5,
 						"kind": "constructor"
@@ -4556,7 +4556,7 @@
 					{
 						"endchar": 5,
 						"name": "this",
-						"line": 43,
+						"line": 48,
 						"comment": "Null Value constructor\n",
 						"deco": "FNaNcNfxE4dpq25value11ValueFormatxEQBa4oids7OidTypeZSQBsQBq5Value",
 						"parameters": [
@@ -4569,7 +4569,7 @@
 								"deco": "xE4dpq24oids7OidType"
 							}
 						],
-						"endline": 47,
+						"endline": 52,
 						"originalType": "pure ref @safe (in ValueFormat format, in OidType oidType)",
 						"char": 5,
 						"kind": "constructor"
@@ -4577,50 +4577,50 @@
 					{
 						"endchar": 9,
 						"name": "isNull",
-						"line": 52,
+						"line": 57,
 						"comment": "Indicates if the value is NULL\n",
 						"deco": "xFNaNbNiNfZb",
-						"endline": 55,
+						"endline": 60,
 						"char": 14,
 						"kind": "function"
 					},
 					{
 						"endchar": 9,
 						"name": "isArray",
-						"line": 58,
+						"line": 63,
 						"comment": "Indicates if the value is array type\n",
 						"deco": "xFNaNbNiNfZb",
-						"endline": 61,
+						"endline": 66,
 						"char": 14,
 						"kind": "function"
 					},
 					{
 						"endchar": 9,
 						"name": "oidType",
-						"line": 65,
+						"line": 70,
 						"comment": "Returns Oid of the value\n",
 						"deco": "xFNaNbNiNfZE4dpq24oids7OidType",
-						"endline": 68,
+						"endline": 73,
 						"char": 17,
 						"kind": "function"
 					},
 					{
 						"endchar": 9,
 						"name": "format",
-						"line": 71,
+						"line": 76,
 						"comment": "Returns ValueFormat representation (text or binary)\n",
 						"deco": "xFNaNbNiNfZE4dpq25value11ValueFormat",
-						"endline": 74,
+						"endline": 79,
 						"char": 21,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "toString",
-						"line": 93,
+						"line": 98,
 						"comment": "\n",
 						"deco": "xFNeZAya",
-						"endline": 100,
+						"endline": 105,
 						"char": 12,
 						"kind": "function"
 					}
@@ -4632,7 +4632,7 @@
 				"members": [
 					{
 						"name": "TEXT",
-						"line": 122,
+						"line": 127,
 						"value": "0",
 						"comment": "\n",
 						"char": 5,
@@ -4640,7 +4640,7 @@
 					},
 					{
 						"name": "BINARY",
-						"line": 123,
+						"line": 128,
 						"value": "1",
 						"comment": "\n",
 						"char": 5,
@@ -4648,7 +4648,7 @@
 					}
 				],
 				"name": "ValueFormat",
-				"line": 121,
+				"line": 126,
 				"comment": "\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -4658,7 +4658,7 @@
 				"members": [
 					{
 						"name": "NOT_ARRAY",
-						"line": 131,
+						"line": 136,
 						"value": "0",
 						"comment": "Format of the value isn't array\n",
 						"char": 5,
@@ -4666,7 +4666,7 @@
 					},
 					{
 						"name": "NOT_BINARY",
-						"line": 132,
+						"line": 137,
 						"value": "1",
 						"comment": "Format of the column isn't binary\n",
 						"char": 5,
@@ -4674,7 +4674,7 @@
 					},
 					{
 						"name": "NOT_TEXT",
-						"line": 133,
+						"line": 138,
 						"value": "2",
 						"comment": "Format of the column isn't text string\n",
 						"char": 5,
@@ -4682,7 +4682,7 @@
 					},
 					{
 						"name": "NOT_IMPLEMENTED",
-						"line": 134,
+						"line": 139,
 						"value": "3",
 						"comment": "Support of this type isn't implemented (or format isn't matches to specified D type)\n",
 						"char": 5,
@@ -4690,7 +4690,7 @@
 					},
 					{
 						"name": "SIZE_MISMATCH",
-						"line": 135,
+						"line": 140,
 						"value": "4",
 						"comment": "Value size is not matched to the Postgres value\n",
 						"char": 5,
@@ -4698,7 +4698,7 @@
 					},
 					{
 						"name": "CORRUPTED_JSONB",
-						"line": 136,
+						"line": 141,
 						"value": "5",
 						"comment": "Corrupted JSONB value\n",
 						"char": 5,
@@ -4706,7 +4706,7 @@
 					},
 					{
 						"name": "DATE_VALUE_OVERFLOW",
-						"line": 137,
+						"line": 142,
 						"value": "6",
 						"comment": "Date value isn't fits to Postgres binary Date value\n",
 						"char": 5,
@@ -4714,7 +4714,7 @@
 					}
 				],
 				"name": "ConvExceptionType",
-				"line": 129,
+				"line": 134,
 				"comment": "Conversion exception types\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -4725,7 +4725,7 @@
 					{
 						"offset": 76,
 						"name": "type",
-						"line": 143,
+						"line": 148,
 						"comment": "Exception type\n",
 						"deco": "xE4dpq25value17ConvExceptionType",
 						"originalType": "ConvExceptionType",
@@ -4738,7 +4738,7 @@
 					}
 				],
 				"name": "ValueConvException",
-				"line": 141,
+				"line": 146,
 				"comment": "Value conversion exception\n",
 				"base": "std.conv.ConvException",
 				"char": 1,
