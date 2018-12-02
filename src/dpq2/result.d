@@ -343,6 +343,12 @@ immutable struct Row
         return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
     }
 
+    /// Checks if column with name exists
+    bool columnExists(in string column)
+    {
+        return answer.columnExists(column);
+    }
+
     /// Returns cell value by column number
     immutable (Value) opIndex(in size_t col)
     {
@@ -739,6 +745,7 @@ void _integration_test( string connParam )
         assert( r.OID(3) == OidType.Int4Array );
         assert( r.isSupportedArray(3) );
         assert( !r.isSupportedArray(2) );
+        assert( r[0].columnExists("test_array") );
         auto v = r[0]["test_array"];
         assert( v.isSupportedArray );
         assert( !r[0][2].isSupportedArray );
