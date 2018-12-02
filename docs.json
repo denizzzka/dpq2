@@ -4155,8 +4155,25 @@
 					},
 					{
 						"endchar": 5,
-						"name": "opIndex",
+						"name": "columnExists",
 						"line": 347,
+						"comment": "Checks if column with name exists\n",
+						"deco": "yFxAyaZb",
+						"parameters": [
+							{
+								"name": "column",
+								"deco": "xAya"
+							}
+						],
+						"endline": 350,
+						"originalType": "immutable bool(in string column)",
+						"char": 10,
+						"kind": "function"
+					},
+					{
+						"endchar": 5,
+						"name": "opIndex",
+						"line": 353,
 						"comment": "Returns cell value by column number\n",
 						"deco": "yFxmZyS4dpq25value5Value",
 						"parameters": [
@@ -4165,7 +4182,7 @@
 								"deco": "xm"
 							}
 						],
-						"endline": 358,
+						"endline": 364,
 						"originalType": "immutable immutable(Value)(in size_t col)",
 						"char": 23,
 						"kind": "function"
@@ -4173,7 +4190,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 361,
+						"line": 367,
 						"comment": "Returns cell value by field name\n",
 						"deco": "yFxAyaZyS4dpq25value5Value",
 						"parameters": [
@@ -4182,7 +4199,7 @@
 								"deco": "xAya"
 							}
 						],
-						"endline": 364,
+						"endline": 370,
 						"originalType": "immutable immutable(Value)(in string column)",
 						"char": 23,
 						"kind": "function"
@@ -4190,7 +4207,7 @@
 					{
 						"endchar": 5,
 						"name": "columnNum",
-						"line": 367,
+						"line": 373,
 						"comment": "Returns column number by field name\n",
 						"deco": "yFAyaZm",
 						"parameters": [
@@ -4199,7 +4216,7 @@
 								"deco": "Aya"
 							}
 						],
-						"endline": 370,
+						"endline": 376,
 						"originalType": "immutable size_t(string columnName)",
 						"char": 12,
 						"kind": "function"
@@ -4207,7 +4224,7 @@
 					{
 						"endchar": 5,
 						"name": "columnName",
-						"line": 373,
+						"line": 379,
 						"comment": "Returns column name by field number\n",
 						"deco": "yFxmZAya",
 						"parameters": [
@@ -4216,7 +4233,7 @@
 								"deco": "xm"
 							}
 						],
-						"endline": 376,
+						"endline": 382,
 						"originalType": "immutable string(in size_t colNum)",
 						"char": 12,
 						"kind": "function"
@@ -4224,10 +4241,10 @@
 					{
 						"endchar": 52,
 						"name": "length",
-						"line": 379,
+						"line": 385,
 						"comment": "Returns column count\n",
 						"deco": "yFZm",
-						"endline": 379,
+						"endline": 385,
 						"originalType": "immutable size_t()",
 						"char": 12,
 						"kind": "function"
@@ -4235,10 +4252,10 @@
 					{
 						"endchar": 5,
 						"name": "toString",
-						"line": 382,
+						"line": 388,
 						"comment": "\n",
 						"deco": "yFZAya",
-						"endline": 390,
+						"endline": 396,
 						"char": 12,
 						"kind": "function"
 					}
@@ -4249,7 +4266,7 @@
 			{
 				"endchar": 1,
 				"name": "asArray",
-				"line": 394,
+				"line": 400,
 				"comment": "Creates Array from appropriate Value\n",
 				"deco": "FyS4dpq25value5ValueZySQu6result5Array",
 				"parameters": [
@@ -4258,14 +4275,14 @@
 						"deco": "yS4dpq25value5Value"
 					}
 				],
-				"endline": 409,
+				"endline": 415,
 				"char": 19,
 				"kind": "function"
 			},
 			{
 				"endchar": 1,
 				"name": "toString",
-				"line": 412,
+				"line": 418,
 				"comment": "\n",
 				"deco": "FyS4dpq25value5ValueZAya",
 				"parameters": [
@@ -4274,20 +4291,20 @@
 						"deco": "yS4dpq25value5Value"
 					}
 				],
-				"endline": 417,
+				"endline": 423,
 				"originalType": "string(immutable Value v)",
 				"char": 8,
 				"kind": "function"
 			},
 			{
 				"name": "ArrayProperties",
-				"line": 433,
+				"line": 439,
 				"comment": "\n",
 				"members": [
 					{
 						"offset": 0,
 						"name": "OID",
-						"line": 435,
+						"line": 441,
 						"comment": "Oid\n",
 						"deco": "E4dpq24oids7OidType",
 						"init": "cast(OidType)0u",
@@ -4297,7 +4314,7 @@
 					{
 						"offset": 8,
 						"name": "dimsSize",
-						"line": 436,
+						"line": 442,
 						"comment": "Dimensions sizes info\n",
 						"deco": "Ai",
 						"char": 11,
@@ -4306,7 +4323,7 @@
 					{
 						"offset": 24,
 						"name": "nElems",
-						"line": 437,
+						"line": 443,
 						"comment": "Total elements\n",
 						"deco": "m",
 						"originalType": "size_t",
@@ -4319,13 +4336,13 @@
 			},
 			{
 				"name": "Array",
-				"line": 490,
+				"line": 496,
 				"comment": "Represents Value as array\n\nActually it is a reference to the cell value of the answer table\n",
 				"members": [
 					{
 						"offset": 0,
 						"name": "ap",
-						"line": 492,
+						"line": 498,
 						"comment": "\n",
 						"deco": "yS4dpq26result15ArrayProperties",
 						"originalType": "ArrayProperties",
@@ -4338,10 +4355,10 @@
 					{
 						"endchar": 5,
 						"name": "length",
-						"line": 539,
+						"line": 545,
 						"comment": "Returns number of elements in array\nUseful for one-dimensional arrays\n",
 						"deco": "yFZm",
-						"endline": 542,
+						"endline": 548,
 						"originalType": "immutable size_t()",
 						"char": 12,
 						"kind": "function"
@@ -4349,7 +4366,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 546,
+						"line": 552,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFmZyS4dpq25value5Value",
 						"parameters": [
@@ -4358,7 +4375,7 @@
 								"deco": "m"
 							}
 						],
-						"endline": 549,
+						"endline": 555,
 						"originalType": "immutable immutable(Value)(size_t n)",
 						"char": 23,
 						"kind": "function"
@@ -4366,7 +4383,7 @@
 					{
 						"endchar": 5,
 						"name": "opIndex",
-						"line": 553,
+						"line": 559,
 						"comment": "Returns Value struct by index\nUseful for one-dimensional arrays\n",
 						"deco": "yFiZyS4dpq25value5Value",
 						"parameters": [
@@ -4375,27 +4392,27 @@
 								"deco": "i"
 							}
 						],
-						"endline": 556,
+						"endline": 562,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "getValue",
-						"line": 560,
+						"line": 566,
 						"comment": "Returns Value struct\nUseful for multidimensional arrays\n",
 						"deco": "yFYyS4dpq25value5Value",
-						"endline": 565,
+						"endline": 571,
 						"char": 23,
 						"kind": "function"
 					},
 					{
 						"endchar": 5,
 						"name": "isNULL",
-						"line": 568,
+						"line": 574,
 						"comment": "Value NULL checking\n",
 						"deco": "yFYb",
-						"endline": 572,
+						"endline": 578,
 						"char": 10,
 						"kind": "function"
 					}
@@ -4405,36 +4422,36 @@
 			},
 			{
 				"name": "Notify",
-				"line": 617,
+				"line": 623,
 				"comment": "Notify\n",
 				"members": [
 					{
 						"endchar": 52,
 						"name": "name",
-						"line": 635,
+						"line": 641,
 						"comment": "Returns notification condition name\n",
 						"deco": "FZAya",
-						"endline": 635,
+						"endline": 641,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 51,
 						"name": "extra",
-						"line": 638,
+						"line": 644,
 						"comment": "Returns notification parameter\n",
 						"deco": "FZAya",
-						"endline": 638,
+						"endline": 644,
 						"char": 12,
 						"kind": "function"
 					},
 					{
 						"endchar": 37,
 						"name": "pid",
-						"line": 641,
+						"line": 647,
 						"comment": "Returns process ID of notifying server process\n",
 						"deco": "FZm",
-						"endline": 641,
+						"endline": 647,
 						"originalType": "size_t()",
 						"char": 12,
 						"kind": "function"
@@ -4446,7 +4463,7 @@
 			{
 				"members": [],
 				"name": "ResponseException",
-				"line": 645,
+				"line": 651,
 				"comment": "Covers errors of Answer creation when data was not received due to syntax errors, etc\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,
@@ -4456,7 +4473,7 @@
 				"members": [
 					{
 						"name": "FATAL_ERROR",
-						"line": 664,
+						"line": 670,
 						"value": "0",
 						"comment": "\n",
 						"char": 5,
@@ -4464,7 +4481,7 @@
 					},
 					{
 						"name": "COLUMN_NOT_FOUND",
-						"line": 665,
+						"line": 671,
 						"value": "1",
 						"comment": "Column is not found\n",
 						"char": 5,
@@ -4472,7 +4489,7 @@
 					},
 					{
 						"name": "OUT_OF_RANGE",
-						"line": 666,
+						"line": 672,
 						"value": "2",
 						"comment": "\n",
 						"char": 5,
@@ -4480,7 +4497,7 @@
 					}
 				],
 				"name": "ExceptionType",
-				"line": 662,
+				"line": 668,
 				"comment": "Answer exception types\n",
 				"baseDeco": "i",
 				"char": 1,
@@ -4491,7 +4508,7 @@
 					{
 						"offset": 76,
 						"name": "type",
-						"line": 672,
+						"line": 678,
 						"comment": "Exception type\n",
 						"deco": "xE4dpq26result13ExceptionType",
 						"originalType": "ExceptionType",
@@ -4503,7 +4520,7 @@
 					}
 				],
 				"name": "AnswerException",
-				"line": 670,
+				"line": 676,
 				"comment": "Covers errors of access to Answer data\n",
 				"base": "dpq2.exception.Dpq2Exception",
 				"char": 1,

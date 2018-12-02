@@ -339,6 +339,7 @@ var symbols = [
 {name: 'dpq2.result.Result', kind: "classdeclaration", path: './dpq2/result/Result.html', attributes: []},
 {name: 'dpq2.result.Result.toString', kind: "functiondeclaration", path: './dpq2/result/Result.toString.html', attributes: ["immutable"]},
 {name: 'dpq2.result.Row', kind: "structdeclaration", path: './dpq2/result/Row.html', attributes: []},
+{name: 'dpq2.result.Row.columnExists', kind: "functiondeclaration", path: './dpq2/result/Row.columnExists.html', attributes: ["immutable"]},
 {name: 'dpq2.result.Row.columnName', kind: "functiondeclaration", path: './dpq2/result/Row.columnName.html', attributes: ["immutable"]},
 {name: 'dpq2.result.Row.columnNum', kind: "functiondeclaration", path: './dpq2/result/Row.columnNum.html', attributes: ["immutable"]},
 {name: 'dpq2.result.Row.isNULL', kind: "functiondeclaration", path: './dpq2/result/Row.isNULL.html', attributes: ["immutable"]},
