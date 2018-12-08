@@ -567,6 +567,12 @@ immutable struct Array
     {
         auto n = coords2Serial( _argptr, _arguments );
 
+        return getValueByFlatIndex(n);
+    }
+
+    ///
+    package immutable (Value) getValueByFlatIndex(size_t n)
+    {
         return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
     }
 
@@ -587,7 +593,7 @@ immutable struct Array
         if(!(dimsSize.length == args.length))
             throw new AnswerException(
                 ExceptionType.OUT_OF_RANGE,
-                "Mismatched dimensions number in arguments and server reply",
+                "Mismatched dimensions number in Value and passed arguments: "~dimsSize.length.to!string~" and "~args.length.to!string,
                 __FILE__, __LINE__
             );
 

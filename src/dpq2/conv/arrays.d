@@ -6,10 +6,12 @@ module dpq2.conv.arrays;
 import dpq2.oids : OidType;
 import dpq2.value;
 
-import std.traits : isArray;
+import std.traits : isArray, isAssociativeArray;
 import std.typecons : Nullable;
 
 @safe:
+
+// From array to Value:
 
 template isArrayType(T)
 {
@@ -17,10 +19,11 @@ template isArrayType(T)
     import std.range : ElementType;
     import std.traits : Unqual;
 
-    enum isArrayType = isArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !is(T : string);
+    enum isArrayType = isArray!T && !isAssociativeArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !is(T : string);
 }
 
 static assert(isArrayType!(int[]));
+static assert(!isArrayType!(int[string]));
 static assert(!isArrayType!(ubyte[]));
 static assert(!isArrayType!(string));
 
@@ -268,4 +271,63 @@ unittest
         assert(getDimensionLength!0(arr) == 2);
         assertThrown(getDimensionLength!1(arr) == 3);
     }
+}
+
+// From Value to array:
+
+import dpq2.result: ArrayProperties;
+
+/// Convert Value to native array type
+T binaryValueAs(T)(in Value v) @system
+if(isArrayType!T)
+{
+    int idx;
+    return v.valueToArrayRow!(T, 0)(ArrayProperties(v), idx);
+}
+
+private T valueToArrayRow(T, int currDimension)(in Value v, in ArrayProperties arrayProperties, ref int elemIdx) @system
+{
+    import std.traits: isStaticArray;
+    import std.conv: to;
+
+    T res;
+
+    static if(isStaticArray!T)
+    {
+        if(T.length != arrayProperties.dimsSize[currDimension])
+            throw new ValueConvException(ConvExceptionType.DIMENSION_MISMATCH,
+                "Result array dimension "~currDimension.to!string~" mismatch"
+            );
+    }
+    else
+        res.length = arrayProperties.dimsSize[currDimension];
+
+    foreach(int i, ref elem; res)
+    {
+        import dpq2.result;
+
+        alias ElemType = typeof(elem);
+
+        static if(isArrayType!ElemType)
+            elem = v.valueToArrayRow!(ElemType, currDimension + 1)(arrayProperties, elemIdx);
+        else
+        {
+            elem = v.asArray.getValueByFlatIndex(elemIdx).as!ElemType;
+            elemIdx++;
+        }
+    }
+
+    return res;
+}
+
+@system unittest
+{
+    alias TA = int[3][2][1];
+
+    TA arr = [[[1,2,3], [4,5,6]]];
+    Value v = arr.toValue;
+
+    TA r = v.binaryValueAs!TA;
+
+    assert(r == arr);
 }

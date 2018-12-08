@@ -140,6 +140,7 @@ enum ConvExceptionType
     SIZE_MISMATCH, /// Value size is not matched to the Postgres value
     CORRUPTED_JSONB, /// Corrupted JSONB value
     DATE_VALUE_OVERFLOW, /// Date value isn't fits to Postgres binary Date value
+    DIMENSION_MISMATCH, /// Array dimension size is not matched to the Postgres array
 }
 
 /// Value conversion exception
