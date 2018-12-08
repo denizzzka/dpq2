@@ -336,33 +336,7 @@ private T valueToArrayRow(T, int currDimension)(in Value v, in ArrayProperties a
     return res;
 }
 
-// Static array test
-@system unittest
-{
-    alias TA = int[3][2][1];
-
-    TA arr = [[[1,2,3], [4,5,6]]];
-    Value v = arr.toValue;
-
-    TA r = v.binaryValueAs!TA;
-
-    assert(r == arr);
-}
-
-// Dynamic array test
-@system unittest
-{
-    alias TA = int[][][];
-
-    TA arr = [[[1,2,3], [4,5,6]]];
-    Value v = arr.toValue;
-
-    TA r = v.binaryValueAs!TA;
-
-    assert(r == arr);
-}
-
-// Mixed up array test
+// Array test
 @system unittest
 {
     alias TA = int[][2][];
@@ -373,4 +347,18 @@ private T valueToArrayRow(T, int currDimension)(in Value v, in ArrayProperties a
     TA r = v.binaryValueAs!TA;
 
     assert(r == arr);
+}
+
+// Dimension mismatch test
+@system unittest
+{
+    import std.exception;
+
+    alias TA = int[][2][];
+    alias R = int[][2][3]; // wrong array dimensions
+
+    TA arr = [[[1,2,3], [4,5,6]]];
+    Value v = arr.toValue;
+
+    assertThrown!ValueConvException(v.binaryValueAs!R);
 }
