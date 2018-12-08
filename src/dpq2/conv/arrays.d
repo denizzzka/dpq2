@@ -213,8 +213,10 @@ if (isArray!T)
 {
     import std.range : ElementType;
 
-    static if (is(ElementType!T == ArrayElementType!T)) enum int arrayDimensions = 1;
-    else enum int arrayDimensions = 1 + arrayDimensions!(ElementType!T);
+    static if (is(ElementType!T == ArrayElementType!T))
+        enum int arrayDimensions = 1;
+    else
+        enum int arrayDimensions = 1 + arrayDimensions!(ElementType!T);
 }
 
 unittest
@@ -223,6 +225,27 @@ unittest
     static assert(arrayDimensions!(int[][]) == 2);
     static assert(arrayDimensions!(int[][][]) == 3);
     static assert(arrayDimensions!(int[][][][]) == 4);
+}
+
+template arrayDimensionType(T, size_t dimNum, size_t currDimNum = 0)
+if (isArray!T)
+{
+    T instance;
+    alias CurrT = typeof(instance[0]);
+
+    static if (currDimNum < dimNum)
+        alias arrayDimensionType = arrayDimensionType!(CurrT, dimNum, currDimNum + 1);
+    else
+        alias arrayDimensionType = CurrT;
+}
+
+unittest
+{
+    static assert(is(arrayDimensionType!(bool[2][3], 0) == bool[2]));
+    static assert(is(arrayDimensionType!(bool[][3], 0) == bool[]));
+    static assert(is(arrayDimensionType!(bool[3][], 0) == bool[3]));
+    static assert(is(arrayDimensionType!(bool[2][][4], 0) == bool[2][]));
+    static assert(is(arrayDimensionType!(bool[3][], 1) == bool));
 }
 
 auto getDimensionLength(int idx, T)(T v)
