@@ -195,8 +195,10 @@ template ArrayElementType(T)
     import std.range : ElementType;
     import std.traits : isArray, isSomeString;
 
-    static if (!isArrayType!T) alias ArrayElementType = T;
-    else alias ArrayElementType = ArrayElementType!(ElementType!T);
+    static if (!isArrayType!T)
+        alias ArrayElementType = T;
+    else
+        alias ArrayElementType = ArrayElementType!(ElementType!T);
 }
 
 unittest
@@ -230,8 +232,9 @@ unittest
 template arrayDimensionType(T, size_t dimNum, size_t currDimNum = 0)
 if (isArray!T)
 {
-    T instance;
-    alias CurrT = typeof(instance[0]);
+    import std.range : ElementType;
+
+    alias CurrT = ElementType!T;
 
     static if (currDimNum < dimNum)
         alias arrayDimensionType = arrayDimensionType!(CurrT, dimNum, currDimNum + 1);
