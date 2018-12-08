@@ -256,7 +256,7 @@ auto getDimensionLength(int idx, T)(T v)
     import std.range : ElementType;
     import std.traits : isStaticArray;
 
-    static assert(idx >= 0 || !is(T == ArrayElementType!T), "Dimension index out of bounds");
+    static assert(idx >= 0 && !is(T == ArrayElementType!T), "Dimension index out of bounds");
 
     static if (idx == 0) return v.length;
     else
