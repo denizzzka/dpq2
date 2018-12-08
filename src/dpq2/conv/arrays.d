@@ -87,11 +87,10 @@ if (isArrayType!T)
     buffer ~= dimensions.nativeToBigEndian[]; // write number of dimensions
     buffer ~= (hasNull ? 1 : 0).nativeToBigEndian[]; // write null element flag
     buffer ~= (cast(int)elemOid).nativeToBigEndian[]; // write elements Oid
-    size_t[dimensions] dlen;
+    size_t[dimensions] dlen = getDimensionsLengths(v);
+
     static foreach (d; 0..dimensions)
     {
-        dlen[d] = getDimensionLength!d(v);
-        enforce(dlen[d] < uint.max, format!"Array length can't be larger than %s"(uint.max));
         buffer ~= (cast(uint)dlen[d]).nativeToBigEndian[]; // write number of dimensions
         buffer ~= 1.nativeToBigEndian[]; // write left bound index (PG indexes from 1 implicitly)
     }
@@ -260,6 +259,11 @@ if (isArrayType!T)
 private void calcDimensionsLengths(T, Ret)(T arr, ref Ret ret, int currDimNum)
 if (isArray!T)
 {
+    import std.exception : enforce;
+    import std.format : format;
+
+    enforce(arr.length < uint.max, format!"Array dimension length can't be larger or equal than %s"(uint.max));
+
     ret[currDimNum] = arr.length;
 
     static if(isArrayType!(ElementType!T))
@@ -283,53 +287,6 @@ unittest
     assert(ret[0] == 1);
     assert(ret[1] == 2);
     assert(ret[2] == 3);
-}
-
-auto getDimensionLength(int idx, T)(T v)
-{
-    import std.traits : isStaticArray;
-
-    static assert(idx >= 0 && !is(T == ArrayElementType!T), "Dimension index out of bounds");
-
-    static if (idx == 0) return v.length;
-    else
-    {
-        // check same lengths on next dimension
-        static if (!isStaticArray!(ElementType!T))
-        {
-            import std.algorithm : map, max, min, reduce;
-            import std.exception : enforce;
-
-            auto lengths = v.map!(a => a.length).reduce!(min, max);
-            enforce(lengths[0] == lengths[1], "Different lengths of sub arrays");
-        }
-
-        return getDimensionLength!(idx-1)(v[0]);
-    }
-}
-
-unittest
-{
-    {
-        int[3][2][1] arr = [[[1,2,3], [4,5,6]]];
-        assert(getDimensionLength!0(arr) == 1);
-        assert(getDimensionLength!1(arr) == 2);
-        assert(getDimensionLength!2(arr) == 3);
-    }
-
-    {
-        int[][][] arr = [[[1,2,3], [4,5,6]]];
-        assert(getDimensionLength!0(arr) == 1);
-        assert(getDimensionLength!1(arr) == 2);
-        assert(getDimensionLength!2(arr) == 3);
-    }
-
-    {
-        import std.exception : assertThrown;
-        int[][] arr = [[1,2,3], [4,5]];
-        assert(getDimensionLength!0(arr) == 2);
-        assertThrown(getDimensionLength!1(arr) == 3);
-    }
 }
 
 // From Value to array:
