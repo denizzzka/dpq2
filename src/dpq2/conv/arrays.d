@@ -7,6 +7,7 @@ import dpq2.oids : OidType;
 import dpq2.value;
 
 import std.traits : isArray, isAssociativeArray;
+import std.range : ElementType;
 import std.typecons : Nullable;
 
 @safe:
@@ -16,7 +17,6 @@ import std.typecons : Nullable;
 template isArrayType(T)
 {
     import dpq2.conv.geometric : isValidPolygon;
-    import std.range : ElementType;
     import std.traits : Unqual;
 
     enum isArrayType = isArray!T && !isAssociativeArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !is(T : string);
@@ -192,8 +192,7 @@ package:
 
 template ArrayElementType(T)
 {
-    import std.range : ElementType;
-    import std.traits : isArray, isSomeString;
+    import std.traits : isSomeString;
 
     static if (!isArrayType!T)
         alias ArrayElementType = T;
@@ -213,8 +212,6 @@ unittest
 template arrayDimensions(T)
 if (isArray!T)
 {
-    import std.range : ElementType;
-
     static if (is(ElementType!T == ArrayElementType!T))
         enum int arrayDimensions = 1;
     else
@@ -232,8 +229,6 @@ unittest
 template arrayDimensionType(T, size_t dimNum, size_t currDimNum = 0)
 if (isArray!T)
 {
-    import std.range : ElementType;
-
     alias CurrT = ElementType!T;
 
     static if (currDimNum < dimNum)
@@ -251,9 +246,47 @@ unittest
     static assert(is(arrayDimensionType!(bool[3][], 1) == bool));
 }
 
+auto getDimensionsLengths(T)(T v)
+if (isArrayType!T)
+{
+    enum dimNum = arrayDimensions!T;
+    size_t[dimNum] ret = -1;
+
+    calcDimensionsLengths(v, ret, 0);
+
+    return ret;
+}
+
+private void calcDimensionsLengths(T, Ret)(T arr, ref Ret ret, int currDimNum)
+if (isArray!T)
+{
+    ret[currDimNum] = arr.length;
+
+    static if(isArrayType!(ElementType!T))
+    {
+        currDimNum++;
+
+        if(currDimNum < ret.length)
+            if(arr.length > 0)
+                calcDimensionsLengths(arr[0], ret, currDimNum);
+    }
+}
+
+unittest
+{
+    alias T = int[][2][];
+
+    T arr = [[[1,2,3], [4,5,6]]];
+
+    auto ret = getDimensionsLengths(arr);
+
+    assert(ret[0] == 1);
+    assert(ret[1] == 2);
+    assert(ret[2] == 3);
+}
+
 auto getDimensionLength(int idx, T)(T v)
 {
-    import std.range : ElementType;
     import std.traits : isStaticArray;
 
     static assert(idx >= 0 && !is(T == ArrayElementType!T), "Dimension index out of bounds");
