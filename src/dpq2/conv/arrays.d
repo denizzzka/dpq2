@@ -361,3 +361,16 @@ private T valueToArrayRow(T, int currDimension)(in Value v, in ArrayProperties a
 
     assert(r == arr);
 }
+
+// Mixed up array test
+@system unittest
+{
+    alias TA = int[][2][];
+
+    TA arr = [[[1,2,3], [4,5,6]]];
+    Value v = arr.toValue;
+
+    TA r = v.binaryValueAs!TA;
+
+    assert(r == arr);
+}
