@@ -331,7 +331,7 @@ unittest
 import dpq2.result: ArrayProperties;
 
 /// Convert Value to native array type
-T binaryValueAs(T)(in Value v) @system
+T binaryValueAs(T)(in Value v) @trusted
 if(isArrayType!T)
 {
     int idx;

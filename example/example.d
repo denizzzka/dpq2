@@ -55,7 +55,8 @@ void main(string[] args)
     writeln( "3.2: ", r[0][3].asArray[1].as!PGtext );
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
-    writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.1: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.2: ", r[0]["multi_array"].as!(int[][]) );
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
     writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 
