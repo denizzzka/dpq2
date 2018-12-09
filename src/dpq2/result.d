@@ -593,10 +593,9 @@ immutable struct Array
         auto args = new int[ _arguments.length ];
 
         if(!(dimsSize.length == args.length))
-            throw new AnswerException( // TODO: Conv eception?
-                ExceptionType.OUT_OF_RANGE,
+            throw new ValueConvException(
+                ConvExceptionType.OUT_OF_RANGE,
                 "Mismatched dimensions number in Value and passed arguments: "~dimsSize.length.to!string~" and "~args.length.to!string,
-                __FILE__, __LINE__
             );
 
         for( uint i; i < args.length; ++i )
@@ -605,10 +604,9 @@ immutable struct Array
             args[i] = va_arg!(int)(_argptr);
 
             if(!(dimsSize[i] > args[i]))
-                throw new AnswerException(
-                    ExceptionType.OUT_OF_RANGE,
-                    "Out of range",
-                    __FILE__, __LINE__
+                throw new ValueConvException(
+                    ConvExceptionType.OUT_OF_RANGE,
+                    "Index is out of range",
                 );
         }
 

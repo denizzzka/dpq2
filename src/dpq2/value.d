@@ -142,6 +142,7 @@ enum ConvExceptionType
     DATE_VALUE_OVERFLOW, /// Date value isn't fits to Postgres binary Date value
     DIMENSION_MISMATCH, /// Array dimension size is not matched to the Postgres array
     CORRUPTED_ARRAY, /// Corrupted array value
+    OUT_OF_RANGE, /// Index is out of range
 }
 
 /// Value conversion exception
