@@ -349,16 +349,27 @@ private T valueToArrayRow(T, int currDimension)(in Value v, in ArrayProperties a
     assert(r == arr);
 }
 
+import std.exception: assertThrown;
+
 // Dimension mismatch test
 @system unittest
 {
-    import std.exception;
-
     alias TA = int[][2][];
-    alias R = int[][2][3]; // wrong array dimensions
+    alias R = int[][2][3]; // array dimensions mismatch
 
     TA arr = [[[1,2,3], [4,5,6]]];
     Value v = arr.toValue;
 
     assertThrown!ValueConvException(v.binaryValueAs!R);
+}
+
+// Corrupt array test
+@system unittest
+{
+    alias TA = int[][2][];
+
+    TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
+    Value v = arr.toValue;
+
+    assertThrown!ValueConvException(v.binaryValueAs!TA);
 }
