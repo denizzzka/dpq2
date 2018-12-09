@@ -9,6 +9,7 @@ import dpq2.value;
 import std.traits : isArray, isAssociativeArray;
 import std.range : ElementType;
 import std.typecons : Nullable;
+import std.exception: assertThrown;
 
 @safe:
 
@@ -215,8 +216,6 @@ if (isArrayType!T)
 // Corrupt array test
 unittest
 {
-    import core.exception: AssertError;
-
     alias TA = int[][2][];
 
     TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
@@ -389,8 +388,6 @@ private T valueToArrayRow(T, int currDimension)(in Value v, ArrayProperties arra
 
     assert(r == arr);
 }
-
-import std.exception: assertThrown;
 
 // Dimension mismatch test
 @system unittest
