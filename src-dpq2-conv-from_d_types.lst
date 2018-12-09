@@ -45,7 +45,7 @@
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-     55|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+     72|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/**
@@ -100,7 +100,7 @@
        |                __FILE__, __LINE__
        |            );
        |
-      6|    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
+       |    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
       6|    long days = mj_day - mj_pg_epoch;
        |
       6|    return Value(nativeToBigEndian(days.to!int).dup, OidType.Date, false);
@@ -127,7 +127,7 @@
       1|        us = us.min;
        |    else
        |    {
-      8|        enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
+       |        enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
       8|        long j = modJulianDayForIntYear(v.date.year, v.date.month, v.date.day) - mj_pg_epoch;
       8|        us = (((j * 24 + v.time.hour) * 60 + v.time.minute) * 60 + v.time.second) * 1_000_000 + v.fracSec.total!"usecs";
        |    }

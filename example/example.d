@@ -28,7 +28,7 @@ void main(string[] args)
         writeln("bson: ", cell.as!Bson);
     }
 
-    // Separated arguments query with binary result:
+    // Binary arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
         "$1::double precision as double_field, "~
@@ -38,12 +38,12 @@ void main(string[] args)
         "$4::integer[] as multi_array, "~
         "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'::json as json_value";
 
-    p.argsFromArray = [
-        "-1234.56789012345",
+    p.argsVariadic(
+        -1234.56789012345,
         "first line\nsecond line",
-        null,
-        "{{1, 2, 3}, {4, 5, 6}}"
-    ];
+        Nullable!string.init,
+        [[1, 2, 3], [4, 5, 6]]
+    );
 
     auto r = conn.execParams(p);
 
@@ -55,7 +55,8 @@ void main(string[] args)
     writeln( "3.2: ", r[0][3].asArray[1].as!PGtext );
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
-    writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.1: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.2: ", r[0]["multi_array"].as!(int[][]) );
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
     writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 

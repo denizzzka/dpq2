@@ -519,7 +519,9 @@ immutable struct Array
             for(uint i = 0; i < nElems; ++i)
             {
                 ubyte[int.sizeof] size_net; // network byte order
-                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
+
+                size_net[] = cell.data.safeBufferRead(curr_offset, size_net.sizeof);
+
                 uint size = bigEndianToNative!uint( size_net );
                 if( size == size.max ) // NULL magic number
                 {
@@ -531,7 +533,7 @@ immutable struct Array
                     elementIsNULL[i] = false;
                 }
                 curr_offset += size_net.sizeof;
-                elements[i] = cell.data[curr_offset .. curr_offset + size];
+                elements[i] = cell.data.safeBufferRead(curr_offset, size);
                 curr_offset += size;
             }
 
@@ -567,6 +569,12 @@ immutable struct Array
     {
         auto n = coords2Serial( _argptr, _arguments );
 
+        return getValueByFlatIndex(n);
+    }
+
+    ///
+    package immutable (Value) getValueByFlatIndex(size_t n)
+    {
         return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
     }
 
@@ -585,10 +593,9 @@ immutable struct Array
         auto args = new int[ _arguments.length ];
 
         if(!(dimsSize.length == args.length))
-            throw new AnswerException(
-                ExceptionType.OUT_OF_RANGE,
-                "Mismatched dimensions number in arguments and server reply",
-                __FILE__, __LINE__
+            throw new ValueConvException(
+                ConvExceptionType.OUT_OF_RANGE,
+                "Mismatched dimensions number in Value and passed arguments: "~dimsSize.length.to!string~" and "~args.length.to!string,
             );
 
         for( uint i; i < args.length; ++i )
@@ -597,10 +604,9 @@ immutable struct Array
             args[i] = va_arg!(int)(_argptr);
 
             if(!(dimsSize[i] > args[i]))
-                throw new AnswerException(
-                    ExceptionType.OUT_OF_RANGE,
-                    "Out of range",
-                    __FILE__, __LINE__
+                throw new ValueConvException(
+                    ConvExceptionType.OUT_OF_RANGE,
+                    "Index is out of range",
                 );
         }
 
@@ -617,6 +623,16 @@ immutable struct Array
         assert( element_num <= nElems );
         return element_num;
     }
+}
+
+private auto safeBufferRead(in ubyte[] buff, size_t offset, size_t len)
+{
+    import core.exception: RangeError;
+
+    try
+        return buff[ offset .. offset + len ];
+    catch(RangeError e)
+        throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY, "Corrupted array");
 }
 
 /// Notify

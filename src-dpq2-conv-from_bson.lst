@@ -95,13 +95,13 @@
        |
        |Value bsonArrayToValue(ref Bson bsonArr, OidType defaultType)
        |{
-      4|    ubyte[] nullValue() pure
+       |    ubyte[] nullValue() pure
        |    {
       6|        ubyte[] ret = [0xff, 0xff, 0xff, 0xff]; //NULL magic number
       6|        return ret;
        |    }
        |
-      4|    ubyte[] rawValue(Value v) pure
+       |    ubyte[] rawValue(Value v) pure
        |    {
      13|        if(v.isNull)
        |        {
@@ -116,7 +116,7 @@
       4|    ArrayProperties ap;
       4|    ubyte[] rawValues;
        |
-      4|    void recursive(ref Bson bsonArr, int dimension)
+       |    void recursive(ref Bson bsonArr, int dimension)
        |    {
      10|        if(dimension == ap.dimsSize.length)
        |        {

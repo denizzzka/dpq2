@@ -255,7 +255,7 @@
        |    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
        |    static immutable(TTimeStamp) max()
        |    {
-     11|        enum maxFract = 1.seconds - 1.usecs;
+       |        enum maxFract = 1.seconds - 1.usecs;
        |
      11|        return TTimeStamp(PgDate(294276, 12, 31), TimeOfDay(23, 59, 59), maxFract);
        |    }
@@ -342,9 +342,8 @@
      10|    fsec_t ts;
        |
      10|    if(timestamp2tm(raw, tm, ts) < 0)
-0000000|        throw new AnswerException(
-       |            ExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
-       |            __FILE__, __LINE__
+0000000|        throw new ValueConvException(
+       |            ConvExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
        |        );
        |
      10|    TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);
@@ -376,7 +375,7 @@
        |
        |void j2date(int jd, out int year, out int month, out int day)
        |{
-     17|    enum MONTHS_PER_YEAR = 12;
+       |    enum MONTHS_PER_YEAR = 12;
        |
      17|    jd += POSTGRES_EPOCH_JDATE;
        |
@@ -490,4 +489,4 @@
      10|    sec = cast(int)(time / USECS_PER_SEC);
      10|    fsec = cast(int)(time - sec*USECS_PER_SEC);
        |}
-src/dpq2/conv/time.d is 91% covered
+src/dpq2/conv/time.d is 90% covered

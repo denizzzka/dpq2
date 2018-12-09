@@ -290,7 +290,7 @@
        |/// Creates forward range from immutable Answer
        |auto rangify(T)(T obj)
        |{
-      2|    struct Rangify(T)
+       |    struct Rangify(T)
        |    {
        |        T obj;
        |        alias obj this;
@@ -399,19 +399,19 @@
        |/// Creates Array from appropriate Value
        |immutable (Array) asArray(immutable(Value) v)
        |{
-     16|    if(v.format == ValueFormat.TEXT)
+     36|    if(v.format == ValueFormat.TEXT)
 0000000|        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
        |            "Value internal format is text",
        |            __FILE__, __LINE__
        |        );
        |
-     16|    if(!v.isSupportedArray)
+     36|    if(!v.isSupportedArray)
 0000000|        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
        |            "Format of the value is "~to!string(v.oidType)~", isn't supported array",
        |            __FILE__, __LINE__
        |        );
        |
-     16|    return immutable Array(v);
+     36|    return immutable Array(v);
        |}
        |
        |///
@@ -443,49 +443,49 @@
        |    size_t nElems; /// Total elements
        |    package size_t dataOffset;
        |
-     28|    this(in Value cell)
+     50|    this(in Value cell)
        |    {
-     28|        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
-     28|        int nDims = bigEndianToNative!int(h.ndims);
-     28|        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
+     50|        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
+     50|        int nDims = bigEndianToNative!int(h.ndims);
+     50|        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
        |
-     28|        if(nDims < 0)
+     50|        if(nDims < 0)
 0000000|            throw new AnswerException(ExceptionType.FATAL_ERROR,
        |                "Array dimensions number is negative ("~to!string(nDims)~")",
        |                __FILE__, __LINE__
        |            );
        |
-     28|        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
+     50|        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
        |
-     28|        dimsSize = new int[nDims];
+     50|        dimsSize = new int[nDims];
        |
        |        // Recognize dimensions of array
-    128|        for( auto i = 0; i < nDims; ++i )
+    256|        for( auto i = 0; i < nDims; ++i )
        |        {
-     36|            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+     78|            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
        |
-     36|            const dim_size = bigEndianToNative!int(d.dim_size);
-     36|            const lbound = bigEndianToNative!int(d.lbound);
+     78|            const dim_size = bigEndianToNative!int(d.dim_size);
+     78|            const lbound = bigEndianToNative!int(d.lbound);
        |
-     36|            if(dim_size < 0)
+     78|            if(dim_size < 0)
 0000000|                throw new AnswerException(ExceptionType.FATAL_ERROR,
        |                    "Dimension size is negative ("~to!string(dim_size)~")",
        |                    __FILE__, __LINE__
        |                );
        |
        |            // FIXME: What is lbound in postgresql array reply?
-     36|            if(!(lbound == 1))
+     78|            if(!(lbound == 1))
 0000000|                throw new AnswerException(ExceptionType.FATAL_ERROR,
        |                    "Please report if you came across this error! lbound=="~to!string(lbound),
        |                    __FILE__, __LINE__
        |                );
        |
-     36|            dimsSize[i] = dim_size;
+     78|            dimsSize[i] = dim_size;
        |
-     36|            if(i == 0) // first dimension
-     23|                nElems = dim_size;
+     78|            if(i == 0) // first dimension
+     45|                nElems = dim_size;
        |            else
-     13|                nElems *= dim_size;
+     33|                nElems *= dim_size;
        |        }
        |    }
        |}
@@ -501,42 +501,44 @@
        |    private ubyte[][] elements;
        |    private bool[] elementIsNULL;
        |
-     16|    this(immutable Value cell)
+     36|    this(immutable Value cell)
        |    {
-     16|        if(!(cell.format == ValueFormat.BINARY))
+     36|        if(!(cell.format == ValueFormat.BINARY))
 0000000|            throw new ValueConvException(ConvExceptionType.NOT_BINARY,
        |                msg_NOT_BINARY, __FILE__, __LINE__);
        |
-     16|        ap = cast(immutable) ArrayProperties(cell);
+     36|        ap = cast(immutable) ArrayProperties(cell);
        |
        |        // Looping through all elements and fill out index of them
        |        {
-     16|            auto elements = new immutable (ubyte)[][ nElems ];
-     16|            auto elementIsNULL = new bool[ nElems ];
+     36|            auto elements = new immutable (ubyte)[][ nElems ];
+     36|            auto elementIsNULL = new bool[ nElems ];
        |
-     16|            size_t curr_offset = ap.dataOffset;
+     36|            size_t curr_offset = ap.dataOffset;
        |
-    186|            for(uint i = 0; i < nElems; ++i)
+    378|            for(uint i = 0; i < nElems; ++i)
        |            {
-     77|                ubyte[int.sizeof] size_net; // network byte order
-     77|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
-     77|                uint size = bigEndianToNative!uint( size_net );
-     77|                if( size == size.max ) // NULL magic number
+    153|                ubyte[int.sizeof] size_net; // network byte order
+       |
+    153|                size_net[] = cell.data.safeBufferRead(curr_offset, size_net.sizeof);
+       |
+    153|                uint size = bigEndianToNative!uint( size_net );
+    153|                if( size == size.max ) // NULL magic number
        |                {
-      8|                    elementIsNULL[i] = true;
-      8|                    size = 0;
+     10|                    elementIsNULL[i] = true;
+     10|                    size = 0;
        |                }
        |                else
        |                {
-     69|                    elementIsNULL[i] = false;
+    143|                    elementIsNULL[i] = false;
        |                }
-     77|                curr_offset += size_net.sizeof;
-     77|                elements[i] = cell.data[curr_offset .. curr_offset + size];
-     77|                curr_offset += size;
+    153|                curr_offset += size_net.sizeof;
+    153|                elements[i] = cell.data.safeBufferRead(curr_offset, size);
+    153|                curr_offset += size;
        |            }
        |
-     16|            this.elements = elements.idup;
-     16|            this.elementIsNULL = elementIsNULL.idup;
+     36|            this.elements = elements.idup;
+     36|            this.elementIsNULL = elementIsNULL.idup;
        |        }
        |    }
        |
@@ -567,7 +569,13 @@
        |    {
      18|        auto n = coords2Serial( _argptr, _arguments );
        |
-     18|        return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
+     18|        return getValueByFlatIndex(n);
+       |    }
+       |
+       |    ///
+       |    package immutable (Value) getValueByFlatIndex(size_t n)
+       |    {
+     38|        return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
        |    }
        |
        |    /// Value NULL checking
@@ -585,10 +593,9 @@
      20|        auto args = new int[ _arguments.length ];
        |
      20|        if(!(dimsSize.length == args.length))
-0000000|            throw new AnswerException(
-       |                ExceptionType.OUT_OF_RANGE,
-       |                "Mismatched dimensions number in arguments and server reply",
-       |                __FILE__, __LINE__
+0000000|            throw new ValueConvException(
+       |                ConvExceptionType.OUT_OF_RANGE,
+       |                "Mismatched dimensions number in Value and passed arguments: "~dimsSize.length.to!string~" and "~args.length.to!string,
        |            );
        |
     108|        for( uint i; i < args.length; ++i )
@@ -597,10 +604,9 @@
      34|            args[i] = va_arg!(int)(_argptr);
        |
      34|            if(!(dimsSize[i] > args[i]))
-0000000|                throw new AnswerException(
-       |                    ExceptionType.OUT_OF_RANGE,
-       |                    "Out of range",
-       |                    __FILE__, __LINE__
+0000000|                throw new ValueConvException(
+       |                    ConvExceptionType.OUT_OF_RANGE,
+       |                    "Index is out of range",
        |                );
        |        }
        |
@@ -617,6 +623,16 @@
      20|        assert( element_num <= nElems );
      20|        return element_num;
        |    }
+       |}
+       |
+       |private auto safeBufferRead(in ubyte[] buff, size_t offset, size_t len)
+       |{
+       |    import core.exception: RangeError;
+       |
+       |    try
+    306|        return buff[ offset .. offset + len ];
+       |    catch(RangeError e)
+0000000|        throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY, "Corrupted array");
        |}
        |
        |/// Notify

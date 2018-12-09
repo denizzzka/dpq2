@@ -10,7 +10,7 @@
        |import vibe.data.json: Json, parseJsonString;
        |
        |version (integration_tests)
-       |private bool compareArrays(A, B)(A _a, B _b)
+       |private bool compareArraysWithCareAboutNullables(A, B)(A _a, B _b)
        |{
        |    static assert(is(A == B));
        |
@@ -48,7 +48,7 @@
       1|    params.resultFormat = ValueFormat.BINARY;
        |
        |    {
-      1|        void testIt(T)(T nativeValue, string pgType, string pgValue)
+       |        void testIt(T)(T nativeValue, string pgType, string pgValue)
        |        {
        |            import std.algorithm : strip;
        |            import std.string : representation;
@@ -58,13 +58,11 @@
      69|            params.args = null;
      69|            auto answer = conn.execParams(params);
      69|            immutable Value v = answer[0][0];
-       |            static if (isArrayType!T || (is(T==Nullable!R, R) && isArrayType!R))
-      8|                auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
-       |            else
-     61|                auto result = v.as!T;
+       |
+     69|            auto result = v.as!T;
        |
        |            static if(isArrayType!T)
-      6|                const bool assertResult = compareArrays(result, nativeValue);
+      6|                const bool assertResult = compareArraysWithCareAboutNullables(result, nativeValue);
        |            else
      68|                const bool assertResult = result == nativeValue;
        |
@@ -106,7 +104,7 @@
        |            }
        |        }
        |
-      1|        alias C = testIt; // "C" means "case"
+       |        alias C = testIt; // "C" means "case"
        |
       1|        C!PGboolean(true, "boolean", "true");
       1|        C!PGboolean(false, "boolean", "false");

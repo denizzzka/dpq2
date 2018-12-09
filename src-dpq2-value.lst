@@ -31,17 +31,17 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    437|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    463|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
        |        import std.exception: enforce;
        |
        |        //TODO: it is possible to skip this check for fixed-size values?
-    437|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
+    463|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
        |
-    437|        this._data = data;
-    437|        this._format = format;
-    437|        this._oidType = oidType;
-    437|        this._isNull = isNull;
+    463|        this._data = data;
+    463|        this._format = format;
+    463|        this._oidType = oidType;
+    463|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
@@ -56,7 +56,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1172|            return _isNull;
+   1331|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -69,13 +69,13 @@
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    716|            return _oidType;
+    718|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    461|            return _format;
+    520|            return _format;
        |        }
        |    }
        |
@@ -89,9 +89,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    872|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+   1031|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    862|        return _data;
+   1021|        return _data;
        |    }
        |
        |    ///
@@ -137,9 +137,12 @@
        |    NOT_BINARY, /// Format of the column isn't binary
        |    NOT_TEXT, /// Format of the column isn't text string
        |    NOT_IMPLEMENTED, /// Support of this type isn't implemented (or format isn't matches to specified D type)
-       |    SIZE_MISMATCH, /// Value size is not matched to the Postgres value
+       |    SIZE_MISMATCH, /// Value size is not matched to the Postgres value or vice versa
        |    CORRUPTED_JSONB, /// Corrupted JSONB value
        |    DATE_VALUE_OVERFLOW, /// Date value isn't fits to Postgres binary Date value
+       |    DIMENSION_MISMATCH, /// Array dimension size is not matched to the Postgres array
+       |    CORRUPTED_ARRAY, /// Corrupted array value
+       |    OUT_OF_RANGE, /// Index is out of range
        |}
        |
        |/// Value conversion exception
@@ -147,10 +150,10 @@
        |{
        |    const ConvExceptionType type; /// Exception type
        |
-     32|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
+     34|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
        |    {
-     32|        type = t;
-     32|        super(msg, file, line);
+     34|        type = t;
+     34|        super(msg, file, line);
        |    }
        |}
        |

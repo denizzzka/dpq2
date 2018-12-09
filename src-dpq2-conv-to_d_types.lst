@@ -12,6 +12,7 @@
        |import dpq2.conv.numeric: rawValueToNumeric;
        |import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
        |import dpq2.conv.geometric: binaryValueAs, Line;
+       |import dpq2.conv.arrays : binaryValueAs;
        |
        |import vibe.data.json: Json, parseJsonString;
        |import vibe.data.bson: Bson;
@@ -53,9 +54,9 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    115|    if(v.format == VF.BINARY)
+    120|    if(v.format == VF.BINARY)
        |    {
-    111|        if(!(
+    116|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -69,25 +70,25 @@
        |
        |    static if(is(T == Nullable!R, R))
        |    {
-      3|        alias Ret = R;
+       |        alias Ret = R;
        |
-      3|        if (v.isNull)
-      3|            return T.init;
+      5|        if (v.isNull)
+      4|            return T.init;
        |    }
        |    else
-    111|        alias Ret = T;
+       |        alias Ret = T;
        |
-    111|    Ret r;
+    115|    Ret r;
        |
-    218|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    226|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     88|        r = v.valueAsString;
+     92|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
-0000000|        return T(r);
+      1|        return T(r);
        |    else
-    109|        return r;
+    112|        return r;
        |}
        |
        |@system unittest
@@ -108,19 +109,19 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     69|    if(!(v.format == VF.BINARY))
+     92|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-      8|        if (v.isNull)
-      2|            return T.init;
+     10|        if (v.isNull)
+      3|            return T.init;
        |        else
-      6|            return T(binaryValueAs!R(v));
+      7|            return T(binaryValueAs!R(v));
        |    }
        |    else
-     60|        return binaryValueAs!T(v);
+     81|        return binaryValueAs!T(v);
        |}
        |
        |@system unittest
@@ -137,7 +138,7 @@
        | */
        |auto tunnelForBinaryValueAsCalls(T)(in Value v)
        |{
-     30|    return binaryValueAs!T(v);
+     21|    return binaryValueAs!T(v);
        |}
        |
        |string valueAsString(in Value v) pure
@@ -168,21 +169,21 @@
        |if( isNumeric!(T) )
        |{
        |    static if(isIntegral!(T))
-     41|        if(!isNativeInteger(v.oidType))
+     47|        if(!isNativeInteger(v.oidType))
       1|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
        |
        |    static if(isFloatingPoint!(T))
       5|        if(!isNativeFloat(v.oidType))
       1|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
        |
-     44|    if(!(v.data.length == T.sizeof))
+     50|    if(!(v.data.length == T.sizeof))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
        |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
        |            __FILE__, __LINE__);
        |
-     40|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
-     40|    return bigEndianToNative!(T)(s);
+     46|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     46|    return bigEndianToNative!(T)(s);
        |}
        |
        |@system unittest
@@ -275,4 +276,4 @@
       1|    auto v = Value([1], OidType.Int4);
       2|    assertThrown!ValueConvException(v.binaryValueAs!Json);
        |}
-src/dpq2/conv/to_d_types.d is 98% covered
+src/dpq2/conv/to_d_types.d is 100% covered

@@ -189,7 +189,7 @@
        |{
        |    import dpq2.result: ValueConvException, ConvExceptionType;
        |
-     24|    struct NumericVar_net // network byte order
+       |    struct NumericVar_net // network byte order
        |    {
        |        ubyte[2] num; // num of digits
        |        ubyte[2] weight;
