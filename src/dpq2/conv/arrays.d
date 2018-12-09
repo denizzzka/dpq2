@@ -27,6 +27,40 @@ static assert(!isArrayType!(int[string]));
 static assert(!isArrayType!(ubyte[]));
 static assert(!isArrayType!(string));
 
+/// Write array element into buffer
+private void writeArrayElement(R, T)(ref R output, T item, ref int counter)
+{
+    import std.array : Appender;
+    import std.bitmanip : nativeToBigEndian;
+    import std.exception : enforce;
+    import std.format : format;
+
+    static if (is(T == ArrayElementType!T))
+    {
+        import dpq2.conv.from_d_types : toValue;
+
+        static immutable ubyte[] nullVal = [255,255,255,255]; //special length value to indicate null value in array
+        auto v = item.toValue; // TODO: Direct serialization to buffer would be more effective
+
+        if (v.isNull)
+            output ~= nullVal;
+        else
+        {
+            auto l = v._data.length;
+            enforce(l < uint.max, format!"Array item can't be larger than %s"(uint.max-1)); // -1 because uint.max is a null special value //FIXME: add exception
+            output ~= (cast(uint)l).nativeToBigEndian[]; // write item length
+            output ~= v._data;
+        }
+
+        counter++;
+    }
+    else
+    {
+        foreach (i; item)
+            writeArrayElement(output, i, counter);
+    }
+}
+
 /// Converts dynamic or static array of supported types to the coresponding PG array type value
 Value toValue(T)(auto ref T v)
 if (isArrayType!T)
@@ -34,33 +68,7 @@ if (isArrayType!T)
     import dpq2.oids : detectOidTypeFromNative, oidConvTo;
     import std.array : Appender;
     import std.bitmanip : nativeToBigEndian;
-    import std.exception : enforce;
-    import std.format : format;
     import std.traits : isStaticArray;
-
-    static void writeItem(R, T)(ref R output, T item)
-    {
-        static if (is(T == ArrayElementType!T))
-        {
-            import dpq2.conv.from_d_types : toValue;
-
-            static immutable ubyte[] nullVal = [255,255,255,255]; //special length value to indicate null value in array
-            auto v = item.toValue; // TODO: Direct serialization to buffer would be more effective
-            if (v.isNull) output ~= nullVal;
-            else
-            {
-                auto l = v._data.length;
-                enforce(l < uint.max, format!"Array item can't be larger than %s"(uint.max-1)); // -1 because uint.max is a null special value
-                output ~= (cast(uint)l).nativeToBigEndian[]; // write item length
-                output ~= v._data;
-            }
-        }
-        else
-        {
-            foreach (i; item)
-                writeItem(output, i);
-        }
-    }
 
     alias ET = ArrayElementType!T;
     enum dimensions = arrayDimensions!T;
@@ -87,7 +95,7 @@ if (isArrayType!T)
     buffer ~= dimensions.nativeToBigEndian[]; // write number of dimensions
     buffer ~= (hasNull ? 1 : 0).nativeToBigEndian[]; // write null element flag
     buffer ~= (cast(int)elemOid).nativeToBigEndian[]; // write elements Oid
-    size_t[dimensions] dlen = getDimensionsLengths(v);
+    const size_t[dimensions] dlen = getDimensionsLengths(v);
 
     static foreach (d; 0..dimensions)
     {
@@ -96,7 +104,19 @@ if (isArrayType!T)
     }
 
     //write data
-    foreach (i; v) writeItem(buffer, i);
+    int elemCount;
+    foreach (i; v) writeArrayElement(buffer, i, elemCount);
+
+    // Array consistency check
+    // Can be triggered if non-symmetric multidimensional dynamic array is used
+    {
+        size_t mustBeElementsCount = 1;
+
+        foreach(dim; dlen)
+            mustBeElementsCount *= dim;
+
+        assert(elemCount == mustBeElementsCount); //FIXME: exception
+    }
 
     return Value(buffer.data, arrOid);
 }
@@ -366,10 +386,10 @@ import std.exception: assertThrown;
 // Corrupt array test
 @system unittest
 {
+    import core.exception: AssertError;
+
     alias TA = int[][2][];
 
     TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
-    Value v = arr.toValue;
-
-    assertThrown!ValueConvException(v.binaryValueAs!TA);
+    assertThrown!AssertError(arr.toValue);
 }
