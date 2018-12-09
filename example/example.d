@@ -28,7 +28,7 @@ void main(string[] args)
         writeln("bson: ", cell.as!Bson);
     }
 
-    // Separated binary arguments query with binary result:
+    // Binary arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
         "$1::double precision as double_field, "~
