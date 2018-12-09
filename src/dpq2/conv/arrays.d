@@ -118,7 +118,9 @@ if (isArrayType!T)
         foreach(dim; dlen)
             mustBeElementsCount *= dim;
 
-        assert(elemCount == mustBeElementsCount); //FIXME: exception
+        if(elemCount != mustBeElementsCount)
+            throw new ValueConvException(ConvExceptionType.DIMENSION_MISMATCH,
+                "Array dimensions isn't fit to Postgres array type");
     }
 
     return Value(buffer.data, arrOid);
@@ -395,5 +397,5 @@ import std.exception: assertThrown;
     alias TA = int[][2][];
 
     TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
-    assertThrown!AssertError(arr.toValue);
+    assertThrown!ValueConvException(arr.toValue);
 }
