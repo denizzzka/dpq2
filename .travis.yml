@@ -28,12 +28,12 @@ script:
 
 matrix:
   include:
-    - d: dmd-2.078.3
+    - d: dmd
 
       script:
         - dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="${CONN_STRING}"
         - dub run dpq2:example --build=release -- --conninfo="${CONN_STRING}"
-        - dub build --build=ddox
+        #- dub build --build=ddox #disabled because it fails: vibe-d-0.8.4/vibe-d/data/vibe/data/json.d(2138,6): Warning: Ddoc: parameter count mismatch
 
       before_install:
         - dub fetch dscanner

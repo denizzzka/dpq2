@@ -75,7 +75,7 @@ void main(string[] args)
         writeln("bson: ", cell.as!Bson);
     }
 
-    // Separated arguments query with binary result:
+    // Binary arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
         "$1::double precision as double_field, "~
@@ -84,16 +84,16 @@ void main(string[] args)
         "array['first', 'second', NULL]::text[] as array_field, "~
         "$4::integer[] as multi_array, "~
         "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'::json as json_value";
-    
-    p.argsFromArray = [
-        "-1234.56789012345",
+
+    p.argsVariadic(
+        -1234.56789012345,
         "first line\nsecond line",
-        null,
-        "{ {1, 2, 3}, {4, 5, 6} }"
-    ];
+        Nullable!string.init,
+        [[1, 2, 3], [4, 5, 6]]
+    );
 
     auto r = conn.execParams(p);
-    
+
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
     writeln( "1: ", r[0][1].as!PGtext );
     writeln( "2.1 isNull: ", r[0][2].isNull );
@@ -102,7 +102,8 @@ void main(string[] args)
     writeln( "3.2: ", r[0][3].asArray[1].as!PGtext );
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
-    writeln( "4: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.1: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.2: ", r[0]["multi_array"].as!(int[][]) );
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
     writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 
@@ -118,10 +119,12 @@ void main(string[] args)
 
 Compile and run:
 ```
-Running ./dpq2_example --conninfo=dbname=postgres
-Text query result by name: 2016-02-23 15:22:29.024757
+Running ./dpq2_example --conninfo=user=postgres
+2018-12-09T10:08:07.862:package.d:__lambda1:19 DerelictPQ loading...
+2018-12-09T10:08:07.863:package.d:__lambda1:26 ...DerelictPQ loading finished
+Text query result by name: 2018-12-09 10:08:07.868141
 Text query result by index: 456.78
-bson: "2016-02-23 15:22:29.024757"
+bson: "2018-12-09 10:08:07.868141"
 bson: "abc"
 bson: "123"
 bson: "456.78"
@@ -135,7 +138,8 @@ second line
 3.2: second
 3.3: true
 3.4: true
-4: 6
+4.1: 6
+4.2: [[1, 2, 3], [4, 5, 6]]
 5.1 Json: {"text_str":"text string","float_value":123.456}
 5.2 Bson: {"text_str":"text string","float_value":123.456}
 column name: 'double_field', bson: -1234.56789012345

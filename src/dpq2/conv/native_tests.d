@@ -10,7 +10,7 @@ import vibe.data.bson: Bson, deserializeBson;
 import vibe.data.json: Json, parseJsonString;
 
 version (integration_tests)
-private bool compareArrays(A, B)(A _a, B _b)
+private bool compareArraysWithCareAboutNullables(A, B)(A _a, B _b)
 {
     static assert(is(A == B));
 
@@ -58,13 +58,11 @@ public void _integration_test( string connParam ) @system
             params.args = null;
             auto answer = conn.execParams(params);
             immutable Value v = answer[0][0];
-            static if (isArrayType!T || (is(T==Nullable!R, R) && isArrayType!R))
-                auto result = v.as!Bson.deserializeBson!T; //HACK: There is no direct way to read back the array values using as!.. yet
-            else
-                auto result = v.as!T;
+
+            auto result = v.as!T;
 
             static if(isArrayType!T)
-                const bool assertResult = compareArrays(result, nativeValue);
+                const bool assertResult = compareArraysWithCareAboutNullables(result, nativeValue);
             else
                 const bool assertResult = result == nativeValue;
 

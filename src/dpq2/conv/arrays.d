@@ -6,23 +6,64 @@ module dpq2.conv.arrays;
 import dpq2.oids : OidType;
 import dpq2.value;
 
-import std.traits : isArray;
+import std.traits : isArray, isAssociativeArray;
+import std.range : ElementType;
 import std.typecons : Nullable;
+import std.exception: assertThrown;
 
 @safe:
+
+// From array to Value:
 
 template isArrayType(T)
 {
     import dpq2.conv.geometric : isValidPolygon;
-    import std.range : ElementType;
     import std.traits : Unqual;
 
-    enum isArrayType = isArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !is(T : string);
+    enum isArrayType = isArray!T && !isAssociativeArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !is(T : string);
 }
 
 static assert(isArrayType!(int[]));
+static assert(!isArrayType!(int[string]));
 static assert(!isArrayType!(ubyte[]));
 static assert(!isArrayType!(string));
+
+/// Write array element into buffer
+private void writeArrayElement(R, T)(ref R output, T item, ref int counter)
+{
+    import std.array : Appender;
+    import std.bitmanip : nativeToBigEndian;
+    import std.format : format;
+
+    static if (is(T == ArrayElementType!T))
+    {
+        import dpq2.conv.from_d_types : toValue;
+
+        static immutable ubyte[] nullVal = [255,255,255,255]; //special length value to indicate null value in array
+        auto v = item.toValue; // TODO: Direct serialization to buffer would be more effective
+
+        if (v.isNull)
+            output ~= nullVal;
+        else
+        {
+            auto l = v._data.length;
+
+            if(!(l < uint.max))
+                throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+                 format!"Array item size can't be larger than %s"(uint.max-1)); // -1 because uint.max is a NULL special value
+
+            output ~= (cast(uint)l).nativeToBigEndian[]; // write item length
+            output ~= v._data;
+        }
+
+        counter++;
+    }
+    else
+    {
+        foreach (i; item)
+            writeArrayElement(output, i, counter);
+    }
+}
 
 /// Converts dynamic or static array of supported types to the coresponding PG array type value
 Value toValue(T)(auto ref T v)
@@ -31,33 +72,7 @@ if (isArrayType!T)
     import dpq2.oids : detectOidTypeFromNative, oidConvTo;
     import std.array : Appender;
     import std.bitmanip : nativeToBigEndian;
-    import std.exception : enforce;
-    import std.format : format;
     import std.traits : isStaticArray;
-
-    static void writeItem(R, T)(ref R output, T item)
-    {
-        static if (is(T == ArrayElementType!T))
-        {
-            import dpq2.conv.from_d_types : toValue;
-
-            static immutable ubyte[] nullVal = [255,255,255,255]; //special length value to indicate null value in array
-            auto v = item.toValue; // TODO: Direct serialization to buffer would be more effective
-            if (v.isNull) output ~= nullVal;
-            else
-            {
-                auto l = v._data.length;
-                enforce(l < uint.max, format!"Array item can't be larger than %s"(uint.max-1)); // -1 because uint.max is a null special value
-                output ~= (cast(uint)l).nativeToBigEndian[]; // write item length
-                output ~= v._data;
-            }
-        }
-        else
-        {
-            foreach (i; item)
-                writeItem(output, i);
-        }
-    }
 
     alias ET = ArrayElementType!T;
     enum dimensions = arrayDimensions!T;
@@ -84,17 +99,30 @@ if (isArrayType!T)
     buffer ~= dimensions.nativeToBigEndian[]; // write number of dimensions
     buffer ~= (hasNull ? 1 : 0).nativeToBigEndian[]; // write null element flag
     buffer ~= (cast(int)elemOid).nativeToBigEndian[]; // write elements Oid
-    size_t[dimensions] dlen;
+    const size_t[dimensions] dlen = getDimensionsLengths(v);
+
     static foreach (d; 0..dimensions)
     {
-        dlen[d] = getDimensionLength!d(v);
-        enforce(dlen[d] < uint.max, format!"Array length can't be larger than %s"(uint.max));
         buffer ~= (cast(uint)dlen[d]).nativeToBigEndian[]; // write number of dimensions
         buffer ~= 1.nativeToBigEndian[]; // write left bound index (PG indexes from 1 implicitly)
     }
 
     //write data
-    foreach (i; v) writeItem(buffer, i);
+    int elemCount;
+    foreach (i; v) writeArrayElement(buffer, i, elemCount);
+
+    // Array consistency check
+    // Can be triggered if non-symmetric multidimensional dynamic array is used
+    {
+        size_t mustBeElementsCount = 1;
+
+        foreach(dim; dlen)
+            mustBeElementsCount *= dim;
+
+        if(elemCount != mustBeElementsCount)
+            throw new ValueConvException(ConvExceptionType.DIMENSION_MISMATCH,
+                "Native array dimensions isn't fit to Postgres array type");
+    }
 
     return Value(buffer.data, arrOid);
 }
@@ -185,15 +213,25 @@ if (isArrayType!T)
     }
 }
 
+// Corrupt array test
+unittest
+{
+    alias TA = int[][2][];
+
+    TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
+    assertThrown!ValueConvException(arr.toValue);
+}
+
 package:
 
 template ArrayElementType(T)
 {
-    import std.range : ElementType;
-    import std.traits : isArray, isSomeString;
+    import std.traits : isSomeString;
 
-    static if (!isArrayType!T) alias ArrayElementType = T;
-    else alias ArrayElementType = ArrayElementType!(ElementType!T);
+    static if (!isArrayType!T)
+        alias ArrayElementType = T;
+    else
+        alias ArrayElementType = ArrayElementType!(ElementType!T);
 }
 
 unittest
@@ -208,10 +246,10 @@ unittest
 template arrayDimensions(T)
 if (isArray!T)
 {
-    import std.range : ElementType;
-
-    static if (is(ElementType!T == ArrayElementType!T)) enum int arrayDimensions = 1;
-    else enum int arrayDimensions = 1 + arrayDimensions!(ElementType!T);
+    static if (is(ElementType!T == ArrayElementType!T))
+        enum int arrayDimensions = 1;
+    else
+        enum int arrayDimensions = 1 + arrayDimensions!(ElementType!T);
 }
 
 unittest
@@ -222,50 +260,143 @@ unittest
     static assert(arrayDimensions!(int[][][][]) == 4);
 }
 
-auto getDimensionLength(int idx, T)(T v)
+template arrayDimensionType(T, size_t dimNum, size_t currDimNum = 0)
+if (isArray!T)
 {
-    import std.range : ElementType;
-    import std.traits : isStaticArray;
+    alias CurrT = ElementType!T;
 
-    static assert(idx >= 0 || !is(T == ArrayElementType!T), "Dimension index out of bounds");
-
-    static if (idx == 0) return v.length;
+    static if (currDimNum < dimNum)
+        alias arrayDimensionType = arrayDimensionType!(CurrT, dimNum, currDimNum + 1);
     else
+        alias arrayDimensionType = CurrT;
+}
+
+unittest
+{
+    static assert(is(arrayDimensionType!(bool[2][3], 0) == bool[2]));
+    static assert(is(arrayDimensionType!(bool[][3], 0) == bool[]));
+    static assert(is(arrayDimensionType!(bool[3][], 0) == bool[3]));
+    static assert(is(arrayDimensionType!(bool[2][][4], 0) == bool[2][]));
+    static assert(is(arrayDimensionType!(bool[3][], 1) == bool));
+}
+
+auto getDimensionsLengths(T)(T v)
+if (isArrayType!T)
+{
+    enum dimNum = arrayDimensions!T;
+    size_t[dimNum] ret = -1;
+
+    calcDimensionsLengths(v, ret, 0);
+
+    return ret;
+}
+
+private void calcDimensionsLengths(T, Ret)(T arr, ref Ret ret, int currDimNum)
+if (isArray!T)
+{
+    import std.format : format;
+
+    if(!(arr.length < uint.max))
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            format!"Array dimension length can't be larger or equal %s"(uint.max));
+
+    ret[currDimNum] = arr.length;
+
+    static if(isArrayType!(ElementType!T))
     {
-        // check same lengths on next dimension
-        static if (!isStaticArray!(ElementType!T))
-        {
-            import std.algorithm : map, max, min, reduce;
-            import std.exception : enforce;
+        currDimNum++;
 
-            auto lengths = v.map!(a => a.length).reduce!(min, max);
-            enforce(lengths[0] == lengths[1], "Different lengths of sub arrays");
-        }
-
-        return getDimensionLength!(idx-1)(v[0]);
+        if(currDimNum < ret.length)
+            if(arr.length > 0)
+                calcDimensionsLengths(arr[0], ret, currDimNum);
     }
 }
 
 unittest
 {
+    alias T = int[][2][];
+
+    T arr = [[[1,2,3], [4,5,6]]];
+
+    auto ret = getDimensionsLengths(arr);
+
+    assert(ret[0] == 1);
+    assert(ret[1] == 2);
+    assert(ret[2] == 3);
+}
+
+// From Value to array:
+
+import dpq2.result: ArrayProperties;
+
+/// Convert Value to native array type
+T binaryValueAs(T)(in Value v) @trusted
+if(isArrayType!T)
+{
+    int idx;
+    return v.valueToArrayRow!(T, 0)(ArrayProperties(v), idx);
+}
+
+private T valueToArrayRow(T, int currDimension)(in Value v, ArrayProperties arrayProperties, ref int elemIdx) @system
+{
+    import std.traits: isStaticArray;
+    import std.conv: to;
+
+    T res;
+
+    // Postgres interprets empty arrays as zero-dimensional arrays
+    if(arrayProperties.dimsSize.length == 0)
+        arrayProperties.dimsSize ~= 0; // adds one zero-size dimension
+
+    static if(isStaticArray!T)
     {
-        int[3][2][1] arr = [[[1,2,3], [4,5,6]]];
-        assert(getDimensionLength!0(arr) == 1);
-        assert(getDimensionLength!1(arr) == 2);
-        assert(getDimensionLength!2(arr) == 3);
+        if(T.length != arrayProperties.dimsSize[currDimension])
+            throw new ValueConvException(ConvExceptionType.DIMENSION_MISMATCH,
+                "Result array dimension "~currDimension.to!string~" mismatch"
+            );
+    }
+    else
+        res.length = arrayProperties.dimsSize[currDimension];
+
+    foreach(int i, ref elem; res)
+    {
+        import dpq2.result;
+
+        alias ElemType = typeof(elem);
+
+        static if(isArrayType!ElemType)
+            elem = v.valueToArrayRow!(ElemType, currDimension + 1)(arrayProperties, elemIdx);
+        else
+        {
+            elem = v.asArray.getValueByFlatIndex(elemIdx).as!ElemType;
+            elemIdx++;
+        }
     }
 
-    {
-        int[][][] arr = [[[1,2,3], [4,5,6]]];
-        assert(getDimensionLength!0(arr) == 1);
-        assert(getDimensionLength!1(arr) == 2);
-        assert(getDimensionLength!2(arr) == 3);
-    }
+    return res;
+}
 
-    {
-        import std.exception : assertThrown;
-        int[][] arr = [[1,2,3], [4,5]];
-        assert(getDimensionLength!0(arr) == 2);
-        assertThrown(getDimensionLength!1(arr) == 3);
-    }
+// Array test
+@system unittest
+{
+    alias TA = int[][2][];
+
+    TA arr = [[[1,2,3], [4,5,6]]];
+    Value v = arr.toValue;
+
+    TA r = v.binaryValueAs!TA;
+
+    assert(r == arr);
+}
+
+// Dimension mismatch test
+@system unittest
+{
+    alias TA = int[][2][];
+    alias R = int[][2][3]; // array dimensions mismatch
+
+    TA arr = [[[1,2,3], [4,5,6]]];
+    Value v = arr.toValue;
+
+    assertThrown!ValueConvException(v.binaryValueAs!R);
 }
