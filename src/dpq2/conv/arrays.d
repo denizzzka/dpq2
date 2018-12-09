@@ -338,12 +338,16 @@ if(isArrayType!T)
     return v.valueToArrayRow!(T, 0)(ArrayProperties(v), idx);
 }
 
-private T valueToArrayRow(T, int currDimension)(in Value v, in ArrayProperties arrayProperties, ref int elemIdx) @system
+private T valueToArrayRow(T, int currDimension)(in Value v, ArrayProperties arrayProperties, ref int elemIdx) @system
 {
     import std.traits: isStaticArray;
     import std.conv: to;
 
     T res;
+
+    // Postgres interprets empty arrays as zero-dimensional arrays
+    if(arrayProperties.dimsSize.length == 0)
+        arrayProperties.dimsSize ~= 0; // adds one zero-size dimension
 
     static if(isStaticArray!T)
     {
