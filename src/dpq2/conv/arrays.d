@@ -32,7 +32,6 @@ private void writeArrayElement(R, T)(ref R output, T item, ref int counter)
 {
     import std.array : Appender;
     import std.bitmanip : nativeToBigEndian;
-    import std.exception : enforce;
     import std.format : format;
 
     static if (is(T == ArrayElementType!T))
@@ -47,7 +46,11 @@ private void writeArrayElement(R, T)(ref R output, T item, ref int counter)
         else
         {
             auto l = v._data.length;
-            enforce(l < uint.max, format!"Array item can't be larger than %s"(uint.max-1)); // -1 because uint.max is a null special value //FIXME: add exception
+
+            if(!(l < uint.max))
+                throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+                 format!"Array item size can't be larger than %s"(uint.max-1)); // -1 because uint.max is a NULL special value
+
             output ~= (cast(uint)l).nativeToBigEndian[]; // write item length
             output ~= v._data;
         }
@@ -279,10 +282,11 @@ if (isArrayType!T)
 private void calcDimensionsLengths(T, Ret)(T arr, ref Ret ret, int currDimNum)
 if (isArray!T)
 {
-    import std.exception : enforce;
     import std.format : format;
 
-    enforce(arr.length < uint.max, format!"Array dimension length can't be larger or equal than %s"(uint.max));
+    if(!(arr.length < uint.max))
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            format!"Array dimension length can't be larger or equal %s"(uint.max));
 
     ret[currDimNum] = arr.length;
 
