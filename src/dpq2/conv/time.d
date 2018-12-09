@@ -342,9 +342,8 @@ if(is(T == TimeStamp) || is(T == TimeStampUTC))
     fsec_t ts;
 
     if(timestamp2tm(raw, tm, ts) < 0)
-        throw new AnswerException(
-            ExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
-            __FILE__, __LINE__
+        throw new ValueConvException(
+            ConvExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
         );
 
     TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);

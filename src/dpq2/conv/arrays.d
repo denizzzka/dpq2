@@ -120,7 +120,7 @@ if (isArrayType!T)
 
         if(elemCount != mustBeElementsCount)
             throw new ValueConvException(ConvExceptionType.DIMENSION_MISMATCH,
-                "Array dimensions isn't fit to Postgres array type");
+                "Native array dimensions isn't fit to Postgres array type");
     }
 
     return Value(buffer.data, arrOid);
