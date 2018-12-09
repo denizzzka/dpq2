@@ -212,6 +212,17 @@ if (isArrayType!T)
     }
 }
 
+// Corrupt array test
+unittest
+{
+    import core.exception: AssertError;
+
+    alias TA = int[][2][];
+
+    TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
+    assertThrown!ValueConvException(arr.toValue);
+}
+
 package:
 
 template ArrayElementType(T)
@@ -387,15 +398,4 @@ import std.exception: assertThrown;
     Value v = arr.toValue;
 
     assertThrown!ValueConvException(v.binaryValueAs!R);
-}
-
-// Corrupt array test
-@system unittest
-{
-    import core.exception: AssertError;
-
-    alias TA = int[][2][];
-
-    TA arr = [[[1,2,3], [4,5]]]; // dimensions is not equal
-    assertThrown!ValueConvException(arr.toValue);
 }
