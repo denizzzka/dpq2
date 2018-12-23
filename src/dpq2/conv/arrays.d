@@ -358,7 +358,7 @@ private T valueToArrayRow(T, int currDimension)(in Value v, ArrayProperties arra
     else
         res.length = arrayProperties.dimsSize[currDimension];
 
-    foreach(int i, ref elem; res)
+    foreach(size_t i, ref elem; res)
     {
         import dpq2.result;
 
