@@ -16,10 +16,16 @@
 	"configurations": [
 		{
 			"name": "static",
+			"subConfigurations": {
+				"derelict-pq": "derelict-pq-static"
+			},
 			"libs": ["pq"]
 		},
 		{
-			"name": "dynamic"
+			"name": "dynamic",
+			"subConfigurations": {
+				"derelict-pq": "derelict-pq-dynamic"
+			}
 		}
 	],
 	"subPackages": [
