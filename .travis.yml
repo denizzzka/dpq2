@@ -17,11 +17,13 @@ addons:
 services: postgresql
 
 env:
-  - CONN_STRING="dbname=postgres"
-  - BUILD=unittest
-  - BUILD=release
-  - STAT_TYPE=static
-  - STAT_TYPE=dynamic
+  global:
+    - CONN_STRING="dbname=postgres"
+  matrix:
+    - BUILD=unittest
+    - BUILD=release
+    - STAT_TYPE=static
+    - STAT_TYPE=dynamic
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
