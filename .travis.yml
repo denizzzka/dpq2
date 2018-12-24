@@ -18,13 +18,16 @@ services: postgresql
 
 env:
   - CONN_STRING="dbname=postgres"
+  - BUILD=unittest
+  - BUILD=release
+  - STAT_TYPE=static
+  - STAT_TYPE=dynamic
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script:
-  - dub run dpq2:integration_tests --build=unittest -- --conninfo="${CONN_STRING}"
-  - dub run dpq2:integration_tests --build=release -- --conninfo="${CONN_STRING}"
+  - dub run dpq2:integration_tests --build=${BUILD} --config=${STAT_TYPE} -- --conninfo="${CONN_STRING}"
 
 matrix:
   include:
