@@ -154,7 +154,7 @@
        |    */
        |    string cmdTuples()
        |    {
-      1|        return PQcmdTuples(cast(PGresult*)result).to!string;
+      1|        return PQcmdTuples(cast(PGresult*) result.result).to!string;
        |    }
        |
        |    /// Returns row count

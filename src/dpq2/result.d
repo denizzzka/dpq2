@@ -154,7 +154,7 @@ immutable class Answer : Result
     */
     string cmdTuples()
     {
-        return PQcmdTuples(cast(PGresult*)result).to!string;
+        return PQcmdTuples(cast(PGresult*) result.result).to!string;
     }
 
     /// Returns row count
