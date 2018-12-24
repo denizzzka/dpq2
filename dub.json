@@ -37,6 +37,20 @@
 				"dpq2": "*",
 				"gfm:math": "~>7.0.0"
 			},
+			"configurations": [
+				{
+					"name": "dynamic",
+					"subConfigurations": {
+						"dpq2": "dynamic"
+					}
+				},
+				{
+					"name": "static",
+					"subConfigurations": {
+						"dpq2": "static"
+					}
+				}
+			],
 			"sourcePath": "integration_tests",
 			"versions": ["integration_tests"]
 		},
