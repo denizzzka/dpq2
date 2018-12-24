@@ -20,10 +20,10 @@ env:
   global:
     - CONN_STRING="dbname=postgres"
   matrix:
-    - BUILD=unittest
-    - BUILD=release
-    - STAT_TYPE=static
-    - STAT_TYPE=dynamic
+    - BUILD=unittest STAT_TYPE=static
+    - BUILD=unittest STAT_TYPE=dynamic
+    - BUILD=release STAT_TYPE=static
+    - BUILD=release STAT_TYPE=dynamic
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
