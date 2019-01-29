@@ -127,6 +127,7 @@ immutable class Answer : Result
         {
             case PGRES_COMMAND_OK:
             case PGRES_TUPLES_OK:
+            case PGRES_SINGLE_TUPLE:
                 break;
 
             default:

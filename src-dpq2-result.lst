@@ -127,6 +127,7 @@
        |        {
      19|            case PGRES_COMMAND_OK:
     184|            case PGRES_TUPLES_OK:
+    184|            case PGRES_SINGLE_TUPLE:
     184|                break;
        |
       2|            default:
