@@ -284,7 +284,7 @@ import money: currency, roundingMode;
 /// Caution: here is no check of fractional precision
 /// See also: PostgreSQL's "lc_monetary" description and "money" package description 
 T binaryValueAs(T)(in Value v) @trusted
-if( isInstanceOf!(currency, T) &&  T.amount.sizeof == 8)
+if( isInstanceOf!(currency, T) &&  T.amount.sizeof == 8 )
 {
     import std.format: format;
 
