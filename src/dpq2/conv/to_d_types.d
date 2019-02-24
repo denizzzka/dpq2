@@ -307,7 +307,7 @@ if( isInstanceOf!(currency, T) &&  T.amount.sizeof == 8 )
     return r;
 }
 
-version(unittest) package alias PGTestMoney = currency!("TEST_CURR", 2); //TODO: roundingMode.UNNECESSARY
+package alias PGTestMoney = currency!("TEST_CURR", 2); //TODO: roundingMode.UNNECESSARY
 
 unittest
 {
