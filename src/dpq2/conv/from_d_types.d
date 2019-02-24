@@ -13,10 +13,11 @@ import std.bitmanip: nativeToBigEndian;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
-import std.traits: isImplicitlyConvertible, isNumeric, OriginalType, Unqual;
+import std.traits: isImplicitlyConvertible, isNumeric, isInstanceOf, OriginalType, Unqual;
 import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
+import money: currency;
 
 /// Converts Nullable!T to Value
 Value toValue(T)(T v)
@@ -48,6 +49,28 @@ if(isNumeric!(T))
     return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
+/// Convert money.currency to PG value
+///
+/// Caution: here is no check of fractional precision while conversion!
+/// See also: PostgreSQL's "lc_monetary" description and "money" package description
+Value toValue(T)(T v)
+if(isInstanceOf!(currency, T) &&  T.amount.sizeof == 8)
+{
+    return Value(v.amount.nativeToBigEndian.dup, OidType.Money, false, ValueFormat.BINARY);
+}
+
+unittest
+{
+    import dpq2.conv.to_d_types: PGTestMoney;
+
+    const pgtm = PGTestMoney(-123.45);
+
+    Value v = pgtm.toValue;
+
+    assert(v.oidType == OidType.Money);
+    assert(v.as!PGTestMoney == pgtm);
+}
+
 /**
     Converts types implicitly convertible to string to PG Value.
     Note that if string is null it is written as an empty string.
@@ -73,7 +96,7 @@ if(is(T : immutable(ubyte)[]))
     return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
 }
 
-///
+/// Constructs Value from boolean
 Value toValue(T : bool)(T v) @trusted
 if (!is(T == Nullable!R, R))
 {
