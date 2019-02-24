@@ -49,7 +49,10 @@ if(isNumeric!(T))
     return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
+/// Convert money.currency to PG value
 ///
+/// Caution: here is no check of fractional precision while conversion!
+/// See also: PostgreSQL's "lc_monetary" description and "money" package description
 Value toValue(T)(T v)
 if(isInstanceOf!(currency, T) &&  T.amount.sizeof == 8)
 {

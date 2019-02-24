@@ -281,8 +281,8 @@ import money: currency, roundingMode;
 
 /// Returns money type
 ///
-/// Caution: here is no check of fractional precision
-/// See also: PostgreSQL's "lc_monetary" description and "money" package description 
+/// Caution: here is no check of fractional precision while conversion!
+/// See also: PostgreSQL's "lc_monetary" description and "money" package description
 T binaryValueAs(T)(in Value v) @trusted
 if( isInstanceOf!(currency, T) &&  T.amount.sizeof == 8 )
 {
