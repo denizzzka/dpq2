@@ -44,6 +44,8 @@
        |    // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
       1|    conn.exec("SET TIMEZONE TO +02");
        |
+      1|    conn.exec("SET lc_monetary = 'en_US.UTF-8'");
+       |
       1|    QueryParams params;
       1|    params.resultFormat = ValueFormat.BINARY;
        |
@@ -54,19 +56,19 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    138|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     69|            params.args = null;
-     69|            auto answer = conn.execParams(params);
-     69|            immutable Value v = answer[0][0];
+    140|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     70|            params.args = null;
+     70|            auto answer = conn.execParams(params);
+     70|            immutable Value v = answer[0][0];
        |
-     69|            auto result = v.as!T;
+     70|            auto result = v.as!T;
        |
        |            static if(isArrayType!T)
       6|                const bool assertResult = compareArraysWithCareAboutNullables(result, nativeValue);
        |            else
-     68|                const bool assertResult = result == nativeValue;
+     69|                const bool assertResult = result == nativeValue;
        |
-     68|            assert(
+     69|            assert(
        |                assertResult,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
@@ -74,17 +76,17 @@
        |
        |            {
        |                // test binary to text conversion
-     68|                params.sqlCommand = "SELECT $1::text";
-     68|                params.args = [nativeValue.toValue];
+     69|                params.sqlCommand = "SELECT $1::text";
+     69|                params.args = [nativeValue.toValue];
        |
-     68|                auto answer2 = conn.execParams(params);
-     68|                auto v2 = answer2[0][0];
+     69|                auto answer2 = conn.execParams(params);
+     69|                auto v2 = answer2[0][0];
        |
-     68|                string textResult = v2.isNull
+     69|                string textResult = v2.isNull
       3|                    ? "NULL"
-     65|                    : v2.as!string.strip(' ');
+     66|                    : v2.as!string.strip(' ');
        |
-     68|                pgValue = pgValue.strip('\'');
+     69|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -97,7 +99,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     68|                assert(textResult == pgValue,
+     69|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -106,6 +108,8 @@
        |
        |        alias C = testIt; // "C" means "case"
        |
+       |        import dpq2.conv.to_d_types: PGTestMoney;
+       |
       1|        C!PGboolean(true, "boolean", "true");
       1|        C!PGboolean(false, "boolean", "false");
       1|        C!(Nullable!PGboolean)(Nullable!PGboolean.init, "boolean", "NULL");
@@ -113,6 +117,7 @@
       1|        C!PGsmallint(-32_761, "smallint", "-32761");
       1|        C!PGinteger(-2_147_483_646, "integer", "-2147483646");
       1|        C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
+      1|        C!PGTestMoney(PGTestMoney(-123.45), "money", "'-$123.45'");
       1|        C!PGreal(-12.3456f, "real", "-12.3456");
       1|        C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
       1|        C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");

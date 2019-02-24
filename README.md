@@ -23,9 +23,10 @@ Features
 * Immutable query result for simplify multithreading
 * Async queries support
 * Reading of the text query results to native D text types
-* Representation of the binary query results to native D types
+* Representation of binary arguments and binary query results as native D types
  * Text types
  * Integer and decimal types
+ * Money type (into money.currency, https://github.com/qznc/d-money)
  * Some data and time types
  * JSON type (stored into vibe.data.json.Json)
  * JSONB type (ditto)

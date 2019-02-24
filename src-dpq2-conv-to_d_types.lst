@@ -54,9 +54,9 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    120|    if(v.format == VF.BINARY)
+    121|    if(v.format == VF.BINARY)
        |    {
-    116|        if(!(
+    117|        if(!(
        |            v.oidType == OidType.Text ||
      27|            v.oidType == OidType.FixedString ||
      26|            v.oidType == OidType.VariableString ||
@@ -78,17 +78,17 @@
        |    else
        |        alias Ret = T;
        |
-    115|    Ret r;
+    116|    Ret r;
        |
-    226|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    228|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     92|        r = v.valueAsString;
+     93|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
       1|        return T(r);
        |    else
-    112|        return r;
+    113|        return r;
        |}
        |
        |@system unittest
@@ -109,7 +109,7 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     92|    if(!(v.format == VF.BINARY))
+     94|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
@@ -121,7 +121,7 @@
       7|            return T(binaryValueAs!R(v));
        |    }
        |    else
-     81|        return binaryValueAs!T(v);
+     83|        return binaryValueAs!T(v);
        |}
        |
        |@system unittest
@@ -143,7 +143,7 @@
        |
        |string valueAsString(in Value v) pure
        |{
-    110|    return (cast(const(char[])) v.data).to!string;
+    111|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
@@ -275,5 +275,43 @@
        |{
       1|    auto v = Value([1], OidType.Int4);
       2|    assertThrown!ValueConvException(v.binaryValueAs!Json);
+       |}
+       |
+       |import money: currency, roundingMode;
+       |
+       |/// Returns money type
+       |///
+       |/// Caution: here is no check of fractional precision while conversion!
+       |/// See also: PostgreSQL's "lc_monetary" description and "money" package description
+       |T binaryValueAs(T)(in Value v) @trusted
+       |if( isInstanceOf!(currency, T) &&  T.amount.sizeof == 8 )
+       |{
+       |    import std.format: format;
+       |
+      3|    if(v.data.length != T.amount.sizeof)
+      1|        throw new AE(
+       |            ET.SIZE_MISMATCH,
+       |            format(
+       |                "%s length (%d) isn't equal to D money type %s size (%d)",
+       |                v.oidType.to!string,
+       |                v.data.length,
+       |                typeid(T).to!string,
+       |                T.amount.sizeof
+       |            )
+       |        );
+       |
+      2|    T r;
+       |
+      2|    r.amount = v.data[0 .. T.amount.sizeof].bigEndianToNative!long;
+       |
+      2|    return r;
+       |}
+       |
+       |package alias PGTestMoney = currency!("TEST_CURR", 2); //TODO: roundingMode.UNNECESSARY
+       |
+       |unittest
+       |{
+      1|    auto v = Value([1], OidType.Money);
+      2|    assertThrown!ValueConvException(v.binaryValueAs!PGTestMoney);
        |}
 src/dpq2/conv/to_d_types.d is 100% covered
