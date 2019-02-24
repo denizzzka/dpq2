@@ -23,7 +23,7 @@ Features
 * Immutable query result for simplify multithreading
 * Async queries support
 * Reading of the text query results to native D text types
-* Representation of the binary query results to native D types
+* Representation of the binary query results to/from native D types
  * Text types
  * Integer and decimal types
  * Money type (into money.currency, https://github.com/qznc/d-money)
