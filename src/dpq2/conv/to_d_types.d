@@ -276,3 +276,41 @@ if( is( T == Json ) )
     auto v = Value([1], OidType.Int4);
     assertThrown!ValueConvException(v.binaryValueAs!Json);
 }
+
+import money: currency, roundingMode;
+
+/// Returns money type
+///
+/// Caution: here is no check of fractional precision
+/// See also: PostgreSQL's "lc_monetary" description and "money" package description 
+T binaryValueAs(T)(in Value v) @trusted
+if( isInstanceOf!(currency, T) &&  T.amount.sizeof == 8)
+{
+    import std.format: format;
+
+    if(v.data.length != T.amount.sizeof)
+        throw new AE(
+            ET.SIZE_MISMATCH,
+            format(
+                "%s length (%d) isn't equal to D money type %s size (%d)",
+                v.oidType.to!string,
+                v.data.length,
+                typeid(T).to!string,
+                T.amount.sizeof
+            )
+        );
+
+    T r;
+
+    r.amount = v.data[0 .. T.amount.sizeof].bigEndianToNative!long;
+
+    return r;
+}
+
+package alias PGTestMoney = currency!("TEST_CURR", 2, roundingMode.UNNECESSARY);
+
+unittest
+{
+    auto v = Value([1], OidType.Money);
+    assertThrown!ValueConvException(v.binaryValueAs!PGTestMoney);
+}
