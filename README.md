@@ -26,7 +26,7 @@ Features
 * Representation of the binary query results to native D types
  * Text types
  * Integer and decimal types
- * Money type
+ * Money type (into money.currency, https://github.com/qznc/d-money)
  * Some data and time types
  * JSON type (stored into vibe.data.json.Json)
  * JSONB type (ditto)
