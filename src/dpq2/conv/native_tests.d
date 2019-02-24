@@ -8,6 +8,7 @@ import std.typecons: Nullable;
 import std.uuid: UUID;
 import vibe.data.bson: Bson, deserializeBson;
 import vibe.data.json: Json, parseJsonString;
+import dpq2.conv.to_d_types: PGTestMoney;
 
 version (integration_tests)
 private bool compareArraysWithCareAboutNullables(A, B)(A _a, B _b)
@@ -43,6 +44,8 @@ public void _integration_test( string connParam ) @system
 
     // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
     conn.exec("SET TIMEZONE TO +02");
+
+    conn.exec("SET lc_monetary = 'en_US.UTF-8'");
 
     QueryParams params;
     params.resultFormat = ValueFormat.BINARY;
@@ -113,6 +116,7 @@ public void _integration_test( string connParam ) @system
         C!PGsmallint(-32_761, "smallint", "-32761");
         C!PGinteger(-2_147_483_646, "integer", "-2147483646");
         C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
+        C!PGTestMoney(PGTestMoney(-123.45), "money", "'-$123.45'");
         C!PGreal(-12.3456f, "real", "-12.3456");
         C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");

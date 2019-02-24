@@ -63,7 +63,7 @@ unittest
 {
     import dpq2.conv.to_d_types: PGTestMoney;
 
-    const pgtm = PGTestMoney("123.45");
+    const pgtm = PGTestMoney(-123.45);
 
     Value v = pgtm.toValue;
 
