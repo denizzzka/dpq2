@@ -8,7 +8,6 @@ import std.typecons: Nullable;
 import std.uuid: UUID;
 import vibe.data.bson: Bson, deserializeBson;
 import vibe.data.json: Json, parseJsonString;
-import dpq2.conv.to_d_types: PGTestMoney;
 
 version (integration_tests)
 private bool compareArraysWithCareAboutNullables(A, B)(A _a, B _b)
@@ -108,6 +107,8 @@ public void _integration_test( string connParam ) @system
         }
 
         alias C = testIt; // "C" means "case"
+
+        import dpq2.conv.to_d_types: PGTestMoney;
 
         C!PGboolean(true, "boolean", "true");
         C!PGboolean(false, "boolean", "false");
