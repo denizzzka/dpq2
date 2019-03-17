@@ -4,12 +4,13 @@ module dpq2.query;
 public import dpq2.args;
 
 import dpq2.connection: Connection, ConnectionException;
-import dpq2.result: Result;
+import dpq2.result: Result, ResponseException;
 import dpq2.value;
 import dpq2.oids: OidType;
 import derelict.pq.pq;
 import core.time: Duration, dur;
 import std.exception: enforce;
+import std.string;
 
 /// Extends Connection by adding query methods
 ///
@@ -178,6 +179,31 @@ mixin template Queries()
         size_t r = PQsendDescribePrepared(conn, statementName.toStringz);
 
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
+    /// Sends a buffer of CSV data to the COPY command
+    void putCopyData( string data )
+    {
+        const size_t r = PQputCopyData( conn, data.toStringz, cast(int) (data.length) );
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+    }
+
+    /// Signals that COPY data send is finished. Finalize and flush the COPY command.
+    immutable (Answer) putCopyEnd()
+    {
+        const char * error;
+        const size_t r = PQputCopyEnd( conn, error );
+        if(error !is null) throw new ConnectionException(error.to!string, __FILE__, __LINE__);
+        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+
+        // after the copying is finished, and there is no connection error, we must still get the command result
+        // this will get if there is any errors in the process (invalid data format or constraint violation, etc.)
+        auto pgResult = PQgetResult( conn );
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
     }
 
     // Waiting for completion of reading or writing
@@ -401,6 +427,27 @@ void _integration_test( string connParam ) @trusted
         assert(res.length == 1);
         assert(res[0].getAnswer[0][0].as!PGtext == "abc");
         assert(res[0].getAnswer[0][1].as!PGinteger == 123456);
+    }
+    {
+        // test COPY
+        conn.exec("DROP TABLE IF EXISTS test_copy;");
+        conn.exec("CREATE TABLE test_copy (v1 TEXT, v2 INT);");
+        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv);");
+        conn.putCopyData("Val1,2\nval2,3\n");
+        conn.putCopyEnd();
+        // This time with error
+        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv);");
+        conn.putCopyData("Val1,2\nval2,4,5\n");
+        bool exceptionFlag = false;
+
+        try conn.putCopyEnd();
+        catch(ResponseException e)
+        {
+            exceptionFlag = true;
+            assert(e.msg.length > 15); // error message check
+        }
+        finally
+            assert(exceptionFlag);
     }
 
     import std.socket;

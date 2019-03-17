@@ -34,6 +34,7 @@ Features
 * Conversion of values to BSON (into vibe.data.bson.Bson)
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support
+* Bulk data upload to table from string data ([SQL COPY](https://www.postgresql.org/docs/current/sql-copy.html))
 
 Building
 --------
@@ -113,6 +114,22 @@ void main(string[] args)
     {
         writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].as!Bson);
     }
+
+    // It is possible to upload CSV data ultra-fast
+    // Re-create the necessary table
+    conn.exec("DROP TABLE IF EXISTS test_dpq2_copy;");
+    conn.exec("CREATE TABLE test_dpq2_copy (v1 TEXT, v2 INT);");
+    // Init the COPY command. This sets the connection in a COPY receive mode until putCopyEnd() is called
+    // Copy CSV data, because it's standard, ultra fast, and readable
+    conn.exec("COPY test_dpq2_copy FROM STDIN WITH (FORMAT csv);");
+    // Write 2 lines of CSV, including text that contains the delimiter. Postgresql handles it well
+    string data = "\"This, right here, is a test\",8\nWow! it works,13\n";
+    conn.putCopyData(data);
+    // Write 2 more lines
+    data = "Horray!,3456\nSuper fast!,325\n";
+    conn.putCopyData(data);
+    // Signal that the COPY is finished. Let Postgresql finalize the command and return any errors with the data.
+    conn.putCopyEnd();
 
     version(LDC) destroy(r); // before Derelict unloads its bindings (prevents SIGSEGV)
 }
