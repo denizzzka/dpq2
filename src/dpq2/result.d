@@ -132,7 +132,7 @@ immutable class Answer : Result
                 break;
 
             case PGRES_COPY_OUT:
-                throw new AnswerException(ExceptionType.NOT_IMPLEMENTED, "COPY TO not yet supported");
+                throw new AnswerException(ExceptionType.COPY_OUT_NOT_IMPLEMENTED, "COPY TO not yet supported");
 
             default:
                 throw new ResponseException(this, __FILE__, __LINE__);
@@ -699,7 +699,7 @@ enum ExceptionType
     FATAL_ERROR, ///
     COLUMN_NOT_FOUND, /// Column is not found
     OUT_OF_RANGE, ///
-    NOT_IMPLEMENTED = 10000, /// A called feature is not implemented
+    COPY_OUT_NOT_IMPLEMENTED = 10000, /// TODO
 }
 
 /// Covers errors of access to Answer data
