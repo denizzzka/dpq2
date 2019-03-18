@@ -196,20 +196,35 @@ mixin template Queries()
     /// Signals that COPY data send is finished. Finalize and flush the COPY command.
     immutable(Answer) putCopyEnd()
     {
-        const char * error;
-        const size_t r = PQputCopyEnd( conn, error );
+        assert(!isNonBlocking, "Only for blocking connections");
 
-        if(error !is null) throw new ConnectionException(error.to!string, __FILE__, __LINE__);
-        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+        const bool r = sendPutCopyEnd;
+
+        assert(r, "Impossible status for blocking connections");
 
         // after the copying is finished, and there is no connection error, we must still get the command result
         // this will get if there is any errors in the process (invalid data format or constraint violation, etc.)
-        auto pgResult = PQgetResult( conn );
+        auto pgResult = PQgetResult(conn);
 
         // is guaranteed by libpq that the result will not be changed until it will not be destroyed
         auto container = createResultContainer(cast(immutable) pgResult);
 
         return new immutable Answer(container);
+    }
+
+    /// Signals that COPY data send is finished.
+    ///
+    /// Returns: true if the termination data was sent, zero if it was not sent because the attempt would block (this case is only possible if the connection is in nonblocking mode)
+    bool sendPutCopyEnd()
+    {
+        const char* error;
+        const int r = PQputCopyEnd(conn, error);
+
+        if(error !is null) throw new ConnectionException(error.to!string);
+
+        if(r == -1) throw new ConnectionException(this);
+
+        return r != 0;
     }
 
     // Waiting for completion of reading or writing
