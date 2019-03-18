@@ -182,17 +182,23 @@ mixin template Queries()
     }
 
     /// Sends a buffer of CSV data to the COPY command
-    void putCopyData( string data )
+    ///
+    /// Returns: true if the data was queued, false if it was not queued because of full buffers (this will only happen in nonblocking mode)
+    bool putCopyData( string data )
     {
-        const size_t r = PQputCopyData( conn, data.toStringz, cast(int) (data.length) );
-        if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
+        const int r = PQputCopyData(conn, data.toStringz, data.length.to!int);
+
+        if(r == -1) throw new ConnectionException(this);
+
+        return r != 0;
     }
 
     /// Signals that COPY data send is finished. Finalize and flush the COPY command.
-    immutable (Answer) putCopyEnd()
+    immutable(Answer) putCopyEnd()
     {
         const char * error;
         const size_t r = PQputCopyEnd( conn, error );
+
         if(error !is null) throw new ConnectionException(error.to!string, __FILE__, __LINE__);
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
 
