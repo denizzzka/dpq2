@@ -10,7 +10,6 @@ import dpq2.oids: OidType;
 import derelict.pq.pq;
 import core.time: Duration, dur;
 import std.exception: enforce;
-import std.string;
 
 /// Extends Connection by adding query methods
 ///
