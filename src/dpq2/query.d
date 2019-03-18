@@ -4,7 +4,7 @@ module dpq2.query;
 public import dpq2.args;
 
 import dpq2.connection: Connection, ConnectionException;
-import dpq2.result: Result, ResponseException;
+import dpq2.result: Result;
 import dpq2.value;
 import dpq2.oids: OidType;
 import derelict.pq.pq;
@@ -450,24 +450,26 @@ void _integration_test( string connParam ) @trusted
     }
     {
         // test COPY
-        conn.exec("DROP TABLE IF EXISTS test_copy;");
-        conn.exec("CREATE TABLE test_copy (v1 TEXT, v2 INT);");
-        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv);");
-        conn.putCopyData("Val1,2\nval2,3\n");
-        conn.putCopyEnd();
-        // This time with error
-        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv);");
-        conn.putCopyData("Val1,2\nval2,4,5\n");
-        bool exceptionFlag = false;
+        conn.exec("CREATE TEMP TABLE test_copy (text_field TEXT, int_field INT8)");
 
-        try conn.putCopyEnd();
-        catch(ResponseException e)
-        {
-            exceptionFlag = true;
-            assert(e.msg.length > 15); // error message check
-        }
-        finally
-            assert(exceptionFlag);
+        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
+        conn.putCopyData("Val1,1\nval2,2\n");
+        conn.putCopyData("Val3,3\nval4,4\n");
+        conn.putCopyEnd();
+
+        auto res = conn.exec("SELECT count(text_field), sum(int_field) FROM test_copy");
+        assert(res.length == 1);
+        assert(res[0][0].as!string == "4");
+        assert(res[0][1].as!string == "10");
+
+        // This time with error
+        import std.exception: assertThrown;
+        import dpq2.result: ResponseException;
+
+        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
+        conn.putCopyData("Val1,2\nval2,4,POORLY_FORMATTED_CSV\n");
+
+        assertThrown!ResponseException(conn.putCopyEnd());
     }
 
     import std.socket;
