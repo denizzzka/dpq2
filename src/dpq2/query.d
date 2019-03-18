@@ -180,6 +180,52 @@ mixin template Queries()
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
+    /// Sends a buffer of CSV data to the COPY command
+    ///
+    /// Returns: true if the data was queued, false if it was not queued because of full buffers (this will only happen in nonblocking mode)
+    bool putCopyData( string data )
+    {
+        const int r = PQputCopyData(conn, data.toStringz, data.length.to!int);
+
+        if(r == -1) throw new ConnectionException(this);
+
+        return r != 0;
+    }
+
+    /// Signals that COPY data send is finished. Finalize and flush the COPY command.
+    immutable(Answer) putCopyEnd()
+    {
+        assert(!isNonBlocking, "Only for blocking connections");
+
+        const bool r = sendPutCopyEnd;
+
+        assert(r, "Impossible status for blocking connections");
+
+        // after the copying is finished, and there is no connection error, we must still get the command result
+        // this will get if there is any errors in the process (invalid data format or constraint violation, etc.)
+        auto pgResult = PQgetResult(conn);
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
+    }
+
+    /// Signals that COPY data send is finished.
+    ///
+    /// Returns: true if the termination data was sent, zero if it was not sent because the attempt would block (this case is only possible if the connection is in nonblocking mode)
+    bool sendPutCopyEnd()
+    {
+        const char* error;
+        const int r = PQputCopyEnd(conn, error);
+
+        if(error !is null) throw new ConnectionException(error.to!string);
+
+        if(r == -1) throw new ConnectionException(this);
+
+        return r != 0;
+    }
+
     // Waiting for completion of reading or writing
     // Returns: timeout is not occured
     version(integration_tests)
@@ -401,6 +447,29 @@ void _integration_test( string connParam ) @trusted
         assert(res.length == 1);
         assert(res[0].getAnswer[0][0].as!PGtext == "abc");
         assert(res[0].getAnswer[0][1].as!PGinteger == 123456);
+    }
+    {
+        // test COPY
+        conn.exec("CREATE TEMP TABLE test_copy (text_field TEXT, int_field INT8)");
+
+        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
+        conn.putCopyData("Val1,1\nval2,2\n");
+        conn.putCopyData("Val3,3\nval4,4\n");
+        conn.putCopyEnd();
+
+        auto res = conn.exec("SELECT count(text_field), sum(int_field) FROM test_copy");
+        assert(res.length == 1);
+        assert(res[0][0].as!string == "4");
+        assert(res[0][1].as!string == "10");
+
+        // This time with error
+        import std.exception: assertThrown;
+        import dpq2.result: ResponseException;
+
+        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
+        conn.putCopyData("Val1,2\nval2,4,POORLY_FORMATTED_CSV\n");
+
+        assertThrown!ResponseException(conn.putCopyEnd());
     }
 
     import std.socket;
