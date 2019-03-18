@@ -31,17 +31,17 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    468|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    470|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
        |        import std.exception: enforce;
        |
        |        //TODO: it is possible to skip this check for fixed-size values?
-    468|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
+    470|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
        |
-    468|        this._data = data;
-    468|        this._format = format;
-    468|        this._oidType = oidType;
-    468|        this._isNull = isNull;
+    470|        this._data = data;
+    470|        this._format = format;
+    470|        this._oidType = oidType;
+    470|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
@@ -56,7 +56,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1343|            return _isNull;
+   1345|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -75,7 +75,7 @@
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    525|            return _format;
+    529|            return _format;
        |        }
        |    }
        |
@@ -89,9 +89,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-   1041|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+   1043|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-   1031|        return _data;
+   1033|        return _data;
        |    }
        |
        |    ///

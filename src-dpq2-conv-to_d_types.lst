@@ -54,7 +54,7 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    121|    if(v.format == VF.BINARY)
+    123|    if(v.format == VF.BINARY)
        |    {
     117|        if(!(
        |            v.oidType == OidType.Text ||
@@ -78,17 +78,17 @@
        |    else
        |        alias Ret = T;
        |
-    116|    Ret r;
+    118|    Ret r;
        |
-    228|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+    230|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
      23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     93|        r = v.valueAsString;
+     95|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
       1|        return T(r);
        |    else
-    113|        return r;
+    115|        return r;
        |}
        |
        |@system unittest
@@ -143,7 +143,7 @@
        |
        |string valueAsString(in Value v) pure
        |{
-    111|    return (cast(const(char[])) v.data).to!string;
+    113|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field

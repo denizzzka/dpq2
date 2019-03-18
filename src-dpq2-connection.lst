@@ -46,7 +46,7 @@
        |
        |    invariant
        |    {
-    515|        assert(conn !is null);
+    540|        assert(conn !is null);
        |    }
        |
        |    /// Makes a new connection to the database server
@@ -81,7 +81,7 @@
        |    /// Returns the blocking status of the database connection
        |    bool isNonBlocking()
        |    {
-0000000|        return PQisnonblocking(conn) == 1;
+      4|        return PQisnonblocking(conn) == 1;
        |    }
        |
        |    /// Sets the nonblocking status of the connection
@@ -230,9 +230,9 @@
        |    /// Get result after PQexec* functions or throw exception if pull is empty
        |    package immutable(ResultContainer) createResultContainer(immutable PGresult* r) const
        |    {
-    190|        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
+    196|        if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
        |
-    188|        return new immutable ResultContainer(r);
+    194|        return new immutable ResultContainer(r);
        |    }
        |
        |    /// Select single-row mode for the currently-executing query

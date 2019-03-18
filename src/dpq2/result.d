@@ -128,7 +128,11 @@ immutable class Answer : Result
             case PGRES_COMMAND_OK:
             case PGRES_TUPLES_OK:
             case PGRES_SINGLE_TUPLE:
+            case PGRES_COPY_IN:
                 break;
+
+            case PGRES_COPY_OUT:
+                throw new AnswerException(ExceptionType.COPY_OUT_NOT_IMPLEMENTED, "COPY TO not yet supported");
 
             default:
                 throw new ResponseException(this, __FILE__, __LINE__);
@@ -695,6 +699,7 @@ enum ExceptionType
     FATAL_ERROR, ///
     COLUMN_NOT_FOUND, /// Column is not found
     OUT_OF_RANGE, ///
+    COPY_OUT_NOT_IMPLEMENTED = 10000, /// TODO
 }
 
 /// Covers errors of access to Answer data
