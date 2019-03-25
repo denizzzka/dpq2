@@ -18,14 +18,6 @@ import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 
-version(D_NoBoundsChecks)
-{
-    static assert(false,
-            `It is found what current version of dpq2 is not checks byte arrays bounds properly. `~
-            `To avoid security risks please do not disable built-in bounds check.`
-        );
-}
-
 /// Result table's cell coordinates
 private struct Coords
 {
@@ -448,6 +440,48 @@ package struct Dim_net // network byte order
     ubyte[4] lbound; // unknown
 }
 
+private @safe struct BytesReader(A = const ubyte[])
+{
+    A arr;
+    size_t currIdx;
+
+    this(A a)
+    {
+        arr = a;
+    }
+
+    T* read(T)() @trusted
+    {
+        const incremented = currIdx + T.sizeof;
+
+        // Malformed buffer?
+        if(incremented > arr.length)
+            throw new AnswerException(ExceptionType.FATAL_ERROR, null);
+
+        auto ret = cast(T*) &arr[currIdx];
+
+        currIdx = incremented;
+
+        return ret;
+    }
+
+    A readBuff(size_t len)
+    in(len >= 0)
+    {
+        const incremented = currIdx + len;
+
+        // Malformed buffer?
+        if(incremented > arr.length)
+            throw new AnswerException(ExceptionType.FATAL_ERROR, null);
+
+        auto ret = arr[currIdx .. incremented];
+
+        currIdx = incremented;
+
+        return ret;
+    }
+}
+
 ///
 struct ArrayProperties
 {
@@ -458,14 +492,33 @@ struct ArrayProperties
 
     this(in Value cell)
     {
-        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
+        try
+            fillStruct(cell);
+        catch(AnswerException e)
+        {
+            // Malformed array bytes buffer?
+            if(e.type == ExceptionType.FATAL_ERROR && e.msg is null)
+                throw new ValueConvException(
+                    ConvExceptionType.CORRUPTED_ARRAY,
+                    "Corrupted array",
+                    __FILE__, __LINE__, e
+                );
+            else
+                throw e;
+        }
+    }
+
+    private void fillStruct(in Value cell)
+    {
+        auto data = BytesReader!(immutable ubyte[])(cell.data);
+
+        const ArrayHeader_net* h = data.read!ArrayHeader_net;
         int nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
         if(nDims < 0)
-            throw new AnswerException(ExceptionType.FATAL_ERROR,
+            throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                 "Array dimensions number is negative ("~to!string(nDims)~")",
-                __FILE__, __LINE__
             );
 
         dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
@@ -481,16 +534,14 @@ struct ArrayProperties
             const lbound = bigEndianToNative!int(d.lbound);
 
             if(dim_size < 0)
-                throw new AnswerException(ExceptionType.FATAL_ERROR,
+                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                     "Dimension size is negative ("~to!string(dim_size)~")",
-                    __FILE__, __LINE__
                 );
 
             // FIXME: What is lbound in postgresql array reply?
             if(!(lbound == 1))
-                throw new AnswerException(ExceptionType.FATAL_ERROR,
+                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                     "Please report if you came across this error! lbound=="~to!string(lbound),
-                    __FILE__, __LINE__
                 );
 
             dimsSize[i] = dim_size;
@@ -523,35 +574,44 @@ immutable struct Array
         ap = cast(immutable) ArrayProperties(cell);
 
         // Looping through all elements and fill out index of them
+        try
         {
             auto elements = new immutable (ubyte)[][ nElems ];
             auto elementIsNULL = new bool[ nElems ];
 
-            size_t curr_offset = ap.dataOffset;
+            auto data = BytesReader!(immutable ubyte[])(cell.data[ap.dataOffset .. $]);
 
             for(uint i = 0; i < nElems; ++i)
             {
-                ubyte[int.sizeof] size_net; // network byte order
+                /// size in network byte order
+                const size_net = data.read!(ubyte[int.sizeof]);
 
-                size_net[] = cell.data.safeBufferRead(curr_offset, size_net.sizeof);
-
-                uint size = bigEndianToNative!uint( size_net );
+                uint size = bigEndianToNative!uint(*size_net);
                 if( size == size.max ) // NULL magic number
                 {
                     elementIsNULL[i] = true;
-                    size = 0;
                 }
                 else
                 {
                     elementIsNULL[i] = false;
+                    elements[i] = data.readBuff(size);
                 }
-                curr_offset += size_net.sizeof;
-                elements[i] = cell.data.safeBufferRead(curr_offset, size);
-                curr_offset += size;
             }
 
             this.elements = elements.idup;
             this.elementIsNULL = elementIsNULL.idup;
+        }
+        catch(AnswerException e)
+        {
+            // Malformed array bytes buffer?
+            if(e.type == ExceptionType.FATAL_ERROR && e.msg is null)
+                throw new ValueConvException(
+                    ConvExceptionType.CORRUPTED_ARRAY,
+                    "Corrupted array",
+                    __FILE__, __LINE__, e
+                );
+            else
+                throw e;
         }
     }
 
@@ -636,16 +696,6 @@ immutable struct Array
         assert( element_num <= nElems );
         return element_num;
     }
-}
-
-private auto safeBufferRead(in ubyte[] buff, size_t offset, size_t len)
-{
-    import core.exception: RangeError;
-
-    try
-        return buff[ offset .. offset + len ];
-    catch(RangeError e)
-        throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY, "Corrupted array");
 }
 
 /// Notify
