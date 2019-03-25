@@ -440,6 +440,32 @@ package struct Dim_net // network byte order
     ubyte[4] lbound; // unknown
 }
 
+private struct BytesReader
+{
+    const ubyte[] arr;
+    size_t currIdx;
+
+    this(in ubyte[] a)
+    {
+        arr = a;
+    }
+
+    const(T)* read(T)()
+    {
+        const incremented = currIdx + T.sizeof;
+
+        // Malformed array?
+        if(incremented > arr.length)
+            throw new AnswerException(ExceptionType.FATAL_ERROR, null);
+
+        auto ret = cast(T*) &arr[currIdx];
+
+        currIdx = incremented;
+
+        return ret;
+    }
+}
+
 ///
 struct ArrayProperties
 {
@@ -450,7 +476,9 @@ struct ArrayProperties
 
     this(in Value cell)
     {
-        const ArrayHeader_net* h = cast(ArrayHeader_net*) cell.data.ptr;
+        auto data = BytesReader(cell.data);
+
+        const ArrayHeader_net* h = data.read!ArrayHeader_net;
         int nDims = bigEndianToNative!int(h.ndims);
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 

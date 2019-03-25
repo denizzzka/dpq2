@@ -333,18 +333,8 @@ import dpq2.result: ArrayProperties;
 T binaryValueAs(T)(in Value v) @trusted
 if(isArrayType!T)
 {
-    version(D_NoBoundsChecks)
-    {
-        static assert(false,
-                `It is found what current version of dpq2 is not checks byte arrays bounds properly. `~
-                `To avoid security risks please do not disable built-in bounds check while arrays reading.`
-            );
-    }
-    else
-    {
-        int idx;
-        return v.valueToArrayRow!(T, 0)(ArrayProperties(v), idx);
-    }
+    int idx;
+    return v.valueToArrayRow!(T, 0)(ArrayProperties(v), idx);
 }
 
 private T valueToArrayRow(T, int currDimension)(in Value v, ArrayProperties arrayProperties, ref int elemIdx) @system
