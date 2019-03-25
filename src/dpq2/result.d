@@ -574,6 +574,7 @@ immutable struct Array
         ap = cast(immutable) ArrayProperties(cell);
 
         // Looping through all elements and fill out index of them
+        try
         {
             auto elements = new immutable (ubyte)[][ nElems ];
             auto elementIsNULL = new bool[ nElems ];
@@ -599,6 +600,18 @@ immutable struct Array
 
             this.elements = elements.idup;
             this.elementIsNULL = elementIsNULL.idup;
+        }
+        catch(AnswerException e)
+        {
+            // Malformed array bytes buffer?
+            if(e.type == ExceptionType.FATAL_ERROR && e.msg is null)
+                throw new ValueConvException(
+                    ConvExceptionType.CORRUPTED_ARRAY,
+                    "Corrupted array",
+                    __FILE__, __LINE__, e
+                );
+            else
+                throw e;
         }
     }
 
