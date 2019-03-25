@@ -440,25 +440,41 @@ package struct Dim_net // network byte order
     ubyte[4] lbound; // unknown
 }
 
-private struct BytesReader
+private struct BytesReader(A = const ubyte[])
 {
-    const ubyte[] arr;
+    A arr;
     size_t currIdx;
 
-    this(in ubyte[] a)
+    this(A a)
     {
         arr = a;
     }
 
-    const(T)* read(T)()
+    T* read(T)()
     {
         const incremented = currIdx + T.sizeof;
 
-        // Malformed array?
+        // Malformed buffer?
         if(incremented > arr.length)
             throw new AnswerException(ExceptionType.FATAL_ERROR, null);
 
         auto ret = cast(T*) &arr[currIdx];
+
+        currIdx = incremented;
+
+        return ret;
+    }
+
+    A readBuff(size_t len)
+    in(len >= 0)
+    {
+        const incremented = currIdx + len;
+
+        // Malformed buffer?
+        if(incremented > arr.length)
+            throw new AnswerException(ExceptionType.FATAL_ERROR, null);
+
+        auto ret = arr[currIdx .. incremented];
 
         currIdx = incremented;
 
@@ -476,7 +492,7 @@ struct ArrayProperties
 
     this(in Value cell)
     {
-        auto data = BytesReader(cell.data);
+        auto data = BytesReader!(immutable ubyte[])(cell.data);
 
         const ArrayHeader_net* h = data.read!ArrayHeader_net;
         int nDims = bigEndianToNative!int(h.ndims);
@@ -547,27 +563,23 @@ immutable struct Array
             auto elements = new immutable (ubyte)[][ nElems ];
             auto elementIsNULL = new bool[ nElems ];
 
-            size_t curr_offset = ap.dataOffset;
+            auto data = BytesReader!(immutable ubyte[])(cell.data[ap.dataOffset .. $]);
 
             for(uint i = 0; i < nElems; ++i)
             {
-                ubyte[int.sizeof] size_net; // network byte order
+                /// size in network byte order
+                const size_net = data.read!(ubyte[int.sizeof]);
 
-                size_net[] = cell.data.safeBufferRead(curr_offset, size_net.sizeof);
-
-                uint size = bigEndianToNative!uint( size_net );
+                uint size = bigEndianToNative!uint(*size_net);
                 if( size == size.max ) // NULL magic number
                 {
                     elementIsNULL[i] = true;
-                    size = 0;
                 }
                 else
                 {
                     elementIsNULL[i] = false;
+                    elements[i] = data.readBuff(size);
                 }
-                curr_offset += size_net.sizeof;
-                elements[i] = cell.data.safeBufferRead(curr_offset, size);
-                curr_offset += size;
             }
 
             this.elements = elements.idup;
@@ -658,6 +670,7 @@ immutable struct Array
     }
 }
 
+//TODO: remove
 private auto safeBufferRead(in ubyte[] buff, size_t offset, size_t len)
 {
     import core.exception: RangeError;
