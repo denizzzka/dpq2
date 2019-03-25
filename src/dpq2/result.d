@@ -670,17 +670,6 @@ immutable struct Array
     }
 }
 
-//TODO: remove
-private auto safeBufferRead(in ubyte[] buff, size_t offset, size_t len)
-{
-    import core.exception: RangeError;
-
-    try
-        return buff[ offset .. offset + len ];
-    catch(RangeError e)
-        throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY, "Corrupted array");
-}
-
 /// Notify
 class Notify
 {
