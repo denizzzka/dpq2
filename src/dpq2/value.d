@@ -150,10 +150,10 @@ class ValueConvException : ConvException
 {
     const ConvExceptionType type; /// Exception type
 
-    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
+    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__, Throwable next = null) pure @safe
     {
         type = t;
-        super(msg, file, line);
+        super(msg, file, line, next);
     }
 }
 

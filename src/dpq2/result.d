@@ -440,7 +440,7 @@ package struct Dim_net // network byte order
     ubyte[4] lbound; // unknown
 }
 
-private struct BytesReader(A = const ubyte[])
+private @safe struct BytesReader(A = const ubyte[])
 {
     A arr;
     size_t currIdx;
@@ -450,7 +450,7 @@ private struct BytesReader(A = const ubyte[])
         arr = a;
     }
 
-    T* read(T)()
+    T* read(T)() @trusted
     {
         const incremented = currIdx + T.sizeof;
 
@@ -491,6 +491,23 @@ struct ArrayProperties
     package size_t dataOffset;
 
     this(in Value cell)
+    {
+        try
+            fillStruct(cell);
+        catch(AnswerException e)
+        {
+            if(e.type == ExceptionType.FATAL_ERROR)
+                throw new ValueConvException(
+                    ConvExceptionType.CORRUPTED_ARRAY,
+                    "Corrupted array",
+                    __FILE__, __LINE__, e
+                );
+            else
+                throw e;
+        }
+    }
+
+    private void fillStruct(in Value cell)
     {
         auto data = BytesReader!(immutable ubyte[])(cell.data);
 
