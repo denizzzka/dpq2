@@ -56,7 +56,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1345|            return _isNull;
+   1075|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -89,9 +89,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-   1043|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    773|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-   1033|        return _data;
+    763|        return _data;
        |    }
        |
        |    ///
@@ -150,10 +150,10 @@
        |{
        |    const ConvExceptionType type; /// Exception type
        |
-     35|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__) pure @safe
+     35|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__, Throwable next = null) pure @safe
        |    {
      35|        type = t;
-     35|        super(msg, file, line);
+     35|        super(msg, file, line, next);
        |    }
        |}
        |
