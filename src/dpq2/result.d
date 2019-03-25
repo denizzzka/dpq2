@@ -496,7 +496,8 @@ struct ArrayProperties
             fillStruct(cell);
         catch(AnswerException e)
         {
-            if(e.type == ExceptionType.FATAL_ERROR)
+            // Malformed array bytes buffer?
+            if(e.type == ExceptionType.FATAL_ERROR && e.msg is null)
                 throw new ValueConvException(
                     ConvExceptionType.CORRUPTED_ARRAY,
                     "Corrupted array",
