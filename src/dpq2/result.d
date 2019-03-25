@@ -517,9 +517,8 @@ struct ArrayProperties
         OID = oid2oidType(bigEndianToNative!Oid(h.OID));
 
         if(nDims < 0)
-            throw new AnswerException(ExceptionType.FATAL_ERROR,
+            throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                 "Array dimensions number is negative ("~to!string(nDims)~")",
-                __FILE__, __LINE__
             );
 
         dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
@@ -535,16 +534,14 @@ struct ArrayProperties
             const lbound = bigEndianToNative!int(d.lbound);
 
             if(dim_size < 0)
-                throw new AnswerException(ExceptionType.FATAL_ERROR,
+                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                     "Dimension size is negative ("~to!string(dim_size)~")",
-                    __FILE__, __LINE__
                 );
 
             // FIXME: What is lbound in postgresql array reply?
             if(!(lbound == 1))
-                throw new AnswerException(ExceptionType.FATAL_ERROR,
+                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                     "Please report if you came across this error! lbound=="~to!string(lbound),
-                    __FILE__, __LINE__
                 );
 
             dimsSize[i] = dim_size;
