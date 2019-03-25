@@ -18,14 +18,6 @@ import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 
-version(D_NoBoundsChecks)
-{
-    static assert(false,
-            `It is found what current version of dpq2 is not checks byte arrays bounds properly. `~
-            `To avoid security risks please do not disable built-in bounds check.`
-        );
-}
-
 /// Result table's cell coordinates
 private struct Coords
 {
