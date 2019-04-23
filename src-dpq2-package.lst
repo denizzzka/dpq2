@@ -8,25 +8,29 @@
        |import derelict.pq.pq;
        |debug import std.experimental.logger;
        |
-       |static __gshared bool __initialized;
-       |
-       |static this()
+       |version(DerelictPQ_Static){}
+       |else
        |{
-       |    import std.concurrency : initOnce;
-      1|    initOnce!__initialized({
-       |        debug
-       |        {
-      2|            trace("DerelictPQ loading...");
-       |        }
+       |    static __gshared bool __initialized;
        |
-      1|        DerelictPQ.load();
+       |    static this()
+       |    {
+       |        import std.concurrency : initOnce;
+      1|        initOnce!__initialized({
+       |            debug
+       |            {
+      2|                trace("DerelictPQ loading...");
+       |            }
        |
-       |        debug
-       |        {
-      2|            trace("...DerelictPQ loading finished");
-       |        }
-      1|        return true;
-      1|    }());
+      1|            DerelictPQ.load();
+       |
+       |            debug
+       |            {
+      2|                trace("...DerelictPQ loading finished");
+       |            }
+      1|            return true;
+      1|        }());
+       |    }
        |}
        |
        |public
