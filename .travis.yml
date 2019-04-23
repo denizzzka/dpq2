@@ -17,14 +17,19 @@ addons:
 services: postgresql
 
 env:
-  - CONN_STRING="dbname=postgres"
+  global:
+    - CONN_STRING="dbname=postgres"
+  matrix:
+    - BUILD=unittest STAT_TYPE=static
+    - BUILD=unittest STAT_TYPE=dynamic
+    - BUILD=release STAT_TYPE=static
+    - BUILD=release STAT_TYPE=dynamic
 
 before_script:
   - psql -c 'create database "dpq2-test"' -U postgres
 
 script:
-  - dub run dpq2:integration_tests --build=unittest -- --conninfo="${CONN_STRING}"
-  - dub run dpq2:integration_tests --build=release -- --conninfo="${CONN_STRING}"
+  - dub run dpq2:integration_tests --build=${BUILD} --config=${STAT_TYPE} -- --conninfo="${CONN_STRING}"
 
 matrix:
   include:

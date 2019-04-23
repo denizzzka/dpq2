@@ -8,25 +8,29 @@ module dpq2;
 import derelict.pq.pq;
 debug import std.experimental.logger;
 
-static __gshared bool __initialized;
-
-static this()
+version(DerelictPQ_Static){}
+else
 {
-    import std.concurrency : initOnce;
-    initOnce!__initialized({
-        debug
-        {
-            trace("DerelictPQ loading...");
-        }
+    static __gshared bool __initialized;
 
-        DerelictPQ.load();
+    static this()
+    {
+        import std.concurrency : initOnce;
+        initOnce!__initialized({
+            debug
+            {
+                trace("DerelictPQ loading...");
+            }
 
-        debug
-        {
-            trace("...DerelictPQ loading finished");
-        }
-        return true;
-    }());
+            DerelictPQ.load();
+
+            debug
+            {
+                trace("...DerelictPQ loading finished");
+            }
+            return true;
+        }());
+    }
 }
 
 public
