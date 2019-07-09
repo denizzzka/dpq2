@@ -91,8 +91,8 @@ if(isValidPointType!Vec2Ddouble)
 {
     import std.algorithm : copy;
 
-    auto rem = point.x.nativeToBigEndian.copy(target);
-    rem = point.y.nativeToBigEndian.copy(rem);
+    auto rem = point.x.nativeToBigEndian[0 .. $].copy(target);
+    rem = point.y.nativeToBigEndian[0 .. $].copy(rem);
 
     return rem;
 }
@@ -154,9 +154,9 @@ if(is(T == Line))
 
     ubyte[] data = new ubyte[24];
 
-    auto rem = line.a.nativeToBigEndian.copy(data);
-    rem = line.b.nativeToBigEndian.copy(rem);
-    rem = line.c.nativeToBigEndian.copy(rem);
+    auto rem = line.a.nativeToBigEndian[0 .. $].copy(data);
+    rem = line.b.nativeToBigEndian[0 .. $].copy(rem);
+    rem = line.c.nativeToBigEndian[0 .. $].copy(rem);
 
     return createValue(data, OidType.Line);
 }
@@ -183,8 +183,8 @@ if(isInstanceOf!(Path, T))
 
     ubyte[] data = new ubyte[path.points.length * 16 + 5];
 
-    auto rem = (cast(ubyte)(path.isClosed ? 1 : 0)).nativeToBigEndian.copy(data);
-    rem = (cast(int)path.points.length).nativeToBigEndian.copy(rem);
+    auto rem = (cast(ubyte)(path.isClosed ? 1 : 0)).nativeToBigEndian[0 .. $].copy(data);
+    rem = (cast(int)path.points.length).nativeToBigEndian[0 .. $].copy(rem);
 
     foreach (ref p; path.points)
     {
@@ -204,7 +204,7 @@ if(isValidPolygon!Polygon)
             "At least one point is needed for Polygon", __FILE__, __LINE__);
 
     ubyte[] data = new ubyte[poly.length * 16 + 4];
-    auto rem = (cast(int)poly.length).nativeToBigEndian.copy(data);
+    auto rem = (cast(int)poly.length).nativeToBigEndian[0 .. $].copy(data);
 
     foreach (ref p; poly)
         rem = p.serializePoint(rem);
@@ -219,7 +219,7 @@ if(isInstanceOf!(Circle, T))
 
     ubyte[] data = new ubyte[24];
     auto rem = c.center.serializePoint(data);
-    c.radius.nativeToBigEndian.copy(rem);
+    c.radius.nativeToBigEndian[0 .. $].copy(rem);
 
     return createValue(data, OidType.Circle);
 }
