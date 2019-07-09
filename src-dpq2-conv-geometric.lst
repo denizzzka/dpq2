@@ -91,8 +91,8 @@
        |{
        |    import std.algorithm : copy;
        |
-     48|    auto rem = point.x.nativeToBigEndian.copy(target);
-     48|    rem = point.y.nativeToBigEndian.copy(rem);
+     48|    auto rem = point.x.nativeToBigEndian[0 .. $].copy(target);
+     48|    rem = point.y.nativeToBigEndian[0 .. $].copy(rem);
        |
      48|    return rem;
        |}
@@ -154,9 +154,9 @@
        |
       4|    ubyte[] data = new ubyte[24];
        |
-      4|    auto rem = line.a.nativeToBigEndian.copy(data);
-      4|    rem = line.b.nativeToBigEndian.copy(rem);
-      4|    rem = line.c.nativeToBigEndian.copy(rem);
+      4|    auto rem = line.a.nativeToBigEndian[0 .. $].copy(data);
+      4|    rem = line.b.nativeToBigEndian[0 .. $].copy(rem);
+      4|    rem = line.c.nativeToBigEndian[0 .. $].copy(rem);
        |
       4|    return createValue(data, OidType.Line);
        |}
@@ -183,8 +183,9 @@
        |
       6|    ubyte[] data = new ubyte[path.points.length * 16 + 5];
        |
-     12|    auto rem = (cast(ubyte)(path.isClosed ? 1 : 0)).nativeToBigEndian.copy(data);
-      6|    rem = (cast(int)path.points.length).nativeToBigEndian.copy(rem);
+     12|    ubyte isClosed = path.isClosed ? 1 : 0;
+      6|    auto rem = [isClosed].copy(data);
+      6|    rem = (cast(int) path.points.length).nativeToBigEndian[0 .. $].copy(rem);
        |
      60|    foreach (ref p; path.points)
        |    {
@@ -204,7 +205,7 @@
        |            "At least one point is needed for Polygon", __FILE__, __LINE__);
        |
       4|    ubyte[] data = new ubyte[poly.length * 16 + 4];
-      4|    auto rem = (cast(int)poly.length).nativeToBigEndian.copy(data);
+      4|    auto rem = (cast(int)poly.length).nativeToBigEndian[0 .. $].copy(data);
        |
      42|    foreach (ref p; poly)
      10|        rem = p.serializePoint(rem);
@@ -219,7 +220,7 @@
        |
       4|    ubyte[] data = new ubyte[24];
       4|    auto rem = c.center.serializePoint(data);
-      4|    c.radius.nativeToBigEndian.copy(rem);
+      4|    c.radius.nativeToBigEndian[0 .. $].copy(rem);
        |
       4|    return createValue(data, OidType.Circle);
        |}
