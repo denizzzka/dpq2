@@ -183,8 +183,9 @@ if(isInstanceOf!(Path, T))
 
     ubyte[] data = new ubyte[path.points.length * 16 + 5];
 
-    auto rem = (cast(ubyte)(path.isClosed ? 1 : 0)).nativeToBigEndian[0 .. $].copy(data);
-    rem = (cast(int)path.points.length).nativeToBigEndian[0 .. $].copy(rem);
+    ubyte isClosed = path.isClosed ? 1 : 0;
+    auto rem = [isClosed].copy(data);
+    rem = (cast(int) path.points.length).nativeToBigEndian[0 .. $].copy(rem);
 
     foreach (ref p; path.points)
     {
