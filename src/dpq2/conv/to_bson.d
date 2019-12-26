@@ -9,7 +9,7 @@ import dpq2.conv.numeric: rawValueToNumeric;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone, UTC;
-import std.bitmanip: bigEndianToNative;
+import std.bitmanip: bigEndianToNative, BitArray;
 import std.conv: to;
 
 ///
@@ -140,6 +140,11 @@ Bson rawValueToBson(in Value v)
         case ByteArray:
             auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
             res = Bson(b);
+            break;
+        case VariableBitString:
+            import std.format;
+            auto dval = v.tunnelForBinaryValueAsCalls!BitArray;
+            res = Bson(format("%b", dval));
             break;
 
         case UUID:

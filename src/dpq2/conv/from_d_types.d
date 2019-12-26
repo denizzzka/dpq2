@@ -9,7 +9,7 @@ import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
-import std.bitmanip: nativeToBigEndian;
+import std.bitmanip: nativeToBigEndian, BitArray, append;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
@@ -69,6 +69,41 @@ unittest
 
     assert(v.oidType == OidType.Money);
     assert(v.as!PGTestMoney == pgtm);
+}
+
+/// Convert std.bitmanip.BitArray  to PG value
+Value toValue(T)(T v) @trusted
+if(is(Unqual!T == BitArray))
+{
+    import std.array : appender;
+    import core.bitop : bitswap;
+
+    size_t len = v.length / 8 + (v.length % 8 ? 1 : 0);
+    auto data = cast(size_t[])v;
+    auto buffer = appender!(const ubyte[])();
+    buffer.append!uint(cast(uint)v.length);
+    foreach (d; data[0 .. v.dim])
+    {
+        auto ntb = nativeToBigEndian(bitswap(d));
+        foreach (b; ntb[0 .. len])
+        {
+            buffer.append!ubyte(b);
+        }
+
+    }
+    return Value(buffer.data.dup, OidType.VariableBitString, false, ValueFormat.BINARY);
+}
+
+@trusted unittest
+{
+    import std.bitmanip : BitArray;
+
+    auto varbit = BitArray([1,0,1,1,0]);
+
+    Value v = varbit.toValue;
+
+    assert(v.oidType == OidType.VariableBitString);
+    assert(v.as!BitArray == varbit);
 }
 
 /**

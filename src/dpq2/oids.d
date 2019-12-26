@@ -194,6 +194,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
         static if(is(UT == VibeJson)){ return Json; } else
         static if(is(UT == StdUUID)){ return UUID; } else
+        static if(is(UT == BitArray)){ return VariableBitString; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
