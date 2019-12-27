@@ -167,6 +167,7 @@ OidType detectOidTypeFromNative(T)()
 
 private OidType detectOidTypeNotCareAboutNullable(T)()
 {
+    import std.bitmanip : BitArray;
     import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;

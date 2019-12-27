@@ -95,7 +95,7 @@ if(is(Unqual!T == BitArray))
         }
 
     }
-    return Value(buffer.data.dup, OidType.VariableBitString, false, ValueFormat.BINARY);
+    return Value(buffer.data.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
 }
 
 /// Reverses the order of bits - needed because of dmd Issue 19693
@@ -130,6 +130,19 @@ package N softBitswap(N)(N x) pure
 
     assert(v.oidType == OidType.VariableBitString);
     assert(v.as!BitArray == varbit);
+
+    // test softBitswap
+    assert (softBitswap!uint( 0x8000_0100 ) == 0x0080_0001);
+    foreach (i; 0 .. 32)
+        assert (softBitswap!uint(1 << i) == 1 << 32 - i - 1);
+
+    assert (softBitswap!ulong( 0b1000000000000000000000010000000000000000100000000000000000000001)
+            == 0b1000000000000000000000010000000000000000100000000000000000000001);
+    assert (softBitswap!ulong( 0b1110000000000000000000010000000000000000100000000000000000000001)
+        == 0b1000000000000000000000010000000000000000100000000000000000000111);
+    foreach (i; 0 .. 64)
+        assert (softBitswap!ulong(1UL << i) == 1UL << 64 - i - 1);
+
 }
 
 /**

@@ -177,6 +177,18 @@ Bson rawValueToBson(in Value v)
     return res;
 }
 
+@system unittest
+{
+    import std.bitmanip : BitArray;
+    import dpq2.conv.from_d_types : toValue;
+
+    auto varbit = BitArray([1,0,1,1,0,1,1,1,1,0,1]);
+    Value v = varbit.toValue;
+    auto bson = rawValueToBson(v);
+    assert(bson.toString == "\"101_10111101\"");
+
+}
+
 version (integration_tests)
 public void _integration_test( string connParam )
 {
