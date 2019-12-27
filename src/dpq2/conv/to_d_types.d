@@ -342,7 +342,12 @@ if( is(T == BitArray) )
     {
         ubyte[size_t.sizeof] tmpData;
         tmpData[0 .. ch.length] = ch[];
-        auto re = bitswap(bigEndianToNative!size_t(tmpData));
+
+        // DMD Issue 19693
+        version(DigitalMars)
+            auto re = softBitswap(bigEndianToNative!size_t(tmpData));
+        else
+            auto re = bitswap(bigEndianToNative!size_t(tmpData));
         newData ~= re;
     }
     return T(newData, len);

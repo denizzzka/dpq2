@@ -84,7 +84,11 @@ if(is(Unqual!T == BitArray))
     buffer.append!uint(cast(uint)v.length);
     foreach (d; data[0 .. v.dim])
     {
-        auto ntb = nativeToBigEndian(bitswap(d));
+        // DMD Issue 19693
+        version(DigitalMars)
+            auto ntb = nativeToBigEndian(softBitswap(d));
+        else
+            auto ntb = nativeToBigEndian(bitswap(d));
         foreach (b; ntb[0 .. len])
         {
             buffer.append!ubyte(b);
@@ -92,6 +96,28 @@ if(is(Unqual!T == BitArray))
 
     }
     return Value(buffer.data.dup, OidType.VariableBitString, false, ValueFormat.BINARY);
+}
+
+/// Reverses the order of bits - needed because of dmd Issue 19693
+/// https://issues.dlang.org/show_bug.cgi?id=19693
+package N softBitswap(N)(N x) pure
+    if (is(N == uint) || is(N == ulong))
+{
+    import core.bitop : bswap;
+    // swap 1-bit pairs:
+    enum mask1 = cast(N) 0x5555_5555_5555_5555L;
+    x = ((x >> 1) & mask1) | ((x & mask1) << 1);
+    // swap 2-bit pairs:
+    enum mask2 = cast(N) 0x3333_3333_3333_3333L;
+    x = ((x >> 2) & mask2) | ((x & mask2) << 2);
+    // swap 4-bit pairs:
+    enum mask4 = cast(N) 0x0F0F_0F0F_0F0F_0F0FL;
+    x = ((x >> 4) & mask4) | ((x & mask4) << 4);
+
+    // reverse the order of all bytes:
+    x = bswap(x);
+
+    return x;
 }
 
 @trusted unittest
