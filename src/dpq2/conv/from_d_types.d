@@ -71,7 +71,7 @@ unittest
     assert(v.as!PGTestMoney == pgtm);
 }
 
-/// Convert std.bitmanip.BitArray  to PG value
+/// Convert std.bitmanip.BitArray to PG value
 Value toValue(T)(T v) @trusted
 if(is(Unqual!T == BitArray))
 {

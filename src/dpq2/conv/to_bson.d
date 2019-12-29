@@ -141,6 +141,7 @@ Bson rawValueToBson(in Value v)
             auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
             res = Bson(b);
             break;
+
         case VariableBitString:
             import std.format;
             auto dval = v.tunnelForBinaryValueAsCalls!BitArray;
