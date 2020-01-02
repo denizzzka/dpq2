@@ -142,12 +142,6 @@ Bson rawValueToBson(in Value v)
             res = Bson(b);
             break;
 
-        case VariableBitString:
-            import std.format;
-            auto dval = v.tunnelForBinaryValueAsCalls!BitArray;
-            res = Bson(format("%b", dval));
-            break;
-
         case UUID:
             // See: https://github.com/vibe-d/vibe.d/issues/2161
             // res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
@@ -176,18 +170,6 @@ Bson rawValueToBson(in Value v)
     }
 
     return res;
-}
-
-@system unittest
-{
-    import std.bitmanip : BitArray;
-    import dpq2.conv.from_d_types : toValue;
-
-    auto varbit = BitArray([1,0,1,1,0,1,1,1,1,0,1]);
-    Value v = varbit.toValue;
-    auto bson = rawValueToBson(v);
-    assert(bson.toString == "\"101_10111101\"");
-
 }
 
 version (integration_tests)
