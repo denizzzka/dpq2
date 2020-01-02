@@ -21,7 +21,7 @@ import std.uuid;
 import std.datetime;
 import std.traits: isScalarType;
 import std.typecons : Nullable;
-import std.bitmanip: bigEndianToNative;
+import std.bitmanip: bigEndianToNative, BitArray;
 import std.conv: to;
 version (unittest) import std.exception : assertThrown;
 
@@ -42,6 +42,7 @@ alias PGtimestamp = TimeStamp; /// Both date and time without time zone
 alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
 alias PGjson =          Json; /// json or jsonb
 alias PGline =          Line; /// Line (geometric type)
+alias PGvarbit =        BitArray; /// BitArray
 
 private alias VF = ValueFormat;
 private alias AE = ValueConvException;
@@ -313,4 +314,47 @@ unittest
 {
     auto v = Value([1], OidType.Money);
     assertThrown!ValueConvException(v.binaryValueAs!PGTestMoney);
+}
+
+T binaryValueAs(T)(in Value v) @trusted
+if( is(T == BitArray) )
+{
+    import core.bitop : bitswap;
+    import std.bitmanip;
+    import std.format: format;
+    import std.range : chunks;
+
+    if(v.data.length < int.sizeof)
+        throw new AE(
+            ET.SIZE_MISMATCH,
+            format(
+                "%s length (%d) is less than minimum int type size (%d)",
+                v.oidType.to!string,
+                v.data.length,
+                int.sizeof
+            )
+        );
+
+    auto data = v.data;
+    size_t len = data.read!int;
+    size_t[] newData;
+    foreach (ch; data.chunks(size_t.sizeof))
+    {
+        ubyte[size_t.sizeof] tmpData;
+        tmpData[0 .. ch.length] = ch[];
+
+        // DMD Issue 19693
+        version(DigitalMars)
+            auto re = softBitswap(bigEndianToNative!size_t(tmpData));
+        else
+            auto re = bitswap(bigEndianToNative!size_t(tmpData));
+        newData ~= re;
+    }
+    return T(newData, len);
+}
+
+unittest
+{
+    auto v = Value([1], OidType.VariableBitString);
+    assertThrown!ValueConvException(v.binaryValueAs!BitArray);
 }

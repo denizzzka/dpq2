@@ -3,6 +3,7 @@
        |import dpq2;
        |import dpq2.conv.arrays : isArrayType;
        |import dpq2.conv.geometric: Line;
+       |import std.bitmanip : BitArray;
        |import std.datetime;
        |import std.typecons: Nullable;
        |import std.uuid: UUID;
@@ -56,19 +57,19 @@
        |            import std.string : representation;
        |
        |            // test string to native conversion
-    140|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
-     70|            params.args = null;
-     70|            auto answer = conn.execParams(params);
-     70|            immutable Value v = answer[0][0];
+    146|            params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
+     73|            params.args = null;
+     73|            auto answer = conn.execParams(params);
+     73|            immutable Value v = answer[0][0];
        |
-     70|            auto result = v.as!T;
+     73|            auto result = v.as!T;
        |
        |            static if(isArrayType!T)
       6|                const bool assertResult = compareArraysWithCareAboutNullables(result, nativeValue);
        |            else
-     69|                const bool assertResult = result == nativeValue;
+     72|                const bool assertResult = result == nativeValue;
        |
-     69|            assert(
+     72|            assert(
        |                assertResult,
        |                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
        |                v.oidType, typeid(T), pgValue, nativeValue, result)
@@ -76,17 +77,17 @@
        |
        |            {
        |                // test binary to text conversion
-     69|                params.sqlCommand = "SELECT $1::text";
-     69|                params.args = [nativeValue.toValue];
+     72|                params.sqlCommand = "SELECT $1::text";
+     72|                params.args = [nativeValue.toValue];
        |
-     69|                auto answer2 = conn.execParams(params);
-     69|                auto v2 = answer2[0][0];
+     72|                auto answer2 = conn.execParams(params);
+     72|                auto v2 = answer2[0][0];
        |
-     69|                string textResult = v2.isNull
+     72|                string textResult = v2.isNull
       3|                    ? "NULL"
-     66|                    : v2.as!string.strip(' ');
+     69|                    : v2.as!string.strip(' ');
        |
-     69|                pgValue = pgValue.strip('\'');
+     72|                pgValue = pgValue.strip('\'');
        |
        |                // Special cases:
        |                static if(is(T == PGbytea))
@@ -99,7 +100,7 @@
       2|                    textResult = textResult.parseJsonString.toString;
        |                }
        |
-     69|                assert(textResult == pgValue,
+     72|                assert(textResult == pgValue,
        |                    format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
        |                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
        |                );
@@ -128,6 +129,9 @@
        |            "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
       1|        C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
       1|        C!(Nullable!PGuuid)(Nullable!UUID(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+      1|        C!PGvarbit(BitArray([1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]), "varbit", "'101011010110101'");
+      1|        C!PGvarbit(BitArray([0, 0, 1, 0, 1]), "varbit", "'00101'");
+      1|        C!PGvarbit(BitArray([1, 0, 1, 0, 0]), "varbit", "'10100'");
        |
        |        // numeric testing
       1|        C!PGnumeric("NaN", "numeric", "'NaN'");

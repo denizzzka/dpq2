@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    256|    return cast(OidType)(oid);
+    262|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -162,11 +162,12 @@
        |    static if(is(T == Nullable!R,R))
       7|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
        |    else
-     89|        return detectOidTypeNotCareAboutNullable!T;
+     93|        return detectOidTypeNotCareAboutNullable!T;
        |}
        |
        |private OidType detectOidTypeNotCareAboutNullable(T)()
        |{
+       |    import std.bitmanip : BitArray;
        |    import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
        |    import std.datetime.systime : SysTime;
        |    import std.traits : Unqual;
@@ -194,6 +195,7 @@
       1|        static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
 0000000|        static if(is(UT == VibeJson)){ return Json; } else
 0000000|        static if(is(UT == StdUUID)){ return UUID; } else
+      4|        static if(is(UT == BitArray)){ return VariableBitString; } else
        |
        |        static assert(false, "Unsupported D type: "~T.stringof);
        |    }

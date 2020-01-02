@@ -167,6 +167,7 @@ OidType detectOidTypeFromNative(T)()
 
 private OidType detectOidTypeNotCareAboutNullable(T)()
 {
+    import std.bitmanip : BitArray;
     import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
     import std.datetime.systime : SysTime;
     import std.traits : Unqual;
@@ -194,6 +195,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
         static if(is(UT == VibeJson)){ return Json; } else
         static if(is(UT == StdUUID)){ return UUID; } else
+        static if(is(UT == BitArray)){ return VariableBitString; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }

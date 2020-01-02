@@ -9,7 +9,7 @@ import dpq2.conv.numeric: rawValueToNumeric;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone, UTC;
-import std.bitmanip: bigEndianToNative;
+import std.bitmanip: bigEndianToNative, BitArray;
 import std.conv: to;
 
 ///

@@ -9,7 +9,7 @@ import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
-import std.bitmanip: nativeToBigEndian;
+import std.bitmanip: nativeToBigEndian, BitArray, append;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
@@ -69,6 +69,80 @@ unittest
 
     assert(v.oidType == OidType.Money);
     assert(v.as!PGTestMoney == pgtm);
+}
+
+/// Convert std.bitmanip.BitArray to PG value
+Value toValue(T)(T v) @trusted
+if(is(Unqual!T == BitArray))
+{
+    import std.array : appender;
+    import core.bitop : bitswap;
+
+    size_t len = v.length / 8 + (v.length % 8 ? 1 : 0);
+    auto data = cast(size_t[])v;
+    auto buffer = appender!(const ubyte[])();
+    buffer.append!uint(cast(uint)v.length);
+    foreach (d; data[0 .. v.dim])
+    {
+        // DMD Issue 19693
+        version(DigitalMars)
+            auto ntb = nativeToBigEndian(softBitswap(d));
+        else
+            auto ntb = nativeToBigEndian(bitswap(d));
+        foreach (b; ntb[0 .. len])
+        {
+            buffer.append!ubyte(b);
+        }
+
+    }
+    return Value(buffer.data.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+}
+
+/// Reverses the order of bits - needed because of dmd Issue 19693
+/// https://issues.dlang.org/show_bug.cgi?id=19693
+package N softBitswap(N)(N x) pure
+    if (is(N == uint) || is(N == ulong))
+{
+    import core.bitop : bswap;
+    // swap 1-bit pairs:
+    enum mask1 = cast(N) 0x5555_5555_5555_5555L;
+    x = ((x >> 1) & mask1) | ((x & mask1) << 1);
+    // swap 2-bit pairs:
+    enum mask2 = cast(N) 0x3333_3333_3333_3333L;
+    x = ((x >> 2) & mask2) | ((x & mask2) << 2);
+    // swap 4-bit pairs:
+    enum mask4 = cast(N) 0x0F0F_0F0F_0F0F_0F0FL;
+    x = ((x >> 4) & mask4) | ((x & mask4) << 4);
+
+    // reverse the order of all bytes:
+    x = bswap(x);
+
+    return x;
+}
+
+@trusted unittest
+{
+    import std.bitmanip : BitArray;
+
+    auto varbit = BitArray([1,0,1,1,0]);
+
+    Value v = varbit.toValue;
+
+    assert(v.oidType == OidType.VariableBitString);
+    assert(v.as!BitArray == varbit);
+
+    // test softBitswap
+    assert (softBitswap!uint( 0x8000_0100 ) == 0x0080_0001);
+    foreach (i; 0 .. 32)
+        assert (softBitswap!uint(1 << i) == 1 << 32 - i - 1);
+
+    assert (softBitswap!ulong( 0b1000000000000000000000010000000000000000100000000000000000000001)
+            == 0b1000000000000000000000010000000000000000100000000000000000000001);
+    assert (softBitswap!ulong( 0b1110000000000000000000010000000000000000100000000000000000000001)
+        == 0b1000000000000000000000010000000000000000100000000000000000000111);
+    foreach (i; 0 .. 64)
+        assert (softBitswap!ulong(1UL << i) == 1UL << 64 - i - 1);
+
 }
 
 /**

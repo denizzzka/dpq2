@@ -31,17 +31,17 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    470|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    481|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
        |        import std.exception: enforce;
        |
        |        //TODO: it is possible to skip this check for fixed-size values?
-    470|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
+    481|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
        |
-    470|        this._data = data;
-    470|        this._format = format;
-    470|        this._oidType = oidType;
-    470|        this._isNull = isNull;
+    481|        this._data = data;
+    481|        this._format = format;
+    481|        this._oidType = oidType;
+    481|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
@@ -56,7 +56,7 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1075|            return _isNull;
+   1103|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
@@ -69,13 +69,13 @@
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    723|            return _oidType;
+    734|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    529|            return _format;
+    542|            return _format;
        |        }
        |    }
        |
@@ -89,9 +89,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    773|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    795|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    763|        return _data;
+    785|        return _data;
        |    }
        |
        |    ///
@@ -150,10 +150,10 @@
        |{
        |    const ConvExceptionType type; /// Exception type
        |
-     35|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__, Throwable next = null) pure @safe
+     36|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__, Throwable next = null) pure @safe
        |    {
-     35|        type = t;
-     35|        super(msg, file, line, next);
+     36|        type = t;
+     36|        super(msg, file, line, next);
        |    }
        |}
        |
