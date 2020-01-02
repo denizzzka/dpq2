@@ -3,6 +3,7 @@ module dpq2.conv.native_tests;
 import dpq2;
 import dpq2.conv.arrays : isArrayType;
 import dpq2.conv.geometric: Line;
+import std.bitmanip : BitArray;
 import std.datetime;
 import std.typecons: Nullable;
 import std.uuid: UUID;
@@ -128,6 +129,9 @@ public void _integration_test( string connParam ) @system
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
         C!(Nullable!PGuuid)(Nullable!UUID(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
+        C!PGvarbit(BitArray([1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]), "varbit", "'101011010110101'");
+        C!PGvarbit(BitArray([0, 0, 1, 0, 1]), "varbit", "'00101'");
+        C!PGvarbit(BitArray([1, 0, 1, 0, 0]), "varbit", "'10100'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");
