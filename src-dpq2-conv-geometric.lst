@@ -91,36 +91,36 @@
        |{
        |    import std.algorithm : copy;
        |
-     48|    auto rem = point.x.nativeToBigEndian[0 .. $].copy(target);
-     48|    rem = point.y.nativeToBigEndian[0 .. $].copy(rem);
+     33|    auto rem = point.x.nativeToBigEndian[0 .. $].copy(target);
+     33|    rem = point.y.nativeToBigEndian[0 .. $].copy(rem);
        |
-     48|    return rem;
+     33|    return rem;
        |}
        |
        |Value toValue(Vec2Ddouble)(Vec2Ddouble pt)
        |if(isValidPointType!Vec2Ddouble)
        |{
-      4|    ubyte[] data = new ubyte[16];
-      4|    pt.serializePoint(data);
+      3|    ubyte[] data = new ubyte[16];
+      3|    pt.serializePoint(data);
        |
-      4|    return createValue(data, OidType.Point);
+      3|    return createValue(data, OidType.Point);
        |}
        |
        |private auto serializeBox(Box, T)(Box box, T target)
        |{
-      4|    auto rem = box.max.serializePoint(target);
-      4|    rem = box.min.serializePoint(rem);
+      3|    auto rem = box.max.serializePoint(target);
+      3|    rem = box.min.serializePoint(rem);
        |
-      4|    return rem;
+      3|    return rem;
        |}
        |
        |Value toValue(Box)(Box box)
        |if(isValidBoxType!Box)
        |{
-      4|    ubyte[] data = new ubyte[32];
-      4|    box.serializeBox(data);
+      3|    ubyte[] data = new ubyte[32];
+      3|    box.serializeBox(data);
        |
-      4|    return createValue(data, OidType.Box);
+      3|    return createValue(data, OidType.Box);
        |}
        |
        |/// Infinite line - {A,B,C} (Ax + By + C = 0)
@@ -152,24 +152,24 @@
        |{
        |    import std.algorithm : copy;
        |
-      4|    ubyte[] data = new ubyte[24];
+      3|    ubyte[] data = new ubyte[24];
        |
-      4|    auto rem = line.a.nativeToBigEndian[0 .. $].copy(data);
-      4|    rem = line.b.nativeToBigEndian[0 .. $].copy(rem);
-      4|    rem = line.c.nativeToBigEndian[0 .. $].copy(rem);
+      3|    auto rem = line.a.nativeToBigEndian[0 .. $].copy(data);
+      3|    rem = line.b.nativeToBigEndian[0 .. $].copy(rem);
+      3|    rem = line.c.nativeToBigEndian[0 .. $].copy(rem);
        |
-      4|    return createValue(data, OidType.Line);
+      3|    return createValue(data, OidType.Line);
        |}
        |
        |Value toValue(LineSegment)(LineSegment lseg)
        |if(isValidLineSegmentType!LineSegment)
        |{
-      4|    ubyte[] data = new ubyte[32];
+      3|    ubyte[] data = new ubyte[32];
        |
-      4|    auto rem = lseg.start.serializePoint(data);
-      4|    rem = lseg.end.serializePoint(rem);
+      3|    auto rem = lseg.start.serializePoint(data);
+      3|    rem = lseg.end.serializePoint(rem);
        |
-      4|    return createValue(data, OidType.LineSegment);
+      3|    return createValue(data, OidType.LineSegment);
        |}
        |
        |Value toValue(T)(T path)
@@ -177,22 +177,22 @@
        |{
        |    import std.algorithm : copy;
        |
-      6|    if(path.points.length < 1)
+      4|    if(path.points.length < 1)
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "At least one point is needed for Path", __FILE__, __LINE__);
        |
-      6|    ubyte[] data = new ubyte[path.points.length * 16 + 5];
+      4|    ubyte[] data = new ubyte[path.points.length * 16 + 5];
        |
-     12|    ubyte isClosed = path.isClosed ? 1 : 0;
-      6|    auto rem = [isClosed].copy(data);
-      6|    rem = (cast(int) path.points.length).nativeToBigEndian[0 .. $].copy(rem);
+      8|    ubyte isClosed = path.isClosed ? 1 : 0;
+      4|    auto rem = [isClosed].copy(data);
+      4|    rem = (cast(int) path.points.length).nativeToBigEndian[0 .. $].copy(rem);
        |
-     60|    foreach (ref p; path.points)
+     36|    foreach (ref p; path.points)
        |    {
-     14|        rem = p.serializePoint(rem);
+      8|        rem = p.serializePoint(rem);
        |    }
        |
-      6|    return createValue(data, OidType.Path);
+      4|    return createValue(data, OidType.Path);
        |}
        |
        |Value toValue(Polygon)(Polygon poly)
@@ -200,17 +200,17 @@
        |{
        |    import std.algorithm : copy;
        |
-      4|    if(poly.length < 1)
+      3|    if(poly.length < 1)
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "At least one point is needed for Polygon", __FILE__, __LINE__);
        |
-      4|    ubyte[] data = new ubyte[poly.length * 16 + 4];
-      4|    auto rem = (cast(int)poly.length).nativeToBigEndian[0 .. $].copy(data);
+      3|    ubyte[] data = new ubyte[poly.length * 16 + 4];
+      3|    auto rem = (cast(int)poly.length).nativeToBigEndian[0 .. $].copy(data);
        |
-     42|    foreach (ref p; poly)
-     10|        rem = p.serializePoint(rem);
+     30|    foreach (ref p; poly)
+      7|        rem = p.serializePoint(rem);
        |
-      4|    return createValue(data, OidType.Polygon);
+      3|    return createValue(data, OidType.Polygon);
        |}
        |
        |Value toValue(T)(T c)
@@ -218,17 +218,17 @@
        |{
        |    import std.algorithm : copy;
        |
-      4|    ubyte[] data = new ubyte[24];
-      4|    auto rem = c.center.serializePoint(data);
-      4|    c.radius.nativeToBigEndian[0 .. $].copy(rem);
+      3|    ubyte[] data = new ubyte[24];
+      3|    auto rem = c.center.serializePoint(data);
+      3|    c.radius.nativeToBigEndian[0 .. $].copy(rem);
        |
-      4|    return createValue(data, OidType.Circle);
+      3|    return createValue(data, OidType.Circle);
        |}
        |
        |/// Caller must ensure that reference to the data will not be passed to elsewhere
        |private Value createValue(const ubyte[] data, OidType oid) pure @trusted
        |{
-     30|    return Value(cast(immutable) data, oid);
+     22|    return Value(cast(immutable) data, oid);
        |}
        |
        |private alias AE = ValueConvException;
@@ -238,72 +238,72 @@
        |Vec2Ddouble binaryValueAs(Vec2Ddouble)(in Value v)
        |if(isValidPointType!Vec2Ddouble)
        |{
-      4|    if(!(v.oidType == OidType.Point))
+      3|    if(!(v.oidType == OidType.Point))
       1|        throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
        |
-      3|    auto data = v.data;
+      2|    auto data = v.data;
        |
-      3|    if(!(data.length == 16))
+      2|    if(!(data.length == 16))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres Point size", __FILE__, __LINE__);
        |
-      2|    return pointFromBytes!Vec2Ddouble(data[0..16]);
+      1|    return pointFromBytes!Vec2Ddouble(data[0..16]);
        |}
        |
        |private Vec2Ddouble pointFromBytes(Vec2Ddouble)(in ubyte[16] data) pure
        |if(isValidPointType!Vec2Ddouble)
        |{
-     28|    return Vec2Ddouble(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
+     13|    return Vec2Ddouble(data[0..8].bigEndianToNative!double, data[8..16].bigEndianToNative!double);
        |}
        |
        |T binaryValueAs(T)(in Value v)
        |if (is(T == Line))
        |{
-      4|    if(!(v.oidType == OidType.Line))
+      3|    if(!(v.oidType == OidType.Line))
       1|        throwTypeComplaint(v.oidType, "Line", __FILE__, __LINE__);
        |
-      3|    if(!(v.data.length == 24))
+      2|    if(!(v.data.length == 24))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres Line size", __FILE__, __LINE__);
        |
-      2|    return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
+      1|    return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
        |}
        |
        |LineSegment binaryValueAs(LineSegment)(in Value v)
        |if(isValidLineSegmentType!LineSegment)
        |{
-      4|    if(!(v.oidType == OidType.LineSegment))
+      3|    if(!(v.oidType == OidType.LineSegment))
       1|        throwTypeComplaint(v.oidType, "LineSegment", __FILE__, __LINE__);
        |
-      3|    if(!(v.data.length == 32))
+      2|    if(!(v.data.length == 32))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres LineSegment size", __FILE__, __LINE__);
        |
        |    alias Point = ReturnType!(LineSegment.start);
        |
-      2|    auto start = v.data[0..16].pointFromBytes!Point;
-      2|    auto end = v.data[16..32].pointFromBytes!Point;
+      1|    auto start = v.data[0..16].pointFromBytes!Point;
+      1|    auto end = v.data[16..32].pointFromBytes!Point;
        |
-      2|    return LineSegment(start, end);
+      1|    return LineSegment(start, end);
        |}
        |
        |Box binaryValueAs(Box)(in Value v)
        |if(isValidBoxType!Box)
        |{
-      4|    if(!(v.oidType == OidType.Box))
+      3|    if(!(v.oidType == OidType.Box))
       1|        throwTypeComplaint(v.oidType, "Box", __FILE__, __LINE__);
        |
-      3|    if(!(v.data.length == 32))
+      2|    if(!(v.data.length == 32))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres Box size", __FILE__, __LINE__);
        |
        |    alias Point = typeof(Box.min);
        |
-      2|    Box res;
-      2|    res.max = v.data[0..16].pointFromBytes!Point;
-      2|    res.min = v.data[16..32].pointFromBytes!Point;
+      1|    Box res;
+      1|    res.max = v.data[0..16].pointFromBytes!Point;
+      1|    res.min = v.data[16..32].pointFromBytes!Point;
        |
-      2|    return res;
+      1|    return res;
        |}
        |
        |T binaryValueAs(T)(in Value v)
@@ -311,30 +311,30 @@
        |{
        |    import std.array : uninitializedArray;
        |
-      7|    if(!(v.oidType == OidType.Path))
+      5|    if(!(v.oidType == OidType.Path))
       1|        throwTypeComplaint(v.oidType, "Path", __FILE__, __LINE__);
        |
-      6|    if(!((v.data.length - 5) % 16 == 0))
+      4|    if(!((v.data.length - 5) % 16 == 0))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres Path size", __FILE__, __LINE__);
        |
-      5|    T res;
-      5|    res.isClosed = v.data[0..1].bigEndianToNative!byte == 1;
-      5|    int len = v.data[1..5].bigEndianToNative!int;
+      3|    T res;
+      3|    res.isClosed = v.data[0..1].bigEndianToNative!byte == 1;
+      3|    int len = v.data[1..5].bigEndianToNative!int;
        |
-      5|    if (len != (v.data.length - 5)/16)
+      3|    if (len != (v.data.length - 5)/16)
       1|        throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
        |
        |    alias Point = typeof(T.points[0]);
        |
-      4|    res.points = uninitializedArray!(Point[])(len);
-     28|    for (int i=0; i<len; i++)
+      2|    res.points = uninitializedArray!(Point[])(len);
+     12|    for (int i=0; i<len; i++)
        |    {
-     10|        const ubyte[] b = v.data[ i*16+5 .. i*16+5+16 ];
-     10|        res.points[i] = b[0..16].pointFromBytes!Point;
+      4|        const ubyte[] b = v.data[ i*16+5 .. i*16+5+16 ];
+      4|        res.points[i] = b[0..16].pointFromBytes!Point;
        |    }
        |
-      4|    return res;
+      2|    return res;
        |}
        |
        |Polygon binaryValueAs(Polygon)(in Value v)
@@ -342,44 +342,44 @@
        |{
        |    import std.array : uninitializedArray;
        |
-      5|    if(!(v.oidType == OidType.Polygon))
+      4|    if(!(v.oidType == OidType.Polygon))
       1|        throwTypeComplaint(v.oidType, "Polygon", __FILE__, __LINE__);
        |
-      4|    if(!((v.data.length - 4) % 16 == 0))
+      3|    if(!((v.data.length - 4) % 16 == 0))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres Polygon size", __FILE__, __LINE__);
        |
-      3|    Polygon res;
-      3|    int len = v.data[0..4].bigEndianToNative!int;
+      2|    Polygon res;
+      2|    int len = v.data[0..4].bigEndianToNative!int;
        |
-      3|    if (len != (v.data.length - 4)/16)
+      2|    if (len != (v.data.length - 4)/16)
       1|        throw new AE(ET.SIZE_MISMATCH, "Path points number mismatch", __FILE__, __LINE__);
        |
        |    alias Point = ElementType!Polygon;
        |
-      2|    res = uninitializedArray!(Point[])(len);
-     16|    for (int i=0; i<len; i++)
+      1|    res = uninitializedArray!(Point[])(len);
+      8|    for (int i=0; i<len; i++)
        |    {
-      6|        const ubyte[] b = v.data[(i*16+4)..(i*16+16+4)];
-      6|        res[i] = b[0..16].pointFromBytes!Point;
+      3|        const ubyte[] b = v.data[(i*16+4)..(i*16+16+4)];
+      3|        res[i] = b[0..16].pointFromBytes!Point;
        |    }
        |
-      2|    return res;
+      1|    return res;
        |}
        |
        |T binaryValueAs(T)(in Value v)
        |if(isInstanceOf!(Circle, T))
        |{
-      4|    if(!(v.oidType == OidType.Circle))
+      3|    if(!(v.oidType == OidType.Circle))
       1|        throwTypeComplaint(v.oidType, "Circle", __FILE__, __LINE__);
        |
-      3|    if(!(v.data.length == 24))
+      2|    if(!(v.data.length == 24))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres Circle size", __FILE__, __LINE__);
        |
        |    alias Point = typeof(T.center);
        |
-      2|    return T(
+      1|    return T(
        |        v.data[0..16].pointFromBytes!Point,
        |        v.data[16..24].bigEndianToNative!double
        |    );

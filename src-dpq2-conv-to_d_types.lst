@@ -55,41 +55,41 @@
        |T as(T)(in Value v) pure @trusted
        |if(is(T : string))
        |{
-    126|    if(v.format == VF.BINARY)
+     15|    if(v.format == VF.BINARY)
        |    {
-    120|        if(!(
+     15|        if(!(
        |            v.oidType == OidType.Text ||
-     27|            v.oidType == OidType.FixedString ||
-     26|            v.oidType == OidType.VariableString ||
-     25|            v.oidType == OidType.Numeric ||
-      2|            v.oidType == OidType.Json ||
-      1|            v.oidType == OidType.Jsonb ||
-      1|            v.oidType == OidType.Name
+0000000|            v.oidType == OidType.FixedString ||
+0000000|            v.oidType == OidType.VariableString ||
+0000000|            v.oidType == OidType.Numeric ||
+0000000|            v.oidType == OidType.Json ||
+0000000|            v.oidType == OidType.Jsonb ||
+0000000|            v.oidType == OidType.Name
        |        ))
-      1|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
+0000000|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
        |    }
        |
        |    static if(is(T == Nullable!R, R))
        |    {
        |        alias Ret = R;
        |
-      5|        if (v.isNull)
-      4|            return T.init;
+      2|        if (v.isNull)
+      2|            return T.init;
        |    }
        |    else
        |        alias Ret = T;
        |
-    121|    Ret r;
+     13|    Ret r;
        |
-    236|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
-     23|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
+     26|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+0000000|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     98|        r = v.valueAsString;
+     13|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
-      1|        return T(r);
+0000000|        return T(r);
        |    else
-    118|        return r;
+     11|        return r;
        |}
        |
        |@system unittest
@@ -110,19 +110,19 @@
        |T as(T)(in Value v)
        |if(!is(T : string) && !is(T == Bson))
        |{
-     98|    if(!(v.format == VF.BINARY))
+     38|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
        |    static if (is(T == Nullable!R, R))
        |    {
-     10|        if (v.isNull)
-      3|            return T.init;
+      4|        if (v.isNull)
+      1|            return T.init;
        |        else
-      7|            return T(binaryValueAs!R(v));
+      3|            return T(binaryValueAs!R(v));
        |    }
        |    else
-     87|        return binaryValueAs!T(v);
+     33|        return binaryValueAs!T(v);
        |}
        |
        |@system unittest
@@ -139,22 +139,22 @@
        | */
        |auto tunnelForBinaryValueAsCalls(T)(in Value v)
        |{
-     21|    return binaryValueAs!T(v);
+      7|    return binaryValueAs!T(v);
        |}
        |
        |string valueAsString(in Value v) pure
        |{
-    116|    return (cast(const(char[])) v.data).to!string;
+     16|    return (cast(const(char[])) v.data).to!string;
        |}
        |
        |/// Returns value as bytes from binary formatted field
        |T binaryValueAs(T)(in Value v)
        |if(is(T : const ubyte[]))
        |{
-      3|    if(!(v.oidType == OidType.ByteArray))
+      2|    if(!(v.oidType == OidType.ByteArray))
       1|        throwTypeComplaint(v.oidType, "immutable ubyte[]", __FILE__, __LINE__);
        |
-      2|    return v.data;
+      1|    return v.data;
        |}
        |
        |@system unittest
@@ -170,21 +170,21 @@
        |if( isNumeric!(T) )
        |{
        |    static if(isIntegral!(T))
-     47|        if(!isNativeInteger(v.oidType))
+     24|        if(!isNativeInteger(v.oidType))
       1|            throwTypeComplaint(v.oidType, "integral types", __FILE__, __LINE__);
        |
        |    static if(isFloatingPoint!(T))
-      5|        if(!isNativeFloat(v.oidType))
+      2|        if(!isNativeFloat(v.oidType))
       1|            throwTypeComplaint(v.oidType, "floating point types", __FILE__, __LINE__);
        |
-     50|    if(!(v.data.length == T.sizeof))
+     24|    if(!(v.data.length == T.sizeof))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            to!string(v.oidType)~" length ("~to!string(v.data.length)~") isn't equal to native D type "~
        |                to!string(typeid(T))~" size ("~to!string(T.sizeof)~")",
        |            __FILE__, __LINE__);
        |
-     46|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
-     46|    return bigEndianToNative!(T)(s);
+     22|    ubyte[T.sizeof] s = v.data[0..T.sizeof];
+     22|    return bigEndianToNative!(T)(s);
        |}
        |
        |@system unittest
@@ -201,16 +201,16 @@
        |UUID binaryValueAs(T)(in Value v)
        |if( is( T == UUID ) )
        |{
-      6|    if(!(v.oidType == OidType.UUID))
+      2|    if(!(v.oidType == OidType.UUID))
       1|        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
        |
-      5|    if(!(v.data.length == 16))
+      1|    if(!(v.data.length == 16))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
        |
-      4|    UUID r;
-      4|    r.data = v.data;
-      4|    return r;
+0000000|    UUID r;
+0000000|    r.data = v.data;
+0000000|    return r;
        |}
        |
        |@system unittest
@@ -226,14 +226,14 @@
        |bool binaryValueAs(T : bool)(in Value v)
        |if (!is(T == Nullable!R, R))
        |{
-     11|    if(!(v.oidType == OidType.Bool))
+      6|    if(!(v.oidType == OidType.Bool))
       1|        throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
        |
-     10|    if(!(v.data.length == 1))
+      5|    if(!(v.data.length == 1))
       1|        throw new AE(ET.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
        |
-      9|    return v.data[0] != 0;
+      4|    return v.data[0] != 0;
        |}
        |
        |@system unittest
@@ -251,25 +251,25 @@
        |{
        |    import dpq2.conv.jsonb: jsonbValueToJson;
        |
-     10|    Json res;
+      4|    Json res;
        |
-     10|    switch(v.oidType)
+      4|    switch(v.oidType)
        |    {
-      7|        case OidType.Json:
+      3|        case OidType.Json:
        |            // represent value as text and parse it into Json
-      7|            string t = v.valueAsString;
-      7|            res = parseJsonString(t);
-      7|            break;
+      3|            string t = v.valueAsString;
+      3|            res = parseJsonString(t);
+      3|            break;
        |
-      2|        case OidType.Jsonb:
-      2|            res = v.jsonbValueToJson;
-      2|            break;
+0000000|        case OidType.Jsonb:
+0000000|            res = v.jsonbValueToJson;
+0000000|            break;
        |
       1|        default:
       1|            throwTypeComplaint(v.oidType, "json or jsonb", __FILE__, __LINE__);
        |    }
        |
-      9|    return res;
+      3|    return res;
        |}
        |
        |@system unittest
@@ -289,7 +289,7 @@
        |{
        |    import std.format: format;
        |
-      3|    if(v.data.length != T.amount.sizeof)
+      2|    if(v.data.length != T.amount.sizeof)
       1|        throw new AE(
        |            ET.SIZE_MISMATCH,
        |            format(
@@ -301,11 +301,11 @@
        |            )
        |        );
        |
-      2|    T r;
+      1|    T r;
        |
-      2|    r.amount = v.data[0 .. T.amount.sizeof].bigEndianToNative!long;
+      1|    r.amount = v.data[0 .. T.amount.sizeof].bigEndianToNative!long;
        |
-      2|    return r;
+      1|    return r;
        |}
        |
        |package alias PGTestMoney = currency!("TEST_CURR", 2); //TODO: roundingMode.UNNECESSARY
@@ -324,7 +324,7 @@
        |    import std.format: format;
        |    import std.range : chunks;
        |
-      5|    if(v.data.length < int.sizeof)
+      2|    if(v.data.length < int.sizeof)
       1|        throw new AE(
        |            ET.SIZE_MISMATCH,
        |            format(
@@ -335,22 +335,22 @@
        |            )
        |        );
        |
-      4|    auto data = v.data;
-      4|    size_t len = data.read!int;
-      4|    size_t[] newData;
-     20|    foreach (ch; data.chunks(size_t.sizeof))
+      1|    auto data = v.data;
+      1|    size_t len = data.read!int;
+      1|    size_t[] newData;
+      5|    foreach (ch; data.chunks(size_t.sizeof))
        |    {
-      4|        ubyte[size_t.sizeof] tmpData;
-      4|        tmpData[0 .. ch.length] = ch[];
+      1|        ubyte[size_t.sizeof] tmpData;
+      1|        tmpData[0 .. ch.length] = ch[];
        |
        |        // DMD Issue 19693
        |        version(DigitalMars)
-      4|            auto re = softBitswap(bigEndianToNative!size_t(tmpData));
+      1|            auto re = softBitswap(bigEndianToNative!size_t(tmpData));
        |        else
        |            auto re = bitswap(bigEndianToNative!size_t(tmpData));
-      4|        newData ~= re;
+      1|        newData ~= re;
        |    }
-      4|    return T(newData, len);
+      1|    return T(newData, len);
        |}
        |
        |unittest
@@ -358,4 +358,4 @@
       1|    auto v = Value([1], OidType.VariableBitString);
       2|    assertThrown!ValueConvException(v.binaryValueAs!BitArray);
        |}
-src/dpq2/conv/to_d_types.d is 100% covered
+src/dpq2/conv/to_d_types.d is 85% covered

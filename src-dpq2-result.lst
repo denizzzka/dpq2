@@ -34,14 +34,14 @@
        |
        |    nothrow invariant()
        |    {
-    207|        assert( result != null );
+0000000|        assert( result != null );
        |    }
        |
-    414|    package this(immutable PGresult* r)
+0000000|    package this(immutable PGresult* r)
        |    {
-    207|        assert(r);
+0000000|        assert(r);
        |
-    207|        result = r;
+0000000|        result = r;
        |    }
        |
        |    ~this()
@@ -57,15 +57,15 @@
        |{
        |    private ResultContainer result;
        |
-    210|    package this(immutable ResultContainer r)
+0000000|    package this(immutable ResultContainer r)
        |    {
-    210|        result = r;
+0000000|        result = r;
        |    }
        |
        |    /// Returns the result status of the command.
        |    ExecStatusType status() nothrow
        |    {
-    204|        return PQresultStatus(result);
+0000000|        return PQresultStatus(result);
        |    }
        |
        |    /// Text description of result status.
@@ -77,7 +77,7 @@
        |    /// Returns the error message associated with the command, or an empty string if there was no error.
        |    string resultErrorMessage()
        |    {
-      3|        return PQresultErrorMessage(result).to!string;
+0000000|        return PQresultErrorMessage(result).to!string;
        |    }
        |
        |    /// Returns an individual field of an error report.
@@ -89,7 +89,7 @@
        |    /// Creates Answer object
        |    immutable(Answer) getAnswer()
        |    {
-      3|        return new immutable Answer(result);
+0000000|        return new immutable Answer(result);
        |    }
        |
        |    ///
@@ -106,28 +106,28 @@
        |/// Contains result of query with valid data answer
        |immutable class Answer : Result
        |{
-    198|    package this(immutable ResultContainer r)
+0000000|    package this(immutable ResultContainer r)
        |    {
-    201|        super(r);
+0000000|        super(r);
        |
-    201|        checkAnswerForErrors();
+0000000|        checkAnswerForErrors();
        |    }
        |
        |    private void checkAnswerForErrors()
        |    {
-    201|        switch(status)
+0000000|        switch(status)
        |        {
-     22|            case PGRES_COMMAND_OK:
-    196|            case PGRES_TUPLES_OK:
-    196|            case PGRES_SINGLE_TUPLE:
-    198|            case PGRES_COPY_IN:
-    198|                break;
+0000000|            case PGRES_COMMAND_OK:
+0000000|            case PGRES_TUPLES_OK:
+0000000|            case PGRES_SINGLE_TUPLE:
+0000000|            case PGRES_COPY_IN:
+0000000|                break;
        |
 0000000|            case PGRES_COPY_OUT:
 0000000|                throw new AnswerException(ExceptionType.COPY_OUT_NOT_IMPLEMENTED, "COPY TO not yet supported");
        |
-      3|            default:
-      3|                throw new ResponseException(this, __FILE__, __LINE__);
+0000000|            default:
+0000000|                throw new ResponseException(this, __FILE__, __LINE__);
        |        }
        |    }
        |
@@ -138,7 +138,7 @@
        |     */
        |    string cmdStatus()
        |    {
-      1|        return (cast(PGresult*) result.result).PQcmdStatus.to!string;
+0000000|        return (cast(PGresult*) result.result).PQcmdStatus.to!string;
        |    }
        |
        |    /**
@@ -151,79 +151,79 @@
        |    */
        |    string cmdTuples()
        |    {
-      1|        return PQcmdTuples(cast(PGresult*) result.result).to!string;
+0000000|        return PQcmdTuples(cast(PGresult*) result.result).to!string;
        |    }
        |
        |    /// Returns row count
-    400|    size_t length() nothrow { return PQntuples(result); }
+0000000|    size_t length() nothrow { return PQntuples(result); }
        |
        |    /// Returns column count
-   1031|    size_t columnCount() nothrow { return PQnfields(result); }
+0000000|    size_t columnCount() nothrow { return PQnfields(result); }
        |
        |    /// Returns column format
        |    ValueFormat columnFormat( const size_t colNum )
        |    {
-    207|        assertCol( colNum );
+0000000|        assertCol( colNum );
        |
-    207|        return cast(ValueFormat) PQfformat(result, to!int(colNum));
+0000000|        return cast(ValueFormat) PQfformat(result, to!int(colNum));
        |    }
        |
        |    /// Returns column Oid
        |    OidType OID( size_t colNum )
        |    {
-    208|        assertCol( colNum );
+0000000|        assertCol( colNum );
        |
-    208|        return PQftype(result, to!int(colNum)).oid2oidType;
+0000000|        return PQftype(result, to!int(colNum)).oid2oidType;
        |    }
        |
        |    /// Checks if column type is array
        |    bool isArray( const size_t colNum )
        |    {
-      2|        assertCol(colNum);
+0000000|        assertCol(colNum);
        |
-      2|        return dpq2.oids.isSupportedArray(OID(colNum));
+0000000|        return dpq2.oids.isSupportedArray(OID(colNum));
        |    }
        |    alias isSupportedArray = isArray; //TODO: deprecated
        |
        |    /// Returns column number by field name
        |    size_t columnNum( string columnName )
        |    {
-     17|        size_t n = PQfnumber(result, toStringz(columnName));
+0000000|        size_t n = PQfnumber(result, toStringz(columnName));
        |
-     17|        if( n == -1 )
+0000000|        if( n == -1 )
 0000000|            throw new AnswerException(ExceptionType.COLUMN_NOT_FOUND,
        |                    "Column '"~columnName~"' is not found", __FILE__, __LINE__);
        |
-     17|        return n;
+0000000|        return n;
        |    }
        |
        |    /// Returns column name by field number
        |    string columnName( in size_t colNum )
        |    {
-      2|        const char* s = PQfname(result, colNum.to!int);
+0000000|        const char* s = PQfname(result, colNum.to!int);
        |
-      2|        if( s == null )
+0000000|        if( s == null )
 0000000|            throw new AnswerException(
        |                    ExceptionType.OUT_OF_RANGE,
        |                    "Column "~to!string(colNum)~" is out of range 0.."~to!string(columnCount),
        |                    __FILE__, __LINE__
        |                );
        |
-      2|        return s.to!string;
+0000000|        return s.to!string;
        |    }
        |
        |    /// Returns true if the column exists, false if not
        |    bool columnExists( string columnName )
        |    {
-      3|        size_t n = PQfnumber(result, columnName.toStringz);
+0000000|        size_t n = PQfnumber(result, columnName.toStringz);
        |
-      3|        return n != -1;
+0000000|        return n != -1;
        |    }
        |
        |    /// Returns row of cells
        |    immutable (Row) opIndex(in size_t row)
        |    {
-    196|        return immutable Row(this, row);
+0000000|        return immutable Row(this, row);
        |    }
        |
        |    /**
@@ -233,7 +233,7 @@
        |    */
        |    uint nParams()
        |    {
-      2|        return PQnparams(result);
+0000000|        return PQnparams(result);
        |    }
        |
        |    /**
@@ -244,7 +244,7 @@
        |    */
        |    OidType paramType(T)(T paramNum)
        |    {
-      4|        return PQparamtype(result, paramNum.to!uint).oid2oidType;
+0000000|        return PQparamtype(result, paramNum.to!uint).oid2oidType;
        |    }
        |
        |    ///
@@ -267,7 +267,7 @@
        |
        |    private void assertCol( const size_t c )
        |    {
-   1021|        if(!(c < columnCount))
+0000000|        if(!(c < columnCount))
 0000000|            throw new AnswerException(
        |                ExceptionType.OUT_OF_RANGE,
        |                "Column "~to!string(c)~" is out of range 0.."~to!string(columnCount)~" of result columns",
@@ -277,7 +277,7 @@
        |
        |    private void assertRow( const size_t r )
        |    {
-    396|        if(!(r < length))
+0000000|        if(!(r < length))
 0000000|            throw new AnswerException(
        |                ExceptionType.OUT_OF_RANGE,
        |                "Row "~to!string(r)~" is out of range 0.."~to!string(length)~" of result rows",
@@ -287,8 +287,8 @@
        |
        |     private void assertCoords( const Coords c )
        |    {
-    200|        assertRow( c.row );
-    200|        assertCol( c.col );
+0000000|        assertRow( c.row );
+0000000|        assertCol( c.col );
        |    }
        |}
        |
@@ -302,17 +302,17 @@
        |
        |        private int curr;
        |
-      2|        this(T o)
+0000000|        this(T o)
        |        {
-      2|            obj = o;
+0000000|            obj = o;
        |        }
        |
-      9|        auto front(){ return obj[curr]; }
-      9|        void popFront(){ ++curr; }
-     11|        bool empty(){ return curr >= obj.length; }
+0000000|        auto front(){ return obj[curr]; }
+0000000|        void popFront(){ ++curr; }
+0000000|        bool empty(){ return curr >= obj.length; }
        |    }
        |
-      2|    return Rangify!(T)(obj);
+0000000|    return Rangify!(T)(obj);
        |}
        |
        |/// Represents one row from the answer table
@@ -322,20 +322,20 @@
        |    private size_t row;
        |
        |    ///
-    196|    this(immutable Answer answer, in size_t row)
+0000000|    this(immutable Answer answer, in size_t row)
        |    {
-    196|        answer.assertRow( row );
+0000000|        answer.assertRow( row );
        |
-    196|        this.answer = answer;
-    196|        this.row = row;
+0000000|        this.answer = answer;
+0000000|        this.row = row;
        |    }
        |
        |    /// Returns the actual length of a cell value in bytes.
        |    size_t size( const size_t col )
        |    {
-    200|        answer.assertCol(col);
+0000000|        answer.assertCol(col);
        |
-    200|        return PQgetlength(answer.result, to!int(row), to!int(col));
+0000000|        return PQgetlength(answer.result, to!int(row), to!int(col));
        |    }
        |
        |    /// Checks if value is NULL
@@ -343,51 +343,51 @@
        |    /// Do not confuse it with Nullable's isNull method
        |    bool isNULL( const size_t col )
        |    {
-    204|        answer.assertCol(col);
+0000000|        answer.assertCol(col);
        |
-    204|        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
+0000000|        return PQgetisnull(answer.result, to!int(row), to!int(col)) != 0;
        |    }
        |
        |    /// Checks if column with name exists
        |    bool columnExists(in string column)
        |    {
-      1|        return answer.columnExists(column);
+0000000|        return answer.columnExists(column);
        |    }
        |
        |    /// Returns cell value by column number
        |    immutable (Value) opIndex(in size_t col)
        |    {
-    200|        answer.assertCoords( Coords( row, col ) );
+0000000|        answer.assertCoords( Coords( row, col ) );
        |
        |        // The pointer returned by PQgetvalue points to storage that is part of the PGresult structure.
        |        // One should not modify the data it points to, and one must explicitly copy the data into other
        |        // storage if it is to be used past the lifetime of the PGresult structure itself.
-    200|        immutable ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
-    200|        size_t s = size(col);
+0000000|        immutable ubyte* v = cast(immutable) PQgetvalue(answer.result, to!int(row), to!int(col));
+0000000|        size_t s = size(col);
        |
-    200|        return immutable Value(v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
+0000000|        return immutable Value(v[0..s], answer.OID(col), isNULL(col), answer.columnFormat(col));
        |    }
        |
        |    /// Returns cell value by field name
        |    immutable (Value) opIndex(in string column)
        |    {
-     16|        return opIndex(columnNum(column));
+0000000|        return opIndex(columnNum(column));
        |    }
        |
        |    /// Returns column number by field name
        |    size_t columnNum( string columnName )
        |    {
-     16|        return answer.columnNum( columnName );
+0000000|        return answer.columnNum( columnName );
        |    }
        |
        |    /// Returns column name by field number
        |    string columnName( in size_t colNum )
        |    {
-      1|        return answer.columnName( colNum );
+0000000|        return answer.columnName( colNum );
        |    }
        |
        |    /// Returns column count
-      9|    size_t length() { return answer.columnCount(); }
+0000000|    size_t length() { return answer.columnCount(); }
        |
        |    ///
        |    string toString()
@@ -404,19 +404,19 @@
        |/// Creates Array from appropriate Value
        |immutable (Array) asArray(immutable(Value) v)
        |{
-     36|    if(v.format == ValueFormat.TEXT)
+     12|    if(v.format == ValueFormat.TEXT)
 0000000|        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
        |            "Value internal format is text",
        |            __FILE__, __LINE__
        |        );
        |
-     36|    if(!v.isSupportedArray)
+     12|    if(!v.isSupportedArray)
 0000000|        throw new ValueConvException(ConvExceptionType.NOT_ARRAY,
        |            "Format of the value is "~to!string(v.oidType)~", isn't supported array",
        |            __FILE__, __LINE__
        |        );
        |
-     36|    return immutable Array(v);
+     12|    return immutable Array(v);
        |}
        |
        |///
@@ -445,40 +445,40 @@
        |    A arr;
        |    size_t currIdx;
        |
-     86|    this(A a)
+     28|    this(A a)
        |    {
-     86|        arr = a;
+     28|        arr = a;
        |    }
        |
        |    T* read(T)() @trusted
        |    {
-    203|        const incremented = currIdx + T.sizeof;
+     73|        const incremented = currIdx + T.sizeof;
        |
        |        // Malformed buffer?
-    203|        if(incremented > arr.length)
+     73|        if(incremented > arr.length)
 0000000|            throw new AnswerException(ExceptionType.FATAL_ERROR, null);
        |
-    203|        auto ret = cast(T*) &arr[currIdx];
+     73|        auto ret = cast(T*) &arr[currIdx];
        |
-    203|        currIdx = incremented;
+     73|        currIdx = incremented;
        |
-    203|        return ret;
+     73|        return ret;
        |    }
        |
        |    A readBuff(size_t len)
-    143|    in(len >= 0)
+     56|    in(len >= 0)
        |    {
-    143|        const incremented = currIdx + len;
+     56|        const incremented = currIdx + len;
        |
        |        // Malformed buffer?
-    143|        if(incremented > arr.length)
+     56|        if(incremented > arr.length)
 0000000|            throw new AnswerException(ExceptionType.FATAL_ERROR, null);
        |
-    143|        auto ret = arr[currIdx .. incremented];
+     56|        auto ret = arr[currIdx .. incremented];
        |
-    143|        currIdx = incremented;
+     56|        currIdx = incremented;
        |
-    143|        return ret;
+     56|        return ret;
        |    }
        |}
        |
@@ -490,10 +490,10 @@
        |    size_t nElems; /// Total elements
        |    package size_t dataOffset;
        |
-     50|    this(in Value cell)
+     16|    this(in Value cell)
        |    {
        |        try
-     50|            fillStruct(cell);
+     16|            fillStruct(cell);
        |        catch(AnswerException e)
        |        {
        |            // Malformed array bytes buffer?
@@ -510,46 +510,46 @@
        |
        |    private void fillStruct(in Value cell)
        |    {
-     50|        auto data = BytesReader!(immutable ubyte[])(cell.data);
+     16|        auto data = BytesReader!(immutable ubyte[])(cell.data);
        |
-     50|        const ArrayHeader_net* h = data.read!ArrayHeader_net;
-     50|        int nDims = bigEndianToNative!int(h.ndims);
-     50|        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
+     16|        const ArrayHeader_net* h = data.read!ArrayHeader_net;
+     16|        int nDims = bigEndianToNative!int(h.ndims);
+     16|        OID = oid2oidType(bigEndianToNative!Oid(h.OID));
        |
-     50|        if(nDims < 0)
+     16|        if(nDims < 0)
 0000000|            throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
        |                "Array dimensions number is negative ("~to!string(nDims)~")",
        |            );
        |
-     50|        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
+     16|        dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
        |
-     50|        dimsSize = new int[nDims];
+     16|        dimsSize = new int[nDims];
        |
        |        // Recognize dimensions of array
-    256|        for( auto i = 0; i < nDims; ++i )
+    106|        for( auto i = 0; i < nDims; ++i )
        |        {
-     78|            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
+     37|            Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
        |
-     78|            const dim_size = bigEndianToNative!int(d.dim_size);
-     78|            const lbound = bigEndianToNative!int(d.lbound);
+     37|            const dim_size = bigEndianToNative!int(d.dim_size);
+     37|            const lbound = bigEndianToNative!int(d.lbound);
        |
-     78|            if(dim_size < 0)
+     37|            if(dim_size < 0)
 0000000|                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
        |                    "Dimension size is negative ("~to!string(dim_size)~")",
        |                );
        |
        |            // FIXME: What is lbound in postgresql array reply?
-     78|            if(!(lbound == 1))
+     37|            if(!(lbound == 1))
 0000000|                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
        |                    "Please report if you came across this error! lbound=="~to!string(lbound),
        |                );
        |
-     78|            dimsSize[i] = dim_size;
+     37|            dimsSize[i] = dim_size;
        |
-     78|            if(i == 0) // first dimension
-     45|                nElems = dim_size;
+     37|            if(i == 0) // first dimension
+     16|                nElems = dim_size;
        |            else
-     33|                nElems *= dim_size;
+     21|                nElems *= dim_size;
        |        }
        |    }
        |}
@@ -565,41 +565,41 @@
        |    private ubyte[][] elements;
        |    private bool[] elementIsNULL;
        |
-     36|    this(immutable Value cell)
+     12|    this(immutable Value cell)
        |    {
-     36|        if(!(cell.format == ValueFormat.BINARY))
+     12|        if(!(cell.format == ValueFormat.BINARY))
 0000000|            throw new ValueConvException(ConvExceptionType.NOT_BINARY,
        |                msg_NOT_BINARY, __FILE__, __LINE__);
        |
-     36|        ap = cast(immutable) ArrayProperties(cell);
+     12|        ap = cast(immutable) ArrayProperties(cell);
        |
        |        // Looping through all elements and fill out index of them
        |        try
        |        {
-     36|            auto elements = new immutable (ubyte)[][ nElems ];
-     36|            auto elementIsNULL = new bool[ nElems ];
+     12|            auto elements = new immutable (ubyte)[][ nElems ];
+     12|            auto elementIsNULL = new bool[ nElems ];
        |
-     36|            auto data = BytesReader!(immutable ubyte[])(cell.data[ap.dataOffset .. $]);
+     12|            auto data = BytesReader!(immutable ubyte[])(cell.data[ap.dataOffset .. $]);
        |
-    378|            for(uint i = 0; i < nElems; ++i)
+    138|            for(uint i = 0; i < nElems; ++i)
        |            {
        |                /// size in network byte order
-    153|                const size_net = data.read!(ubyte[int.sizeof]);
+     57|                const size_net = data.read!(ubyte[int.sizeof]);
        |
-    153|                uint size = bigEndianToNative!uint(*size_net);
-    153|                if( size == size.max ) // NULL magic number
+     57|                uint size = bigEndianToNative!uint(*size_net);
+     57|                if( size == size.max ) // NULL magic number
        |                {
-     10|                    elementIsNULL[i] = true;
+      1|                    elementIsNULL[i] = true;
        |                }
        |                else
        |                {
-    143|                    elementIsNULL[i] = false;
-    143|                    elements[i] = data.readBuff(size);
+     56|                    elementIsNULL[i] = false;
+     56|                    elements[i] = data.readBuff(size);
        |                }
        |            }
        |
-     36|            this.elements = elements.idup;
-     36|            this.elementIsNULL = elementIsNULL.idup;
+     12|            this.elements = elements.idup;
+     12|            this.elementIsNULL = elementIsNULL.idup;
        |        }
        |        catch(AnswerException e)
        |        {
@@ -619,7 +619,7 @@
        |    /// Useful for one-dimensional arrays
        |    size_t length()
        |    {
-      9|        return nElems;
+      6|        return nElems;
        |    }
        |
        |    /// Returns Value struct by index
@@ -633,50 +633,50 @@
        |    /// Useful for one-dimensional arrays
        |    immutable (Value) opIndex(int n)
        |    {
-     13|        return getValue(n);
+      9|        return getValue(n);
        |    }
        |
        |    /// Returns Value struct
        |    /// Useful for multidimensional arrays
        |    immutable (Value) getValue( ... )
        |    {
-     18|        auto n = coords2Serial( _argptr, _arguments );
+     13|        auto n = coords2Serial( _argptr, _arguments );
        |
-     18|        return getValueByFlatIndex(n);
+     13|        return getValueByFlatIndex(n);
        |    }
        |
        |    ///
        |    package immutable (Value) getValueByFlatIndex(size_t n)
        |    {
-     38|        return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
+     19|        return immutable Value(elements[n], OID, elementIsNULL[n], ValueFormat.BINARY);
        |    }
        |
        |    /// Value NULL checking
        |    bool isNULL( ... )
        |    {
-      2|        auto n = coords2Serial( _argptr, _arguments );
-      2|        return elementIsNULL[n];
+0000000|        auto n = coords2Serial( _argptr, _arguments );
+0000000|        return elementIsNULL[n];
        |    }
        |
        |    private size_t coords2Serial( va_list _argptr, TypeInfo[] _arguments )
        |    {
-     20|        assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
+     13|        assert( _arguments.length > 0, "Number of the arguments must be more than 0" );
        |
        |        // Variadic args parsing
-     20|        auto args = new int[ _arguments.length ];
+     13|        auto args = new int[ _arguments.length ];
        |
-     20|        if(!(dimsSize.length == args.length))
+     13|        if(!(dimsSize.length == args.length))
 0000000|            throw new ValueConvException(
        |                ConvExceptionType.OUT_OF_RANGE,
        |                "Mismatched dimensions number in Value and passed arguments: "~dimsSize.length.to!string~" and "~args.length.to!string,
        |            );
        |
-    108|        for( uint i; i < args.length; ++i )
+     68|        for( uint i; i < args.length; ++i )
        |        {
-     34|            assert( _arguments[i] == typeid(int) );
-     34|            args[i] = va_arg!(int)(_argptr);
+     21|            assert( _arguments[i] == typeid(int) );
+     21|            args[i] = va_arg!(int)(_argptr);
        |
-     34|            if(!(dimsSize[i] > args[i]))
+     21|            if(!(dimsSize[i] > args[i]))
 0000000|                throw new ValueConvException(
        |                    ConvExceptionType.OUT_OF_RANGE,
        |                    "Index is out of range",
@@ -684,17 +684,17 @@
        |        }
        |
        |        // Calculates serial number of the element
-     20|        auto inner = args.length - 1; // inner dimension
-     20|        auto element_num = args[inner]; // serial number of the element
-     20|        uint s = 1; // perpendicular to a vector which size is calculated currently
-     68|        for( auto i = inner; i > 0; --i )
+     13|        auto inner = args.length - 1; // inner dimension
+     13|        auto element_num = args[inner]; // serial number of the element
+     13|        uint s = 1; // perpendicular to a vector which size is calculated currently
+     42|        for( auto i = inner; i > 0; --i )
        |        {
-     14|            s *= dimsSize[i];
-     14|            element_num += s * args[i-1];
+      8|            s *= dimsSize[i];
+      8|            element_num += s * args[i-1];
        |        }
        |
-     20|        assert( element_num <= nElems );
-     20|        return element_num;
+     13|        assert( element_num <= nElems );
+     13|        return element_num;
        |    }
        |}
        |
@@ -703,12 +703,12 @@
        |{
        |    private immutable PGnotify* n;
        |
-      1|    package this(immutable PGnotify* pgn)
+0000000|    package this(immutable PGnotify* pgn)
        |    {
-      1|        assert(pgn != null);
+0000000|        assert(pgn != null);
        |
-      1|        n = pgn;
-      1|        cast(void) enforce!OutOfMemoryError(n, "Can't write notify");
+0000000|        n = pgn;
+0000000|        cast(void) enforce!OutOfMemoryError(n, "Can't write notify");
        |    }
        |
        |    ~this()
@@ -717,10 +717,10 @@
        |    }
        |
        |    /// Returns notification condition name
-      1|    string name() { return to!string( n.relname ); }
+0000000|    string name() { return to!string( n.relname ); }
        |
        |    /// Returns notification parameter
-      1|    string extra() { return to!string( n.extra ); }
+0000000|    string extra() { return to!string( n.extra ); }
        |
        |    /// Returns process ID of notifying server process
 0000000|    size_t pid() { return n.be_pid; }
@@ -732,11 +732,11 @@
        |    immutable(Result) result;
        |    alias result this;
        |
-      3|    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
+0000000|    this(immutable(Result) result, string file = __FILE__, size_t line = __LINE__)
        |    {
-      3|        this.result = result;
+0000000|        this.result = result;
        |
-      3|        super(result.resultErrorMessage(), file, line);
+0000000|        super(result.resultErrorMessage(), file, line);
        |    }
        |}
        |
@@ -771,11 +771,11 @@
        |{
        |    import core.exception: AssertError;
        |
-      1|    auto conn = new Connection(connParam);
+0000000|    auto conn = new Connection(connParam);
        |
        |    // Text type results testing
        |    {
-      1|        string sql_query =
+0000000|        string sql_query =
        |        "select now() as time,  'abc'::text as field_name,   123,  456.78\n"~
        |        "union all\n"~
        |
@@ -784,22 +784,22 @@
        |
        |        "select NULL,           'ijk_АБВГД'::text,           789,  12345.115345";
        |
-      1|        auto e = conn.exec(sql_query);
+0000000|        auto e = conn.exec(sql_query);
        |
-      1|        assert( e[1][2].as!PGtext == "456" );
-      1|        assert( e[2][1].as!PGtext == "ijk_АБВГД" );
-      1|        assert( !e[0].isNULL(0) );
-      1|        assert( e[2].isNULL(0) );
-      1|        assert( e.columnNum( "field_name" ) == 1 );
-      1|        assert( e[1]["field_name"].as!PGtext == "def" );
-      1|        assert(e.columnExists("field_name"));
-      1|        assert(!e.columnExists("foo"));
+0000000|        assert( e[1][2].as!PGtext == "456" );
+0000000|        assert( e[2][1].as!PGtext == "ijk_АБВГД" );
+0000000|        assert( !e[0].isNULL(0) );
+0000000|        assert( e[2].isNULL(0) );
+0000000|        assert( e.columnNum( "field_name" ) == 1 );
+0000000|        assert( e[1]["field_name"].as!PGtext == "def" );
+0000000|        assert(e.columnExists("field_name"));
+0000000|        assert(!e.columnExists("foo"));
        |    }
        |
        |    // Binary type arguments testing:
-      1|    QueryParams p;
-      1|    p.resultFormat = ValueFormat.BINARY;
-      1|    p.sqlCommand = "SELECT "~
+0000000|    QueryParams p;
+0000000|    p.resultFormat = ValueFormat.BINARY;
+0000000|    p.sqlCommand = "SELECT "~
        |        "-32761::smallint, "~
        |        "-2147483646::integer as integer_value, "~
        |        "'first line\nsecond line'::text, "~
@@ -816,134 +816,134 @@
        |        "array['1','23',NULL,'789A']::text[] as text_array, "~
        |        "array[]::text[] as empty_array";
        |
-      1|    auto r = conn.execParams(p);
+0000000|    auto r = conn.execParams(p);
        |
        |    {
-      1|        assert( r[0].isNULL(4) );
-      1|        assert( !r[0].isNULL(2) );
+0000000|        assert( r[0].isNULL(4) );
+0000000|        assert( !r[0].isNULL(2) );
        |
-      1|        assert( r.OID(3) == OidType.Int4Array );
-      1|        assert( r.isSupportedArray(3) );
-      1|        assert( !r.isSupportedArray(2) );
-      1|        assert( r[0].columnExists("test_array") );
-      1|        auto v = r[0]["test_array"];
-      1|        assert( v.isSupportedArray );
-      1|        assert( !r[0][2].isSupportedArray );
-      1|        auto a = v.asArray;
-      1|        assert( a.OID == OidType.Int4 );
-      1|        assert( a.getValue(2,1,2).as!PGinteger == 18 );
-      1|        assert( a.isNULL(2,0,2) );
-      1|        assert( !a.isNULL(2,1,2) );
-      1|        assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
-      1|        assert( r[0]["small_array"].asArray[2].isNull );
-      1|        assert( r[0]["text_array"].asArray[2].isNull );
-      1|        assert( r.columnName(3) == "test_array" );
-      1|        assert( r[0].columnName(3) == "test_array" );
-      1|        assert( r[0]["empty_array"].asArray.nElems == 0 );
-      1|        assert( r[0]["empty_array"].asArray.dimsSize.length == 0 );
-      1|        assert( r[0]["empty_array"].asArray.length == 0 );
-      1|        assert( r[0]["text_array"].asArray.length == 4 );
-      1|        assert( r[0]["test_array"].asArray.length == 18 );
+0000000|        assert( r.OID(3) == OidType.Int4Array );
+0000000|        assert( r.isSupportedArray(3) );
+0000000|        assert( !r.isSupportedArray(2) );
+0000000|        assert( r[0].columnExists("test_array") );
+0000000|        auto v = r[0]["test_array"];
+0000000|        assert( v.isSupportedArray );
+0000000|        assert( !r[0][2].isSupportedArray );
+0000000|        auto a = v.asArray;
+0000000|        assert( a.OID == OidType.Int4 );
+0000000|        assert( a.getValue(2,1,2).as!PGinteger == 18 );
+0000000|        assert( a.isNULL(2,0,2) );
+0000000|        assert( !a.isNULL(2,1,2) );
+0000000|        assert( r[0]["small_array"].asArray[1].as!PGinteger == 22 );
+0000000|        assert( r[0]["small_array"].asArray[2].isNull );
+0000000|        assert( r[0]["text_array"].asArray[2].isNull );
+0000000|        assert( r.columnName(3) == "test_array" );
+0000000|        assert( r[0].columnName(3) == "test_array" );
+0000000|        assert( r[0]["empty_array"].asArray.nElems == 0 );
+0000000|        assert( r[0]["empty_array"].asArray.dimsSize.length == 0 );
+0000000|        assert( r[0]["empty_array"].asArray.length == 0 );
+0000000|        assert( r[0]["text_array"].asArray.length == 4 );
+0000000|        assert( r[0]["test_array"].asArray.length == 18 );
        |
        |        // Access to NULL cell
        |        {
-      1|            bool isNullFlag = false;
+0000000|            bool isNullFlag = false;
        |            try
-      1|                cast(void) r[0][4].as!PGsmallint;
+0000000|                cast(void) r[0][4].as!PGsmallint;
        |            catch(AssertError)
-      1|                isNullFlag = true;
+0000000|                isNullFlag = true;
        |            finally
-      1|                assert(isNullFlag);
+0000000|                assert(isNullFlag);
        |        }
        |
        |        // Access to NULL array element
        |        {
-      1|            bool isNullFlag = false;
+0000000|            bool isNullFlag = false;
        |            try
-      1|                cast(void) r[0]["small_array"].asArray[2].as!PGinteger;
+0000000|                cast(void) r[0]["small_array"].asArray[2].as!PGinteger;
        |            catch(AssertError)
-      1|                isNullFlag = true;
+0000000|                isNullFlag = true;
        |            finally
-      1|                assert(isNullFlag);
+0000000|                assert(isNullFlag);
        |        }
        |    }
        |
        |    // Notifies test
        |    {
-      1|        conn.exec( "listen test_notify; notify test_notify, 'test payload'" );
-      1|        auto notify = conn.getNextNotify;
+0000000|        conn.exec( "listen test_notify; notify test_notify, 'test payload'" );
+0000000|        auto notify = conn.getNextNotify;
        |
-      1|        assert( notify.name == "test_notify" );
-      1|        assert( notify.extra == "test payload" );
+0000000|        assert( notify.name == "test_notify" );
+0000000|        assert( notify.extra == "test payload" );
        |    }
        |
        |    // Async query test 1
-      1|    conn.sendQuery( "select 123; select 456; select 789" );
-      4|    while( conn.getResult() !is null ){}
-      1|    assert( conn.getResult() is null ); // removes null answer at the end
+0000000|    conn.sendQuery( "select 123; select 456; select 789" );
+0000000|    while( conn.getResult() !is null ){}
+0000000|    assert( conn.getResult() is null ); // removes null answer at the end
        |
        |    // Async query test 2
-      1|    conn.sendQueryParams(p);
-      2|    while( conn.getResult() !is null ){}
-      1|    assert( conn.getResult() is null ); // removes null answer at the end
+0000000|    conn.sendQueryParams(p);
+0000000|    while( conn.getResult() !is null ){}
+0000000|    assert( conn.getResult() is null ); // removes null answer at the end
        |
        |    {
        |        // Range test
-      1|        auto rowsRange = rangify(r);
-      1|        size_t count = 0;
+0000000|        auto rowsRange = rangify(r);
+0000000|        size_t count = 0;
        |
-      5|        foreach(row; rowsRange)
-     26|            foreach(elem; rangify(row))
-      8|                count++;
+0000000|        foreach(row; rowsRange)
+0000000|            foreach(elem; rangify(row))
+0000000|                count++;
        |
-      1|        assert(count == 8);
+0000000|        assert(count == 8);
        |    }
        |
        |    {
-      1|        bool exceptionFlag = false;
+0000000|        bool exceptionFlag = false;
        |
-      1|        try r[0]["integer_value"].as!PGtext;
+0000000|        try r[0]["integer_value"].as!PGtext;
        |        catch(ValueConvException e)
        |        {
-      1|            exceptionFlag = true;
-      1|            assert(e.msg.length > 5); // error message check
+0000000|            exceptionFlag = true;
+0000000|            assert(e.msg.length > 5); // error message check
        |        }
        |        finally
-      1|            assert(exceptionFlag);
+0000000|            assert(exceptionFlag);
        |    }
        |
        |    {
-      1|        bool exceptionFlag = false;
+0000000|        bool exceptionFlag = false;
        |
-      1|        try conn.exec("WRONG SQL QUERY");
+0000000|        try conn.exec("WRONG SQL QUERY");
        |        catch(ResponseException e)
        |        {
-      1|            exceptionFlag = true;
-      1|            assert(e.msg.length > 20); // error message check
+0000000|            exceptionFlag = true;
+0000000|            assert(e.msg.length > 20); // error message check
        |
        |            version(LDC) destroy(e); // before Derelict unloads its bindings (prevents SIGSEGV)
        |        }
        |        finally
-      1|            assert(exceptionFlag);
+0000000|            assert(exceptionFlag);
        |    }
        |
        |    {
        |        import dpq2.conv.from_d_types : toValue;
        |
-      1|        conn.exec("CREATE TABLE test (num INTEGER)");
-      1|        scope (exit) conn.exec("DROP TABLE test");
-      1|        conn.prepare("test", "INSERT INTO test (num) VALUES ($1)");
-      1|        QueryParams qp;
-      1|        qp.preparedStatementName = "test";
-      1|        qp.args = new Value[1];
-     33|        foreach (i; 0..10)
+0000000|        conn.exec("CREATE TABLE test (num INTEGER)");
+0000000|        scope (exit) conn.exec("DROP TABLE test");
+0000000|        conn.prepare("test", "INSERT INTO test (num) VALUES ($1)");
+0000000|        QueryParams qp;
+0000000|        qp.preparedStatementName = "test";
+0000000|        qp.args = new Value[1];
+0000000|        foreach (i; 0..10)
        |        {
-     10|            qp.args[0] = i.toValue;
-     10|            conn.execPrepared(qp);
+0000000|            qp.args[0] = i.toValue;
+0000000|            conn.execPrepared(qp);
        |        }
        |
-      1|        auto res = conn.exec("DELETE FROM test");
-      1|        assert(res.cmdTuples == "10");
+0000000|        auto res = conn.exec("DELETE FROM test");
+0000000|        assert(res.cmdTuples == "10");
        |    }
        |}
-src/dpq2/result.d is 83% covered
+src/dpq2/result.d is 25% covered

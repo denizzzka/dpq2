@@ -32,15 +32,15 @@
        |SysTime binaryValueAs(T)(in Value v) @trusted
        |if( is( T == SysTime ) )
        |{
-      2|    if(!(v.oidType == OidType.TimeStampWithZone))
+      1|    if(!(v.oidType == OidType.TimeStampWithZone))
 0000000|        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
        |
-      2|    if(!(v.data.length == long.sizeof))
+      1|    if(!(v.data.length == long.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
        |
-      2|    auto t = rawTimeStamp2nativeTime!TimeStampUTC(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
-      2|    return SysTime(t.dateTime, t.fracSec, UTC());
+      1|    auto t = rawTimeStamp2nativeTime!TimeStampUTC(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
+      1|    return SysTime(t.dateTime, t.fracSec, UTC());
        |}
        |
        |pure:
@@ -49,51 +49,51 @@
        |Date binaryValueAs(T)(in Value v) @trusted
        |if( is( T == Date ) )
        |{
-      7|    if(!(v.oidType == OidType.Date))
+      5|    if(!(v.oidType == OidType.Date))
 0000000|        throwTypeComplaint(v.oidType, "Date", __FILE__, __LINE__);
        |
-      7|    if(!(v.data.length == uint.sizeof))
+      5|    if(!(v.data.length == uint.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
        |
-      7|    int jd = bigEndianToNative!uint(v.data.ptr[0..uint.sizeof]);
-     21|    int year, month, day;
-      7|    j2date(jd, year, month, day);
+      5|    int jd = bigEndianToNative!uint(v.data.ptr[0..uint.sizeof]);
+     15|    int year, month, day;
+      5|    j2date(jd, year, month, day);
        |
        |    // TODO: support PG Date like TTimeStamp manner and remove this check
-      7|    if(year > short.max)
-      1|        throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
+      5|    if(year > short.max)
+0000000|        throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
        |            "Year "~year.to!string~" is bigger than supported by std.datetime.Date", __FILE__, __LINE__);
        |
-      6|    return Date(year, month, day);
+      5|    return Date(year, month, day);
        |}
        |
        |/// Returns value time without time zone as native TimeOfDay
        |TimeOfDay binaryValueAs(T)(in Value v) @trusted
        |if( is( T == TimeOfDay ) )
        |{
-      2|    if(!(v.oidType == OidType.Time))
+      1|    if(!(v.oidType == OidType.Time))
 0000000|        throwTypeComplaint(v.oidType, "time without time zone", __FILE__, __LINE__);
        |
-      2|    if(!(v.data.length == TimeADT.sizeof))
+      1|    if(!(v.data.length == TimeADT.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
        |
-      2|    return time2tm(bigEndianToNative!TimeADT(v.data.ptr[0..TimeADT.sizeof]));
+      1|    return time2tm(bigEndianToNative!TimeADT(v.data.ptr[0..TimeADT.sizeof]));
        |}
        |
        |/// Returns value timestamp without time zone as TimeStamp
        |TimeStamp binaryValueAs(T)(in Value v) @trusted
        |if( is( T == TimeStamp ) )
        |{
-      8|    if(!(v.oidType == OidType.TimeStamp))
+      3|    if(!(v.oidType == OidType.TimeStamp))
 0000000|        throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
        |
-      8|    if(!(v.data.length == long.sizeof))
+      3|    if(!(v.data.length == long.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
        |
-      8|    return rawTimeStamp2nativeTime!TimeStamp(
+      3|    return rawTimeStamp2nativeTime!TimeStamp(
        |        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
        |    );
        |}
@@ -102,14 +102,14 @@
        |TimeStampUTC binaryValueAs(T)(in Value v) @trusted
        |if( is( T == TimeStampUTC ) )
        |{
-      2|    if(!(v.oidType == OidType.TimeStampWithZone))
+0000000|    if(!(v.oidType == OidType.TimeStampWithZone))
 0000000|        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
        |
-      2|    if(!(v.data.length == long.sizeof))
+0000000|    if(!(v.data.length == long.sizeof))
 0000000|        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
        |            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
        |
-      2|    return rawTimeStamp2nativeTime!TimeStampUTC(
+0000000|    return rawTimeStamp2nativeTime!TimeStampUTC(
        |        bigEndianToNative!long(v.data.ptr[0..long.sizeof])
        |    );
        |}
@@ -137,19 +137,19 @@
        |    ubyte day; ///
        |
        |    /// '-infinity', earlier than all other dates
-     42|    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
+     30|    static PgDate earlier() pure { return PgDate(int.min, 0, 0); }
        |
        |    /// 'infinity', later than all other dates
-     39|    static PgDate later() pure { return PgDate(int.max, 0, 0); }
+     26|    static PgDate later() pure { return PgDate(int.max, 0, 0); }
        |
-     33|    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
-     30|    bool isLater() const pure { return year == later.year; } /// 'infinity'
+     23|    bool isEarlier() const pure { return year == earlier.year; } /// '-infinity'
+     19|    bool isLater() const pure { return year == later.year; } /// 'infinity'
        |}
        |
        |///
        |static toPgDate(Date d) pure
        |{
-     13|    return PgDate(d.year, d.month, d.day);
+      8|    return PgDate(d.year, d.month, d.day);
        |}
        |
        |/++
@@ -167,23 +167,23 @@
        |    Duration fracSec; /// fractional seconds, 1 microsecond resolution
        |
        |    ///
-     26|    this(DateTime dt, Duration fractionalSeconds = Duration.zero) pure
+     16|    this(DateTime dt, Duration fractionalSeconds = Duration.zero) pure
        |    {
-     13|        this(dt.date.toPgDate, dt.timeOfDay, fractionalSeconds);
+      8|        this(dt.date.toPgDate, dt.timeOfDay, fractionalSeconds);
        |    }
        |
        |    ///
-    126|    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
+     92|    this(PgDate d, TimeOfDay t = TimeOfDay(), Duration fractionalSeconds = Duration.zero) pure
        |    {
-     63|        date = d;
-     63|        time = t;
-     63|        fracSec = fractionalSeconds;
+     46|        date = d;
+     46|        time = t;
+     46|        fracSec = fractionalSeconds;
        |    }
        |
        |    ///
        |    void throwIfNotFitsToDate() const
        |    {
-     12|        if(date.year > short.max)
+      7|        if(date.year > short.max)
 0000000|            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
        |                "Year "~date.year.to!string~" is bigger than supported by std.datetime", __FILE__, __LINE__);
        |    }
@@ -191,34 +191,34 @@
        |    ///
        |    DateTime dateTime() const pure
        |    {
-     14|        if(infinity != InfinityState.NONE)
+      9|        if(infinity != InfinityState.NONE)
       2|            throw new ValueConvException(ConvExceptionType.DATE_VALUE_OVERFLOW,
        |                "TTimeStamp value is "~infinity.to!string, __FILE__, __LINE__);
        |
-     12|        throwIfNotFitsToDate();
+      7|        throwIfNotFitsToDate();
        |
-     24|        return DateTime(Date(date.year, date.month, date.day), time);
+     14|        return DateTime(Date(date.year, date.month, date.day), time);
        |    }
        |
        |    invariant()
        |    {
-    300|        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
-    300|        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
-    300|        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
+    206|        assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
+    206|        assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
+    206|        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
        |    }
        |
-     66|    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
-     60|    bool isLater() const pure { return date.isLater; } /// 'infinity'
+     46|    bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
+     38|    bool isLater() const pure { return date.isLater; } /// 'infinity'
        |
        |    /// Returns infinity state
        |    InfinityState infinity() const pure
        |    {
        |        with(InfinityState)
        |        {
-     32|            if(isEarlier) return INFINITY_MIN;
-     28|            if(isLater) return INFINITY_MAX;
+     27|            if(isEarlier) return INFINITY_MIN;
+     23|            if(isLater) return INFINITY_MAX;
        |
-     32|            return NONE;
+     22|            return NONE;
        |        }
        |    }
        |
@@ -249,7 +249,7 @@
        |        is -1, etc." (Phobos docs). But Postgres isn't uses ISO 8601
        |        for date calculation.
        |        */
-     11|        return TTimeStamp(PgDate(-4712, 1, 1), TimeOfDay.min, Duration.zero);
+     10|        return TTimeStamp(PgDate(-4712, 1, 1), TimeOfDay.min, Duration.zero);
        |    }
        |
        |    /// Returns the TimeStamp farthest in the future which is representable by TimeStamp.
@@ -257,14 +257,14 @@
        |    {
        |        enum maxFract = 1.seconds - 1.usecs;
        |
-     11|        return TTimeStamp(PgDate(294276, 12, 31), TimeOfDay(23, 59, 59), maxFract);
+     10|        return TTimeStamp(PgDate(294276, 12, 31), TimeOfDay(23, 59, 59), maxFract);
        |    }
        |
        |    /// '-infinity', earlier than all other time stamps
-      9|    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.earlier); }
+      7|    static immutable(TTimeStamp) earlier() pure { return TTimeStamp(PgDate.earlier); }
        |
        |    /// 'infinity', later than all other time stamps
-      9|    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.later); }
+      7|    static immutable(TTimeStamp) later() pure { return TTimeStamp(PgDate.later); }
        |
        |    ///
        |    string toString() const
@@ -335,28 +335,28 @@
        |{
        |    import core.stdc.time: time_t;
        |
-     13|    if(raw == long.max) return T.later; // infinity
-     12|    if(raw == long.min) return T.earlier; // -infinity
+      4|    if(raw == long.max) return T.later; // infinity
+      4|    if(raw == long.min) return T.earlier; // -infinity
        |
-     10|    pg_tm tm;
-     10|    fsec_t ts;
+      4|    pg_tm tm;
+      4|    fsec_t ts;
        |
-     10|    if(timestamp2tm(raw, tm, ts) < 0)
+      4|    if(timestamp2tm(raw, tm, ts) < 0)
 0000000|        throw new ValueConvException(
        |            ConvExceptionType.OUT_OF_RANGE, "Timestamp is out of range",
        |        );
        |
-     10|    TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);
+      4|    TimeStamp ret = raw_pg_tm2nativeTime(tm, ts);
        |
        |    static if(is(T == TimeStamp))
-      6|        return ret;
+      3|        return ret;
        |    else
-      4|        return TimeStampUTC(ret.dateTime, ret.fracSec);
+      1|        return TimeStampUTC(ret.dateTime, ret.fracSec);
        |}
        |
        |TimeStamp raw_pg_tm2nativeTime(pg_tm tm, fsec_t ts)
        |{
-     10|    return TimeStamp(
+      4|    return TimeStamp(
        |        PgDate(
        |            tm.tm_year,
        |            cast(ubyte) tm.tm_mon,
@@ -377,21 +377,21 @@
        |{
        |    enum MONTHS_PER_YEAR = 12;
        |
-     17|    jd += POSTGRES_EPOCH_JDATE;
+      9|    jd += POSTGRES_EPOCH_JDATE;
        |
-     17|    uint julian = jd + 32044;
-     17|    uint quad = julian / 146097;
-     17|    uint extra = (julian - quad * 146097) * 4 + 3;
-     17|    julian += 60 + quad * 3 + extra / 146097;
-     17|    quad = julian / 1461;
-     17|    julian -= quad * 1461;
-     17|    int y = julian * 4 / 1461;
-     34|    julian = ((y != 0) ? ((julian + 305) % 365) : ((julian + 306) % 366))
+      9|    uint julian = jd + 32044;
+      9|    uint quad = julian / 146097;
+      9|    uint extra = (julian - quad * 146097) * 4 + 3;
+      9|    julian += 60 + quad * 3 + extra / 146097;
+      9|    quad = julian / 1461;
+      9|    julian -= quad * 1461;
+      9|    int y = julian * 4 / 1461;
+     18|    julian = ((y != 0) ? ((julian + 305) % 365) : ((julian + 306) % 366))
        |        + 123;
-     17|    year = (y+ quad * 4) - 4800;
-     17|    quad = julian * 2141 / 65536;
-     17|    day = julian - 7834 * quad / 256;
-     17|    month = (quad + 10) % MONTHS_PER_YEAR + 1;
+      9|    year = (y+ quad * 4) - 4800;
+      9|    quad = julian * 2141 / 65536;
+      9|    day = julian - 7834 * quad / 256;
+      9|    month = (quad + 10) % MONTHS_PER_YEAR + 1;
        |}
        |
        |private alias long Timestamp;
@@ -402,24 +402,24 @@
        |
        |void TMODULO(ref long t, ref long q, double u)
        |{
-     10|    q = cast(long)(t / u);
-     20|    if (q != 0) t -= q * cast(long)u;
+      4|    q = cast(long)(t / u);
+      8|    if (q != 0) t -= q * cast(long)u;
        |}
        |
        |TimeOfDay time2tm(TimeADT time)
        |{
-      2|    immutable long USECS_PER_HOUR  = 3600000000;
-      2|    immutable long USECS_PER_MINUTE = 60000000;
-      2|    immutable long USECS_PER_SEC = 1000000;
+      1|    immutable long USECS_PER_HOUR  = 3600000000;
+      1|    immutable long USECS_PER_MINUTE = 60000000;
+      1|    immutable long USECS_PER_SEC = 1000000;
        |
-      2|    int tm_hour = cast(int)(time / USECS_PER_HOUR);
-      2|    time -= tm_hour * USECS_PER_HOUR;
-      2|    int tm_min = cast(int)(time / USECS_PER_MINUTE);
-      2|    time -= tm_min * USECS_PER_MINUTE;
-      2|    int tm_sec = cast(int)(time / USECS_PER_SEC);
-      2|    time -= tm_sec * USECS_PER_SEC;
+      1|    int tm_hour = cast(int)(time / USECS_PER_HOUR);
+      1|    time -= tm_hour * USECS_PER_HOUR;
+      1|    int tm_min = cast(int)(time / USECS_PER_MINUTE);
+      1|    time -= tm_min * USECS_PER_MINUTE;
+      1|    int tm_sec = cast(int)(time / USECS_PER_SEC);
+      1|    time -= tm_sec * USECS_PER_SEC;
        |
-      2|    return TimeOfDay(tm_hour, tm_min, tm_sec);
+      1|    return TimeOfDay(tm_hour, tm_min, tm_sec);
        |}
        |
        |struct pg_tm
@@ -458,35 +458,35 @@
        |*/
        |int timestamp2tm(Timestamp dt, out pg_tm tm, out fsec_t fsec)
        |{
-     10|    Timestamp   date;
-     10|    Timestamp   time;
-     10|    pg_time_t   utime;
+      4|    Timestamp   date;
+      4|    Timestamp   time;
+      4|    pg_time_t   utime;
        |
-     10|    time = dt;
-     10|    TMODULO(time, date, USECS_PER_DAY);
+      4|    time = dt;
+      4|    TMODULO(time, date, USECS_PER_DAY);
        |
-     10|    if (time < 0)
+      4|    if (time < 0)
        |    {
-      5|        time += USECS_PER_DAY;
-      5|        date -= 1;
+0000000|        time += USECS_PER_DAY;
+0000000|        date -= 1;
        |    }
        |
-     10|    j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
-     10|    dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
+      4|    j2date(cast(int) date, tm.tm_year, tm.tm_mon, tm.tm_mday);
+      4|    dt2time(time, tm.tm_hour, tm.tm_min, tm.tm_sec, fsec);
        |
-     10|    return 0;
+      4|    return 0;
        |}
        |
        |void dt2time(Timestamp jd, out int hour, out int min, out int sec, out fsec_t fsec)
        |{
-     10|    TimeOffset  time;
+      4|    TimeOffset  time;
        |
-     10|    time = jd;
-     10|    hour = cast(int)(time / USECS_PER_HOUR);
-     10|    time -= hour * USECS_PER_HOUR;
-     10|    min = cast(int)(time / USECS_PER_MINUTE);
-     10|    time -= min * USECS_PER_MINUTE;
-     10|    sec = cast(int)(time / USECS_PER_SEC);
-     10|    fsec = cast(int)(time - sec*USECS_PER_SEC);
+      4|    time = jd;
+      4|    hour = cast(int)(time / USECS_PER_HOUR);
+      4|    time -= hour * USECS_PER_HOUR;
+      4|    min = cast(int)(time / USECS_PER_MINUTE);
+      4|    time -= min * USECS_PER_MINUTE;
+      4|    sec = cast(int)(time / USECS_PER_SEC);
+      4|    fsec = cast(int)(time - sec*USECS_PER_SEC);
        |}
-src/dpq2/conv/time.d is 90% covered
+src/dpq2/conv/time.d is 86% covered

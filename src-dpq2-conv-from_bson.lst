@@ -13,8 +13,8 @@
        |/// Default type will be used for NULL value and for array without detected type
        |Value bsonToValue(Bson v, OidType defaultType = OidType.Undefined)
        |{
-      8|    if(v.type == Bson.Type.array)
-      4|        return bsonArrayToValue(v, defaultType);
+      7|    if(v.type == Bson.Type.array)
+      3|        return bsonArrayToValue(v, defaultType);
        |    else
       4|        return bsonValueToValue(v, defaultType);
        |}
@@ -23,10 +23,10 @@
        |
        |Value bsonValueToValue(Bson v, OidType defaultType)
        |{
-     17|    Value ret;
+     13|    Value ret;
        |
        |    with(Bson.Type)
-     17|    switch(v.type)
+     13|    switch(v.type)
        |    {
 0000000|        case null_:
 0000000|            ret = Value(ValueFormat.BINARY, defaultType);
@@ -41,9 +41,9 @@
       2|            ret = v.get!bool.toValue;
       2|            break;
        |
-     14|        case int_:
-     14|            ret = v.get!int.toValue;
-     14|            break;
+     10|        case int_:
+     10|            ret = v.get!int.toValue;
+     10|            break;
        |
 0000000|        case long_:
 0000000|            ret = v.get!long.toValue;
@@ -65,7 +65,7 @@
        |                );
        |    }
        |
-     17|    return ret;
+     13|    return ret;
        |}
        |
        |unittest
@@ -97,61 +97,61 @@
        |{
        |    ubyte[] nullValue() pure
        |    {
-      6|        ubyte[] ret = [0xff, 0xff, 0xff, 0xff]; //NULL magic number
-      6|        return ret;
+      4|        ubyte[] ret = [0xff, 0xff, 0xff, 0xff]; //NULL magic number
+      4|        return ret;
        |    }
        |
        |    ubyte[] rawValue(Value v) pure
        |    {
-     13|        if(v.isNull)
+      9|        if(v.isNull)
        |        {
 0000000|            return nullValue();
        |        }
        |        else
        |        {
-     13|            return v._data.length.to!uint.nativeToBigEndian ~ v._data;
+      9|            return v._data.length.to!uint.nativeToBigEndian ~ v._data;
        |        }
        |    }
        |
-      4|    ArrayProperties ap;
-      4|    ubyte[] rawValues;
+      3|    ArrayProperties ap;
+      3|    ubyte[] rawValues;
        |
        |    void recursive(ref Bson bsonArr, int dimension)
        |    {
-     10|        if(dimension == ap.dimsSize.length)
+      7|        if(dimension == ap.dimsSize.length)
        |        {
-      7|            ap.dimsSize ~= bsonArr.length.to!int;
+      5|            ap.dimsSize ~= bsonArr.length.to!int;
        |        }
        |        else
        |        {
-      3|            if(ap.dimsSize[dimension] != bsonArr.length)
+      2|            if(ap.dimsSize[dimension] != bsonArr.length)
       1|                throw new ValueConvException(ConvExceptionType.NOT_ARRAY, "Jagged arrays are unsupported", __FILE__, __LINE__);
        |        }
        |
-      9|        foreach(bElem; bsonArr)
+      6|        foreach(bElem; bsonArr)
        |        {
-     25|            ap.nElems++;
+     17|            ap.nElems++;
        |
-     25|            switch(bElem.type)
+     17|            switch(bElem.type)
        |            {
-      6|                case Bson.Type.array:
-      6|                    recursive(bElem, dimension + 1);
-      5|                    break;
+      4|                case Bson.Type.array:
+      4|                    recursive(bElem, dimension + 1);
+      3|                    break;
        |
-      6|                case Bson.Type.null_:
-      6|                    rawValues ~= nullValue();
-      6|                    break;
+      4|                case Bson.Type.null_:
+      4|                    rawValues ~= nullValue();
+      4|                    break;
        |
-     13|                default:
-     13|                    Value v = bsonValueToValue(bElem, OidType.Undefined);
+      9|                default:
+      9|                    Value v = bsonValueToValue(bElem, OidType.Undefined);
        |
-     13|                    if(ap.OID == OidType.Undefined)
+      9|                    if(ap.OID == OidType.Undefined)
        |                    {
-      4|                        ap.OID = v.oidType;
+      3|                        ap.OID = v.oidType;
        |                    }
        |                    else
        |                    {
-      9|                        if(ap.OID != v.oidType)
+      6|                        if(ap.OID != v.oidType)
 0000000|                            throw new ValueConvException(
        |                                    ConvExceptionType.NOT_ARRAY,
        |                                    "Bson (which used for creating "~ap.OID.to!string~" array) also contains value of type "~v.oidType.to!string,
@@ -159,34 +159,34 @@
        |                                );
        |                    }
        |
-     13|                    rawValues ~= rawValue(v);
+      9|                    rawValues ~= rawValue(v);
        |            }
        |        }
        |    }
        |
-      4|    recursive(bsonArr, 0);
+      3|    recursive(bsonArr, 0);
        |
-      3|    if(ap.OID == OidType.Undefined) ap.OID = defaultType.oidConvTo!"element";
+      2|    if(ap.OID == OidType.Undefined) ap.OID = defaultType.oidConvTo!"element";
        |
-      3|    ArrayHeader_net h;
-      3|    h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
-      3|    h.OID = nativeToBigEndian(ap.OID.to!Oid);
+      2|    ArrayHeader_net h;
+      2|    h.ndims = nativeToBigEndian(ap.dimsSize.length.to!int);
+      2|    h.OID = nativeToBigEndian(ap.OID.to!Oid);
        |
-      3|    ubyte[] ret;
-      3|    ret ~= (cast(ubyte*) &h)[0 .. h.sizeof];
+      2|    ubyte[] ret;
+      2|    ret ~= (cast(ubyte*) &h)[0 .. h.sizeof];
        |
-     24|    foreach(i; 0 .. ap.dimsSize.length)
+     15|    foreach(i; 0 .. ap.dimsSize.length)
        |    {
-      5|        Dim_net dim;
-      5|        dim.dim_size = nativeToBigEndian(ap.dimsSize[i]);
-      5|        dim.lbound = nativeToBigEndian!int(1);
+      3|        Dim_net dim;
+      3|        dim.dim_size = nativeToBigEndian(ap.dimsSize[i]);
+      3|        dim.lbound = nativeToBigEndian!int(1);
        |
-      5|        ret ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
+      3|        ret ~= (cast(ubyte*) &dim)[0 .. dim.sizeof];
        |    }
        |
-      3|    ret ~= rawValues;
+      2|    ret ~= rawValues;
        |
-      3|    return Value(cast(immutable) ret, ap.OID.oidConvTo!"array", false, ValueFormat.BINARY);
+      2|    return Value(cast(immutable) ret, ap.OID.oidConvTo!"array", false, ValueFormat.BINARY);
        |}
        |
        |unittest

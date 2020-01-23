@@ -31,24 +31,24 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    481|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    150|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
        |        import std.exception: enforce;
        |
        |        //TODO: it is possible to skip this check for fixed-size values?
-    481|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
+    150|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
        |
-    481|        this._data = data;
-    481|        this._format = format;
-    481|        this._oidType = oidType;
-    481|        this._isNull = isNull;
+    150|        this._data = data;
+    150|        this._format = format;
+    150|        this._oidType = oidType;
+    150|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
-     12|    this(in ValueFormat format, in OidType oidType) pure
+      6|    this(in ValueFormat format, in OidType oidType) pure
        |    {
-     12|        this._format = format;
-     12|        this._oidType = oidType;
+      6|        this._format = format;
+      6|        this._oidType = oidType;
        |    }
        |
        |    @safe const pure nothrow @nogc
@@ -56,32 +56,32 @@
        |        /// Indicates if the value is NULL
        |        bool isNull()
        |        {
-   1103|            return _isNull;
+    264|            return _isNull;
        |        }
        |
        |        /// Indicates if the value is array type
        |        bool isArray()
        |        {
-     95|            return dpq2.oids.isSupportedArray(oidType);
+     23|            return dpq2.oids.isSupportedArray(oidType);
        |        }
        |        alias isSupportedArray = isArray; //TODO: deprecate
        |
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    734|            return _oidType;
+    187|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-    542|            return _format;
+     97|            return _format;
        |        }
        |    }
        |
        |    package void oidType(OidType type) @safe pure nothrow @nogc
        |    {
-     13|        _oidType = type;
+      9|        _oidType = type;
        |    }
        |
        |    immutable(ubyte)[] data() pure const
@@ -89,9 +89,9 @@
        |        import std.exception;
        |        import core.exception;
        |
-    795|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+    197|        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
        |
-    785|        return _data;
+    191|        return _data;
        |    }
        |
        |    ///
@@ -150,16 +150,16 @@
        |{
        |    const ConvExceptionType type; /// Exception type
        |
-     36|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__, Throwable next = null) pure @safe
+     34|    this(ConvExceptionType t, string msg, string file = __FILE__, size_t line = __LINE__, Throwable next = null) pure @safe
        |    {
-     36|        type = t;
-     36|        super(msg, file, line, next);
+     34|        type = t;
+     34|        super(msg, file, line, next);
        |    }
        |}
        |
        |package void throwTypeComplaint(OidType receivedType, string expectedType, string file = __FILE__, size_t line = __LINE__) pure
        |{
-     14|    throw new ValueConvException(
+     13|    throw new ValueConvException(
        |            ConvExceptionType.NOT_IMPLEMENTED,
        |            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
        |            file, line

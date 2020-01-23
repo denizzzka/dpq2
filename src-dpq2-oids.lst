@@ -13,7 +13,7 @@
        |{
        |    static assert(Oid.sizeof == OidType.sizeof);
        |
-    262|    return cast(OidType)(oid);
+     16|    return cast(OidType)(oid);
        |}
        |
        |/**
@@ -25,12 +25,12 @@
        | */
        |OidType oidConvTo(string s)(OidType type)
        |{
-    257|    foreach(ref a; appropriateArrOid)
+    107|    foreach(ref a; appropriateArrOid)
        |    {
        |        static if(s == "array")
        |        {
-     79|            if(a.value == type)
-     20|                return a.array;
+     32|            if(a.value == type)
+     11|                return a.array;
        |        }
        |        else
        |        static if(s == "element")
@@ -56,12 +56,12 @@
        |bool isNativeInteger(OidType t) pure
        |{
        |    with(OidType)
-     47|    switch(t)
+     24|    switch(t)
        |    {
-      3|        case Int8:
-      7|        case Int2:
-     46|        case Int4:
-     46|            return true;
+      1|        case Int8:
+      2|        case Int2:
+     23|        case Int4:
+     23|            return true;
       1|        default:
       1|            break;
        |    }
@@ -73,11 +73,11 @@
        |bool isNativeFloat(OidType t) pure
        |{
        |    with(OidType)
-      5|    switch(t)
+      2|    switch(t)
        |    {
-      1|        case Float4:
-      4|        case Float8:
-      4|            return true;
+0000000|        case Float4:
+      1|        case Float8:
+      1|            return true;
       1|        default:
       1|            break;
        |    }
@@ -127,32 +127,32 @@
        |bool isSupportedArray(OidType t) pure nothrow @nogc
        |{
        |    with(OidType)
-     97|    switch(t)
+     23|    switch(t)
        |    {
 0000000|        case BoolArray:
 0000000|        case ByteArrayArray:
 0000000|        case CharArray:
 0000000|        case Int2Array:
-     27|        case Int4Array:
-     45|        case TextArray:
-     45|        case Int8Array:
-     45|        case Float4Array:
-     45|        case Float8Array:
-     45|        case TimeStampArray:
-     45|        case TimeStampWithZoneArray:
-     45|        case DateArray:
-     45|        case TimeArray:
-     45|        case TimeWithZoneArray:
-     45|        case NumericArray:
-     46|        case UUIDArray:
-     47|        case JsonArray:
-     47|        case JsonbArray:
-     47|            return true;
-     50|        default:
-     50|            break;
+     12|        case Int4Array:
+     16|        case TextArray:
+     16|        case Int8Array:
+     16|        case Float4Array:
+     16|        case Float8Array:
+     16|        case TimeStampArray:
+     16|        case TimeStampWithZoneArray:
+     16|        case DateArray:
+     16|        case TimeArray:
+     16|        case TimeWithZoneArray:
+     16|        case NumericArray:
+     16|        case UUIDArray:
+     16|        case JsonArray:
+     16|        case JsonbArray:
+     16|            return true;
+      7|        default:
+      7|            break;
        |    }
        |
-     50|    return false;
+      7|    return false;
        |}
        |
        |OidType detectOidTypeFromNative(T)()
@@ -160,9 +160,9 @@
        |    import std.typecons : Nullable;
        |
        |    static if(is(T == Nullable!R,R))
-      7|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
+      4|        return detectOidTypeNotCareAboutNullable!(typeof(T.get));
        |    else
-     93|        return detectOidTypeNotCareAboutNullable!T;
+     58|        return detectOidTypeNotCareAboutNullable!T;
        |}
        |
        |private OidType detectOidTypeNotCareAboutNullable(T)()
@@ -179,14 +179,14 @@
        |
        |    with(OidType)
        |    {
-      4|        static if(is(UT == string)){ return Text; } else
-      2|        static if(is(UT == ubyte[])){ return ByteArray; } else
-     11|        static if(is(UT == bool)){ return Bool; } else
-      2|        static if(is(UT == short)){ return Int2; } else
-     66|        static if(is(UT == int)){ return Int4; } else
-      2|        static if(is(UT == long)){ return Int8; } else
-      1|        static if(is(UT == float)){ return Float4; } else
-      2|        static if(is(UT == double)){ return Float8; } else
+      2|        static if(is(UT == string)){ return Text; } else
+      1|        static if(is(UT == ubyte[])){ return ByteArray; } else
+      7|        static if(is(UT == bool)){ return Bool; } else
+      1|        static if(is(UT == short)){ return Int2; } else
+     42|        static if(is(UT == int)){ return Int4; } else
+      1|        static if(is(UT == long)){ return Int8; } else
+0000000|        static if(is(UT == float)){ return Float4; } else
+      1|        static if(is(UT == double)){ return Float8; } else
       1|        static if(is(UT == StdDate)){ return Date; } else
       1|        static if(is(UT == TimeOfDay)){ return Time; } else
       1|        static if(is(UT == DateTime)){ return TimeStamp; } else
@@ -195,7 +195,7 @@
       1|        static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
 0000000|        static if(is(UT == VibeJson)){ return Json; } else
 0000000|        static if(is(UT == StdUUID)){ return UUID; } else
-      4|        static if(is(UT == BitArray)){ return VariableBitString; } else
+      1|        static if(is(UT == BitArray)){ return VariableBitString; } else
        |
        |        static assert(false, "Unsupported D type: "~T.stringof);
        |    }
@@ -373,4 +373,4 @@
        |    FDWHandler = 3115, ///
        |    AnyRange = 3831, ///
        |}
-src/dpq2/oids.d is 86% covered
+src/dpq2/oids.d is 83% covered

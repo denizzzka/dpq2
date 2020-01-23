@@ -293,203 +293,203 @@
        |    import dpq2.conv.to_d_types;
        |    import dpq2.conv.to_bson;
        |
-      1|    auto conn = new Connection(connParam);
+0000000|    auto conn = new Connection(connParam);
        |
        |    // Text type arguments testing
        |    {
-      1|        string sql_query =
+0000000|        string sql_query =
        |        "select now() as time, 'abc'::text as string, 123, 456.78\n"~
        |        "union all\n"~
        |        "select now(), 'абвгд'::text, 777, 910.11\n"~
        |        "union all\n"~
        |        "select NULL, 'ijk'::text, 789, 12345.115345";
        |
-      1|        auto a = conn.exec( sql_query );
+0000000|        auto a = conn.exec( sql_query );
        |
-      1|        assert( a.cmdStatus.length > 2 );
-      1|        assert( a.columnCount == 4 );
-      1|        assert( a.length == 3 );
-      1|        assert( a.columnFormat(1) == ValueFormat.TEXT );
-      1|        assert( a.columnFormat(2) == ValueFormat.TEXT );
+0000000|        assert( a.cmdStatus.length > 2 );
+0000000|        assert( a.columnCount == 4 );
+0000000|        assert( a.length == 3 );
+0000000|        assert( a.columnFormat(1) == ValueFormat.TEXT );
+0000000|        assert( a.columnFormat(2) == ValueFormat.TEXT );
        |    }
        |
        |    // Binary type arguments testing
        |    {
        |        import vibe.data.bson: Bson;
        |
-      1|        const string sql_query =
+0000000|        const string sql_query =
        |        "select $1::text, $2::integer, $3::text, $4, $5::integer[]";
        |
-      1|        Value[5] args;
-      1|        args[0] = toValue("абвгд");
-      1|        args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
-      1|        args[2] = toValue("123");
-      1|        args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
+0000000|        Value[5] args;
+0000000|        args[0] = toValue("абвгд");
+0000000|        args[1] = Value(ValueFormat.BINARY, OidType.Undefined); // undefined type NULL value
+0000000|        args[2] = toValue("123");
+0000000|        args[3] = Value(ValueFormat.BINARY, OidType.Int8); // NULL value
        |
-      1|        Bson binArray = Bson([
+0000000|        Bson binArray = Bson([
        |            Bson([Bson(null), Bson(123), Bson(456)]),
        |            Bson([Bson(0), Bson(789), Bson(null)])
        |        ]);
        |
-      1|        args[4] = bsonToValue(binArray);
+0000000|        args[4] = bsonToValue(binArray);
        |
-      1|        QueryParams p;
-      1|        p.sqlCommand = sql_query;
-      1|        p.args = args[];
+0000000|        QueryParams p;
+0000000|        p.sqlCommand = sql_query;
+0000000|        p.args = args[];
        |
-      1|        auto a = conn.execParams( p );
+0000000|        auto a = conn.execParams( p );
        |
-     18|        foreach(i; 0 .. args.length)
-      5|            assert(a.columnFormat(i) == ValueFormat.BINARY);
+0000000|        foreach(i; 0 .. args.length)
+0000000|            assert(a.columnFormat(i) == ValueFormat.BINARY);
        |
-      1|        assert( a.OID(0) == OidType.Text );
-      1|        assert( a.OID(1) == OidType.Int4 );
-      1|        assert( a.OID(2) == OidType.Text );
-      1|        assert( a.OID(3) == OidType.Int8 );
-      1|        assert( a.OID(4) == OidType.Int4Array );
+0000000|        assert( a.OID(0) == OidType.Text );
+0000000|        assert( a.OID(1) == OidType.Int4 );
+0000000|        assert( a.OID(2) == OidType.Text );
+0000000|        assert( a.OID(3) == OidType.Int8 );
+0000000|        assert( a.OID(4) == OidType.Int4Array );
        |
        |        // binary args array test
-      1|        assert( a[0][4].as!Bson == binArray );
+0000000|        assert( a[0][4].as!Bson == binArray );
        |    }
        |
        |    {
        |        // Bug #52: empty text argument
-      1|        QueryParams p;
-      1|        Value v = toValue("");
+0000000|        QueryParams p;
+0000000|        Value v = toValue("");
        |
-      1|        p.sqlCommand = "SELECT $1";
-      1|        p.args = [v];
+0000000|        p.sqlCommand = "SELECT $1";
+0000000|        p.args = [v];
        |
-      1|        auto a = conn.execParams(p);
+0000000|        auto a = conn.execParams(p);
        |
-      1|        assert( !a[0][0].isNull );
-      1|        assert( a[0][0].as!string == "" );
+0000000|        assert( !a[0][0].isNull );
+0000000|        assert( a[0][0].as!string == "" );
        |    }
        |
        |    // checking prepared statements
        |    {
        |        // uses PQprepare:
-      1|        conn.prepareEx("prepared statement 1", "SELECT $1::integer");
+0000000|        conn.prepareEx("prepared statement 1", "SELECT $1::integer");
        |
-      1|        QueryParams p;
-      1|        p.preparedStatementName = "prepared statement 1";
-      1|        p.args = [42.toValue];
-      1|        auto r = conn.execPrepared(p);
-      1|        assert (r[0][0].as!int == 42);
+0000000|        QueryParams p;
+0000000|        p.preparedStatementName = "prepared statement 1";
+0000000|        p.args = [42.toValue];
+0000000|        auto r = conn.execPrepared(p);
+0000000|        assert (r[0][0].as!int == 42);
        |    }
        |    {
        |        // uses PQsendPrepare:
-      1|        conn.sendPrepare("prepared statement 2", "SELECT $1::text, $2::integer");
+0000000|        conn.sendPrepare("prepared statement 2", "SELECT $1::text, $2::integer");
        |
-      1|        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
-      1|        conn.consumeInput();
+0000000|        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
+0000000|        conn.consumeInput();
        |
-      1|        immutable(Result)[] res;
+0000000|        immutable(Result)[] res;
        |
-      2|        while(true)
+0000000|        while(true)
        |        {
-      2|            auto r = conn.getResult();
-      3|            if(r is null) break;
-      1|            res ~= r;
+0000000|            auto r = conn.getResult();
+0000000|            if(r is null) break;
+0000000|            res ~= r;
        |        }
        |
-      1|        assert(res.length == 1);
-      1|        assert(res[0].status == PGRES_COMMAND_OK);
+0000000|        assert(res.length == 1);
+0000000|        assert(res[0].status == PGRES_COMMAND_OK);
        |    }
        |    {
        |        // check prepared arg types and result types
-      1|        auto a = conn.describePrepared("prepared statement 2");
+0000000|        auto a = conn.describePrepared("prepared statement 2");
        |
-      1|        assert(a.nParams == 2);
-      1|        assert(a.paramType(0) == OidType.Text);
-      1|        assert(a.paramType(1) == OidType.Int4);
+0000000|        assert(a.nParams == 2);
+0000000|        assert(a.paramType(0) == OidType.Text);
+0000000|        assert(a.paramType(1) == OidType.Int4);
        |    }
        |    {
        |        // async check prepared arg types and result types
-      1|        conn.sendDescribePrepared("prepared statement 2");
+0000000|        conn.sendDescribePrepared("prepared statement 2");
        |
-      1|        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
-      1|        conn.consumeInput();
+0000000|        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
+0000000|        conn.consumeInput();
        |
-      1|        immutable(Result)[] res;
+0000000|        immutable(Result)[] res;
        |
-      2|        while(true)
+0000000|        while(true)
        |        {
-      2|            auto r = conn.getResult();
-      3|            if(r is null) break;
-      1|            res ~= r;
+0000000|            auto r = conn.getResult();
+0000000|            if(r is null) break;
+0000000|            res ~= r;
        |        }
        |
-      1|        assert(res.length == 1);
-      1|        assert(res[0].status == PGRES_COMMAND_OK);
+0000000|        assert(res.length == 1);
+0000000|        assert(res[0].status == PGRES_COMMAND_OK);
        |
-      1|        auto a = res[0].getAnswer;
+0000000|        auto a = res[0].getAnswer;
        |
-      1|        assert(a.nParams == 2);
-      1|        assert(a.paramType(0) == OidType.Text);
-      1|        assert(a.paramType(1) == OidType.Int4);
+0000000|        assert(a.nParams == 2);
+0000000|        assert(a.paramType(0) == OidType.Text);
+0000000|        assert(a.paramType(1) == OidType.Int4);
        |    }
        |    {
-      1|        QueryParams p;
-      1|        p.preparedStatementName = "prepared statement 2";
-      1|        p.argsFromArray = ["abc", "123456"];
+0000000|        QueryParams p;
+0000000|        p.preparedStatementName = "prepared statement 2";
+0000000|        p.argsFromArray = ["abc", "123456"];
        |
-      1|        conn.sendQueryPrepared(p);
+0000000|        conn.sendQueryPrepared(p);
        |
-      1|        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
-      1|        conn.consumeInput();
+0000000|        conn.waitEndOf(WaitType.READ, dur!"seconds"(5));
+0000000|        conn.consumeInput();
        |
-      1|        immutable(Result)[] res;
+0000000|        immutable(Result)[] res;
        |
-      2|        while(true)
+0000000|        while(true)
        |        {
-      2|            auto r = conn.getResult();
-      3|            if(r is null) break;
-      1|            res ~= r;
+0000000|            auto r = conn.getResult();
+0000000|            if(r is null) break;
+0000000|            res ~= r;
        |        }
        |
-      1|        assert(res.length == 1);
-      1|        assert(res[0].getAnswer[0][0].as!PGtext == "abc");
-      1|        assert(res[0].getAnswer[0][1].as!PGinteger == 123456);
+0000000|        assert(res.length == 1);
+0000000|        assert(res[0].getAnswer[0][0].as!PGtext == "abc");
+0000000|        assert(res[0].getAnswer[0][1].as!PGinteger == 123456);
        |    }
        |    {
        |        // test COPY
-      1|        conn.exec("CREATE TEMP TABLE test_copy (text_field TEXT, int_field INT8)");
+0000000|        conn.exec("CREATE TEMP TABLE test_copy (text_field TEXT, int_field INT8)");
        |
-      1|        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
-      1|        conn.putCopyData("Val1,1\nval2,2\n");
-      1|        conn.putCopyData("Val3,3\nval4,4\n");
-      1|        conn.putCopyEnd();
+0000000|        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
+0000000|        conn.putCopyData("Val1,1\nval2,2\n");
+0000000|        conn.putCopyData("Val3,3\nval4,4\n");
+0000000|        conn.putCopyEnd();
        |
-      1|        auto res = conn.exec("SELECT count(text_field), sum(int_field) FROM test_copy");
-      1|        assert(res.length == 1);
-      1|        assert(res[0][0].as!string == "4");
-      1|        assert(res[0][1].as!string == "10");
+0000000|        auto res = conn.exec("SELECT count(text_field), sum(int_field) FROM test_copy");
+0000000|        assert(res.length == 1);
+0000000|        assert(res[0][0].as!string == "4");
+0000000|        assert(res[0][1].as!string == "10");
        |
        |        // This time with error
        |        import std.exception: assertThrown;
        |        import dpq2.result: ResponseException;
        |
-      1|        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
-      1|        conn.putCopyData("Val1,2\nval2,4,POORLY_FORMATTED_CSV\n");
+0000000|        conn.exec("COPY test_copy FROM STDIN WITH (FORMAT csv)");
+0000000|        conn.putCopyData("Val1,2\nval2,4,POORLY_FORMATTED_CSV\n");
        |
-      2|        assertThrown!ResponseException(conn.putCopyEnd());
+0000000|        assertThrown!ResponseException(conn.putCopyEnd());
        |    }
        |
        |    import std.socket;
-      1|    conn.socket.shutdown(SocketShutdown.BOTH); // breaks connection
+0000000|    conn.socket.shutdown(SocketShutdown.BOTH); // breaks connection
        |
        |    {
-      1|        bool exceptionFlag = false;
+0000000|        bool exceptionFlag = false;
        |
-      1|        try conn.exec("SELECT 'abc'::text").getAnswer;
+0000000|        try conn.exec("SELECT 'abc'::text").getAnswer;
        |        catch(ConnectionException e)
        |        {
-      1|            exceptionFlag = true;
-      1|            assert(e.msg.length > 15); // error message check
+0000000|            exceptionFlag = true;
+0000000|            assert(e.msg.length > 15); // error message check
        |        }
        |        finally
-      1|            assert(exceptionFlag);
+0000000|            assert(exceptionFlag);
        |    }
        |}
-src/dpq2/query.d is 100% covered
+src/dpq2/query.d is 0% covered

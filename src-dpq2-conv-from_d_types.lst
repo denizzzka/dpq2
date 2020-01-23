@@ -23,10 +23,10 @@
        |Value toValue(T)(T v)
        |if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))))
        |{
-     17|    if (v.isNull)
-      7|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+     10|    if (v.isNull)
+      4|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
        |    else
-     10|        return toValue(v.get);
+      6|        return toValue(v.get);
        |}
        |
        |/// ditto
@@ -36,17 +36,17 @@
        |    import dpq2.conv.arrays : arrToValue = toValue; // deprecation import workaround
        |    import std.range : ElementType;
        |
-      2|    if (v.isNull)
-      1|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(ElementType!(typeof(v.get))).oidConvTo!"array");
+0000000|    if (v.isNull)
+0000000|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(ElementType!(typeof(v.get))).oidConvTo!"array");
        |    else
-      1|        return arrToValue(v.get);
+0000000|        return arrToValue(v.get);
        |}
        |
        |///
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-     72|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+     45|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/// Convert money.currency to PG value
@@ -56,7 +56,7 @@
        |Value toValue(T)(T v)
        |if(isInstanceOf!(currency, T) &&  T.amount.sizeof == 8)
        |{
-      2|    return Value(v.amount.nativeToBigEndian.dup, OidType.Money, false, ValueFormat.BINARY);
+      1|    return Value(v.amount.nativeToBigEndian.dup, OidType.Money, false, ValueFormat.BINARY);
        |}
        |
        |unittest
@@ -78,24 +78,24 @@
        |    import std.array : appender;
        |    import core.bitop : bitswap;
        |
-      8|    size_t len = v.length / 8 + (v.length % 8 ? 1 : 0);
-      4|    auto data = cast(size_t[])v;
-      4|    auto buffer = appender!(const ubyte[])();
-      4|    buffer.append!uint(cast(uint)v.length);
-     24|    foreach (d; data[0 .. v.dim])
+      2|    size_t len = v.length / 8 + (v.length % 8 ? 1 : 0);
+      1|    auto data = cast(size_t[])v;
+      1|    auto buffer = appender!(const ubyte[])();
+      1|    buffer.append!uint(cast(uint)v.length);
+      6|    foreach (d; data[0 .. v.dim])
        |    {
        |        // DMD Issue 19693
        |        version(DigitalMars)
-      4|            auto ntb = nativeToBigEndian(softBitswap(d));
+      1|            auto ntb = nativeToBigEndian(softBitswap(d));
        |        else
        |            auto ntb = nativeToBigEndian(bitswap(d));
-     27|        foreach (b; ntb[0 .. len])
+      6|        foreach (b; ntb[0 .. len])
        |        {
-      5|            buffer.append!ubyte(b);
+      1|            buffer.append!ubyte(b);
        |        }
        |
        |    }
-      4|    return Value(buffer.data.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+      1|    return Value(buffer.data.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/// Reverses the order of bits - needed because of dmd Issue 19693
@@ -106,18 +106,18 @@
        |    import core.bitop : bswap;
        |    // swap 1-bit pairs:
        |    enum mask1 = cast(N) 0x5555_5555_5555_5555L;
-    107|    x = ((x >> 1) & mask1) | ((x & mask1) << 1);
+    101|    x = ((x >> 1) & mask1) | ((x & mask1) << 1);
        |    // swap 2-bit pairs:
        |    enum mask2 = cast(N) 0x3333_3333_3333_3333L;
-    107|    x = ((x >> 2) & mask2) | ((x & mask2) << 2);
+    101|    x = ((x >> 2) & mask2) | ((x & mask2) << 2);
        |    // swap 4-bit pairs:
        |    enum mask4 = cast(N) 0x0F0F_0F0F_0F0F_0F0FL;
-    107|    x = ((x >> 4) & mask4) | ((x & mask4) << 4);
+    101|    x = ((x >> 4) & mask4) | ((x & mask4) << 4);
        |
        |    // reverse the order of all bytes:
-    107|    x = bswap(x);
+    101|    x = bswap(x);
        |
-    107|    return x;
+    101|    return x;
        |}
        |
        |@trusted unittest
@@ -156,27 +156,27 @@
        |    import std.string : representation;
        |
        |    static assert(isImplicitlyConvertible!(T, string));
-     56|    auto buf = (cast(string) v).representation;
+     16|    auto buf = (cast(string) v).representation;
        |
-     58|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+     16|    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     56|    return Value(buf, OidType.Text, false, valueFormat);
+     16|    return Value(buf, OidType.Text, false, valueFormat);
        |}
        |
        |/// Constructs Value from array of bytes
        |Value toValue(T)(T v)
        |if(is(T : immutable(ubyte)[]))
        |{
-      2|    return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
+      1|    return Value(v, detectOidTypeFromNative!(ubyte[]), false, ValueFormat.BINARY);
        |}
        |
        |/// Constructs Value from boolean
        |Value toValue(T : bool)(T v) @trusted
        |if (!is(T == Nullable!R, R))
        |{
-     18|    immutable ubyte[] buf = [ v ? 1 : 0 ];
+     12|    immutable ubyte[] buf = [ v ? 1 : 0 ];
        |
-      9|    return Value(buf, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+      6|    return Value(buf, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/// Constructs Value from Date
@@ -187,10 +187,10 @@
        |    import dpq2.value;
        |    import dpq2.conv.time: POSTGRES_EPOCH_JDATE;
        |
-      7|    long mj_day = v.modJulianDay;
+      6|    long mj_day = v.modJulianDay;
        |
        |    // max days isn't checked because Phobos Date days value always fits into Postgres Date
-      7|    if (mj_day < -POSTGRES_EPOCH_JDATE)
+      6|    if (mj_day < -POSTGRES_EPOCH_JDATE)
       1|        throw new ValueConvException(
        |                ConvExceptionType.DATE_VALUE_OVERFLOW,
        |                "Date value doesn't fit into Postgres binary Date",
@@ -198,38 +198,38 @@
        |            );
        |
        |    enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
-      6|    long days = mj_day - mj_pg_epoch;
+      5|    long days = mj_day - mj_pg_epoch;
        |
-      6|    return Value(nativeToBigEndian(days.to!int).dup, OidType.Date, false);
+      5|    return Value(nativeToBigEndian(days.to!int).dup, OidType.Date, false);
        |}
        |
        |/// Constructs Value from TimeOfDay
        |Value toValue(T)(T v)
        |if (is(Unqual!T == TimeOfDay))
        |{
-      2|    long us = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
+      1|    long us = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
        |
-      2|    return Value(nativeToBigEndian(us).dup, OidType.Time, false);
+      1|    return Value(nativeToBigEndian(us).dup, OidType.Time, false);
        |}
        |
        |/// Constructs Value from TimeStamp or from TimeStampUTC
        |Value toValue(T)(T v)
        |if (is(Unqual!T == TimeStamp) || is(Unqual!T == TimeStampUTC))
        |{
-     10|    long us; /// microseconds
+      4|    long us; /// microseconds
        |
-     10|    if(v.isLater) // infinity
-      1|        us = us.max;
-      9|    else if(v.isEarlier) // -infinity
-      1|        us = us.min;
+      4|    if(v.isLater) // infinity
+0000000|        us = us.max;
+      4|    else if(v.isEarlier) // -infinity
+0000000|        us = us.min;
        |    else
        |    {
        |        enum mj_pg_epoch = POSTGRES_EPOCH_DATE.modJulianDay;
-      8|        long j = modJulianDayForIntYear(v.date.year, v.date.month, v.date.day) - mj_pg_epoch;
-      8|        us = (((j * 24 + v.time.hour) * 60 + v.time.minute) * 60 + v.time.second) * 1_000_000 + v.fracSec.total!"usecs";
+      4|        long j = modJulianDayForIntYear(v.date.year, v.date.month, v.date.day) - mj_pg_epoch;
+      4|        us = (((j * 24 + v.time.hour) * 60 + v.time.minute) * 60 + v.time.second) * 1_000_000 + v.fracSec.total!"usecs";
        |    }
        |
-     10|    return Value(
+      4|    return Value(
        |            nativeToBigEndian(us).dup,
        |            is(Unqual!T == TimeStamp) ? OidType.TimeStamp : OidType.TimeStampWithZone,
        |            false
@@ -240,13 +240,13 @@
        |{
        |    // Wikipedia magic:
        |
-     11|    const a = (14 - month) / 12;
-     11|    const y = year + 4800 - a;
-     11|    const m = month + a * 12 - 3;
+      7|    const a = (14 - month) / 12;
+      7|    const y = year + 4800 - a;
+      7|    const m = month + a * 12 - 3;
        |
-     11|    const jd = day + (m*153+2)/5 + y*365 + y/4 - y/100 + y/400 - 32045;
+      7|    const jd = day + (m*153+2)/5 + y*365 + y/4 - y/100 + y/400 - 32045;
        |
-     11|    return jd - 2_400_001;
+      7|    return jd - 2_400_001;
        |}
        |unittest
        |{
@@ -274,26 +274,26 @@
        |Value toValue(T)(T v)
        |if (is(Unqual!T == SysTime))
        |{
-      2|    long us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
+      1|    long us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
        |
-      2|    return Value(nativeToBigEndian(us).dup, OidType.TimeStampWithZone, false);
+      1|    return Value(nativeToBigEndian(us).dup, OidType.TimeStampWithZone, false);
        |}
        |
        |/// Constructs Value from UUID
        |Value toValue(T)(T v)
        |if (is(Unqual!T == UUID))
        |{
-      3|    return Value(v.data.dup, OidType.UUID);
+0000000|    return Value(v.data.dup, OidType.UUID);
        |}
        |
        |/// Constructs Value from Json
        |Value toValue(T)(T v)
        |if (is(Unqual!T == Json))
        |{
-      6|    auto r = toValue(v.toString);
-      6|    r.oidType = OidType.Json;
+      2|    auto r = toValue(v.toString);
+      2|    r.oidType = OidType.Json;
        |
-      6|    return r;
+      2|    return r;
        |}
        |
        |version(unittest)
@@ -519,4 +519,4 @@
       1|    assert(!nv.as!(Nullable!Json).isNull);
       1|    assert(nv.as!(Nullable!Json).get == j);
        |}
-src/dpq2/conv/from_d_types.d is 100% covered
+src/dpq2/conv/from_d_types.d is 96% covered

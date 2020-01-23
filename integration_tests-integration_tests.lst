@@ -11,15 +11,15 @@
        |
        |int main(string[] args)
        |{
-      1|    string conninfo;
-      1|    getopt( args, "conninfo", &conninfo );
+0000000|    string conninfo;
+0000000|    getopt( args, "conninfo", &conninfo );
        |
-      1|    conn._integration_test( conninfo );
-      1|    query._integration_test( conninfo );
-      1|    result._integration_test( conninfo );
-      1|    native._integration_test( conninfo );
-      1|    bson._integration_test( conninfo );
+0000000|    conn._integration_test( conninfo );
+0000000|    query._integration_test( conninfo );
+0000000|    result._integration_test( conninfo );
+0000000|    native._integration_test( conninfo );
+0000000|    bson._integration_test( conninfo );
        |
-      1|    return 0;
+0000000|    return 0;
        |}
-integration_tests/integration_tests.d is 100% covered
+integration_tests/integration_tests.d is 0% covered

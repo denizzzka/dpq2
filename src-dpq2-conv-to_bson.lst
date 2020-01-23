@@ -16,16 +16,16 @@
        |Bson as(T)(in Value v)
        |if(is(T == Bson))
        |{
-     41|    if(v.isNull)
+      9|    if(v.isNull)
        |    {
-      2|        return Bson(null);
+0000000|        return Bson(null);
        |    }
        |    else
        |    {
-     44|        if(v.isSupportedArray && ValueFormat.BINARY)
-      5|            return arrayValueToBson(v);
+     11|        if(v.isSupportedArray && ValueFormat.BINARY)
+      2|            return arrayValueToBson(v);
        |        else
-     34|            return rawValueToBson(v);
+      7|            return rawValueToBson(v);
        |    }
        |}
        |
@@ -33,133 +33,133 @@
        |
        |Bson arrayValueToBson(in Value cell)
        |{
-      5|    const ap = ArrayProperties(cell);
+      2|    const ap = ArrayProperties(cell);
        |
        |    // empty array
-      6|    if(ap.dimsSize.length == 0) return Bson.emptyArray;
+      2|    if(ap.dimsSize.length == 0) return Bson.emptyArray;
        |
-      4|    size_t curr_offset = ap.dataOffset;
+      2|    size_t curr_offset = ap.dataOffset;
        |
        |    Bson recursive(size_t dimNum)
        |    {
-     16|        const dimSize = ap.dimsSize[dimNum];
-     16|        Bson[] res = new Bson[dimSize];
+      4|        const dimSize = ap.dimsSize[dimNum];
+      4|        Bson[] res = new Bson[dimSize];
        |
-    153|        foreach(elemNum; 0..dimSize)
+     51|        foreach(elemNum; 0..dimSize)
        |        {
-     35|            if(dimNum < ap.dimsSize.length - 1)
+     13|            if(dimNum < ap.dimsSize.length - 1)
        |            {
-     12|                res[elemNum] = recursive(dimNum + 1);
+      2|                res[elemNum] = recursive(dimNum + 1);
        |            }
        |            else
        |            {
-     23|                ubyte[int.sizeof] size_net; // network byte order
-     23|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
-     23|                uint size = bigEndianToNative!uint( size_net );
+     11|                ubyte[int.sizeof] size_net; // network byte order
+     11|                size_net[] = cell.data[ curr_offset .. curr_offset + size_net.sizeof ];
+     11|                uint size = bigEndianToNative!uint( size_net );
        |
-     23|                curr_offset += size_net.sizeof;
+     11|                curr_offset += size_net.sizeof;
        |
-     23|                Bson b;
-     23|                if(size == size.max) // NULL magic number
+     11|                Bson b;
+     11|                if(size == size.max) // NULL magic number
        |                {
-      7|                    b = Bson(null);
-      7|                    size = 0;
+      4|                    b = Bson(null);
+      4|                    size = 0;
        |                }
        |                else
        |                {
-     16|                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
-     16|                    b = v.as!Bson;
+      7|                    auto v = Value(cast(ubyte[]) cell.data[curr_offset .. curr_offset + size], ap.OID, false);
+      7|                    b = v.as!Bson;
        |                }
        |
-     23|                curr_offset += size;
-     23|                res[elemNum] = b;
+     11|                curr_offset += size;
+     11|                res[elemNum] = b;
        |            }
        |        }
        |
-     16|        return Bson(res);
+      4|        return Bson(res);
        |    }
        |
-      4|    return recursive(0);
+      2|    return recursive(0);
        |}
        |
        |Bson rawValueToBson(in Value v)
        |{
-     34|    if(v.format == ValueFormat.TEXT)
+      7|    if(v.format == ValueFormat.TEXT)
        |    {
-      4|        const text = v.valueAsString;
+0000000|        const text = v.valueAsString;
        |
-      4|        if(v.oidType == OidType.Json)
+0000000|        if(v.oidType == OidType.Json)
        |        {
-      2|            return Bson(text.parseJsonString);
+0000000|            return Bson(text.parseJsonString);
        |        }
        |
-      2|        return Bson(text);
+0000000|        return Bson(text);
        |    }
        |
-     30|    Bson res;
+      7|    Bson res;
        |
        |    with(OidType)
        |    with(Bson.Type)
-     30|    switch(v.oidType)
+      7|    switch(v.oidType)
        |    {
-      2|        case OidType.Bool:
-      2|            bool n = v.tunnelForBinaryValueAsCalls!PGboolean;
-      2|            res = Bson(n);
-      2|            break;
+0000000|        case OidType.Bool:
+0000000|            bool n = v.tunnelForBinaryValueAsCalls!PGboolean;
+0000000|            res = Bson(n);
+0000000|            break;
        |
-      1|        case Int2:
-      1|            auto n = v.tunnelForBinaryValueAsCalls!PGsmallint.to!int;
-      1|            res = Bson(n);
-      1|            break;
+0000000|        case Int2:
+0000000|            auto n = v.tunnelForBinaryValueAsCalls!PGsmallint.to!int;
+0000000|            res = Bson(n);
+0000000|            break;
        |
-     12|        case Int4:
-     12|            int n = v.tunnelForBinaryValueAsCalls!PGinteger;
-     12|            res = Bson(n);
-     12|            break;
-       |
-      1|        case Int8:
-      1|            long n = v.tunnelForBinaryValueAsCalls!PGbigint;
-      1|            res = Bson(n);
-      1|            break;
-       |
-      1|        case Float8:
-      1|            double n = v.tunnelForBinaryValueAsCalls!PGdouble_precision;
-      1|            res = Bson(n);
-      1|            break;
-       |
-      1|        case Numeric:
-      1|            res = Bson(rawValueToNumeric(v.data));
-      1|            break;
-       |
-      6|        case Text:
-      7|        case FixedString:
-      7|        case VariableString:
-      7|            res = Bson(v.valueAsString);
+      7|        case Int4:
+      7|            int n = v.tunnelForBinaryValueAsCalls!PGinteger;
+      7|            res = Bson(n);
       7|            break;
        |
-      1|        case ByteArray:
-      1|            auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
-      1|            res = Bson(b);
-      1|            break;
+0000000|        case Int8:
+0000000|            long n = v.tunnelForBinaryValueAsCalls!PGbigint;
+0000000|            res = Bson(n);
+0000000|            break;
        |
-      1|        case UUID:
+0000000|        case Float8:
+0000000|            double n = v.tunnelForBinaryValueAsCalls!PGdouble_precision;
+0000000|            res = Bson(n);
+0000000|            break;
+       |
+0000000|        case Numeric:
+0000000|            res = Bson(rawValueToNumeric(v.data));
+0000000|            break;
+       |
+0000000|        case Text:
+0000000|        case FixedString:
+0000000|        case VariableString:
+0000000|            res = Bson(v.valueAsString);
+0000000|            break;
+       |
+0000000|        case ByteArray:
+0000000|            auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
+0000000|            res = Bson(b);
+0000000|            break;
+       |
+0000000|        case UUID:
        |            // See: https://github.com/vibe-d/vibe.d/issues/2161
        |            // res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
-      1|            res = serializeToBson(v.tunnelForBinaryValueAsCalls!PGuuid);
-      1|            break;
+0000000|            res = serializeToBson(v.tunnelForBinaryValueAsCalls!PGuuid);
+0000000|            break;
        |
-      1|        case TimeStampWithZone:
-      1|            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStampUTC);
-      1|            auto time = BsonDate(SysTime(ts.dateTime, UTC()));
-      1|            long usecs = ts.fracSec.total!"usecs";
-      1|            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
-      1|            break;
+0000000|        case TimeStampWithZone:
+0000000|            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStampUTC);
+0000000|            auto time = BsonDate(SysTime(ts.dateTime, UTC()));
+0000000|            long usecs = ts.fracSec.total!"usecs";
+0000000|            res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
+0000000|            break;
        |
-      1|        case Json:
-      2|        case Jsonb:
-      2|            vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
-      2|            res = Bson(json);
-      2|            break;
+0000000|        case Json:
+0000000|        case Jsonb:
+0000000|            vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
+0000000|            res = Bson(json);
+0000000|            break;
        |
 0000000|        default:
 0000000|            throw new ValueConvException(
@@ -169,7 +169,7 @@
        |                );
        |    }
        |
-     30|    return res;
+      7|    return res;
        |}
        |
        |version (integration_tests)
@@ -180,67 +180,67 @@
        |    import std.uuid;
        |    import std.datetime: SysTime, DateTime, UTC;
        |
-      1|    auto conn = new Connection(connParam);
+0000000|    auto conn = new Connection(connParam);
        |
        |    // text answer tests
        |    {
-      1|        auto a = conn.exec(
+0000000|        auto a = conn.exec(
        |                "SELECT 123::int8 as int_num_value,"~
        |                    "'text string'::text as text_value,"~
        |                    "'123.456'::json as json_numeric_value,"~
        |                    "'\"json_value_string\"'::json as json_text_value"
        |            );
        |
-      1|        auto r = a[0]; // first row
+0000000|        auto r = a[0]; // first row
        |
-      1|        assert(r["int_num_value"].as!Bson == Bson("123"));
-      1|        assert(r["text_value"].as!Bson == Bson("text string"));
-      1|        assert(r["json_numeric_value"].as!Bson == Bson(123.456));
-      1|        assert(r["json_text_value"].as!Bson == Bson("json_value_string"));
+0000000|        assert(r["int_num_value"].as!Bson == Bson("123"));
+0000000|        assert(r["text_value"].as!Bson == Bson("text string"));
+0000000|        assert(r["json_numeric_value"].as!Bson == Bson(123.456));
+0000000|        assert(r["json_text_value"].as!Bson == Bson("json_value_string"));
        |    }
        |
        |    // binary answer tests
-      1|    QueryParams params;
-      1|    params.resultFormat = ValueFormat.BINARY;
+0000000|    QueryParams params;
+0000000|    params.resultFormat = ValueFormat.BINARY;
        |
        |    {
        |        void testIt(Bson bsonValue, string pgType, string pgValue)
        |        {
-     18|            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
-     18|            auto answer = conn.execParams(params);
+0000000|            params.sqlCommand = "SELECT "~pgValue~"::"~pgType~" as bson_test_value";
+0000000|            auto answer = conn.execParams(params);
        |
-     18|            immutable Value v = answer[0][0];
-     18|            Bson bsonRes = v.as!Bson;
+0000000|            immutable Value v = answer[0][0];
+0000000|            Bson bsonRes = v.as!Bson;
        |
-     34|            if(v.isNull || !v.isSupportedArray) // standalone
+0000000|            if(v.isNull || !v.isSupportedArray) // standalone
        |            {
-     17|                if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
+0000000|                if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
        |
-     16|                assert(bsonRes == bsonValue, "Received unexpected value\nreceived bsonType="~to!string(bsonValue.type)~"\nexpected nativeType="~pgType~
+0000000|                assert(bsonRes == bsonValue, "Received unexpected value\nreceived bsonType="~to!string(bsonValue.type)~"\nexpected nativeType="~pgType~
        |                    "\nsent pgValue="~pgValue~"\nexpected bsonValue="~to!string(bsonValue)~"\nresult="~to!string(bsonRes));
        |            }
        |            else // arrays
        |            {
-      4|                assert(bsonRes.type == Bson.Type.array && bsonRes.toString == bsonValue.toString,
+0000000|                assert(bsonRes.type == Bson.Type.array && bsonRes.toString == bsonValue.toString,
        |                    "pgType="~pgType~" pgValue="~pgValue~" bsonValue="~to!string(bsonValue));
        |            }
        |        }
        |
        |        alias C = testIt; // "C" means "case"
        |
-      1|        C(Bson(null), "text", "null");
-      1|        C(Bson(null), "integer", "null");
-      1|        C(Bson(true), "boolean", "true");
-      1|        C(Bson(false), "boolean", "false");
-      1|        C(Bson(-32_761), "smallint", "-32761");
-      1|        C(Bson(-2_147_483_646), "integer", "-2147483646");
-      1|        C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
-      1|        C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
-      1|        C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
-      1|        C(Bson("12345 "), "char(6)", "'12345'");
-      1|        C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
+0000000|        C(Bson(null), "text", "null");
+0000000|        C(Bson(null), "integer", "null");
+0000000|        C(Bson(true), "boolean", "true");
+0000000|        C(Bson(false), "boolean", "false");
+0000000|        C(Bson(-32_761), "smallint", "-32761");
+0000000|        C(Bson(-2_147_483_646), "integer", "-2147483646");
+0000000|        C(Bson(-9_223_372_036_854_775_806), "bigint", "-9223372036854775806");
+0000000|        C(Bson(-1234.56789012345), "double precision", "-1234.56789012345");
+0000000|        C(Bson("first line\nsecond line"), "text", "'first line\nsecond line'");
+0000000|        C(Bson("12345 "), "char(6)", "'12345'");
+0000000|        C(Bson("-487778762.918209326"), "numeric", "-487778762.918209326");
        |
-      1|        C(Bson(BsonBinData(
+0000000|        C(Bson(BsonBinData(
        |                    BsonBinData.Type.userDefined,
        |                    [0x44, 0x20, 0x72, 0x75, 0x6c, 0x65, 0x73, 0x00, 0x21]
        |                )),
@@ -249,21 +249,21 @@
        |        //See: https://github.com/vibe-d/vibe.d/issues/2161
        |        // C(Bson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
        |        //         "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
-      1|        C(serializeToBson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
+0000000|        C(serializeToBson(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")),
        |                "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
        |
-      1|        C(Bson([
+0000000|        C(Bson([
        |                Bson([Bson([Bson("1")]),Bson([Bson("22")]),Bson([Bson("333")])]),
        |                Bson([Bson([Bson("4")]),Bson([Bson(null)]),Bson([Bson("6")])])
        |            ]), "text[]", "'{{{1},{22},{333}},{{4},{null},{6}}}'");
        |
-      1|        C(Bson.emptyArray, "text[]", "'{}'");
+0000000|        C(Bson.emptyArray, "text[]", "'{}'");
        |
-      1|        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp with time zone", "'1997-12-17 07:37:16.000012 UTC'");
+0000000|        C(Bson(["time": Bson(BsonDate(SysTime(DateTime(1997, 12, 17, 7, 37, 16), UTC()))), "usecs": Bson(cast(long) 12)]), "timestamp with time zone", "'1997-12-17 07:37:16.000012 UTC'");
        |
-      1|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+0000000|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "json", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
        |
-      1|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "jsonb", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
+0000000|        C(Bson(Json(["float_value": Json(123.456), "text_str": Json("text string")])), "jsonb", "'{\"float_value\": 123.456,\"text_str\": \"text string\"}'");
        |    }
        |}
-src/dpq2/conv/to_bson.d is 98% covered
+src/dpq2/conv/to_bson.d is 28% covered
