@@ -53,7 +53,7 @@ private alias ET = ConvExceptionType;
     Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
 */
 T as(T)(in Value v) pure @trusted
-if(is(T : string))
+if(is(T : const(char)[]))
 {
     if(v.format == VF.BINARY)
     {
@@ -108,7 +108,7 @@ if(is(T : string))
     Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
 */
 T as(T)(in Value v)
-if(!is(T : string) && !is(T == Bson))
+if(!is(T : const(char)[]) && !is(T == Bson))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,
@@ -142,9 +142,9 @@ auto tunnelForBinaryValueAsCalls(T)(in Value v)
     return binaryValueAs!T(v);
 }
 
-string valueAsString(in Value v) pure
+char[] valueAsString(in Value v) pure
 {
-    return (cast(const(char[])) v.data).to!string;
+    return (cast(const(char[])) v.data).to!(char[]);
 }
 
 /// Returns value as bytes from binary formatted field
