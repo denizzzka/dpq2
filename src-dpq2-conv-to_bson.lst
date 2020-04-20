@@ -86,7 +86,7 @@
        |{
       7|    if(v.format == ValueFormat.TEXT)
        |    {
-0000000|        const text = v.valueAsString;
+0000000|        immutable text = v.valueAsString;
        |
 0000000|        if(v.oidType == OidType.Json)
        |        {

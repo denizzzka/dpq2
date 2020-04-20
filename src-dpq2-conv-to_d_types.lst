@@ -53,11 +53,11 @@
        |    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
        |*/
        |T as(T)(in Value v) pure @trusted
-       |if(is(T : string))
+       |if(is(T : const(char)[]))
        |{
-     15|    if(v.format == VF.BINARY)
+     16|    if(v.format == VF.BINARY)
        |    {
-     15|        if(!(
+     16|        if(!(
        |            v.oidType == OidType.Text ||
 0000000|            v.oidType == OidType.FixedString ||
 0000000|            v.oidType == OidType.VariableString ||
@@ -79,17 +79,17 @@
        |    else
        |        alias Ret = T;
        |
-     13|    Ret r;
+     14|    Ret r;
        |
-     26|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
+     28|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
 0000000|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     13|        r = v.valueAsString;
+     14|        r = v.valueAsString;
        |
        |    static if(is(T == Nullable!R2, R2))
 0000000|        return T(r);
        |    else
-     11|        return r;
+     12|        return r;
        |}
        |
        |@system unittest
@@ -108,7 +108,7 @@
        |    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
        |*/
        |T as(T)(in Value v)
-       |if(!is(T : string) && !is(T == Bson))
+       |if(!is(T : const(char)[]) && !is(T == Bson))
        |{
      38|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
@@ -142,9 +142,9 @@
       7|    return binaryValueAs!T(v);
        |}
        |
-       |string valueAsString(in Value v) pure
+       |char[] valueAsString(in Value v) pure
        |{
-     16|    return (cast(const(char[])) v.data).to!string;
+     17|    return (cast(const(char[])) v.data).to!(char[]);
        |}
        |
        |/// Returns value as bytes from binary formatted field

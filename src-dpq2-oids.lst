@@ -170,7 +170,7 @@
        |    import std.bitmanip : BitArray;
        |    import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
        |    import std.datetime.systime : SysTime;
-       |    import std.traits : Unqual;
+       |    import std.traits : Unqual, isSomeString;
        |    import std.uuid : StdUUID = UUID;
        |    static import dpq2.conv.time;
        |    import vibe.data.json : VibeJson = Json;
@@ -179,7 +179,7 @@
        |
        |    with(OidType)
        |    {
-      2|        static if(is(UT == string)){ return Text; } else
+      2|        static if(isSomeString!UT){ return Text; } else
       1|        static if(is(UT == ubyte[])){ return ByteArray; } else
       7|        static if(is(UT == bool)){ return Bool; } else
       1|        static if(is(UT == short)){ return Int2; } else
