@@ -86,7 +86,7 @@ Bson rawValueToBson(in Value v)
 {
     if(v.format == ValueFormat.TEXT)
     {
-        const text = v.valueAsString;
+        immutable text = v.valueAsString;
 
         if(v.oidType == OidType.Json)
         {

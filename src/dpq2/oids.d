@@ -170,7 +170,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     import std.bitmanip : BitArray;
     import std.datetime.date : StdDate = Date, TimeOfDay, DateTime;
     import std.datetime.systime : SysTime;
-    import std.traits : Unqual;
+    import std.traits : Unqual, isSomeString;
     import std.uuid : StdUUID = UUID;
     static import dpq2.conv.time;
     import vibe.data.json : VibeJson = Json;
@@ -179,7 +179,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
 
     with(OidType)
     {
-        static if(is(UT == string)){ return Text; } else
+        static if(isSomeString!UT){ return Text; } else
         static if(is(UT == ubyte[])){ return ByteArray; } else
         static if(is(UT == bool)){ return Bool; } else
         static if(is(UT == short)){ return Int2; } else

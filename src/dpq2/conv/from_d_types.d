@@ -3,7 +3,7 @@ module dpq2.conv.from_d_types;
 
 @safe:
 
-public import dpq2.conv.arrays : isArrayType, toValue;
+public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
@@ -13,7 +13,7 @@ import std.bitmanip: nativeToBigEndian, BitArray, append;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
-import std.traits: isImplicitlyConvertible, isNumeric, isInstanceOf, OriginalType, Unqual;
+import std.traits: isImplicitlyConvertible, isNumeric, isInstanceOf, OriginalType, Unqual, isSomeString;
 import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
@@ -151,16 +151,25 @@ package N softBitswap(N)(N x) pure
     If NULL is a desired DB value, Nullable!string can be used instead.
 */
 Value toValue(T)(T v, ValueFormat valueFormat = ValueFormat.BINARY) @trusted
-if(is(T : string))
+if(isSomeString!T || isStaticArrayString!T)
 {
-    import std.string : representation;
+    static if(is(T == string))
+    {
+        import std.string : representation;
 
-    static assert(isImplicitlyConvertible!(T, string));
-    auto buf = (cast(string) v).representation;
+        static assert(isImplicitlyConvertible!(T, string));
+        auto buf = (cast(string) v).representation;
 
-    if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+        if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
 
-    return Value(buf, OidType.Text, false, valueFormat);
+        return Value(buf, OidType.Text, false, valueFormat);
+    }
+    else
+    {
+        // convert to a string
+        import std.conv : to;
+        return toValue(v.to!string, valueFormat);
+    }
 }
 
 /// Constructs Value from array of bytes
@@ -518,4 +527,16 @@ unittest
     assert(nv.oidType == OidType.Json);
     assert(!nv.as!(Nullable!Json).isNull);
     assert(nv.as!(Nullable!Json).get == j);
+}
+
+unittest
+{
+    import dpq2.conv.to_d_types : as;
+    char[2] arr;
+    auto v = arr.toValue();
+    assert(v.oidType == OidType.Text);
+    assert(!v.isNull);
+
+    auto varr = v.as!string;
+    assert(varr.length == 2);
 }

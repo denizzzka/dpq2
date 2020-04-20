@@ -6,12 +6,25 @@ module dpq2.conv.arrays;
 import dpq2.oids : OidType;
 import dpq2.value;
 
-import std.traits : isArray, isAssociativeArray;
+import std.traits : isArray, isAssociativeArray, isSomeString;
 import std.range : ElementType;
 import std.typecons : Nullable;
 import std.exception: assertThrown;
 
 @safe:
+
+template isStaticArrayString(T)
+{
+    import std.traits : isStaticArray;
+    static if(isStaticArray!T)
+        enum isStaticArrayString = isSomeString!(typeof(T.init[]));
+    else
+        enum isStaticArrayString = false;
+}
+
+static assert(isStaticArrayString!(char[2]));
+static assert(!isStaticArrayString!string);
+static assert(!isStaticArrayString!(ubyte[2]));
 
 // From array to Value:
 
@@ -20,13 +33,15 @@ template isArrayType(T)
     import dpq2.conv.geometric : isValidPolygon;
     import std.traits : Unqual;
 
-    enum isArrayType = isArray!T && !isAssociativeArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !is(T : string);
+    enum isArrayType = isArray!T && !isAssociativeArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !isSomeString!T
+        && !isStaticArrayString!T;
 }
 
 static assert(isArrayType!(int[]));
 static assert(!isArrayType!(int[string]));
 static assert(!isArrayType!(ubyte[]));
 static assert(!isArrayType!(string));
+static assert(!isArrayType!(char[2]));
 
 /// Write array element into buffer
 private void writeArrayElement(R, T)(ref R output, T item, ref int counter)
