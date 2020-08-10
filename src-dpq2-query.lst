@@ -481,15 +481,18 @@
        |
        |    {
 0000000|        bool exceptionFlag = false;
+0000000|        string errorMsg;
        |
 0000000|        try conn.exec("SELECT 'abc'::text").getAnswer;
        |        catch(ConnectionException e)
        |        {
 0000000|            exceptionFlag = true;
+0000000|            errorMsg = e.msg;
 0000000|            assert(e.msg.length > 15); // error message check
        |        }
-       |        finally
-0000000|            assert(exceptionFlag);
+       |        finally {
+0000000|            assert(exceptionFlag, errorMsg);
+       |        }
        |    }
        |}
 src/dpq2/query.d is 0% covered
