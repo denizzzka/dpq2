@@ -481,14 +481,17 @@ void _integration_test( string connParam ) @trusted
 
     {
         bool exceptionFlag = false;
+		string errorMsg;
 
         try conn.exec("SELECT 'abc'::text").getAnswer;
         catch(ConnectionException e)
         {
             exceptionFlag = true;
+			errorMsg = e.msg;
             assert(e.msg.length > 15); // error message check
         }
-        finally
-            assert(exceptionFlag);
+        finally {
+            assert(exceptionFlag, errorMsg);
+		}
     }
 }
