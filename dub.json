@@ -9,7 +9,7 @@
 	"targetPath": "bin",
 	"dependencies": {
 		"derelict-pq": "~>4.0.0-alpha.2",
-		"vibe-d:data": "~>0.8.3-beta.1",
+		"vibe-d:data": ">=0.8.3-beta.1",
 		"money": "~>2.3.0"
 	},
 	"targetType": "sourceLibrary",
