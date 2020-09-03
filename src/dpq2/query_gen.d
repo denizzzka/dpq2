@@ -48,10 +48,11 @@ auto d(T)(T value)
 private struct CTStatement(SQL_CMD...)
 {
     QueryParams qp;
+    alias qp this;
 
-    this(SQL_CMD sqlCmd, Connection conn)
+    this(Connection conn, SQL_CMD sqlCmd)
     {
-        qp = parseSqlCmd!SQL_CMD(sqlCmd, conn);
+        qp = parseSqlCmd!SQL_CMD(conn, sqlCmd);
     }
 }
 
@@ -89,8 +90,10 @@ private void concatWithDelimiter(A, T)(ref A appender, T val)
 {
 
     if(
-        val.length && val[0].symbolNeedsDelimit &&
-        appender.data.length && appender.data[$-1].symbolNeedsDelimit
+        val.length &&
+        appender.data.length &&
+        val[0].symbolNeedsDelimit &&
+        appender.data[$-1].symbolNeedsDelimit
     )
         appender ~= ' ';
 
@@ -105,7 +108,7 @@ private string escapeName(string s, Connection conn)
         return '"'~s~'"';
 }
 
-private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd, Connection conn)
+private QueryParams parseSqlCmd(SQL_CMD...)(Connection conn, SQL_CMD sqlCmd)
 {
     QueryParams qp;
     auto resultSql = appender!string;
@@ -116,14 +119,14 @@ private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd, Connection conn)
         static if(isStatementArg!(typeof(V)))
         {
             // previous argument already was processed?
-            static if(isStatementArg!(typeof(sqlCmd[i-1])))
+            static if(i > 0 && isStatementArg!(typeof(sqlCmd[i-1])))
             {
                 resultSql ~= `,`;
             }
 
             static if(isInstanceOf!(DollarArg, typeof(V)))
             {
-                resultSql ~= `$`;
+                resultSql.concatWithDelimiter(`$`);
                 resultSql ~= (qp.args.length + 1).to!string;
             }
             else static if(V.argLikeIn == ArgLikeIn.UPDATE)
@@ -163,8 +166,17 @@ private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd, Connection conn)
 
 struct Dollars {}
 
-auto wrapStatement(T...)(T statement, Connection conn = null) {
-    return CTStatement!T(statement, conn);
+///
+auto wrapStatement(T...)(Connection conn, T statement)
+{
+    return CTStatement!T(conn, statement);
+}
+
+///
+auto wrapStatement(T...)(T statement)
+if(!is(T[0] == Connection))
+{
+    return CTStatement!T(null, statement);
 }
 
 unittest
@@ -223,4 +235,15 @@ unittest
     assert(stmnt.qp.args[0] == 123.toValue);
     assert(stmnt.qp.args[1] == `abc`.toValue);
     assert(stmnt.qp.args[2] == 456.toValue);
+}
+
+version(integration_tests)
+void _integration_test(string connParam)
+{
+    auto conn = new Connection(connParam);
+    auto stmnt = wrapStatement(conn, i!"Some Integer"(123));
+
+    assert(stmnt.qp.sqlCommand == `"Some Integer"`);
+    assert(stmnt.qp.args.length == 1);
+    assert(stmnt.qp.args[0] == 123.toValue);
 }
