@@ -30,14 +30,13 @@ private struct DollarArg(T)
 /// INSERT-like argument
 auto i(string statementArgName, T)(T value)
 {
-    //FIXME: wrong way quotes adding
-    return Arg!(ArgLikeIn.INSERT, '"'~statementArgName~'"', T)(value);
+    return Arg!(ArgLikeIn.INSERT, statementArgName, T)(value);
 }
 
 /// UPDATE-like argument
 auto u(string statementArgName, T)(T value)
 {
-    return Arg!(ArgLikeIn.UPDATE, '"'~statementArgName~'"', T)(value);
+    return Arg!(ArgLikeIn.UPDATE, statementArgName, T)(value);
 }
 
 /// Argument representing dollar, usable in SELECT statements
@@ -58,11 +57,12 @@ private struct CTStatement(SQL_CMD...)
 
 private string dollarsString(size_t num)
 {
-    string ret; //TODO: replace by compile-time enum string
+    string ret;
 
     foreach(i; 1 .. num+1)
     {
-          ret ~= `$`~i.to!string; //TODO: appender or CT
+          ret ~= `$`;
+          ret ~= i.to!string;
 
           if(i < num)
                 ret ~= `,`;
@@ -100,9 +100,9 @@ private void concatWithDelimiter(A, T)(ref A appender, T val)
 private string escapeName(string s, Connection conn)
 {
     if(conn !is null)
-        s = conn.escapeIdentifier(s);
-
-    return s;
+        return conn.escapeIdentifier(s);
+    else
+        return '"'~s~'"';
 }
 
 private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd, Connection conn)
