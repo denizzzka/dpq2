@@ -2,6 +2,7 @@
 module dpq2.query_gen;
 
 import dpq2.args: QueryParams;
+import dpq2.connection: Connection;
 import std.conv: to;
 import std.traits: isInstanceOf;
 import std.array: appender;
@@ -49,9 +50,9 @@ private struct CTStatement(SQL_CMD...)
 {
     QueryParams qp;
 
-    this(SQL_CMD sqlCmd)
+    this(SQL_CMD sqlCmd, Connection conn)
     {
-        qp = parseSqlCmd!SQL_CMD(sqlCmd);
+        qp = parseSqlCmd!SQL_CMD(sqlCmd, conn);
     }
 }
 
@@ -96,7 +97,15 @@ private void concatWithDelimiter(A, T)(ref A appender, T val)
     appender ~= val;
 }
 
-private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd)
+private string escapeName(string s, Connection conn)
+{
+    if(conn !is null)
+        s = conn.escapeIdentifier(s);
+
+    return s;
+}
+
+private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd, Connection conn)
 {
     QueryParams qp;
     auto resultSql = appender!string;
@@ -114,15 +123,18 @@ private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd)
 
             static if(isInstanceOf!(DollarArg, typeof(V)))
             {
-                resultSql ~= `$`~(qp.args.length + 1).to!string; //TODO: appender
+                resultSql ~= `$`;
+                resultSql ~= (qp.args.length + 1).to!string;
             }
             else static if(V.argLikeIn == ArgLikeIn.UPDATE)
             {
-                resultSql ~= V.name~`=$`~(qp.args.length + 1).to!string; //FIXME: forgot quotes?
+                resultSql ~= V.name.escapeName(conn);
+                resultSql ~= `=$`;
+                resultSql ~= (qp.args.length + 1).to!string;
             }
             else static if(V.argLikeIn == ArgLikeIn.INSERT)
             {
-                resultSql ~= V.name;
+                resultSql ~= V.name.escapeName(conn);
             }
             else
                 static assert(false);
@@ -151,8 +163,8 @@ private QueryParams parseSqlCmd(SQL_CMD...)(SQL_CMD sqlCmd)
 
 struct Dollars {}
 
-auto wrapStatement(T...)(T statement) {
-    return CTStatement!T(statement);
+auto wrapStatement(T...)(T statement, Connection conn = null) {
+    return CTStatement!T(statement, conn);
 }
 
 unittest
