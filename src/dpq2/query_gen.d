@@ -14,11 +14,11 @@ private enum ArgLikeIn
     UPDATE, // looks like "FieldName" = $3 and passes value into appropriate dollar variable
 }
 
-private struct Arg(ArgLikeIn _argLikeIn, string _name, T)
+private struct Arg(ArgLikeIn _argLikeIn, T)
 {
     enum argLikeIn = _argLikeIn;
-    enum name = _name;
 
+    string name;
     T value;
 }
 
@@ -28,15 +28,15 @@ private struct DollarArg(T)
 }
 
 /// INSERT-like argument
-auto i(string statementArgName, T)(T value)
+auto i(T)(string statementArgName, T value)
 {
-    return Arg!(ArgLikeIn.INSERT, statementArgName, T)(value);
+    return Arg!(ArgLikeIn.INSERT, T)(statementArgName, value);
 }
 
 /// UPDATE-like argument
-auto u(string statementArgName, T)(T value)
+auto u(T)(string statementArgName, T value)
 {
-    return Arg!(ArgLikeIn.UPDATE, statementArgName, T)(value);
+    return Arg!(ArgLikeIn.UPDATE, T)(statementArgName, value);
 }
 
 /// Argument representing dollar, usable in SELECT statements
@@ -204,9 +204,9 @@ unittest
     auto stmnt = wrapStatement(
         `UPDATE table1`,
         `SET`,
-            u!`boolean_field`(true),
-            u!`integer_field`(123),
-            u!`text_field`(`abc`),
+            u(`boolean_field`, true),
+            u(`integer_field`, 123),
+            u(`text_field`, `abc`),
     );
 
     assert(stmnt.qp.sqlCommand.length > 10);
@@ -224,10 +224,10 @@ unittest
 
     auto stmnt = wrapStatement(
         `INSERT INTO table1 (`,
-            i!`integer_field`(integer),
-            i!`text_field`(text),
+            i(`integer_field`, integer),
+            i(`text_field`, text),
         `) WHERE`,
-            u!`integer_field`(another_integer),
+            u(`integer_field`, another_integer),
         `VALUES(`, Dollars(),`)`
     );
 
@@ -241,7 +241,7 @@ version(integration_tests)
 void _integration_test(string connParam)
 {
     auto conn = new Connection(connParam);
-    auto stmnt = wrapStatement(conn, i!"Some Integer"(123));
+    auto stmnt = wrapStatement(conn, i("Some Integer", 123));
 
     assert(stmnt.qp.sqlCommand == `"Some Integer"`);
     assert(stmnt.qp.args.length == 1);
