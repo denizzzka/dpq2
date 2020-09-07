@@ -167,7 +167,7 @@ private QueryParams parseSqlCmd(SQL_CMD...)(Connection conn, SQL_CMD sqlCmd)
 struct Dollars {}
 
 ///
-auto wrapStatement(T...)(Connection conn, T statement)
+auto wrapStatement(C : Connection, T...)(C conn, T statement)
 {
     return CTStatement!T(conn, statement);
 }
