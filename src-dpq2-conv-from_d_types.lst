@@ -46,7 +46,7 @@
        |Value toValue(T)(T v)
        |if(isNumeric!(T))
        |{
-     45|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+     55|    return Value(v.nativeToBigEndian.dup, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/// Convert money.currency to PG value
@@ -158,11 +158,11 @@
        |        import std.string : representation;
        |
        |        static assert(isImplicitlyConvertible!(T, string));
-     17|        auto buf = (cast(string) v).representation;
+     23|        auto buf = (cast(string) v).representation;
        |
-     17|        if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
+     23|        if(valueFormat == ValueFormat.TEXT) buf ~= 0; // for prepareArgs only
        |
-     17|        return Value(buf, OidType.Text, false, valueFormat);
+     23|        return Value(buf, OidType.Text, false, valueFormat);
        |    }
        |    else
        |    {
@@ -183,9 +183,9 @@
        |Value toValue(T : bool)(T v) @trusted
        |if (!is(T == Nullable!R, R))
        |{
-     12|    immutable ubyte[] buf = [ v ? 1 : 0 ];
+     16|    immutable ubyte[] buf = [ v ? 1 : 0 ];
        |
-      6|    return Value(buf, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
+      8|    return Value(buf, detectOidTypeFromNative!T, false, ValueFormat.BINARY);
        |}
        |
        |/// Constructs Value from Date

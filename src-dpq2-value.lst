@@ -31,17 +31,17 @@
        |    // Thus, it is need to store reference to Answer here to ensure that result is still available.
        |    // (Also see DIP1000)
        |    /// ctor
-    151|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
+    169|    this(immutable(ubyte)[] data, in OidType oidType, bool isNull = false, in ValueFormat format = ValueFormat.BINARY) inout pure
        |    {
        |        import std.exception: enforce;
        |
        |        //TODO: it is possible to skip this check for fixed-size values?
-    151|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
+    169|        enforce(data.length <= int.max, `data.length is too big for use as Postgres value`);
        |
-    151|        this._data = data;
-    151|        this._format = format;
-    151|        this._oidType = oidType;
-    151|        this._isNull = isNull;
+    169|        this._data = data;
+    169|        this._format = format;
+    169|        this._oidType = oidType;
+    169|        this._isNull = isNull;
        |    }
        |
        |    /// Null Value constructor
