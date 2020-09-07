@@ -35,6 +35,7 @@ Features
 * Access to PostgreSQL's multidimensional arrays
 * LISTEN/NOTIFY support
 * Bulk data upload to table from string data ([SQL COPY](https://www.postgresql.org/docs/current/sql-copy.html))
+* Simple SQL query builder
 
 Building
 --------
