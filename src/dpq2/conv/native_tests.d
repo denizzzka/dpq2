@@ -56,6 +56,20 @@ public void _integration_test( string connParam ) @system
             import std.algorithm : strip;
             import std.string : representation;
 
+            static string formatValue(T val)
+            {
+                import std.algorithm : joiner, map, strip;
+                import std.conv : text, to;
+                import std.range : chain, ElementType;
+
+                // Nullable format deprecation workaround
+                static if (is(T == Nullable!R, R))
+                    return val.isNull ? "null" : val.get.to!string;
+                else static if (isArrayType!T && is(ElementType!T == Nullable!E, E))
+                    return chain("[", val.map!(a => a.isNull ? "null" : a.to!string).joiner(", "), "]").text;
+                else return val.to!string;
+            }
+
             // test string to native conversion
             params.sqlCommand = format("SELECT %s::%s as d_type_test_value", pgValue is null ? "NULL" : pgValue, pgType);
             params.args = null;
@@ -69,16 +83,15 @@ public void _integration_test( string connParam ) @system
             else
                 const bool assertResult = result == nativeValue;
 
-            assert(
-                assertResult,
+            assert(assertResult,
                 format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
-                v.oidType, typeid(T), pgValue, nativeValue, result)
+                v.oidType, typeid(T), pgValue, formatValue(nativeValue), formatValue(result))
             );
 
             {
                 // test binary to text conversion
                 params.sqlCommand = "SELECT $1::text";
-                params.args = [nativeValue.toValue];
+                params.args = [toValue(nativeValue)];
 
                 auto answer2 = conn.execParams(params);
                 auto v2 = answer2[0][0];
@@ -102,7 +115,7 @@ public void _integration_test( string connParam ) @system
 
                 assert(textResult == pgValue,
                     format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
-                    v.oidType, typeid(T), nativeValue, pgValue, textResult, pgValue.representation, textResult.representation)
+                    v.oidType, typeid(T), formatValue(nativeValue), pgValue, textResult, pgValue.representation, textResult.representation)
                 );
             }
         }
@@ -186,6 +199,7 @@ public void _integration_test( string connParam ) @system
         // SysTime testing
         auto testTZ = new immutable SimpleTimeZone(2.dur!"hours"); // custom TZ
         C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
+        C!(Nullable!SysTime)(Nullable!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ)), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
 
         // json
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
@@ -210,6 +224,7 @@ public void _integration_test( string connParam ) @system
         C!TestPath(TestPath(false, [Point(1,1), Point(2,2), Point(3,3)]), "path", "'[(1,1),(2,2),(3,3)]'");
         C!Polygon(([Point(1,1), Point(2,2), Point(3,3)]), "polygon", "'((1,1),(2,2),(3,3))'");
         C!TestCircle(TestCircle(Point(1,2), 10), "circle", "'<(1,2),10>'");
+        C!(Nullable!Point)(Nullable!Point(Point(1,2)), "point", "'(1,2)'");
 
         //Arrays
         C!(int[][])([[1,2],[3,4]], "int[]", "'{{1,2},{3,4}}'");
