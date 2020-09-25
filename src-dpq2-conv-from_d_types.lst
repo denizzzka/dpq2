@@ -4,7 +4,7 @@
        |@safe:
        |
        |public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
-       |public import dpq2.conv.geometric : toValue;
+       |public import dpq2.conv.geometric : isGeometricType, toValue;
        |import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
        |import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
        |import dpq2.value : Value, ValueFormat;
@@ -21,7 +21,7 @@
        |
        |/// Converts Nullable!T to Value
        |Value toValue(T)(T v)
-       |if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))))
+       |if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))) && !isGeometricType!(typeof(v.get)))
        |{
      10|    if (v.isNull)
       4|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
@@ -40,6 +40,18 @@
 0000000|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!(ElementType!(typeof(v.get))).oidConvTo!"array");
        |    else
 0000000|        return arrToValue(v.get);
+       |}
+       |
+       |/// ditto
+       |Value toValue(T)(T v)
+       |if (is(T == Nullable!R, R) && isGeometricType!(typeof(v.get)))
+       |{
+       |    import dpq2.conv.geometric : geoToValue = toValue; // deprecation import workaround
+       |
+0000000|    if (v.isNull)
+0000000|        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+       |    else
+0000000|        return geoToValue(v.get);
        |}
        |
        |///
@@ -540,4 +552,4 @@
       1|    auto varr = v.as!string;
       1|    assert(varr.length == 2);
        |}
-src/dpq2/conv/from_d_types.d is 96% covered
+src/dpq2/conv/from_d_types.d is 94% covered

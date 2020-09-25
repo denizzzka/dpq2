@@ -4,7 +4,7 @@ module dpq2.conv.from_d_types;
 @safe:
 
 public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
-public import dpq2.conv.geometric : toValue;
+public import dpq2.conv.geometric : isGeometricType, toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
@@ -21,7 +21,7 @@ import money: currency;
 
 /// Converts Nullable!T to Value
 Value toValue(T)(T v)
-if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))))
+if (is(T == Nullable!R, R) && !(isArrayType!(typeof(v.get))) && !isGeometricType!(typeof(v.get)))
 {
     if (v.isNull)
         return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
@@ -40,6 +40,18 @@ if (is(T == Nullable!R, R) && (isArrayType!(typeof(v.get))))
         return Value(ValueFormat.BINARY, detectOidTypeFromNative!(ElementType!(typeof(v.get))).oidConvTo!"array");
     else
         return arrToValue(v.get);
+}
+
+/// ditto
+Value toValue(T)(T v)
+if (is(T == Nullable!R, R) && isGeometricType!(typeof(v.get)))
+{
+    import dpq2.conv.geometric : geoToValue = toValue; // deprecation import workaround
+
+    if (v.isNull)
+        return Value(ValueFormat.BINARY, detectOidTypeFromNative!T);
+    else
+        return geoToValue(v.get);
 }
 
 ///
