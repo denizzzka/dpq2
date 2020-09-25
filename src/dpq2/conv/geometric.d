@@ -5,6 +5,7 @@ import dpq2.oids: OidType;
 import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.traits;
+import std.typecons : Nullable;
 import std.range.primitives: ElementType;
 
 @safe:
@@ -21,17 +22,30 @@ private template GetRvalueOfMember(T, string memberName)
     alias GetRvalueOfMember = R;
 }
 
-/// Checks that type have "x" and "y" members of returning type "double"
-bool isValidPointType(T)()
+template isGeometricType(T) if(!is(T == Nullable!N, N))
 {
-    static if(__traits(compiles, typeof(T.x)) && __traits(compiles, typeof(T.y)))
+    enum isGeometricType =
+            isValidPointType!T
+        || isValidLineType!T
+        || isValidPathType!T
+        || isValidPolygon!T
+        || isValidCircleType!T
+        || isValidLineSegmentType!T
+        || isValidBoxType!T;
+}
+
+/// Checks that type have "x" and "y" members of returning type "double"
+template isValidPointType(T)
+{
+    static if (is(T == Nullable!R, R)) enum isValidPointType = false;
+    else static if(__traits(compiles, typeof(T.x)) && __traits(compiles, typeof(T.y)))
     {
-        return
+        enum isValidPointType =
             is(GetRvalueOfMember!(T, "x") == double) &&
             is(GetRvalueOfMember!(T, "y") == double);
     }
     else
-        return false;
+        enum isValidPointType = false;
 }
 
 unittest
@@ -48,35 +62,55 @@ unittest
 }
 
 /// Checks that type have "min" and "max" members of suitable returning type of point
-bool isValidBoxType(T)()
+template isValidBoxType(T)
 {
-    static if(__traits(compiles, typeof(T.min)) && __traits(compiles, typeof(T.max)))
+    static if (is(T == Nullable!R, R)) enum isValidBoxType = false;
+    else static if(__traits(compiles, typeof(T.min)) && __traits(compiles, typeof(T.max)))
     {
-        return
+        enum isValidBoxType =
             isValidPointType!(GetRvalueOfMember!(T, "min")) &&
             isValidPointType!(GetRvalueOfMember!(T, "max"));
     }
     else
-        return false;
+        enum isValidBoxType = false;
+}
+
+template isValidLineType(T)
+{
+    enum isValidLineType = is(T == Line);
+}
+
+template isValidPathType(T)
+{
+    enum isValidPathType = isInstanceOf!(Path, T);
+}
+
+template isValidCircleType(T)
+{
+    enum isValidCircleType = isInstanceOf!(Circle, T);
 }
 
 ///
-bool isValidLineSegmentType(T)()
+template isValidLineSegmentType(T)
 {
-    static if(__traits(compiles, typeof(T.start)) && __traits(compiles, typeof(T.end)))
+    static if (is(T == Nullable!R, R)) enum isValidLineSegmentType = false;
+    else static if(__traits(compiles, typeof(T.start)) && __traits(compiles, typeof(T.end)))
     {
-        return
+        enum isValidLineSegmentType =
             isValidPointType!(GetRvalueOfMember!(T, "start")) &&
             isValidPointType!(GetRvalueOfMember!(T, "end"));
     }
     else
-        return false;
+        enum isValidLineSegmentType = false;
 }
 
 ///
-bool isValidPolygon(T)()
+template isValidPolygon(T)
 {
-    return isArray!T && isValidPointType!(ElementType!T);
+    static if (is(T == Nullable!R, R))
+        enum isValidPolygon = false;
+    else
+        enum isValidPolygon = isArray!T && isValidPointType!(ElementType!T);
 }
 
 unittest
@@ -148,7 +182,7 @@ if(isValidPointType!Point)
 }
 
 Value toValue(T)(T line)
-if(is(T == Line))
+if(isValidLineType!T)
 {
     import std.algorithm : copy;
 
@@ -173,7 +207,7 @@ if(isValidLineSegmentType!LineSegment)
 }
 
 Value toValue(T)(T path)
-if(isInstanceOf!(Path, T))
+if(isValidPathType!T)
 {
     import std.algorithm : copy;
 
@@ -214,7 +248,7 @@ if(isValidPolygon!Polygon)
 }
 
 Value toValue(T)(T c)
-if(isInstanceOf!(Circle, T))
+if(isValidCircleType!T)
 {
     import std.algorithm : copy;
 
@@ -400,8 +434,8 @@ package mixin template GeometricInstancesForIntegrationTest()
         seg2d seg;
         alias seg this;
 
-        ref Point start(){ return a; }
-        ref Point end(){ return b; }
+        ref Point start() return { return a; }
+        ref Point end() return { return b; }
 
         this(Point a, Point b)
         {

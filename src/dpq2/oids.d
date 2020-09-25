@@ -172,6 +172,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     import std.datetime.systime : SysTime;
     import std.traits : Unqual, isSomeString;
     import std.uuid : StdUUID = UUID;
+    static import dpq2.conv.geometric;
     static import dpq2.conv.time;
     import vibe.data.json : VibeJson = Json;
 
@@ -196,6 +197,13 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == VibeJson)){ return Json; } else
         static if(is(UT == StdUUID)){ return UUID; } else
         static if(is(UT == BitArray)){ return VariableBitString; } else
+        static if(dpq2.conv.geometric.isValidPointType!UT){ return Point; } else
+        static if(dpq2.conv.geometric.isValidLineType!UT){ return Line; } else
+        static if(dpq2.conv.geometric.isValidPathType!UT){ return Path; } else
+        static if(dpq2.conv.geometric.isValidPolygon!UT){ return Polygon; } else
+        static if(dpq2.conv.geometric.isValidCircleType!UT){ return Circle; } else
+        static if(dpq2.conv.geometric.isValidLineSegmentType!UT){ return LineSegment; } else
+        static if(dpq2.conv.geometric.isValidBoxType!UT){ return Box; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
