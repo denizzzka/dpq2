@@ -49,11 +49,22 @@ private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
 /**
+    Returns cell value as a Nullable type using the underlying type conversion after null check.
+*/
+T as(T : Nullable!R, R)(in Value v)
+{
+    if (v.isNull)
+        return T.init;
+    else
+        return T(v.as!R);
+}
+
+/**
     Returns cell value as a native string based type from text or binary formatted field.
-    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+    Throws: AssertError if the db value is NULL.
 */
 T as(T)(in Value v) pure @trusted
-if(is(T : const(char)[]))
+if(is(T : const(char)[]) && !is(T == Nullable!R, R))
 {
     if(v.format == VF.BINARY)
     {
@@ -69,27 +80,10 @@ if(is(T : const(char)[]))
             throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
     }
 
-    static if(is(T == Nullable!R, R))
-    {
-        alias Ret = R;
-
-        if (v.isNull)
-            return T.init;
-    }
-    else
-        alias Ret = T;
-
-    Ret r;
-
     if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
-        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
+        return rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
     else
-        r = v.valueAsString;
-
-    static if(is(T == Nullable!R2, R2))
-        return T(r);
-    else
-        return r;
+        return v.valueAsString;
 }
 
 @system unittest
@@ -105,24 +99,16 @@ if(is(T : const(char)[]))
 
 /**
     Returns value as D type value from binary formatted field.
-    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+    Throws: AssertError if the db value is NULL.
 */
 T as(T)(in Value v)
-if(!is(T : const(char)[]) && !is(T == Bson))
+if(!is(T : const(char)[]) && !is(T == Bson) && !is(T == Nullable!R,R))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,
             msg_NOT_BINARY, __FILE__, __LINE__);
 
-    static if (is(T == Nullable!R, R))
-    {
-        if (v.isNull)
-            return T.init;
-        else
-            return T(binaryValueAs!R(v));
-    }
-    else
-        return binaryValueAs!T(v);
+    return binaryValueAs!T(v);
 }
 
 @system unittest
