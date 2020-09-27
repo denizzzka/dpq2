@@ -49,15 +49,26 @@
        |private alias ET = ConvExceptionType;
        |
        |/**
+       |    Returns cell value as a Nullable type using the underlying type conversion after null check.
+       |*/
+       |T as(T : Nullable!R, R)(in Value v)
+       |{
+      6|    if (v.isNull)
+      3|        return T.init;
+       |    else
+      3|        return T(v.as!R);
+       |}
+       |
+       |/**
        |    Returns cell value as a native string based type from text or binary formatted field.
-       |    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+       |    Throws: AssertError if the db value is NULL.
        |*/
        |T as(T)(in Value v) pure @trusted
-       |if(is(T : const(char)[]))
+       |if(is(T : const(char)[]) && !is(T == Nullable!R, R))
        |{
-     16|    if(v.format == VF.BINARY)
+     14|    if(v.format == VF.BINARY)
        |    {
-     16|        if(!(
+     14|        if(!(
        |            v.oidType == OidType.Text ||
 0000000|            v.oidType == OidType.FixedString ||
 0000000|            v.oidType == OidType.VariableString ||
@@ -69,27 +80,10 @@
 0000000|            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
        |    }
        |
-       |    static if(is(T == Nullable!R, R))
-       |    {
-       |        alias Ret = R;
-       |
-      2|        if (v.isNull)
-      2|            return T.init;
-       |    }
-       |    else
-       |        alias Ret = T;
-       |
-     14|    Ret r;
-       |
      28|    if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
-0000000|        r = rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
+0000000|        return rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
        |    else
-     14|        r = v.valueAsString;
-       |
-       |    static if(is(T == Nullable!R2, R2))
-0000000|        return T(r);
-       |    else
-     12|        return r;
+     14|        return v.valueAsString;
        |}
        |
        |@system unittest
@@ -105,24 +99,16 @@
        |
        |/**
        |    Returns value as D type value from binary formatted field.
-       |    Throws: AssertError if the db value is NULL and Nullable is not used to retrieve the value
+       |    Throws: AssertError if the db value is NULL.
        |*/
        |T as(T)(in Value v)
-       |if(!is(T : const(char)[]) && !is(T == Bson))
+       |if(!is(T : const(char)[]) && !is(T == Bson) && !is(T == Nullable!R,R))
        |{
-     38|    if(!(v.format == VF.BINARY))
+     37|    if(!(v.format == VF.BINARY))
       1|        throw new AE(ET.NOT_BINARY,
        |            msg_NOT_BINARY, __FILE__, __LINE__);
        |
-       |    static if (is(T == Nullable!R, R))
-       |    {
-      4|        if (v.isNull)
-      1|            return T.init;
-       |        else
-      3|            return T(binaryValueAs!R(v));
-       |    }
-       |    else
-     33|        return binaryValueAs!T(v);
+     36|    return binaryValueAs!T(v);
        |}
        |
        |@system unittest

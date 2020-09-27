@@ -69,13 +69,13 @@
        |        /// Returns Oid of the value
        |        OidType oidType()
        |        {
-    190|            return _oidType;
+    188|            return _oidType;
        |        }
        |
        |        /// Returns ValueFormat representation (text or binary)
        |        ValueFormat format()
        |        {
-     99|            return _format;
+     96|            return _format;
        |        }
        |    }
        |
