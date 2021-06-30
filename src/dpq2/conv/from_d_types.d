@@ -317,8 +317,35 @@ if (is(Unqual!T == Json))
     return r;
 }
 
+Value toRecordValue(Value[] elements)
+{
+    import std.array : appender;
+    auto buffer = appender!(ubyte[])();
+    buffer ~= nativeToBigEndian!int(cast(int)elements.length)[];
+    foreach (element; elements)
+    {
+        buffer ~= nativeToBigEndian!int(element.oidType)[];
+        if (element.isNull) {
+            buffer ~= nativeToBigEndian!int(-1)[];
+        } else {
+            buffer ~= nativeToBigEndian!int(cast(int)element.data.length)[];
+            buffer ~= element.data;
+        }
+    }
+
+    return Value(buffer.data.idup, OidType.Record);
+}
+
 version(unittest)
-import dpq2.conv.to_d_types : as;
+import dpq2.conv.to_d_types : as, deserializeRecord;
+
+unittest
+{
+    import std.stdio;
+    Value[] vals = [toValue(17.34), toValue(Nullable!long(17)), toValue(Nullable!long.init)];
+    Value v = vals.toRecordValue;
+    assert(deserializeRecord(v) == vals);
+}
 
 unittest
 {
