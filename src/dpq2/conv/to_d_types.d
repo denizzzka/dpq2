@@ -117,6 +117,47 @@ if(!is(T : const(char)[]) && !is(T == Bson) && !is(T == Nullable!R,R))
     assertThrown!AE(v.as!int);
 }
 
+Value[] deserializeRecord(in Value v)
+{
+    if(!(v.oidType == OidType.Record))
+        throwTypeComplaint(v.oidType, "record", __FILE__, __LINE__);
+
+    if(!(v.data.length >= uint.sizeof))
+        throw new AE(ET.SIZE_MISMATCH,
+            "Value length isn't enough to hold a size", __FILE__, __LINE__);
+
+    immutable(ubyte)[] data = v.data;
+    uint entries = bigEndianToNative!uint(v.data[0 .. uint.sizeof]);
+    data = data[uint.sizeof .. $];
+
+    Value[] ret = new Value[entries];
+
+    foreach (ref res; ret) {
+        if (!(data.length >= 2*int.sizeof))
+            throw new AE(ET.SIZE_MISMATCH,
+                "Value length isn't enough to hold an oid and a size", __FILE__, __LINE__);
+        OidType oidType = cast(OidType)bigEndianToNative!int(data[0 .. int.sizeof]);
+        data = data[int.sizeof .. $];
+        int size = bigEndianToNative!int(data[0 .. int.sizeof]);
+        data = data[int.sizeof .. $];
+
+        if (size == -1)
+        {
+            res = Value(null, oidType, true);
+            continue;
+        }
+        assert(size >= 0);
+        if (!(data.length >= size))
+            throw new AE(ET.SIZE_MISMATCH,
+                "Value length isn't enough to hold object body", __FILE__, __LINE__);
+        immutable(ubyte)[] resData = data[0 .. size];
+        data = data[size .. $];
+        res = Value(resData, oidType);
+    }
+
+    return ret;
+}
+
 package:
 
 /*

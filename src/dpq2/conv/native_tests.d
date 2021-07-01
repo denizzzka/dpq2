@@ -236,4 +236,23 @@ public void _integration_test( string connParam ) @system
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
         C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
     }
+
+    // test round-trip compound types
+    {
+        conn.exec("CREATE TYPE test_type AS (x int, y int)");
+        scope(exit) conn.exec("DROP TYPE test_type");
+
+        params.sqlCommand = "SELECT 'test_type'::regtype::oid";
+        OidType oid = cast(OidType)conn.execParams(params)[0][0].as!Oid;
+
+        Value input = Value(toRecordValue([17.toValue, Nullable!int.init.toValue]).data, oid);
+
+        params.sqlCommand = "SELECT $1::text";
+        params.args = [input];
+        Value v = conn.execParams(params)[0][0];
+        assert(v.as!string == `(17,)`, v.as!string);
+        params.sqlCommand = "SELECT $1";
+        v = conn.execParams(params)[0][0];
+        assert(v.oidType == oid && v.data == input.data);
+    }
 }

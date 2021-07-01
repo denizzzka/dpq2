@@ -61,6 +61,7 @@ bool isNativeInteger(OidType t) pure
         case Int8:
         case Int2:
         case Int4:
+        case Oid:
             return true;
         default:
             break;
