@@ -6,6 +6,7 @@ import dpq2.oids: OidType;
 import dpq2.result: ArrayProperties;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
+import dpq2.conv.time: TimeStampUTC;
 import vibe.data.bson;
 import std.uuid;
 import std.datetime: SysTime, dur, TimeZone, UTC;
@@ -149,7 +150,7 @@ Bson rawValueToBson(in Value v)
             break;
 
         case TimeStampWithZone:
-            auto ts = v.tunnelForBinaryValueAsCalls!(dpq2.conv.time.TimeStampUTC);
+            auto ts = v.tunnelForBinaryValueAsCalls!TimeStampUTC;
             auto time = BsonDate(SysTime(ts.dateTime, UTC()));
             long usecs = ts.fracSec.total!"usecs";
             res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
