@@ -184,6 +184,17 @@ mixin template Queries()
         if(r != 1) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
+    /// Submits a request to obtain information about the specified portal, and waits for completion.
+    immutable(Answer) describePortal(string portalName)
+    {
+        PGresult* pgResult = PQdescribePortal(conn, portalName.toStringz);
+
+        // is guaranteed by libpq that the result will not be changed until it will not be destroyed
+        auto container = createResultContainer(cast(immutable) pgResult);
+
+        return new immutable Answer(container);
+    }
+
     /// Sends a buffer of CSV data to the COPY command
     ///
     /// Returns: true if the data was queued, false if it was not queued because of full buffers (this will only happen in nonblocking mode)
@@ -404,6 +415,15 @@ void _integration_test( string connParam ) @trusted
         assert(a.paramType(0) == OidType.Text);
         assert(a.paramType(1) == OidType.Int4);
     }
+
+    // checking portal description
+    {
+        conn.exec(`BEGIN`);
+        conn.exec(`DECLARE test_cursor1 CURSOR FOR SELECT 123::integer`);
+        auto r = conn.describePortal(`test_cursor1`);
+        conn.exec(`COMMIT`);
+    }
+
     {
         // async check prepared arg types and result types
         conn.sendDescribePrepared("prepared statement 2");
