@@ -3,11 +3,12 @@ module dpq2.conv.native_tests;
 import dpq2;
 import dpq2.conv.arrays : isArrayType;
 import dpq2.conv.geometric: Line;
+import dpq2.conv.to_variant: toVariant;
 import std.bitmanip : BitArray;
 import std.datetime;
 import std.typecons: Nullable;
 import std.uuid: UUID;
-import vibe.data.bson: Bson, deserializeBson;
+import std.variant: Variant;
 import vibe.data.json: Json, parseJsonString;
 
 version (integration_tests)
@@ -77,15 +78,33 @@ public void _integration_test( string connParam ) @system
             immutable Value v = answer[0][0];
 
             auto result = v.as!T;
+            Variant stdVariantResult = v.toVariant;
 
             static if(isArrayType!T)
                 const bool assertResult = compareArraysWithCareAboutNullables(result, nativeValue);
             else
+            {
                 const bool assertResult = result == nativeValue;
+            }
+
+            string formatMsg(string varType, string details)
+            {
+                return format(
+                    "PG to %s conv: %s value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+                    varType, details, v.oidType, typeid(T), pgValue, formatValue(nativeValue), formatValue(result)
+                );
+            }
 
             assert(assertResult,
-                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
-                v.oidType, typeid(T), pgValue, formatValue(nativeValue), formatValue(result))
+                formatMsg("native", "received unexpected value")
+            );
+
+            assert(stdVariantResult.type == typeid(T),
+                formatMsg("std.variant.Variant", "received unexpected type")
+            );
+
+            assert(stdVariantResult.peek == nativeValue,
+                formatMsg("std.variant.Variant", "received unexpected value")
             );
 
             {
