@@ -7,84 +7,72 @@ import dpq2.result: ArrayProperties;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: TimeStampUTC;
-import std.uuid;
-import std.datetime: SysTime, dur, TimeZone, UTC;
+static import geom = dpq2.conv.geometric;
 import std.bitmanip: bigEndianToNative, BitArray;
+import std.datetime: SysTime, dur, TimeZone, UTC;
 import std.conv: to;
+import std.typecons: Nullable;
+import std.uuid;
 import std.variant: Variant;
+import vibe.data.json: VibeJson = Json;
 
 ///
-Variant toVariant(in Value v) /* FIXME: pure? */
+Variant toVariant(bool nullablePayload)(in Value v) @safe
 {
-    if(v.format == ValueFormat.TEXT)
+    auto getNative(T)()
     {
-        immutable text = v.valueAsString;
+        static if(nullablePayload)
+        {
+            Nullable!T ret;
 
-        return Variant(text);
+            if (v.isNull)
+                return ret;
+
+            ret = v.as!T;
+
+            return ret;
+        }
+        else
+        {
+            return v.as!T;
+        }
     }
 
-    Variant res;
+    Variant retVariant(T)() @trusted
+    {
+        return Variant(getNative!T);
+    }
+
+    if(v.format == ValueFormat.TEXT)
+        return retVariant!string;
 
     with(OidType)
     switch(v.oidType)
     {
-        case OidType.Bool:
-            res = v.as!PGboolean;
-            break;
+        case Bool: return retVariant!PGboolean;
+        case Int2: return retVariant!short;
+        case Int4: return retVariant!int;
+        case Int8: return retVariant!long;
+        case Float4: return retVariant!float;
+        case Float8: return retVariant!double;
 
-        //~ case Int2:
-            //~ auto n = v.tunnelForBinaryValueAsCalls!PGsmallint.to!int;
-            //~ res = Bson(n);
-            //~ break;
+        case Text:
+        case FixedString:
+        case VariableString:
+            return retVariant!string;
 
-        //~ case Int4:
-            //~ int n = v.tunnelForBinaryValueAsCalls!PGinteger;
-            //~ res = Bson(n);
-            //~ break;
+        case ByteArray: return retVariant!PGbytea;
+        case UUID: return retVariant!PGuuid;
+        case Date: return retVariant!PGdate;
+        case Time: return retVariant!PGtime_without_time_zone;
+        case TimeStamp: return retVariant!PGtimestamp;
+        case TimeStampWithZone: return retVariant!PGtimestamptz;
 
-        //~ case Int8:
-            //~ long n = v.tunnelForBinaryValueAsCalls!PGbigint;
-            //~ res = Bson(n);
-            //~ break;
+        case Json:
+        case Jsonb:
+            return retVariant!VibeJson;
 
-        //~ case Float8:
-            //~ double n = v.tunnelForBinaryValueAsCalls!PGdouble_precision;
-            //~ res = Bson(n);
-            //~ break;
-
-        //~ case Numeric:
-            //~ res = Bson(rawValueToNumeric(v.data));
-            //~ break;
-
-        //~ case Text:
-        //~ case FixedString:
-        //~ case VariableString:
-            //~ res = Bson(v.valueAsString);
-            //~ break;
-
-        //~ case ByteArray:
-            //~ auto b = BsonBinData(BsonBinData.Type.userDefined, v.data.idup);
-            //~ res = Bson(b);
-            //~ break;
-
-        //~ case UUID:
-            //~ // See: https://github.com/vibe-d/vibe.d/issues/2161
-            //~ // res = Bson(v.tunnelForBinaryValueAsCalls!PGuuid);
-            //~ res = serializeToBson(v.tunnelForBinaryValueAsCalls!PGuuid);
-            //~ break;
-
-        //~ case TimeStampWithZone:
-            //~ auto ts = v.tunnelForBinaryValueAsCalls!TimeStampUTC;
-            //~ auto time = BsonDate(SysTime(ts.dateTime, UTC()));
-            //~ long usecs = ts.fracSec.total!"usecs";
-            //~ res = Bson(["time": Bson(time), "usecs": Bson(usecs)]);
-            //~ break;
-
-        //~ case Json:
-        //~ case Jsonb:
-            //~ vibe.data.json.Json json = v.tunnelForBinaryValueAsCalls!PGjson;
-            //~ res = Bson(json);
-            //~ break;
+        case Line: return retVariant!(geom.Line);
 
         default:
             throw new ValueConvException(
@@ -93,6 +81,4 @@ Variant toVariant(in Value v) /* FIXME: pure? */
                     __FILE__, __LINE__
                 );
     }
-
-    return res;
 }
