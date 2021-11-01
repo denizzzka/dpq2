@@ -36,7 +36,7 @@
 			"dependencies":
 			{
 				"dpq2": "*",
-				"gfm:math": "~>7.0.0"
+				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [
 				{
