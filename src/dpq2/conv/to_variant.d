@@ -48,32 +48,38 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
     if(v.format == ValueFormat.TEXT)
         return retVariant!string;
 
-    //~ if(v.isSupportedArray)
-        //~ return arrayValueToBson(v);
-    //~ else
-        //~ return rawValueToBson(v);
+    template retArray__(NativeT)
+    {
+        static if(isNullablePayload)
+            alias arrType = Nullable!NativeT[];
+        else
+            alias arrType = NativeT[];
 
-
-//~ import std.typecons;
-
-//~ with(OidType)
-//~ Tuple!
-//~ (
-    //~ PGboolean, bool,
-//~ ) variantMapping;
+        alias retArray__ = retVariant!arrType;
+    }
 
     with(OidType)
     switch(v.oidType)
     {
-        mixin(CaseMap!(BoolArray, bool[]));
+        //TODO: replace redundant code for types and its arrays by mixins?
 
-        case Bool: return retVariant!PGboolean;
-        case Int2: return retVariant!short;
-        case Int4: return retVariant!int;
-        //~ CaseMap!("Int4Array", int[]);
-        case Int8: return retVariant!long;
-        case Float4: return retVariant!float;
-        case Float8: return retVariant!double;
+        case Bool:      return retVariant!PGboolean;
+        case BoolArray: return retArray__!PGboolean;
+
+        case Int2:      return retVariant!short;
+        case Int2Array: return retArray__!short;
+
+        case Int4:      return retVariant!int;
+        case Int4Array: return retArray__!int;
+
+        case Int8:      return retVariant!long;
+        case Int8Array: return retArray__!long;
+
+        case Float4:        return retVariant!float;
+        case Float4Array:   return retArray__!float;
+
+        case Float8:        return retVariant!double;
+        case Float8Array:   return retArray__!double;
 
         case Numeric:
         case Text:
@@ -81,18 +87,39 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         case VariableString:
             return retVariant!string;
 
+        case NumericArray:
+        case TextArray:
+        case FixedStringArray:
+        case VariableStringArray:
+            return retArray__!string;
+
         case ByteArray: return retVariant!PGbytea;
-        case UUID: return retVariant!PGuuid;
-        case Date: return retVariant!PGdate;
-        case Time: return retVariant!PGtime_without_time_zone;
-        case TimeStamp: return retVariant!PGtimestamp;
-        case TimeStampWithZone: return retVariant!PGtimestamptz;
+
+        case UUID:      return retVariant!PGuuid;
+        case UUIDArray: return retArray__!PGuuid;
+
+        case Date:      return retVariant!PGdate;
+        case DateArray: return retArray__!PGdate;
+
+        case Time:      return retVariant!PGtime_without_time_zone;
+        case TimeArray: return retArray__!PGtime_without_time_zone;
+
+        case TimeStamp:         return retVariant!PGtimestamp;
+        case TimeStampArray:    return retArray__!PGtimestamp;
+
+        case TimeStampWithZone:         return retVariant!PGtimestamptz;
+        case TimeStampWithZoneArray:    return retArray__!PGtimestamptz;
 
         case Json:
         case Jsonb:
             return retVariant!VibeJson;
 
+        case JsonArray:
+        case JsonbArray:
+            return retArray__!VibeJson;
+
         case Line: return retVariant!(geom.Line);
+        //case LineArray: return retArray__!(geom.Line); //TODO: add LineArray oid
 
         default:
             throw new ValueConvException(
@@ -101,13 +128,4 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
                     __FILE__, __LINE__
                 );
     }
-}
-
-private template CaseMap(OidType oid, NativeT)
-{
-    import std.conv: to;
-
-    enum sss = typeid(NativeT);
-
-    string CaseMap = `case `~oid.to!string~`: return retVariant!`~sss~`;`;
 }

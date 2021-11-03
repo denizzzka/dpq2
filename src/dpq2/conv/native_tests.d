@@ -83,9 +83,9 @@ public void _integration_test( string connParam ) @system
             auto result = v.as!T;
 
             enum disabledForStdVariant = (
-                //~ isArrayType!T || // // TODO: remove
-                is(T == Nullable!(int[])) || // TODO: remove
-                is(T == BitArray) ||
+                is(T == Nullable!string[]) || // Variant haven't heuristics to understand what array elements can contain NULLs
+                is(T == Nullable!(int[])) || // Same reason, but here is all values are Nullable and thus incompatible for comparison with original values
+                is(T == BitArray) || //TODO: remove
                 is(T == PGTestMoney) ||
                 is(T == Json) ||
                 is(T == Point) ||
