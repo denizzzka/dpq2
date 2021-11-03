@@ -51,12 +51,14 @@ public void _integration_test( string connParam ) @system
     params.resultFormat = ValueFormat.BINARY;
 
     {
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
+        mixin GeometricInstancesForIntegrationTest;
+
         void testIt(T)(T nativeValue, in string pgType, string pgValue)
         {
             import std.algorithm : strip;
             import std.string : representation;
             import std.meta: AliasSeq, anySatisfy;
-            import std.traits: isType;
 
             static string formatValue(T val)
             {
@@ -80,25 +82,30 @@ public void _integration_test( string connParam ) @system
 
             auto result = v.as!T;
 
-            import std.stdio;
-            writeln(`==========`);
-            writeln("native typeid=", typeid(T));
-            writeln("pgType=", pgType);
-            result.writeln;
+            enum disabledForStdVariant = (
+                isArrayType!T || // // TODO: remove
+                is(T == Nullable!(int[])) || // TODO: remove
+                is(T == BitArray) ||
+                is(T == PGTestMoney) ||
+                is(T == Json) ||
+                is(T == Point) ||
+                is(T == Nullable!Point) ||
+                is(T == LineSegment) ||
+                is(T == Box) ||
+                is(T == TestPath) ||
+                is(T == Polygon) ||
+                is(T == TestCircle) ||
+                is(T == SysTime) ||
+                is(T == Nullable!SysTime)
+            );
 
-            alias disabledStdVariantTests = AliasSeq!(BitArray, PGTestMoney);
-
-            static if(!anySatisfy!(isType!T, disabledStdVariantTests))
+            static if(!disabledForStdVariant)
             {
-                enum thisTestDisabledForStdVariant = false;
-
                 static if (is(T == Nullable!R, R))
                     auto stdVariantResult = v.as!(Variant, true);
                 else
                     auto stdVariantResult = v.as!(Variant, false);
             }
-            else
-                enum thisTestDisabledForStdVariant = true;
 
             string formatMsg(string varType)
             {
@@ -114,17 +121,13 @@ public void _integration_test( string connParam ) @system
             {
                 const bool assertResult = result == nativeValue;
 
-                //Varint:
-                // Adittional disabled tests what cause types mismatch
-                // TODO: remove
-                alias resultTestsDisabled = AliasSeq!(SysTime, Json, BitArray);
-
-                static if(
-                    !thisTestDisabledForStdVariant ||
-                    !anySatisfy!(isType!T, resultTestsDisabled)
-                )
+                //Variant:
+                static if(!disabledForStdVariant)
                 {
-                    assert(stdVariantResult == nativeValue, formatMsg("std.variant.Variant"));
+                    if(!(is(T == string) && v.oidType == OidType.Json)) // Ignores case with Json what must be treated natively as string
+                    {
+                        assert(stdVariantResult == nativeValue, formatMsg("std.variant.Variant (type: %s)".format(stdVariantResult.type)));
+                    }
                 }
             }
 
@@ -255,8 +258,6 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
-        mixin GeometricInstancesForIntegrationTest;
 
         C!Point(Point(1,2), "point", "'(1,2)'");
         C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
