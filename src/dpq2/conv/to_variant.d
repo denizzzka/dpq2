@@ -48,12 +48,29 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
     if(v.format == ValueFormat.TEXT)
         return retVariant!string;
 
+    //~ if(v.isSupportedArray)
+        //~ return arrayValueToBson(v);
+    //~ else
+        //~ return rawValueToBson(v);
+
+
+//~ import std.typecons;
+
+//~ with(OidType)
+//~ Tuple!
+//~ (
+    //~ PGboolean, bool,
+//~ ) variantMapping;
+
     with(OidType)
     switch(v.oidType)
     {
+        mixin(CaseMap!(BoolArray, bool[]));
+
         case Bool: return retVariant!PGboolean;
         case Int2: return retVariant!short;
         case Int4: return retVariant!int;
+        //~ CaseMap!("Int4Array", int[]);
         case Int8: return retVariant!long;
         case Float4: return retVariant!float;
         case Float8: return retVariant!double;
@@ -84,4 +101,13 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
                     __FILE__, __LINE__
                 );
     }
+}
+
+private template CaseMap(OidType oid, NativeT)
+{
+    import std.conv: to;
+
+    enum sss = typeid(NativeT);
+
+    string CaseMap = `case `~oid.to!string~`: return retVariant!`~sss~`;`;
 }

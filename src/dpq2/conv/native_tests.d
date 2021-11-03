@@ -83,7 +83,7 @@ public void _integration_test( string connParam ) @system
             auto result = v.as!T;
 
             enum disabledForStdVariant = (
-                isArrayType!T || // // TODO: remove
+                //~ isArrayType!T || // // TODO: remove
                 is(T == Nullable!(int[])) || // TODO: remove
                 is(T == BitArray) ||
                 is(T == PGTestMoney) ||
