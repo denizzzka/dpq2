@@ -16,7 +16,6 @@ import std.uuid;
 import std.variant: Variant;
 import vibe.data.json: VibeJson = Json;
 
-//TODO: isNullablePayload should be runtime argument
 ///
 Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 {
