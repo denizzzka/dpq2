@@ -58,6 +58,7 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         case Float4: return retVariant!float;
         case Float8: return retVariant!double;
 
+        case Numeric:
         case Text:
         case FixedString:
         case VariableString:

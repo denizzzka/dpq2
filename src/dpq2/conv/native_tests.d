@@ -51,10 +51,12 @@ public void _integration_test( string connParam ) @system
     params.resultFormat = ValueFormat.BINARY;
 
     {
-        void testIt(T, bool disabledForStdVariant = false)(T nativeValue, in string pgType, string pgValue)
+        void testIt(T)(T nativeValue, in string pgType, string pgValue)
         {
             import std.algorithm : strip;
             import std.string : representation;
+            import std.meta: AliasSeq, anySatisfy;
+            import std.traits: isType;
 
             static string formatValue(T val)
             {
@@ -84,7 +86,9 @@ public void _integration_test( string connParam ) @system
             writeln("pgType=", pgType);
             result.writeln;
 
-            static if(!disabledForStdVariant)
+            alias disabledStdVariantTests = AliasSeq!(BitArray, PGTestMoney);
+
+            static if(!anySatisfy!(isType!T, disabledStdVariantTests))
             {
                 static if (is(T == Nullable!R, R))
                     auto stdVariantResult = v.as!(Variant, true);
@@ -107,13 +111,17 @@ public void _integration_test( string connParam ) @system
                 const bool assertResult = result == nativeValue;
 
                 //Varint:
-                import std.meta;
-                import std.traits;
-
+                // Adittional disabled tests what cause types mismatch
+                // TODO: remove
                 alias resultTestsDisabled = AliasSeq!(SysTime, Json, BitArray);
 
-                static if(!anySatisfy!(isType!T, resultTestsDisabled))
+                static if(
+                    !anySatisfy!(isType!T, disabledStdVariantTests) ||
+                    !anySatisfy!(isType!T, resultTestsDisabled)
+                )
+                {
                     assert(stdVariantResult == nativeValue, formatMsg("std.variant.Variant"));
+                }
             }
 
             assert(assertResult, formatMsg("native"));
@@ -161,7 +169,7 @@ public void _integration_test( string connParam ) @system
         C!PGsmallint(-32_761, "smallint", "-32761");
         C!PGinteger(-2_147_483_646, "integer", "-2147483646");
         C!PGbigint(-9_223_372_036_854_775_806, "bigint", "-9223372036854775806");
-        C!(PGTestMoney, true)(PGTestMoney(-123.45), "money", "'-$123.45'");
+        C!PGTestMoney(PGTestMoney(-123.45), "money", "'-$123.45'");
         C!PGreal(-12.3456f, "real", "-12.3456");
         C!PGdouble_precision(-1234.56789012345, "double precision", "-1234.56789012345");
         C!PGtext("first line\nsecond line", "text", "'first line\nsecond line'");
@@ -172,9 +180,9 @@ public void _integration_test( string connParam ) @system
             "bytea", r"E'\\x44 20 72 75 6c 65 73 00 21'"); // "D rules\x00!" (ASCII)
         C!PGuuid(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640"), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
         C!(Nullable!PGuuid)(Nullable!UUID(UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")), "uuid", "'8b9ab33a-96e9-499b-9c36-aad1fe86d640'");
-        C!(PGvarbit, true)(BitArray([1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]), "varbit", "'101011010110101'");
-        C!(PGvarbit, true)(BitArray([0, 0, 1, 0, 1]), "varbit", "'00101'");
-        C!(PGvarbit, true)(BitArray([1, 0, 1, 0, 0]), "varbit", "'10100'");
+        C!PGvarbit(BitArray([1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]), "varbit", "'101011010110101'");
+        C!PGvarbit(BitArray([0, 0, 1, 0, 1]), "varbit", "'00101'");
+        C!PGvarbit(BitArray([1, 0, 1, 0, 0]), "varbit", "'10100'");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");
