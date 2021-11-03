@@ -106,6 +106,8 @@ if(is(T : const(char)[]) && !is(T == Nullable!R, R))
     assert(v.isNull);
     assertThrown!AssertError(v.as!string == "");
     assert(v.as!(Nullable!string).isNull == true);
+
+    assert(v.as!Variant.get!(Nullable!string).isNull == true);
 }
 
 /**

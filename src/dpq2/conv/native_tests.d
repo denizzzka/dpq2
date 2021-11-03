@@ -258,7 +258,6 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-
         C!Point(Point(1,2), "point", "'(1,2)'");
         C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
         C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
