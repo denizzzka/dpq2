@@ -90,11 +90,15 @@ public void _integration_test( string connParam ) @system
 
             static if(!anySatisfy!(isType!T, disabledStdVariantTests))
             {
+                enum thisTestDisabledForStdVariant = false;
+
                 static if (is(T == Nullable!R, R))
                     auto stdVariantResult = v.as!(Variant, true);
                 else
                     auto stdVariantResult = v.as!(Variant, false);
             }
+            else
+                enum thisTestDisabledForStdVariant = true;
 
             string formatMsg(string varType)
             {
@@ -116,7 +120,7 @@ public void _integration_test( string connParam ) @system
                 alias resultTestsDisabled = AliasSeq!(SysTime, Json, BitArray);
 
                 static if(
-                    !anySatisfy!(isType!T, disabledStdVariantTests) ||
+                    !thisTestDisabledForStdVariant ||
                     !anySatisfy!(isType!T, resultTestsDisabled)
                 )
                 {
