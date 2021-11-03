@@ -52,11 +52,11 @@ private alias ET = ConvExceptionType;
 /**
     Returns cell value as a Variant type.
 */
-T as(T : Variant, bool nullablePayload = true)(in Value v)
+T as(T : Variant, bool isNullablePayload = true)(in Value v)
 {
     import dpq2.conv.to_variant;
 
-    return v.toVariant!nullablePayload;
+    return v.toVariant!isNullablePayload;
 }
 
 /**

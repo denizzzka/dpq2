@@ -16,12 +16,14 @@ import std.uuid;
 import std.variant: Variant;
 import vibe.data.json: VibeJson = Json;
 
+//TODO: isNullablePayload should be runtime argument
 ///
-Variant toVariant(bool nullablePayload)(in Value v) @safe
+Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 {
     auto getNative(T)()
+    if(!is(T == Variant))
     {
-        static if(nullablePayload)
+        static if(isNullablePayload)
         {
             Nullable!T ret;
 
