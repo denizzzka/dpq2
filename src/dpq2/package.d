@@ -9,7 +9,7 @@ import derelict.pq.pq;
 debug import std.experimental.logger;
 
 version(DerelictPQ_Static){}
-else
+else version(Posix)
 {
     static __gshared bool __initialized;
 
