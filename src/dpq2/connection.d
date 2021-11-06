@@ -72,6 +72,15 @@ class Connection
         checkCreatedConnection();
     }
 
+	/// ditto
+    this(ConnectionStart, in string[string] keyValueParams)
+    {
+        auto a = keyValueParams.keyValToPQparamsArrays;
+
+        conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
+        checkCreatedConnection();
+    }
+
     private void checkCreatedConnection()
     {
         enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
@@ -575,5 +584,6 @@ void _integration_test( string connParam )
         kv["dbname"] = "wrong-db-name";
 
         assertThrown!ConnectionException(new Connection(kv));
+        assertThrown!ConnectionException(new Connection(ConnectionStart(), kv));
     }
 }
