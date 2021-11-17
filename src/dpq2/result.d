@@ -188,7 +188,11 @@ immutable class Answer : Result
     /// Returns column number by field name
     size_t columnNum( string columnName )
     {
-        size_t n = PQfnumber(result, toStringz(columnName));
+        import std.internal.cstring : tempCString;
+        size_t n = ( string v, immutable(PGresult*) r ) @trusted {
+            auto tmpstr = v.tempCString; // freed at the end of the scope, also uses SSO
+            return PQfnumber(r, tmpstr);
+        } ( columnName, result );
 
         if( n == -1 )
             throw new AnswerException(ExceptionType.COLUMN_NOT_FOUND,
