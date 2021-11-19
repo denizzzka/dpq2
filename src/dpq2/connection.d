@@ -53,18 +53,36 @@ class Connection
     this(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
+        checkCreatedConnection();
+    }
 
-        enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
+    /// ditto
+    this(in string[string] keyValueParams)
+    {
+        auto a = keyValueParams.keyValToPQparamsArrays;
 
-        if(status != CONNECTION_OK)
-            throw new ConnectionException(this, __FILE__, __LINE__);
+        conn = PQconnectdbParams(&a.keys[0], &a.vals[0], 0);
+        checkCreatedConnection();
     }
 
 	/// Starts creation of a connection to the database server in a nonblocking manner
     this(ConnectionStart, string connString)
     {
         conn = PQconnectStart(toStringz(connString));
+        checkCreatedConnection();
+    }
 
+	/// ditto
+    this(ConnectionStart, in string[string] keyValueParams)
+    {
+        auto a = keyValueParams.keyValToPQparamsArrays;
+
+        conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
+        checkCreatedConnection();
+    }
+
+    private void checkCreatedConnection()
+    {
         enforce!OutOfMemoryError(conn, "Unable to allocate libpq connection data");
 
         if( status == CONNECTION_BAD )
@@ -362,6 +380,32 @@ class Connection
     }
 }
 
+private auto keyValToPQparamsArrays(in string[string] keyValueParams)
+{
+    static struct PQparamsArrays
+    {
+        immutable(char)*[] keys;
+        immutable(char)*[] vals;
+    }
+
+    PQparamsArrays a;
+    a.keys.length = keyValueParams.length + 1;
+    a.vals.length = keyValueParams.length + 1;
+
+    size_t i;
+    foreach(e; keyValueParams.byKeyValue)
+    {
+        a.keys[i] = e.key.toStringz;
+        a.vals[i] = e.value.toStringz;
+
+        i++;
+    }
+
+    assert(i == keyValueParams.length);
+
+    return a;
+}
+
 /// Check connection options in the provided connection string
 ///
 /// Throws exception if connection string isn't passes check.
@@ -530,5 +574,16 @@ void _integration_test( string connParam )
 
         c.exec("ROLLBACK");
         assert(c.transactionStatus == PQTRANS_IDLE);
+    }
+
+    {
+        import std.exception: assertThrown;
+
+        string[string] kv;
+        kv["host"] = "wrong-host";
+        kv["dbname"] = "wrong-db-name";
+
+        assertThrown!ConnectionException(new Connection(kv));
+        assertThrown!ConnectionException(new Connection(ConnectionStart(), kv));
     }
 }
