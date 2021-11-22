@@ -13,6 +13,12 @@ else version(Posix)
 {
     static __gshared bool __initialized;
 
+    /*
+        Not shared static constructor makes possible to setup
+        DerelictPQ.missingSymbolCallback from external static
+        constructors. So it is possible to use this library even with
+        previous versions of libpq with some missing symbols.
+    */
     static this()
     {
         import std.concurrency : initOnce;
