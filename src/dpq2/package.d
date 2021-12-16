@@ -13,5 +13,5 @@ public import dpq2.oids;
 
 
 version(DerelictPQ_Static){}
-else version(DerelictPQ_Dynamic) {}
+else version(DerelictPQ_Dynamic){}
 else static assert(false, "DerelictPQ type (dynamic or static) isn't defined");
