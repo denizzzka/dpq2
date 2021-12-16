@@ -24,6 +24,7 @@
 		},
 		{
 			"name": "dynamic",
+			"versions": ["DerelictPQ_Dynamic"],
 			"subConfigurations": {
 				"derelict-pq": "derelict-pq-dynamic"
 			}

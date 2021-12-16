@@ -39,13 +39,36 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
-/// Connection
-class Connection
+version(DerelictPQ_Static)
+{
+    /// Connection for static version of libpq
+    class Connection
+    {
+        mixin ConnectionMethods;
+    }
+}
+else
+{
+    /// Connection for dynamic version of libpq
+    package class Connection
+    {
+        import dpq2.dynloader: DynamicLoader;
+
+        package shared static DynamicLoader dynamicLoader;
+
+        mixin ConnectionMethods;
+    }
+}
+
+private mixin template ConnectionMethods()
 {
     package PGconn* conn;
 
     invariant
     {
+        version(DerelictPQ_Dynamic)
+            assert(dynamicLoader !is null);
+
         assert(conn !is null);
     }
 
@@ -516,12 +539,21 @@ class ConnectionException : Dpq2Exception
 version (integration_tests)
 void _integration_test( string connParam )
 {
-    assert( PQlibVersion() >= 9_0100 );
-
     {
         debug import std.experimental.logger;
 
-        auto c = new Connection(connParam);
+        version(DerelictPQ_Static)
+            auto c = new Connection(connParam);
+        else
+        {
+            import dpq2.dynloader: DynamicLoader;
+
+            auto dl = new shared DynamicLoader;
+            auto c = dl.createConnection(connParam);
+        }
+
+        assert( PQlibVersion() >= 9_0100 );
+
         auto dbname = c.dbName();
         auto pver = c.protocolVersion();
         auto sver = c.serverVersion();
