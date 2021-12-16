@@ -548,8 +548,8 @@ void _integration_test( string connParam )
         {
             import dpq2.dynloader: DynamicLoader;
 
-            auto dl = new shared DynamicLoader;
-            auto c = dl.createConnection(connParam);
+            auto dynamicLoader = new shared DynamicLoader;
+            auto c = dynamicLoader.createConnection(connParam);
         }
 
         assert( PQlibVersion() >= 9_0100 );
