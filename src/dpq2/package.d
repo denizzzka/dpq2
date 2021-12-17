@@ -9,7 +9,10 @@ import derelict.pq.pq;
 debug import std.experimental.logger;
 
 version(DerelictPQ_Static){}
-else
+else version(DerelictPQ_Dynamic){}
+else static assert(false, "DerelictPQ type (dynamic or static) isn't defined");
+
+version(DerelictPQ_Dynamic)
 {
     static __gshared bool __initialized;
 
