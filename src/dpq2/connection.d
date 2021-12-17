@@ -44,6 +44,12 @@ version(DerelictPQ_Static)
     /// Connection for static version of libpq
     class Connection
     {
+        ///
+        this(T...)(T args)
+        {
+            ctor(args);
+        }
+
         mixin ConnectionMethods;
     }
 }
@@ -54,7 +60,15 @@ else
     {
         import dpq2.dynloader: DynamicLoader;
 
-        package shared static DynamicLoader dynamicLoader;
+        package immutable DynamicLoader dynamicLoader;
+
+        ///
+        this(T...)(immutable DynamicLoader dl, T args)
+        {
+            dynamicLoader = dl;
+
+            ctor(args);
+        }
 
         mixin ConnectionMethods;
     }
@@ -73,14 +87,14 @@ private mixin template ConnectionMethods()
     }
 
     /// Makes a new connection to the database server
-    this(string connString)
+    private void ctor(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
         checkCreatedConnection();
     }
 
     /// ditto
-    this(in string[string] keyValueParams)
+    private void ctor(in string[string] keyValueParams)
     {
         auto a = keyValueParams.keyValToPQparamsArrays;
 
@@ -89,14 +103,14 @@ private mixin template ConnectionMethods()
     }
 
 	/// Starts creation of a connection to the database server in a nonblocking manner
-    this(ConnectionStart, string connString)
+    private void ctor(ConnectionStart, string connString)
     {
         conn = PQconnectStart(toStringz(connString));
         checkCreatedConnection();
     }
 
 	/// ditto
-    this(ConnectionStart, in string[string] keyValueParams)
+    private void ctor(ConnectionStart, in string[string] keyValueParams)
     {
         auto a = keyValueParams.keyValToPQparamsArrays;
 
@@ -261,7 +275,7 @@ private mixin template ConnectionMethods()
 
         if(r)
         {
-            auto container = new immutable ResultContainer(r);
+            auto container = new immutable ResultContainer(dynamicLoader, r);
             return new immutable Result(container);
         }
 
@@ -273,7 +287,10 @@ private mixin template ConnectionMethods()
     {
         if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
 
-        return new immutable ResultContainer(r);
+        version(DerelictPQ_Static)
+            return new immutable ResultContainer(r);
+        else
+            return new immutable ResultContainer(dynamicLoader, r);
     }
 
     /// Select single-row mode for the currently-executing query
@@ -537,20 +554,28 @@ class ConnectionException : Dpq2Exception
 }
 
 version (integration_tests)
+Connection createTestConn(T...)(T params)
+{
+    version(DerelictPQ_Static)
+        auto c = new Connection(params);
+    else
+    {
+        import dpq2.dynloader: DynamicLoader;
+
+        auto dynamicLoader = new immutable DynamicLoader;
+        auto c = dynamicLoader.createConnection(params);
+    }
+
+    return c;
+}
+
+version (integration_tests)
 void _integration_test( string connParam )
 {
     {
         debug import std.experimental.logger;
 
-        version(DerelictPQ_Static)
-            auto c = new Connection(connParam);
-        else
-        {
-            import dpq2.dynloader: DynamicLoader;
-
-            auto dynamicLoader = new shared DynamicLoader;
-            auto c = dynamicLoader.createConnection(connParam);
-        }
+        auto c = createTestConn(connParam);
 
         assert( PQlibVersion() >= 9_0100 );
 
@@ -572,7 +597,7 @@ void _integration_test( string connParam )
         bool exceptionFlag = false;
 
         try
-            auto c = new Connection(ConnectionStart(), "!!!some incorrect connection string!!!");
+            auto c = createTestConn(ConnectionStart(), "!!!some incorrect connection string!!!");
         catch(ConnectionException e)
         {
             exceptionFlag = true;
@@ -583,7 +608,7 @@ void _integration_test( string connParam )
     }
 
     {
-        auto c = new Connection(connParam);
+        auto c = createTestConn(connParam);
 
         assert(c.escapeLiteral("abc'def") == "'abc''def'");
         assert(c.escapeIdentifier("abc'def") == "\"abc'def\"");
@@ -593,7 +618,7 @@ void _integration_test( string connParam )
     }
 
     {
-        auto c = new Connection(connParam);
+        auto c = createTestConn(connParam);
 
         assert(c.transactionStatus == PQTRANS_IDLE);
 
@@ -615,7 +640,7 @@ void _integration_test( string connParam )
         kv["host"] = "wrong-host";
         kv["dbname"] = "wrong-db-name";
 
-        assertThrown!ConnectionException(new Connection(kv));
-        assertThrown!ConnectionException(new Connection(ConnectionStart(), kv));
+        assertThrown!ConnectionException(createTestConn(kv));
+        assertThrown!ConnectionException(createTestConn(ConnectionStart(), kv));
     }
 }

@@ -27,16 +27,28 @@ private struct Coords
 
 package immutable final class ResultContainer
 {
+    version(DerelictPQ_Dynamic)
+    {
+        import dpq2.dynloader: DynamicLoader;
+
+        private DynamicLoader dynamicLoader;
+    }
+
     // ResultContainer allows only one copy of PGresult* due to avoid double free.
     // For the same reason this class is declared as final.
     private PGresult* result;
     alias result this;
 
-    nothrow invariant()
+    version(DerelictPQ_Dynamic)
+    package this(immutable DynamicLoader dl, immutable PGresult* r)
     {
-        assert( result != null );
-    }
+        assert(dl !is null);
+        assert(r !is null);
 
+        dynamicLoader = dl;
+        result = r;
+    }
+    else
     package this(immutable PGresult* r)
     {
         assert(r);
@@ -774,8 +786,9 @@ version (integration_tests)
 void _integration_test( string connParam )
 {
     import core.exception: AssertError;
+    import dpq2.connection: createTestConn;
 
-    auto conn = new Connection(connParam);
+    auto conn = createTestConn(connParam);
 
     // Text type results testing
     {

@@ -7,7 +7,7 @@ module dpq2.dynloader;
 
 /// Available only for dynamic libpq config
 version(DerelictPQ_Dynamic)
-class DynamicLoader
+immutable class DynamicLoader
 {
     import derelict.pq.pq: DerelictPQ;
     import core.sync.mutex: Mutex;
@@ -27,7 +27,7 @@ class DynamicLoader
         before. So it is possible to use this library even with
         previous versions of libpq with some missing symbols.
     */
-    this() shared
+    this()
     {
         mutex.lock();
         scope(exit) mutex.unlock();
@@ -42,25 +42,24 @@ class DynamicLoader
         }
     }
 
-    ~this() shared
+    ~this()
     {
         mutex.lock();
         scope(exit) mutex.unlock();
 
         if(instances.atomicFetchSub(1) == 1)
         {
+            import std.stdio;
+            writeln("Unload PQ");
             DerelictPQ.unload();
         }
     }
 
     import dpq2.connection: Connection;
 
-    ///
-    Connection createConnection(ARGS...)(ARGS args) shared
+    /// Accepts same parameters as Connection ctors in static configuration
+    Connection createConnection(T...)(T args)
     {
-        Connection.dynamicLoader = this;
-        auto conn = new Connection(args);
-
-        return conn;
+        return new Connection(this, args);
     }
 }
