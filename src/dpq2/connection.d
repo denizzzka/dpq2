@@ -39,39 +39,20 @@ Returns 1 if the libpq is thread-safe and 0 if it is not.
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
+/// Connection
 version(DerelictPQ_Static)
+class Connection
 {
-    /// Connection for static version of libpq
-    class Connection
-    {
-        ///
-        this(T...)(T args)
-        {
-            ctor(args);
-        }
-
-        mixin ConnectionMethods;
-    }
+    mixin ConnectionMethods;
 }
 else
+package class Connection
 {
-    /// Connection for dynamic version of libpq
-    package class Connection
-    {
-        import dpq2.dynloader: DynamicLoader;
+    import dpq2.dynloader: ReferenceCounter;
 
-        package immutable DynamicLoader dynamicLoader;
+    private immutable ReferenceCounter dynLoaderRefCnt;
 
-        ///
-        this(T...)(immutable DynamicLoader dl, T args)
-        {
-            dynamicLoader = dl;
-
-            ctor(args);
-        }
-
-        mixin ConnectionMethods;
-    }
+    mixin ConnectionMethods;
 }
 
 private mixin template ConnectionMethods()
@@ -80,41 +61,42 @@ private mixin template ConnectionMethods()
 
     invariant
     {
-        version(DerelictPQ_Dynamic)
-            assert(dynamicLoader !is null);
-
         assert(conn !is null);
     }
 
     /// Makes a new connection to the database server
-    private void ctor(string connString)
+    this(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
     /// ditto
-    private void ctor(in string[string] keyValueParams)
+    this(in string[string] keyValueParams)
     {
         auto a = keyValueParams.keyValToPQparamsArrays;
 
         conn = PQconnectdbParams(&a.keys[0], &a.vals[0], 0);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
 	/// Starts creation of a connection to the database server in a nonblocking manner
-    private void ctor(ConnectionStart, string connString)
+    this(ConnectionStart, string connString)
     {
         conn = PQconnectStart(toStringz(connString));
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
 	/// ditto
-    private void ctor(ConnectionStart, in string[string] keyValueParams)
+    this(ConnectionStart, in string[string] keyValueParams)
     {
         auto a = keyValueParams.keyValToPQparamsArrays;
 
         conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -275,7 +257,7 @@ private mixin template ConnectionMethods()
 
         if(r)
         {
-            auto container = new immutable ResultContainer(dynamicLoader, r);
+            auto container = new immutable ResultContainer(r);
             return new immutable Result(container);
         }
 
@@ -287,10 +269,7 @@ private mixin template ConnectionMethods()
     {
         if(r is null) throw new ConnectionException(this, __FILE__, __LINE__);
 
-        version(DerelictPQ_Static)
-            return new immutable ResultContainer(r);
-        else
-            return new immutable ResultContainer(dynamicLoader, r);
+        return new immutable ResultContainer(r);
     }
 
     /// Select single-row mode for the currently-executing query
@@ -560,10 +539,10 @@ Connection createTestConn(T...)(T params)
         auto c = new Connection(params);
     else
     {
-        import dpq2.dynloader: DynamicLoader;
+        import dpq2.dynloader: getConnectionFactory;
 
-        auto dynamicLoader = new immutable DynamicLoader;
-        auto c = dynamicLoader.createConnection(params);
+        auto connFactory = getConnectionFactory!T;
+        Connection c = connFactory(params);
     }
 
     return c;

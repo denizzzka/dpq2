@@ -29,9 +29,9 @@ package immutable final class ResultContainer
 {
     version(DerelictPQ_Dynamic)
     {
-        import dpq2.dynloader: DynamicLoader;
+        import dpq2.dynloader: ReferenceCounter;
 
-        private DynamicLoader dynamicLoader;
+        private ReferenceCounter dynLoaderRefCnt;
     }
 
     // ResultContainer allows only one copy of PGresult* due to avoid double free.
@@ -39,21 +39,12 @@ package immutable final class ResultContainer
     private PGresult* result;
     alias result this;
 
-    version(DerelictPQ_Dynamic)
-    package this(immutable DynamicLoader dl, immutable PGresult* r)
-    {
-        assert(dl !is null);
-        assert(r !is null);
-
-        dynamicLoader = dl;
-        result = r;
-    }
-    else
     package this(immutable PGresult* r)
     {
         assert(r);
 
         result = r;
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
     }
 
     ~this()
