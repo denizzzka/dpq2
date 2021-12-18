@@ -53,7 +53,8 @@ package struct ReferenceCounter
         }
     }
 
-    // TODO: "This is bug or not? (immutable class containing struct with dtor)"
+    // TODO: here is must be a destructor, but:
+    // "This is bug or not? (immutable class containing struct with dtor)"
     // https://forum.dlang.org/post/spim8c$108b$1@digitalmars.com
     void __custom_dtor() const
     {
