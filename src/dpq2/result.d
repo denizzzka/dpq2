@@ -52,6 +52,8 @@ package immutable final class ResultContainer
         assert(result != null);
 
         PQclear(result);
+
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 }
 

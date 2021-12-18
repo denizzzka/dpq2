@@ -24,8 +24,13 @@ auto getConnectionFactory(T...)()
 
 import core.sync.mutex: Mutex;
 
-private __gshared static Mutex mutex;
-private shared ptrdiff_t instances;
+private __gshared Mutex mutex;
+private __gshared ptrdiff_t instances;
+
+shared static this()
+{
+    mutex = new Mutex();
+}
 
 package struct ReferenceCounter
 {
@@ -37,6 +42,9 @@ package struct ReferenceCounter
 
     this(bool)
     {
+        mutex.lock();
+        scope(exit) mutex.unlock();
+
         if(instances.atomicFetchAdd(1) == 0)
         {
             debug trace("DerelictPQ loading...");
@@ -45,18 +53,23 @@ package struct ReferenceCounter
         }
     }
 
-    //~ ~this()
-    //~ {
-        //~ mutex.lock();
-        //~ scope(exit) mutex.unlock();
+    // TODO: "This is bug or not? (immutable class containing struct with dtor)"
+    // https://forum.dlang.org/post/spim8c$108b$1@digitalmars.com
+    void __custom_dtor() const
+    {
+        mutex.lock();
+        scope(exit) mutex.unlock();
 
-        //~ if(instances.atomicFetchSub(1) == 1)
-        //~ {
-            //~ import std.stdio;
+        import std.stdio;
+        writeln("Instances ", instances);
 
-            //~ debug writeln("DerelictPQ unloading...");
-            //~ DerelictPQ.unload();
-            //~ debug writeln("...DerelictPQ unloading finished");
-        //~ }
-    //~ }
+        if(instances.atomicFetchSub(1) == 1)
+        {
+            import std.stdio;
+
+            debug writeln("DerelictPQ unloading...");
+            DerelictPQ.unload();
+            debug writeln("...DerelictPQ unloading finished");
+        }
+    }
 }

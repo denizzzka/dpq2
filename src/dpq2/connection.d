@@ -111,6 +111,8 @@ private mixin template ConnectionMethods()
     ~this()
     {
         PQfinish( conn );
+
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 
     mixin Queries;
