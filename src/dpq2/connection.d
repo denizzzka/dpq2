@@ -541,10 +541,10 @@ Connection createTestConn(T...)(T params)
         auto c = new Connection(params);
     else
     {
-        import dpq2.dynloader: getConnectionFactory;
+        import dpq2.dynloader: ConnectionFactory;
 
-        auto connFactory = getConnectionFactory!T;
-        Connection c = connFactory(params);
+        auto connFactory = new immutable ConnectionFactory;
+        Connection c = connFactory.createConnection(params);
     }
 
     return c;

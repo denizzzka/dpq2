@@ -9,17 +9,25 @@ version(DerelictPQ_Dynamic):
 
 import dpq2.connection: Connection;
 
-auto getConnectionFactory(T...)()
+immutable class ConnectionFactory
 {
-    immutable cnt = ReferenceCounter(true);
+    ReferenceCounter cnt;
+
+    this()
+    {
+        cnt = ReferenceCounter(true);
+    }
+
+    ~this()
+    {
+        cnt.__custom_dtor();
+    }
 
     /// Accepts same parameters as Connection ctors in static configuration
     Connection createConnection(T...)(T args)
     {
         return new Connection(args);
     }
-
-    return &createConnection!T;
 }
 
 import core.sync.mutex: Mutex;
