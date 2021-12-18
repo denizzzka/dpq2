@@ -69,9 +69,6 @@ package struct ReferenceCounter
         mutex.lock();
         scope(exit) mutex.unlock();
 
-        import std.stdio;
-        writeln("Instances ", instances);
-
         if(instances.atomicFetchSub(1) == 1)
         {
             import std.stdio;
