@@ -64,6 +64,7 @@ package struct ReferenceCounter
     // TODO: here is must be a destructor, but:
     // "This is bug or not? (immutable class containing struct with dtor)"
     // https://forum.dlang.org/post/spim8c$108b$1@digitalmars.com
+    // https://issues.dlang.org/show_bug.cgi?id=13628
     void __custom_dtor() const
     {
         mutex.lock();
