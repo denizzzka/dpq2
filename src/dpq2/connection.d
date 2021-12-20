@@ -432,6 +432,8 @@ private auto keyValToPQparamsArrays(in string[string] keyValueParams)
 /// Throws exception if connection string isn't passes check.
 void connStringCheck(string connString)
 {
+    //FIXME: add dynamic refcounter here using factory ctor
+
     char* errmsg = null;
     PQconninfoOption* r = PQconninfoParse(connString.toStringz, &errmsg);
 
@@ -472,6 +474,8 @@ unittest
 /// Represents query cancellation process
 class Cancellation
 {
+    //FIXME: add dynamic refcounter here
+
     private PGcancel* cancel;
 
     ///
