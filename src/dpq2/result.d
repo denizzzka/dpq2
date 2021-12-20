@@ -44,7 +44,7 @@ package immutable final class ResultContainer
         assert(r);
 
         result = r;
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(null);
     }
 
     ~this()

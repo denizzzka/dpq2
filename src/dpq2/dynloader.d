@@ -26,6 +26,11 @@ immutable class ConnectionFactory
 
     this()
     {
+        this("");
+    }
+
+    this(string path)
+    {
         import std.exception: enforce;
 
         mutex.lock();
@@ -34,7 +39,7 @@ immutable class ConnectionFactory
         enforce!Dpq2Exception(!instanced, "Already instanced");
 
         instanced = true;
-        cnt = ReferenceCounter(true);
+        cnt = ReferenceCounter(path);
     }
 
     ~this()
@@ -76,7 +81,7 @@ package struct ReferenceCounter
 
     this() @disable;
 
-    this(bool)
+    this(string path)
     {
         mutex.lock();
         scope(exit) mutex.unlock();
@@ -84,7 +89,7 @@ package struct ReferenceCounter
         if(instances.atomicFetchAdd(1) == 0)
         {
             debug trace("DerelictPQ loading...");
-            DerelictPQ.load();
+            DerelictPQ.load(path);
             debug trace("...DerelictPQ loading finished");
         }
     }
@@ -126,7 +131,7 @@ shared static this()
     auto f2 = new immutable ConnectionFactory();
 
     // Only one instance of ConnectionFactory is allowed
-    assertThrown!Dpq2Exception(new immutable ConnectionFactory());
+    assertThrown!Dpq2Exception(new immutable ConnectionFactory(`path/to/libpq.dll`));
 
     f2.destroy;
 
