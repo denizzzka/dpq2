@@ -19,6 +19,11 @@ immutable class ConnectionFactory
     ReferenceCounter cnt;
     //TODO: add optional path to dynamic library?
 
+    shared static this()
+    {
+        mutex = new Mutex();
+    }
+
     this()
     {
         import std.exception: enforce;
@@ -55,24 +60,19 @@ immutable class ConnectionFactory
     }
 }
 
-shared static this()
-{
-    ConnectionFactory.mutex = new Mutex();
-}
-
-private __gshared Mutex mutex;
-private __gshared ptrdiff_t instances;
-
-shared static this()
-{
-    mutex = new Mutex();
-}
-
 package struct ReferenceCounter
 {
     import core.atomic;
     import derelict.pq.pq: DerelictPQ;
     debug import std.experimental.logger;
+
+    private __gshared Mutex mutex;
+    private __gshared ptrdiff_t instances;
+
+    shared static this()
+    {
+        mutex = new Mutex();
+    }
 
     this() @disable;
 
@@ -130,7 +130,7 @@ shared static this()
 
     f2.destroy;
 
-    assert(instances == 0);
+    assert(ReferenceCounter.instances == 0);
 
     // Integration tests connection factory initialization
     connFactory = new immutable ConnectionFactory;
