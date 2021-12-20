@@ -541,9 +541,8 @@ Connection createTestConn(T...)(T params)
         auto c = new Connection(params);
     else
     {
-        import dpq2.dynloader: ConnectionFactory;
+        import dpq2.dynloader: connFactory;
 
-        auto connFactory = new immutable ConnectionFactory;
         Connection c = connFactory.createConnection(params);
     }
 

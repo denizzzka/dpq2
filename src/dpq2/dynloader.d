@@ -8,29 +8,57 @@ module dpq2.dynloader;
 version(DerelictPQ_Dynamic):
 
 import dpq2.connection: Connection;
+import core.sync.mutex: Mutex;
+import dpq2.exception: Dpq2Exception;
 
 immutable class ConnectionFactory
 {
+    private __gshared Mutex mutex;
+    private __gshared bool instanced;
+
     ReferenceCounter cnt;
+    //TODO: add optional path to dynamic library?
 
     this()
     {
+        import std.exception: enforce;
+
+        mutex.lock();
+        scope(exit) mutex.unlock();
+
+        enforce!Dpq2Exception(!instanced, "Already instanced");
+
+        instanced = true;
         cnt = ReferenceCounter(true);
     }
 
     ~this()
     {
+        mutex.lock();
+        scope(exit) mutex.unlock();
+
+        assert(instanced);
+
+        instanced = false;
         cnt.__custom_dtor();
     }
 
     /// Accepts same parameters as Connection ctors in static configuration
     Connection createConnection(T...)(T args)
     {
+        mutex.lock();
+        scope(exit) mutex.unlock();
+
+        assert(instanced);
+
         return new Connection(args);
     }
 }
 
-import core.sync.mutex: Mutex;
+shared static this()
+{
+    ConnectionFactory.mutex = new Mutex();
+}
 
 private __gshared Mutex mutex;
 private __gshared ptrdiff_t instances;
@@ -79,4 +107,31 @@ package struct ReferenceCounter
             debug writeln("...DerelictPQ unloading finished");
         }
     }
+}
+
+version (integration_tests)
+version(DerelictPQ_Dynamic):
+
+/// Used by integration tests facility
+package immutable ConnectionFactory connFactory;
+
+shared static this()
+{
+    import std.exception : assertThrown;
+
+    // Some testing:
+    auto f1 = new immutable ConnectionFactory();
+    f1.destroy;
+
+    auto f2 = new immutable ConnectionFactory();
+
+    // Only one instance of ConnectionFactory is allowed
+    assertThrown!Dpq2Exception(new immutable ConnectionFactory());
+
+    f2.destroy;
+
+    assert(instances == 0);
+
+    // Integration tests connection factory initialization
+    connFactory = new immutable ConnectionFactory;
 }
