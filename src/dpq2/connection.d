@@ -430,10 +430,15 @@ private auto keyValToPQparamsArrays(in string[string] keyValueParams)
 /// Check connection options in the provided connection string
 ///
 /// Throws exception if connection string isn't passes check.
+version(DerelictPQ_Static)
 void connStringCheck(string connString)
 {
-    //FIXME: add dynamic refcounter here using factory ctor
+    _connStringCheck(connString);
+}
 
+/// ditto
+package void _connStringCheck(string connString)
+{
     char* errmsg = null;
     PQconninfoOption* r = PQconninfoParse(connString.toStringz, &errmsg);
 
@@ -457,7 +462,7 @@ void connStringCheck(string connString)
 
 unittest
 {
-    connStringCheck("dbname=postgres user=postgres");
+    _connStringCheck("dbname=postgres user=postgres");
 
     {
         bool raised = false;

@@ -73,6 +73,18 @@ immutable class ConnectionFactory
 
         return new Connection(args);
     }
+
+    void connStringCheck(string connString)
+    {
+        mutex.lock();
+        scope(exit) mutex.unlock();
+
+        assert(instanced);
+
+        import dpq2.connection;
+
+        _connStringCheck(connString);
+    }
 }
 
 package struct ReferenceCounter
