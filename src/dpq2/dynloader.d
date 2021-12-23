@@ -166,8 +166,7 @@ package struct ReferenceCounter
     }
 }
 
-version (integration_tests)
-version(DerelictPQ_Dynamic):
+version (integration_tests):
 
 /// Used by integration tests facility
 package immutable ConnectionFactory connFactory;
