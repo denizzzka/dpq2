@@ -1,7 +1,5 @@
 /**
- * Main module
- *
- * Include it to use common functions.
+ * Supporting of dynamic configuration of libpq
  */
 module dpq2.dynloader;
 
