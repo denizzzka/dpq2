@@ -474,13 +474,19 @@ unittest
 /// Represents query cancellation process
 class Cancellation
 {
-    //FIXME: add dynamic refcounter here
+    version(DerelictPQ_Dynamic)
+    {
+        import dpq2.dynloader: ReferenceCounter;
+        private immutable ReferenceCounter dynLoaderRefCnt;
+    }
 
     private PGcancel* cancel;
 
     ///
     this(Connection c)
     {
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+
         cancel = PQgetCancel(c.conn);
 
         if(cancel is null)
@@ -491,6 +497,8 @@ class Cancellation
     ~this()
     {
         PQfreeCancel(cancel);
+
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 
     /**
