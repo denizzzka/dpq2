@@ -36,33 +36,8 @@ int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
-/// dumb flag for Connection ctor parametrization
-struct ConnectionStart {};
-
-/// Connection
-version(DerelictPQ_Static)
-class Connection
+private mixin template ConnectionCtors()
 {
-    mixin ConnectionMethods;
-}
-else
-package class Connection
-{
-    import dpq2.dynloader: ReferenceCounter;
-
-    private immutable ReferenceCounter dynLoaderRefCnt;
-
-    mixin ConnectionMethods;
-}
-
-private mixin template ConnectionMethods()
-{
-    package PGconn* conn;
-
-    invariant
-    {
-        assert(conn !is null);
-    }
 
     /// Makes a new connection to the database server
     this(string connString)
@@ -98,6 +73,31 @@ private mixin template ConnectionMethods()
         conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
         version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
+    }
+}
+
+/// dumb flag for Connection ctor parametrization
+struct ConnectionStart {};
+
+/// Connection
+class Connection
+{
+    package PGconn* conn;
+
+    invariant
+    {
+        assert(conn !is null);
+    }
+
+    version(DerelictPQ_Static)
+        mixin ConnectionCtors;
+    else
+    {
+        import dpq2.dynloader: ReferenceCounter;
+
+        private immutable ReferenceCounter dynLoaderRefCnt;
+
+        package mixin ConnectionCtors;
     }
 
     private void checkCreatedConnection()
