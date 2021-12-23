@@ -460,22 +460,6 @@ package void _connStringCheck(string connString)
     }
 }
 
-unittest
-{
-    _connStringCheck("dbname=postgres user=postgres");
-
-    {
-        bool raised = false;
-
-        try
-            connStringCheck("wrong conninfo string");
-        catch(ConnectionException e)
-            raised = true;
-
-        assert(raised);
-    }
-}
-
 /// Represents query cancellation process
 class Cancellation
 {
@@ -588,6 +572,26 @@ void _integration_test( string connParam )
         }
 
         destroy(c);
+    }
+
+    {
+        version(DerelictPQ_Dynamic)
+            void csc(string s){ connFactory.connStringCheck(s); }
+        else
+            void csc(string s){ connStringCheck(s); }
+
+        csc("dbname=postgres user=postgres");
+
+        {
+            bool raised = false;
+
+            try
+                csc("wrong conninfo string");
+            catch(ConnectionException e)
+                raised = true;
+
+            assert(raised);
+        }
     }
 
     {
