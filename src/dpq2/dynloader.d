@@ -11,7 +11,7 @@ import dpq2.connection: Connection;
 import core.sync.mutex: Mutex;
 import dpq2.exception: Dpq2Exception;
 
-immutable class ConnectionFactory
+class ConnectionFactory
 {
     private __gshared Mutex mutex;
     private __gshared bool instanced;
@@ -22,29 +22,32 @@ immutable class ConnectionFactory
         mutex = new Mutex();
     }
 
-    this()
-    {
-        this("");
-    }
+    //mixin ctorBody; //FIXME: https://issues.dlang.org/show_bug.cgi?id=22627
+    immutable mixin ctorBody;
 
     // If ctor throws dtor will be called. This is behaviour of current D design.
     // https://issues.dlang.org/show_bug.cgi?id=704
-    private bool isSucessfulConstructed;
+    private immutable bool isSucessfulConstructed;
 
-    this(string path)
+    private mixin template ctorBody()
     {
-        import std.exception: enforce;
+        this() { this(""); }
 
-        mutex.lock();
-        scope(success) instanced = true;
-        scope(exit) mutex.unlock();
+        this(string path)
+        {
+            import std.exception: enforce;
 
-        enforce!Dpq2Exception(!instanced, "Already instanced");
+            mutex.lock();
+            scope(success) instanced = true;
+            scope(exit) mutex.unlock();
 
-        cnt = ReferenceCounter(path);
-        assert(ReferenceCounter.instances == 1);
+            enforce!Dpq2Exception(!instanced, "Already instanced");
 
-        isSucessfulConstructed = true;
+            cnt = ReferenceCounter(path);
+            assert(ReferenceCounter.instances == 1);
+
+            isSucessfulConstructed = true;
+        }
     }
 
     ~this()
@@ -64,7 +67,7 @@ immutable class ConnectionFactory
 
     /// This method is need to forbid attempts to create connection without properly loaded libpq
     /// Accepts same parameters as Connection ctors in static configuration
-    Connection createConnection(T...)(T args)
+    Connection createConnection(T...)(T args) const
     {
         mutex.lock();
         scope(exit) mutex.unlock();
@@ -74,7 +77,7 @@ immutable class ConnectionFactory
         return new Connection(args);
     }
 
-    void connStringCheck(string connString)
+    void connStringCheck(string connString) const
     {
         mutex.lock();
         scope(exit) mutex.unlock();
