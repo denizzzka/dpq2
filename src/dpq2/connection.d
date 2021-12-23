@@ -576,7 +576,14 @@ void _integration_test( string connParam )
 
     {
         version(DerelictPQ_Dynamic)
-            void csc(string s){ connFactory.connStringCheck(s); }
+        {
+            void csc(string s)
+            {
+                import dpq2.dynloader: connFactory;
+
+                connFactory.connStringCheck(s);
+            }
+        }
         else
             void csc(string s){ connStringCheck(s); }
 
