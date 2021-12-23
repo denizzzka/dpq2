@@ -68,7 +68,7 @@ private mixin template ConnectionMethods()
     this(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(null);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -78,7 +78,7 @@ private mixin template ConnectionMethods()
         auto a = keyValueParams.keyValToPQparamsArrays;
 
         conn = PQconnectdbParams(&a.keys[0], &a.vals[0], 0);
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(null);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -86,7 +86,7 @@ private mixin template ConnectionMethods()
     this(ConnectionStart, string connString)
     {
         conn = PQconnectStart(toStringz(connString));
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(null);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -96,7 +96,7 @@ private mixin template ConnectionMethods()
         auto a = keyValueParams.keyValToPQparamsArrays;
 
         conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(null);
+        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
