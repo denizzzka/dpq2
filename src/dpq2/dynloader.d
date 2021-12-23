@@ -101,7 +101,7 @@ package struct ReferenceCounter
         scope(exit) mutex.unlock();
 
         import std.stdio;
-        debug writeln("Instances ", instances);
+        writeln("Instances ", instances);
     }
 
     private __gshared Mutex mutex;
@@ -166,10 +166,7 @@ package struct ReferenceCounter
 
 version (integration_tests):
 
-/// Used by integration tests facility
-package immutable ConnectionFactory connFactory;
-
-shared static this()
+void _integration_test()
 {
     import std.exception : assertThrown;
 
@@ -205,13 +202,22 @@ shared static this()
         assertThrown!SharedLibLoadException(
             new immutable ConnectionFactory(`wrong/path/to/libpq.dll`)
         );
-
-        assert(!ConnectionFactory.instanced);
-        assert(ReferenceCounter.instances == 0);
     }
 
-    // Integration tests connection factory initialization
-    connFactory = new immutable ConnectionFactory;
+    assert(!ConnectionFactory.instanced);
+    assert(ReferenceCounter.instances == 0);
+}
+
+// Used only by integration tests facility:
+private shared ConnectionFactory _connFactory;
+
+//TODO: Remove cast and immutable, https://issues.dlang.org/show_bug.cgi?id=22627
+package immutable(ConnectionFactory) connFactory() { return cast(immutable) _connFactory; }
+
+void _initTestsConnectionFactory()
+{
+    //TODO: ditto
+    _connFactory = cast(shared) new immutable ConnectionFactory;
 
     assert(ConnectionFactory.instanced);
     assert(ReferenceCounter.instances == 1);
