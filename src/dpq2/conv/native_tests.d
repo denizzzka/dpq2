@@ -189,6 +189,7 @@ public void _integration_test( string connParam ) @system
                 );
         }
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
+        C!PGtime_with_time_zone(PGtime_with_time_zone(TimeOfDay(12, 34, 56), 3600 * 5), "time with time zone", "'12:34:56-05'");
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
         C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");

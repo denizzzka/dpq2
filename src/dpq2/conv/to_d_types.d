@@ -10,7 +10,7 @@ import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
-import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
+import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC, TimeOfDayWithTZ;
 import dpq2.conv.geometric: binaryValueAs, Line;
 import dpq2.conv.arrays : binaryValueAs;
 
@@ -38,6 +38,7 @@ alias PGbytea =         immutable(ubyte)[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
+alias PGtime_with_time_zone = TimeOfDayWithTZ; /// Time of day with TZ(no date)
 alias PGtimestamp = TimeStamp; /// Both date and time without time zone
 alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
 alias PGjson =          Json; /// json or jsonb

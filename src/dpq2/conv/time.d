@@ -328,7 +328,7 @@ unittest
 struct TimeOfDayWithTZ
 {
     TimeOfDay time; ///
-    int tzSec; /// Time zone in seconds
+    int tzSec; /// Time zone offset from UTC in seconds with east of UTC being negative
 }
 
 /// Returns value time with time zone as TimeOfDayWithTZ

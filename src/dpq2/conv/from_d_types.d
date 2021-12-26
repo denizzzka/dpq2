@@ -547,7 +547,7 @@ unittest
 {
     auto t = TimeOfDayWithTZ(
         TimeOfDay(14, 29, 17),
-        3600 * 7 // TZ == +07
+        -3600 * 7 // Negative means TZ == +07
     );
 
     auto v = toValue(t);
