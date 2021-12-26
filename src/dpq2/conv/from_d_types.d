@@ -5,7 +5,7 @@ module dpq2.conv.from_d_types;
 
 public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : isGeometricType, toValue;
-import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC;
+import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
@@ -224,13 +224,26 @@ if (is(Unqual!T == Date))
     return Value(nativeToBigEndian(days.to!int).dup, OidType.Date, false);
 }
 
+private long convTimeOfDayToPG(in TimeOfDay v) pure
+{
+    return ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
+}
+
 /// Constructs Value from TimeOfDay
 Value toValue(T)(T v)
 if (is(Unqual!T == TimeOfDay))
 {
-    long us = ((60L * v.hour + v.minute) * 60 + v.second) * 1_000_000;
+    return Value(v.convTimeOfDayToPG.nativeToBigEndian.dup, OidType.Time);
+}
 
-    return Value(nativeToBigEndian(us).dup, OidType.Time, false);
+/// Constructs Value from TimeOfDay
+Value toValue(T)(T v)
+if (is(Unqual!T == TimeOfDayWithTZ))
+{
+    const buf = v.time.convTimeOfDayToPG.nativeToBigEndian ~ v.tzSec.nativeToBigEndian;
+    assert(buf.length == 12);
+
+    return Value(buf.dup, OidType.TimeWithZone);
 }
 
 /// Constructs Value from TimeStamp or from TimeStampUTC
@@ -528,6 +541,19 @@ unittest
 
     assert(v.oidType == OidType.Time);
     assert(v.as!TimeOfDay == tod);
+}
+
+unittest
+{
+    auto t = TimeOfDayWithTZ(
+        TimeOfDay(14, 29, 17),
+        3600 * 7 // TZ == +07
+    );
+
+    auto v = toValue(t);
+
+    assert(v.oidType == OidType.TimeWithZone);
+    assert(v.as!TimeOfDayWithTZ == t);
 }
 
 unittest
