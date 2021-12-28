@@ -10,7 +10,7 @@ import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
-import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC, TimeOfDayWithTZ;
+import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.conv.geometric: binaryValueAs, Line;
 import dpq2.conv.arrays : binaryValueAs;
 
@@ -41,6 +41,7 @@ alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
 alias PGtime_with_time_zone = TimeOfDayWithTZ; /// Time of day with TZ(no date)
 alias PGtimestamp = TimeStamp; /// Both date and time without time zone
 alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
+alias PGinterval = Interval; /// Interval
 alias PGjson =          Json; /// json or jsonb
 alias PGline =          Line; /// Line (geometric type)
 alias PGvarbit =        BitArray; /// BitArray

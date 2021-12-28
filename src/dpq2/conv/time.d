@@ -351,6 +351,34 @@ if( is( T == TimeOfDayWithTZ ) )
     );
 }
 
+///
+struct Interval
+{
+    long usecs; /// All time units less than days
+    int days; /// Days, after time for alignment. Sign is ignored by PG server if usecs == 0
+    int months; /// Ditto, after time for alignment. Sign is ignored by PG server if usecs == 0 and days == 0
+}
+
+/// Returns value time with time zone as Interval
+Interval binaryValueAs(T)(in Value v) @trusted
+if( is( T == Interval ) )
+{
+    immutable typeName = "interval";
+
+    if(!(v.oidType == OidType.TimeInterval))
+        throwTypeComplaint(v.oidType, typeName, __FILE__, __LINE__);
+
+    if(v.data.length != long.sizeof * 2)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres "~typeName, __FILE__, __LINE__);
+
+    return Interval(
+        bigEndianToNative!long(v.data.ptr[0 .. 8]),
+        bigEndianToNative!int(v.data.ptr[8 .. 12]),
+        bigEndianToNative!int(v.data.ptr[12 .. 16])
+    );
+}
+
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
 static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code

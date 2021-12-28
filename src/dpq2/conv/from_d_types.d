@@ -5,7 +5,7 @@ module dpq2.conv.from_d_types;
 
 public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : isGeometricType, toValue;
-import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ;
+import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
@@ -244,6 +244,16 @@ if (is(Unqual!T == TimeOfDayWithTZ))
     assert(buf.length == 12);
 
     return Value(buf.dup, OidType.TimeWithZone);
+}
+
+/// Constructs Value from Interval
+Value toValue(T)(T v)
+if (is(Unqual!T == Interval))
+{
+    const buf = v.usecs.nativeToBigEndian ~ v.days.nativeToBigEndian ~ v.months.nativeToBigEndian;
+    assert(buf.length == 16);
+
+    return Value(buf.dup, OidType.TimeInterval);
 }
 
 /// Constructs Value from TimeStamp or from TimeStampUTC
@@ -554,6 +564,20 @@ unittest
 
     assert(v.oidType == OidType.TimeWithZone);
     assert(v.as!TimeOfDayWithTZ == t);
+}
+
+unittest
+{
+    auto t = Interval(
+        -123,
+        -456,
+        -789
+    );
+
+    auto v = toValue(t);
+
+    assert(v.oidType == OidType.TimeInterval);
+    assert(v.as!Interval == t);
 }
 
 unittest
