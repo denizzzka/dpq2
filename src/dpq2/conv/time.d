@@ -310,15 +310,10 @@ struct TimeOfDayWithTZ
 TimeOfDayWithTZ binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeOfDayWithTZ ) )
 {
-    if(!(v.oidType == OidType.TimeWithZone))
-        throwTypeComplaint(v.oidType, "time with time zone", __FILE__, __LINE__);
-
     enum recSize = TimeADT.sizeof + TimeTZ.sizeof;
     static assert(recSize == 12);
 
-    if(v.data.length != recSize)
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres time with time zone type", __FILE__, __LINE__);
+    v.checkValue(OidType.TimeWithZone, recSize, "time with time zone");
 
     return TimeOfDayWithTZ(
         time2tm(bigEndianToNative!TimeADT(v.data.ptr[0 .. TimeADT.sizeof])),
@@ -338,14 +333,7 @@ struct Interval
 Interval binaryValueAs(T)(in Value v) @trusted
 if( is( T == Interval ) )
 {
-    immutable typeName = "interval";
-
-    if(!(v.oidType == OidType.TimeInterval))
-        throwTypeComplaint(v.oidType, typeName, __FILE__, __LINE__);
-
-    if(v.data.length != long.sizeof * 2)
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres "~typeName, __FILE__, __LINE__);
+    v.checkValue(OidType.TimeInterval, long.sizeof * 2, "interval");
 
     return Interval(
         bigEndianToNative!long(v.data.ptr[0 .. 8]),
