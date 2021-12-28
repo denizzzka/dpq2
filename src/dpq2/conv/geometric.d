@@ -3,6 +3,7 @@ module dpq2.conv.geometric;
 
 import dpq2.oids: OidType;
 import dpq2.value: ConvExceptionType, throwTypeComplaint, Value, ValueConvException, ValueFormat;
+import dpq2.conv.to_d_types: checkValue;
 import std.bitmanip: bigEndianToNative, nativeToBigEndian;
 import std.traits;
 import std.typecons : Nullable;
@@ -272,16 +273,9 @@ private alias ET = ConvExceptionType;
 Vec2Ddouble binaryValueAs(Vec2Ddouble)(in Value v)
 if(isValidPointType!Vec2Ddouble)
 {
-    if(!(v.oidType == OidType.Point))
-        throwTypeComplaint(v.oidType, "Point", __FILE__, __LINE__);
+    v.checkValue(OidType.Point, 16, "Point");
 
-    auto data = v.data;
-
-    if(!(data.length == 16))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres Point size", __FILE__, __LINE__);
-
-    return pointFromBytes!Vec2Ddouble(data[0..16]);
+    return pointFromBytes!Vec2Ddouble(v.data[0..16]);
 }
 
 private Vec2Ddouble pointFromBytes(Vec2Ddouble)(in ubyte[16] data) pure
@@ -293,12 +287,7 @@ if(isValidPointType!Vec2Ddouble)
 T binaryValueAs(T)(in Value v)
 if (is(T == Line))
 {
-    if(!(v.oidType == OidType.Line))
-        throwTypeComplaint(v.oidType, "Line", __FILE__, __LINE__);
-
-    if(!(v.data.length == 24))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres Line size", __FILE__, __LINE__);
+    v.checkValue(OidType.Line, 24, "Line");
 
     return Line((v.data[0..8].bigEndianToNative!double), v.data[8..16].bigEndianToNative!double, v.data[16..24].bigEndianToNative!double);
 }
@@ -306,12 +295,7 @@ if (is(T == Line))
 LineSegment binaryValueAs(LineSegment)(in Value v)
 if(isValidLineSegmentType!LineSegment)
 {
-    if(!(v.oidType == OidType.LineSegment))
-        throwTypeComplaint(v.oidType, "LineSegment", __FILE__, __LINE__);
-
-    if(!(v.data.length == 32))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres LineSegment size", __FILE__, __LINE__);
+    v.checkValue(OidType.LineSegment, 32, "LineSegment");
 
     alias Point = ReturnType!(LineSegment.start);
 
@@ -324,12 +308,7 @@ if(isValidLineSegmentType!LineSegment)
 Box binaryValueAs(Box)(in Value v)
 if(isValidBoxType!Box)
 {
-    if(!(v.oidType == OidType.Box))
-        throwTypeComplaint(v.oidType, "Box", __FILE__, __LINE__);
-
-    if(!(v.data.length == 32))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres Box size", __FILE__, __LINE__);
+    v.checkValue(OidType.Box, 32, "Box");
 
     alias Point = typeof(Box.min);
 
@@ -404,12 +383,7 @@ if(isValidPolygon!Polygon)
 T binaryValueAs(T)(in Value v)
 if(isInstanceOf!(Circle, T))
 {
-    if(!(v.oidType == OidType.Circle))
-        throwTypeComplaint(v.oidType, "Circle", __FILE__, __LINE__);
-
-    if(!(v.data.length == 24))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres Circle size", __FILE__, __LINE__);
+    v.checkValue(OidType.Circle, 24, "Circle");
 
     alias Point = typeof(T.center);
 
