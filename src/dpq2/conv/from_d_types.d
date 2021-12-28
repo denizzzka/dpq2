@@ -318,6 +318,20 @@ if (is(Unqual!T == DateTime))
 Value toValue(T)(T v)
 if (is(Unqual!T == SysTime))
 {
+    import dpq2.value: ValueConvException, ConvExceptionType;
+    import core.time;
+    import std.conv: to;
+
+    long usecs;
+    int hnsecs;
+    v.fracSecs.split!("usecs", "hnsecs")(usecs, hnsecs);
+
+    if(hnsecs)
+        throw new ValueConvException(
+            ConvExceptionType.TOO_PRECISE,
+            "fracSecs have 1 microsecond resolution but contains "~v.fracSecs.to!string
+        );
+
     long us = (v - SysTime(POSTGRES_EPOCH_DATE, UTC())).total!"usecs";
 
     return Value(nativeToBigEndian(us).dup, OidType.TimeStampWithZone, false);
@@ -588,6 +602,19 @@ unittest
 
     assert(v.oidType == OidType.TimeStampWithZone);
     assert(v.as!SysTime == t);
+}
+
+unittest
+{
+    import core.time: dur;
+    import std.exception: assertThrown;
+    import dpq2.value: ValueConvException;
+
+    auto t = SysTime.fromISOExtString("2017-11-13T14:29:17.075678Z");
+    t += dur!"hnsecs"(1);
+
+    // TOO_PRECISE
+    assertThrown!ValueConvException(t.toValue);
 }
 
 unittest

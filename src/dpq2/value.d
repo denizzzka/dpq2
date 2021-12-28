@@ -143,6 +143,7 @@ enum ConvExceptionType
     DIMENSION_MISMATCH, /// Array dimension size is not matched to the Postgres array
     CORRUPTED_ARRAY, /// Corrupted array value
     OUT_OF_RANGE, /// Index is out of range
+    TOO_PRECISE, /// Too precise value can't be stored in destination variable
 }
 
 /// Value conversion exception

@@ -179,7 +179,7 @@ struct TTimeStamp(bool isWithTZ)
     {
         assert(fracSec < 1.seconds, "fracSec can't be more than 1 second but contains "~fracSec.to!string);
         assert(fracSec >= Duration.zero, "fracSec is negative: "~fracSec.to!string);
-        assert(fracSec % 1.usecs == 0.hnsecs, "fracSec have 1 microsecond resolution but contains "~fracSec.to!string);
+        assert(!fracSec.isNegative, "fracSec is negative");
     }
 
     bool isEarlier() const pure { return date.isEarlier; } /// '-infinity'
