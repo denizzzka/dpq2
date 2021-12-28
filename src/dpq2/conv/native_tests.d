@@ -190,6 +190,14 @@ public void _integration_test( string connParam ) @system
                 );
         }
         C!PGtime_without_time_zone(TimeOfDay(12, 34, 56), "time without time zone", "'12:34:56'");
+        C!PGtime_with_time_zone(PGtime_with_time_zone(TimeOfDay(12, 34, 56), 3600 * 5), "time with time zone", "'12:34:56-05'");
+        C!PGinterval(PGinterval(-123), "interval", "'-00:00:00.000123'");
+        C!PGinterval(PGinterval(7200_000_000 + 123), "interval", "'02:00:00.000123'");
+        C!PGinterval(PGinterval(0, 2, 13), "interval", "'1 year 1 mon 2 days'");
+        C!PGinterval(PGinterval(0, 0, -1), "interval", "'-1 mons'");
+        C!PGinterval(PGinterval(0, -2, 1), "interval", "'1 mon -2 days'");
+        C!PGinterval(PGinterval(-123, -2, -1), "interval", "'-1 mons -2 days -00:00:00.000123'");
+        C!PGinterval(PGinterval(-(7200_000_000 + 123), 2, 177999999 * 12 + 3), "interval", "'177999999 years 3 mons 2 days -02:00:00.000123'");
         C!PGtimestamp(PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12)), "timestamp without time zone", "'1997-12-17 07:37:16.000012'");
         C!PGtimestamptz(PGtimestamptz(DateTime(1997, 12, 17, 5, 37, 16), dur!"usecs"(12)), "timestamp with time zone", "'1997-12-17 07:37:16.000012+02'");
         C!PGtimestamp(PGtimestamp.earlier, "timestamp", "'-infinity'");

@@ -10,7 +10,7 @@ module dpq2.conv.time;
 
 import dpq2.result;
 import dpq2.oids: OidType;
-import dpq2.value: throwTypeComplaint;
+import dpq2.conv.to_d_types: checkValue;
 
 import core.time;
 import std.datetime.date : Date, DateTime, TimeOfDay;
@@ -32,12 +32,7 @@ import std.conv: to;
 SysTime binaryValueAs(T)(in Value v) @trusted
 if( is( T == SysTime ) )
 {
-    if(!(v.oidType == OidType.TimeStampWithZone))
-        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
-
-    if(!(v.data.length == long.sizeof))
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
+    v.checkValue(OidType.TimeStampWithZone, long.sizeof, "timestamp with time zone");
 
     auto t = rawTimeStamp2nativeTime!TimeStampUTC(bigEndianToNative!long(v.data.ptr[0..long.sizeof]));
     return SysTime(t.dateTime, t.fracSec, UTC());
@@ -49,12 +44,7 @@ pure:
 Date binaryValueAs(T)(in Value v) @trusted
 if( is( T == Date ) )
 {
-    if(!(v.oidType == OidType.Date))
-        throwTypeComplaint(v.oidType, "Date", __FILE__, __LINE__);
-
-    if(!(v.data.length == uint.sizeof))
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres date type", __FILE__, __LINE__);
+    v.checkValue(OidType.Date, uint.sizeof, "date type");
 
     int jd = bigEndianToNative!uint(v.data.ptr[0..uint.sizeof]);
     int year, month, day;
@@ -72,12 +62,7 @@ if( is( T == Date ) )
 TimeOfDay binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeOfDay ) )
 {
-    if(!(v.oidType == OidType.Time))
-        throwTypeComplaint(v.oidType, "time without time zone", __FILE__, __LINE__);
-
-    if(!(v.data.length == TimeADT.sizeof))
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres time without time zone type", __FILE__, __LINE__);
+    v.checkValue(OidType.Time, TimeADT.sizeof, "time without time zone");
 
     return time2tm(bigEndianToNative!TimeADT(v.data.ptr[0..TimeADT.sizeof]));
 }
@@ -86,12 +71,7 @@ if( is( T == TimeOfDay ) )
 TimeStamp binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeStamp ) )
 {
-    if(!(v.oidType == OidType.TimeStamp))
-        throwTypeComplaint(v.oidType, "timestamp without time zone", __FILE__, __LINE__);
-
-    if(!(v.data.length == long.sizeof))
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres timestamp without time zone type", __FILE__, __LINE__);
+    v.checkValue(OidType.TimeStamp, long.sizeof, "timestamp without time zone");
 
     return rawTimeStamp2nativeTime!TimeStamp(
         bigEndianToNative!long(v.data.ptr[0..long.sizeof])
@@ -102,12 +82,7 @@ if( is( T == TimeStamp ) )
 TimeStampUTC binaryValueAs(T)(in Value v) @trusted
 if( is( T == TimeStampUTC ) )
 {
-    if(!(v.oidType == OidType.TimeStampWithZone))
-        throwTypeComplaint(v.oidType, "timestamp with time zone", __FILE__, __LINE__);
-
-    if(!(v.data.length == long.sizeof))
-        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres timestamp with time zone type", __FILE__, __LINE__);
+    v.checkValue(OidType.TimeStampWithZone, long.sizeof, "timestamp with time zone");
 
     return rawTimeStamp2nativeTime!TimeStampUTC(
         bigEndianToNative!long(v.data.ptr[0..long.sizeof])
@@ -324,6 +299,49 @@ unittest
     assert(detectOidTypeFromNative!TimeOfDay == OidType.Time);
 }
 
+///
+struct TimeOfDayWithTZ
+{
+    TimeOfDay time; ///
+    TimeTZ tzSec; /// Time zone offset from UTC in seconds with east of UTC being negative
+}
+
+/// Returns value time with time zone as TimeOfDayWithTZ
+TimeOfDayWithTZ binaryValueAs(T)(in Value v) @trusted
+if( is( T == TimeOfDayWithTZ ) )
+{
+    enum recSize = TimeADT.sizeof + TimeTZ.sizeof;
+    static assert(recSize == 12);
+
+    v.checkValue(OidType.TimeWithZone, recSize, "time with time zone");
+
+    return TimeOfDayWithTZ(
+        time2tm(bigEndianToNative!TimeADT(v.data.ptr[0 .. TimeADT.sizeof])),
+        bigEndianToNative!TimeTZ(v.data.ptr[TimeADT.sizeof .. recSize])
+    );
+}
+
+///
+struct Interval
+{
+    long usecs; /// All time units less than days
+    int days; /// Days, after time for alignment. Sign is ignored by PG server if usecs == 0
+    int months; /// Ditto, after time for alignment. Sign is ignored by PG server if usecs == 0 and days == 0
+}
+
+/// Returns value time with time zone as Interval
+Interval binaryValueAs(T)(in Value v) @trusted
+if( is( T == Interval ) )
+{
+    v.checkValue(OidType.TimeInterval, long.sizeof * 2, "interval");
+
+    return Interval(
+        bigEndianToNative!long(v.data.ptr[0 .. 8]),
+        bigEndianToNative!int(v.data.ptr[8 .. 12]),
+        bigEndianToNative!int(v.data.ptr[12 .. 16])
+    );
+}
+
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
 static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
@@ -397,6 +415,7 @@ void j2date(int jd, out int year, out int month, out int day)
 private alias long Timestamp;
 private alias long TimestampTz;
 private alias long TimeADT;
+private alias int  TimeTZ;
 private alias long TimeOffset;
 private alias int  fsec_t;      /* fractional seconds (in microseconds) */
 

@@ -10,7 +10,7 @@ import dpq2.query: QueryParams;
 import dpq2.result: msg_NOT_BINARY;
 import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
-import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC;
+import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.conv.geometric: binaryValueAs, Line;
 import dpq2.conv.arrays : binaryValueAs;
 
@@ -38,8 +38,10 @@ alias PGbytea =         immutable(ubyte)[]; /// bytea
 alias PGuuid =          UUID; /// UUID
 alias PGdate =          Date; /// Date (no time of day)
 alias PGtime_without_time_zone = TimeOfDay; /// Time of day (no date)
+alias PGtime_with_time_zone = TimeOfDayWithTZ; /// Time of day with TZ(no date)
 alias PGtimestamp = TimeStamp; /// Both date and time without time zone
 alias PGtimestamptz = TimeStampUTC; /// Both date and time stored in UTC time zone
+alias PGinterval = Interval; /// Interval
 alias PGjson =          Json; /// json or jsonb
 alias PGline =          Line; /// Line (geometric type)
 alias PGvarbit =        BitArray; /// BitArray
@@ -224,16 +226,26 @@ if( isNumeric!(T) )
     assertThrown!ValueConvException(v.binaryValueAs!int);
 }
 
+package void checkValue(
+    in Value v,
+    in OidType enforceOid,
+    in size_t enforceSize,
+    in string typeName
+) pure
+{
+    if(!(v.oidType == enforceOid))
+        throwTypeComplaint(v.oidType, typeName);
+
+    if(!(v.data.length == enforceSize))
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            `Value length isn't equal to Postgres `~typeName~` size`);
+}
+
 /// Returns UUID as native UUID value
 UUID binaryValueAs(T)(in Value v)
 if( is( T == UUID ) )
 {
-    if(!(v.oidType == OidType.UUID))
-        throwTypeComplaint(v.oidType, "UUID", __FILE__, __LINE__);
-
-    if(!(v.data.length == 16))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres UUID size", __FILE__, __LINE__);
+    v.checkValue(OidType.UUID, 16, "UUID");
 
     UUID r;
     r.data = v.data;
@@ -253,12 +265,7 @@ if( is( T == UUID ) )
 bool binaryValueAs(T : bool)(in Value v)
 if (!is(T == Nullable!R, R))
 {
-    if(!(v.oidType == OidType.Bool))
-        throwTypeComplaint(v.oidType, "bool", __FILE__, __LINE__);
-
-    if(!(v.data.length == 1))
-        throw new AE(ET.SIZE_MISMATCH,
-            "Value length isn't equal to Postgres boolean size", __FILE__, __LINE__);
+    v.checkValue(OidType.Bool, 1, "bool");
 
     return v.data[0] != 0;
 }
