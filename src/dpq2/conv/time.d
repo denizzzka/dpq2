@@ -324,6 +324,61 @@ unittest
     assert(detectOidTypeFromNative!TimeOfDay == OidType.Time);
 }
 
+///
+struct TimeOfDayWithTZ
+{
+    TimeOfDay time; ///
+    TimeTZ tzSec; /// Time zone offset from UTC in seconds with east of UTC being negative
+}
+
+/// Returns value time with time zone as TimeOfDayWithTZ
+TimeOfDayWithTZ binaryValueAs(T)(in Value v) @trusted
+if( is( T == TimeOfDayWithTZ ) )
+{
+    if(!(v.oidType == OidType.TimeWithZone))
+        throwTypeComplaint(v.oidType, "time with time zone", __FILE__, __LINE__);
+
+    enum recSize = TimeADT.sizeof + TimeTZ.sizeof;
+    static assert(recSize == 12);
+
+    if(v.data.length != recSize)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres time with time zone type", __FILE__, __LINE__);
+
+    return TimeOfDayWithTZ(
+        time2tm(bigEndianToNative!TimeADT(v.data.ptr[0 .. TimeADT.sizeof])),
+        bigEndianToNative!TimeTZ(v.data.ptr[TimeADT.sizeof .. recSize])
+    );
+}
+
+///
+struct Interval
+{
+    long usecs; /// All time units less than days
+    int days; /// Days, after time for alignment. Sign is ignored by PG server if usecs == 0
+    int months; /// Ditto, after time for alignment. Sign is ignored by PG server if usecs == 0 and days == 0
+}
+
+/// Returns value time with time zone as Interval
+Interval binaryValueAs(T)(in Value v) @trusted
+if( is( T == Interval ) )
+{
+    immutable typeName = "interval";
+
+    if(!(v.oidType == OidType.TimeInterval))
+        throwTypeComplaint(v.oidType, typeName, __FILE__, __LINE__);
+
+    if(v.data.length != long.sizeof * 2)
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+            "Value length isn't equal to Postgres "~typeName, __FILE__, __LINE__);
+
+    return Interval(
+        bigEndianToNative!long(v.data.ptr[0 .. 8]),
+        bigEndianToNative!int(v.data.ptr[8 .. 12]),
+        bigEndianToNative!int(v.data.ptr[12 .. 16])
+    );
+}
+
 package enum POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
 package enum POSTGRES_EPOCH_JDATE = POSTGRES_EPOCH_DATE.julianDay;
 static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
@@ -397,6 +452,7 @@ void j2date(int jd, out int year, out int month, out int day)
 private alias long Timestamp;
 private alias long TimestampTz;
 private alias long TimeADT;
+private alias int  TimeTZ;
 private alias long TimeOffset;
 private alias int  fsec_t;      /* fractional seconds (in microseconds) */
 
