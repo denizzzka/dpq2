@@ -105,6 +105,7 @@ shared static this()
         immutable AppropriateArrOid[] a =
         [
             A(Text, TextArray),
+            A(Name, NameArray),
             A(Bool, BoolArray),
             A(Int2, Int2Array),
             A(Int4, Int4Array),
@@ -113,6 +114,7 @@ shared static this()
             A(Float8, Float8Array),
             A(Date, DateArray),
             A(Time, TimeArray),
+            A(TimeWithZone, TimeWithZoneArray),
             A(TimeStampWithZone, TimeStampWithZoneArray),
             A(TimeStamp, TimeStampArray),
             A(Json, JsonArray),
@@ -136,6 +138,7 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
         case Int2Array:
         case Int4Array:
         case TextArray:
+        case NameArray:
         case Int8Array:
         case Float4Array:
         case Float8Array:
@@ -191,6 +194,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == double)){ return Float8; } else
         static if(is(UT == StdDate)){ return Date; } else
         static if(is(UT == TimeOfDay)){ return Time; } else
+        static if(is(UT == dpq2.conv.time.TimeOfDayWithTZ)){ return TimeWithZone; } else
         static if(is(UT == DateTime)){ return TimeStamp; } else
         static if(is(UT == SysTime)){ return TimeStampWithZone; } else
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
