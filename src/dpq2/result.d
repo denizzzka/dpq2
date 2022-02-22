@@ -13,7 +13,7 @@ import derelict.pq.pq;
 
 import core.vararg;
 import std.string: toStringz;
-import std.exception: enforce;
+import std.exception: enforce, assertThrown;
 import core.exception: OutOfMemoryError;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
@@ -404,7 +404,14 @@ immutable struct Row
         string res;
 
         foreach(val; rangify(this))
-            res ~= dpq2.result.toString(val)~"\t";
+        {
+            try
+                res ~= dpq2.result.toString(val);
+            catch(ValueConvException e)
+                res ~= `#%???%#`;
+
+            res ~= "\t";
+        }
 
         return res;
     }
@@ -824,7 +831,8 @@ void _integration_test( string connParam )
         "NULL::smallint,"~
         "array[11,22,NULL,44]::integer[] as small_array, "~
         "array['1','23',NULL,'789A']::text[] as text_array, "~
-        "array[]::text[] as empty_array";
+        "array[]::text[] as empty_array, "~
+        "'2022-02-23'::date as unsupported_toString_output_type";
 
     auto r = conn.execParams(p);
 
@@ -854,6 +862,9 @@ void _integration_test( string connParam )
         assert( r[0]["empty_array"].asArray.length == 0 );
         assert( r[0]["text_array"].asArray.length == 4 );
         assert( r[0]["test_array"].asArray.length == 18 );
+
+        r[0].toString; // Must not throw
+        assertThrown!ValueConvException(r[0]["unsupported_toString_output_type"].toString);
 
         // Access to NULL cell
         {
@@ -906,7 +917,7 @@ void _integration_test( string connParam )
             foreach(elem; rangify(row))
                 count++;
 
-        assert(count == 8);
+        assert(count == 9);
     }
 
     {
