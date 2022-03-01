@@ -162,6 +162,10 @@ Bson rawValueToBson(in Value v)
             res = Bson(json);
             break;
 
+        case OidType.Date:
+            res = Bson(BsonDate(SysTime(v.tunnelForBinaryValueAsCalls!Date))); // TODO: replace Date with OidType.Date
+            break;
+
         default:
             throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
