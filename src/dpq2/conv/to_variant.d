@@ -17,10 +17,10 @@ import std.variant: Variant;
 import vibe.data.json: VibeJson = Json;
 
 ///
-Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
+TVariant toVariant(bool isNullablePayload = true, TVariant = Variant)(in Value v) @safe
 {
     auto getNative(T)()
-    if(!is(T == Variant))
+    if(!is(T == TVariant))
     {
         static if(isNullablePayload)
         {
@@ -39,7 +39,7 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         }
     }
 
-    Variant retVariant(T)() @trusted
+    TVariant retVariant(T)() @trusted
     {
         return Variant(getNative!T);
     }
