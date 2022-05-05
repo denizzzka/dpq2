@@ -10,6 +10,7 @@
 	"dependencies": {
 		"derelict-pq": "~>4.0.0-alpha.2",
 		"vibe-d:data": ">=0.8.3-beta.1 <0.10.0",
+		"mir-core": "~>1.1.106",
 		"money": "~>3.0.2"
 	},
 	"targetType": "sourceLibrary",
@@ -36,6 +37,7 @@
 			"dependencies":
 			{
 				"dpq2": "*",
+				"mir-core": "~>1.1.106",
 				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [
