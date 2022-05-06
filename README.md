@@ -172,15 +172,15 @@ column name: 'multi_array', bson: [[1,2,3],[4,5,6]]
 column name: 'json_value', bson: {"text_str":"text string","float_value":123.456}
 ```
 
-Using dynamic libpq
+Using dynamic version of libpq
 --------
 Is provided two ways to load `libpq` dynamically:
 
-* Automatic load and unload (`dynamic`)
-* Manual load (and unload, if need) (`dynamic-unmanaged`)
+* Automatic load and unload ("dynamic" build config option)
+* Manual load (and unload, if need) ("dynamic-unmanaged")
 
 To load automatically it is necessary to allocate `ConnectionFactory`.
-This class is only available then `--config=dynamic` is used.
+This class is only available then `dynamic` config is used.
 Only one instance of `ConnectionFactory` is allowed.
 It is possible to specify filepath to a library what you want to use, otherwise default will be used:
 ```
