@@ -183,14 +183,14 @@ To load automatically it is necessary to allocate `ConnectionFactory`.
 This class is only available then `dynamic` config is used.
 Only one instance of `ConnectionFactory` is allowed.
 It is possible to specify filepath to a library/libraries what you want to use, otherwise default will be used:
-```
+```D
 // Argument is a string containing one or more comma-separated
 // shared library names
 auto connFactory = new immutable ConnectionFactory("path/to/libpq.dll");
 ```
 
 Then you can create connection by calling `createConnection` method:
-```
+```D
 Connection conn = connFactory.createConnection(params);
 ```
 And then this connection can be used as usual.
@@ -199,7 +199,7 @@ When all objects related to `libpq` (including `ConnectionFactory`) is destroyed
 
 To load manually it is necessary to use build config `dynamic-unmanaged`.
 Manual dynamic `libpq` loading example:
-```
+```D
 import derelict.pq.pq: DerelictPQ;
 import core.memory: GC;
 
