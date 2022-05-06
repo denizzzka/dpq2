@@ -39,8 +39,9 @@ version (integration_tests)
 public void _integration_test( string connParam ) @system
 {
     import std.format: format;
+    import dpq2.connection: createTestConn;
 
-    auto conn = new Connection(connParam);
+    auto conn = createTestConn(connParam);
 
     // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
     conn.exec("SET TIMEZONE TO +02");

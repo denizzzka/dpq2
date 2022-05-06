@@ -303,8 +303,9 @@ void _integration_test( string connParam ) @trusted
 {
     import dpq2.conv.to_d_types;
     import dpq2.conv.to_bson;
+    import dpq2.connection: createTestConn;
 
-    auto conn = new Connection(connParam);
+    auto conn = createTestConn(connParam);
 
     // Text type arguments testing
     {

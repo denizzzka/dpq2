@@ -5,47 +5,13 @@
  */
 module dpq2;
 
-import derelict.pq.pq;
-debug import std.experimental.logger;
+public import dpq2.dynloader;
+public import dpq2.connection;
+public import dpq2.query;
+public import dpq2.result;
+public import dpq2.oids;
 
-version(DerelictPQ_Static){}
-else version(DerelictPQ_Dynamic){}
-else static assert(false, "DerelictPQ type (dynamic or static) isn't defined");
 
-version(DerelictPQ_Dynamic)
-{
-    static __gshared bool __initialized;
-
-    /*
-        Not shared static constructor makes possible to setup
-        DerelictPQ.missingSymbolCallback from external static
-        constructors. So it is possible to use this library even with
-        previous versions of libpq with some missing symbols.
-    */
-    static this()
-    {
-        import std.concurrency : initOnce;
-        initOnce!__initialized({
-            debug
-            {
-                trace("DerelictPQ loading...");
-            }
-
-            DerelictPQ.load();
-
-            debug
-            {
-                trace("...DerelictPQ loading finished");
-            }
-            return true;
-        }());
-    }
-}
-
-public
-{
-    import dpq2.connection;
-    import dpq2.query;
-    import dpq2.result;
-    import dpq2.oids;
-}
+version(Dpq2_Static){}
+else version(Dpq2_Dynamic){}
+else static assert(false, "dpq2 link type (dynamic or static) isn't defined");

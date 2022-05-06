@@ -231,7 +231,7 @@ package void checkValue(
     in OidType enforceOid,
     in size_t enforceSize,
     in string typeName
-) pure
+) pure @safe
 {
     if(!(v.oidType == enforceOid))
         throwTypeComplaint(v.oidType, typeName);

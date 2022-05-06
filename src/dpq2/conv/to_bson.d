@@ -176,12 +176,12 @@ Bson rawValueToBson(in Value v)
 version (integration_tests)
 public void _integration_test( string connParam )
 {
-    import dpq2.connection: Connection;
+    import dpq2.connection: Connection, createTestConn;
     import dpq2.args: QueryParams;
     import std.uuid;
     import std.datetime: SysTime, DateTime, UTC;
 
-    auto conn = new Connection(connParam);
+    auto conn = createTestConn(connParam);
 
     // text answer tests
     {

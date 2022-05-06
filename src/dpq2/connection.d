@@ -36,6 +36,46 @@ int PQisthreadsafe();
 Returns 1 if the libpq is thread-safe and 0 if it is not.
 */
 
+private mixin template ConnectionCtors()
+{
+
+    /// Makes a new connection to the database server
+    this(string connString)
+    {
+        conn = PQconnectdb(toStringz(connString));
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        checkCreatedConnection();
+    }
+
+    /// ditto
+    this(in string[string] keyValueParams)
+    {
+        auto a = keyValueParams.keyValToPQparamsArrays;
+
+        conn = PQconnectdbParams(&a.keys[0], &a.vals[0], 0);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        checkCreatedConnection();
+    }
+
+	/// Starts creation of a connection to the database server in a nonblocking manner
+    this(ConnectionStart, string connString)
+    {
+        conn = PQconnectStart(toStringz(connString));
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        checkCreatedConnection();
+    }
+
+	/// ditto
+    this(ConnectionStart, in string[string] keyValueParams)
+    {
+        auto a = keyValueParams.keyValToPQparamsArrays;
+
+        conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        checkCreatedConnection();
+    }
+}
+
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
@@ -49,36 +89,15 @@ class Connection
         assert(conn !is null);
     }
 
-    /// Makes a new connection to the database server
-    this(string connString)
+    version(Dpq2_Static)
+        mixin ConnectionCtors;
+    else
     {
-        conn = PQconnectdb(toStringz(connString));
-        checkCreatedConnection();
-    }
+        import dpq2.dynloader: ReferenceCounter;
 
-    /// ditto
-    this(in string[string] keyValueParams)
-    {
-        auto a = keyValueParams.keyValToPQparamsArrays;
+        private immutable ReferenceCounter dynLoaderRefCnt;
 
-        conn = PQconnectdbParams(&a.keys[0], &a.vals[0], 0);
-        checkCreatedConnection();
-    }
-
-	/// Starts creation of a connection to the database server in a nonblocking manner
-    this(ConnectionStart, string connString)
-    {
-        conn = PQconnectStart(toStringz(connString));
-        checkCreatedConnection();
-    }
-
-	/// ditto
-    this(ConnectionStart, in string[string] keyValueParams)
-    {
-        auto a = keyValueParams.keyValToPQparamsArrays;
-
-        conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
-        checkCreatedConnection();
+        package mixin ConnectionCtors;
     }
 
     private void checkCreatedConnection()
@@ -92,6 +111,8 @@ class Connection
     ~this()
     {
         PQfinish( conn );
+
+        version(Dpq2_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 
     mixin Queries;
@@ -409,7 +430,14 @@ private auto keyValToPQparamsArrays(in string[string] keyValueParams)
 /// Check connection options in the provided connection string
 ///
 /// Throws exception if connection string isn't passes check.
+version(Dpq2_Static)
 void connStringCheck(string connString)
+{
+    _connStringCheck(connString);
+}
+
+/// ditto
+package void _connStringCheck(string connString)
 {
     char* errmsg = null;
     PQconninfoOption* r = PQconninfoParse(connString.toStringz, &errmsg);
@@ -432,30 +460,22 @@ void connStringCheck(string connString)
     }
 }
 
-unittest
-{
-    connStringCheck("dbname=postgres user=postgres");
-
-    {
-        bool raised = false;
-
-        try
-            connStringCheck("wrong conninfo string");
-        catch(ConnectionException e)
-            raised = true;
-
-        assert(raised);
-    }
-}
-
 /// Represents query cancellation process
 class Cancellation
 {
+    version(Dpq2_Dynamic)
+    {
+        import dpq2.dynloader: ReferenceCounter;
+        private immutable ReferenceCounter dynLoaderRefCnt;
+    }
+
     private PGcancel* cancel;
 
     ///
     this(Connection c)
     {
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+
         cancel = PQgetCancel(c.conn);
 
         if(cancel is null)
@@ -466,6 +486,8 @@ class Cancellation
     ~this()
     {
         PQfreeCancel(cancel);
+
+        version(Dpq2_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 
     /**
@@ -514,14 +536,30 @@ class ConnectionException : Dpq2Exception
 }
 
 version (integration_tests)
+Connection createTestConn(T...)(T params)
+{
+    version(Dpq2_Static)
+        auto c = new Connection(params);
+    else
+    {
+        import dpq2.dynloader: connFactory;
+
+        Connection c = connFactory.createConnection(params);
+    }
+
+    return c;
+}
+
+version (integration_tests)
 void _integration_test( string connParam )
 {
-    assert( PQlibVersion() >= 9_0100 );
-
     {
         debug import std.experimental.logger;
 
-        auto c = new Connection(connParam);
+        auto c = createTestConn(connParam);
+
+        assert( PQlibVersion() >= 9_0100 );
+
         auto dbname = c.dbName();
         auto pver = c.protocolVersion();
         auto sver = c.serverVersion();
@@ -537,10 +575,37 @@ void _integration_test( string connParam )
     }
 
     {
+        version(Dpq2_Dynamic)
+        {
+            void csc(string s)
+            {
+                import dpq2.dynloader: connFactory;
+
+                connFactory.connStringCheck(s);
+            }
+        }
+        else
+            void csc(string s){ connStringCheck(s); }
+
+        csc("dbname=postgres user=postgres");
+
+        {
+            bool raised = false;
+
+            try
+                csc("wrong conninfo string");
+            catch(ConnectionException e)
+                raised = true;
+
+            assert(raised);
+        }
+    }
+
+    {
         bool exceptionFlag = false;
 
         try
-            auto c = new Connection(ConnectionStart(), "!!!some incorrect connection string!!!");
+            auto c = createTestConn(ConnectionStart(), "!!!some incorrect connection string!!!");
         catch(ConnectionException e)
         {
             exceptionFlag = true;
@@ -551,7 +616,7 @@ void _integration_test( string connParam )
     }
 
     {
-        auto c = new Connection(connParam);
+        auto c = createTestConn(connParam);
 
         assert(c.escapeLiteral("abc'def") == "'abc''def'");
         assert(c.escapeIdentifier("abc'def") == "\"abc'def\"");
@@ -561,7 +626,7 @@ void _integration_test( string connParam )
     }
 
     {
-        auto c = new Connection(connParam);
+        auto c = createTestConn(connParam);
 
         assert(c.transactionStatus == PQTRANS_IDLE);
 
@@ -583,7 +648,7 @@ void _integration_test( string connParam )
         kv["host"] = "wrong-host";
         kv["dbname"] = "wrong-db-name";
 
-        assertThrown!ConnectionException(new Connection(kv));
-        assertThrown!ConnectionException(new Connection(ConnectionStart(), kv));
+        assertThrown!ConnectionException(createTestConn(kv));
+        assertThrown!ConnectionException(createTestConn(ConnectionStart(), kv));
     }
 }

@@ -240,7 +240,9 @@ unittest
 version(integration_tests)
 void _integration_test(string connParam)
 {
-    auto conn = new Connection(connParam);
+    import dpq2.connection: createTestConn;
+
+    auto conn = createTestConn(connParam);
     auto stmnt = wrapStatement(conn, i("Some Integer", 123));
 
     assert(stmnt.qp.sqlCommand == `"Some Integer"`);
