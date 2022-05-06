@@ -185,7 +185,7 @@ It is possible to specify filepath to a library what you want to use, otherwise 
 auto connFactory = new immutable ConnectionFactory("path/to/libpq.dll");
 ```
 
-Then you can create connection by calling method:
+Then you can create connection by calling `createConnection` method:
 ```
 Connection conn = connFactory.createConnection(params);
 ```
