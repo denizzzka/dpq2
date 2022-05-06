@@ -207,8 +207,9 @@ DerelictPQ.load();
 
 auto conn = new Connection(connInfo);
 /* Skipped rest of useful SQL processing */
+conn.destroy(); // Ensure that all related to libpq objects are destroyed
 
-GC.collect(); // Ensures that all related to libpq objects are destroyed
+GC.collect(); // Forced removal of references to libpq before library unload
 DerelictPQ.unload();
 ```
 In this case is not need to use `ConnectionFactory` - just create `Connection` by the same way as for `static` config.
