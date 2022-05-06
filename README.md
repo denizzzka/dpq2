@@ -176,8 +176,8 @@ Using dynamic version of libpq
 --------
 Is provided two ways to load `libpq` dynamically:
 
-* Automatic load and unload ("dynamic" build config option)
-* Manual load (and unload, if need) ("dynamic-unmanaged")
+* Automatic load and unload (`dynamic` build config option)
+* Manual load (and unload, if need) (`dynamic-unmanaged`)
 
 To load automatically it is necessary to allocate `ConnectionFactory`.
 This class is only available then `dynamic` config is used.
