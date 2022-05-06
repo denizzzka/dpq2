@@ -8,7 +8,7 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"derelict-pq": "~>4.0.0-alpha.2",
+		"derelict-pq": "~>4.0.0",
 		"vibe-d:data": ">=0.8.3-beta.1 <0.10.0",
 		"money": "~>3.0.2"
 	},
@@ -17,14 +17,22 @@
 	"configurations": [
 		{
 			"name": "static",
+			"versions": ["Dpq2_Static"],
 			"subConfigurations": {
 				"derelict-pq": "derelict-pq-static"
 			},
 			"libs": ["pq"]
 		},
 		{
+			"name": "dynamic-unmanaged",
+			"versions": ["Dpq2_Static"],
+			"subConfigurations": {
+				"derelict-pq": "derelict-pq-dynamic"
+			}
+		},
+		{
 			"name": "dynamic",
-			"versions": ["DerelictPQ_Dynamic"],
+			"versions": ["Dpq2_Dynamic"],
 			"subConfigurations": {
 				"derelict-pq": "derelict-pq-dynamic"
 			}
@@ -44,6 +52,14 @@
 					"name": "dynamic",
 					"subConfigurations": {
 						"dpq2": "dynamic"
+					}
+				},
+				{
+					"name": "dynamic-unmanaged",
+					"versions": ["Test_Dynamic_Unmanaged"],
+					"subConfigurations": {
+						"derelict-pq": "derelict-pq-dynamic",
+						"dpq2": "dynamic-unmanaged"
 					}
 				},
 				{

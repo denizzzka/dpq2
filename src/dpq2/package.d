@@ -12,6 +12,6 @@ public import dpq2.result;
 public import dpq2.oids;
 
 
-version(DerelictPQ_Static){}
-else version(DerelictPQ_Dynamic){}
-else static assert(false, "DerelictPQ type (dynamic or static) isn't defined");
+version(Dpq2_Static){}
+else version(Dpq2_Dynamic){}
+else static assert(false, "dpq2 link type (dynamic or static) isn't defined");

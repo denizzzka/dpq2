@@ -13,10 +13,16 @@ import bson = dpq2.conv.to_bson: _integration_test;
 
 int main(string[] args)
 {
-    version(DerelictPQ_Dynamic)
+    version(Dpq2_Dynamic)
     {
         dynld._integration_test();
         dynld._initTestsConnectionFactory();
+    }
+    else version(Test_Dynamic_Unmanaged)
+    {
+        import derelict.pq.pq;
+
+        DerelictPQ.load();
     }
 
     string conninfo;
@@ -30,4 +36,14 @@ int main(string[] args)
     bson._integration_test( conninfo );
 
     return 0;
+}
+
+version(Test_Dynamic_Unmanaged)
+shared static ~this()
+{
+    import core.memory: GC;
+    import derelict.pq.pq;
+
+    GC.collect(); // Ensures that all related to libpq objects are destroyed
+    DerelictPQ.unload();
 }

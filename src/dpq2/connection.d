@@ -43,7 +43,7 @@ private mixin template ConnectionCtors()
     this(string connString)
     {
         conn = PQconnectdb(toStringz(connString));
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -53,7 +53,7 @@ private mixin template ConnectionCtors()
         auto a = keyValueParams.keyValToPQparamsArrays;
 
         conn = PQconnectdbParams(&a.keys[0], &a.vals[0], 0);
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -61,7 +61,7 @@ private mixin template ConnectionCtors()
     this(ConnectionStart, string connString)
     {
         conn = PQconnectStart(toStringz(connString));
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 
@@ -71,7 +71,7 @@ private mixin template ConnectionCtors()
         auto a = keyValueParams.keyValToPQparamsArrays;
 
         conn = PQconnectStartParams(&a.keys[0], &a.vals[0], 0);
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
         checkCreatedConnection();
     }
 }
@@ -89,7 +89,7 @@ class Connection
         assert(conn !is null);
     }
 
-    version(DerelictPQ_Static)
+    version(Dpq2_Static)
         mixin ConnectionCtors;
     else
     {
@@ -112,7 +112,7 @@ class Connection
     {
         PQfinish( conn );
 
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt.__custom_dtor();
+        version(Dpq2_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 
     mixin Queries;
@@ -430,7 +430,7 @@ private auto keyValToPQparamsArrays(in string[string] keyValueParams)
 /// Check connection options in the provided connection string
 ///
 /// Throws exception if connection string isn't passes check.
-version(DerelictPQ_Static)
+version(Dpq2_Static)
 void connStringCheck(string connString)
 {
     _connStringCheck(connString);
@@ -463,7 +463,7 @@ package void _connStringCheck(string connString)
 /// Represents query cancellation process
 class Cancellation
 {
-    version(DerelictPQ_Dynamic)
+    version(Dpq2_Dynamic)
     {
         import dpq2.dynloader: ReferenceCounter;
         private immutable ReferenceCounter dynLoaderRefCnt;
@@ -474,7 +474,7 @@ class Cancellation
     ///
     this(Connection c)
     {
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
 
         cancel = PQgetCancel(c.conn);
 
@@ -487,7 +487,7 @@ class Cancellation
     {
         PQfreeCancel(cancel);
 
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt.__custom_dtor();
+        version(Dpq2_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 
     /**
@@ -538,7 +538,7 @@ class ConnectionException : Dpq2Exception
 version (integration_tests)
 Connection createTestConn(T...)(T params)
 {
-    version(DerelictPQ_Static)
+    version(Dpq2_Static)
         auto c = new Connection(params);
     else
     {
@@ -575,7 +575,7 @@ void _integration_test( string connParam )
     }
 
     {
-        version(DerelictPQ_Dynamic)
+        version(Dpq2_Dynamic)
         {
             void csc(string s)
             {

@@ -3,7 +3,7 @@
  */
 module dpq2.dynloader;
 
-version(DerelictPQ_Dynamic):
+version(Dpq2_Dynamic):
 
 import dpq2.connection: Connection;
 import core.sync.mutex: Mutex;

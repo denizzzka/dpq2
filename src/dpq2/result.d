@@ -27,7 +27,7 @@ private struct Coords
 
 package immutable final class ResultContainer
 {
-    version(DerelictPQ_Dynamic)
+    version(Dpq2_Dynamic)
     {
         import dpq2.dynloader: ReferenceCounter;
 
@@ -44,7 +44,7 @@ package immutable final class ResultContainer
         assert(r);
 
         result = r;
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
+        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
     }
 
     ~this()
@@ -53,7 +53,7 @@ package immutable final class ResultContainer
 
         PQclear(result);
 
-        version(DerelictPQ_Dynamic) dynLoaderRefCnt.__custom_dtor();
+        version(Dpq2_Dynamic) dynLoaderRefCnt.__custom_dtor();
     }
 }
 
