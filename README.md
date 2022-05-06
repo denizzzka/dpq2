@@ -173,3 +173,22 @@ column name: 'array_field', bson: ["first","second",null]
 column name: 'multi_array', bson: [[1,2,3],[4,5,6]]
 column name: 'json_value', bson: {"text_str":"text string","float_value":123.456}
 ```
+
+Using dynamic libpq
+--------
+
+To load dynamic library it is nessesary to instance `ConnectionFactory`.
+This class is only available then `--config=dynamic` is used.
+Only one instance of `ConnectionFactory` is allowed.
+It is possible to specify filepath to a library what you want to use, otherwise default will be used:
+```
+auto connFactory = new immutable ConnectionFactory("path/to/libpq.dll");
+```
+
+Then you can create connection by calling method:
+```
+Connection conn = connFactory.createConnection(params);
+```
+And then this connection can be used as usual.
+
+When all objects related to `libpq` (including `ConnectionFactory`) is destroyed library will be unloaded automatically.
