@@ -31,6 +31,11 @@ class ConnectionFactory
     {
         this() { this(""); }
 
+        /**
+            Params:
+                path =  A string containing one or more comma-separated shared
+                        library names.
+        */
         this(string path)
         {
             import std.exception: enforce;

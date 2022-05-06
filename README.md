@@ -182,8 +182,10 @@ Is provided two ways to load `libpq` dynamically:
 To load automatically it is necessary to allocate `ConnectionFactory`.
 This class is only available then `dynamic` config is used.
 Only one instance of `ConnectionFactory` is allowed.
-It is possible to specify filepath to a library what you want to use, otherwise default will be used:
+It is possible to specify filepath to a library/libraries what you want to use, otherwise default will be used:
 ```
+// Argument is a string containing one or more comma-separated
+// shared library names
 auto connFactory = new immutable ConnectionFactory("path/to/libpq.dll");
 ```
 
