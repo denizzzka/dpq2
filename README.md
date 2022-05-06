@@ -177,7 +177,7 @@ column name: 'json_value', bson: {"text_str":"text string","float_value":123.456
 Using dynamic libpq
 --------
 
-To load dynamic library it is nessesary to instance `ConnectionFactory`.
+To load dynamic version of `libpq` it is nessesary to instance `ConnectionFactory`.
 This class is only available then `--config=dynamic` is used.
 Only one instance of `ConnectionFactory` is allowed.
 It is possible to specify filepath to a library what you want to use, otherwise default will be used:
