@@ -197,7 +197,7 @@ And then this connection can be used as usual.
 
 When all objects related to `libpq` (including `ConnectionFactory`) is destroyed library will be unloaded automatically.
 
-To load manually it is necessary to use build config `dynamic-unmanaged`.
+To load `libpq` manually it is necessary to use build config `dynamic-unmanaged`.
 Manual dynamic `libpq` loading example:
 ```D
 import derelict.pq.pq: DerelictPQ;
