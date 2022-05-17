@@ -25,7 +25,7 @@ struct QueryParams
     }
 
     /// ditto
-    @property ref inout (Value[]) args() inout pure
+    @property ref inout (Value[]) args() inout pure return
     {
         return _args;
     }
