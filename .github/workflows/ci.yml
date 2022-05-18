@@ -108,6 +108,7 @@ jobs:
         run: |
           dub fetch dscanner
           dub fetch doveralls
+        shell: bash
       - name: Build / test 
         if: matrix.build != 'unittest-cov'
         run: |
@@ -118,6 +119,7 @@ jobs:
         run: |
           dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="$CONN_STRING"
           dub run dpq2:example --build=release -- --conninfo="$CONN_STRING"
+          dub run doveralls
         shell: bash
       - name: Upload coverage data
         if: matrix.build == 'unittest-cov'

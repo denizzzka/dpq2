@@ -41,6 +41,7 @@ jobs:
       - name: Build documentation
         run: |
           dub build --build=ddox
+        shell: bash
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@8817a56e5bfec6e2b08345c81f4d422db53a2cdc
         with:
