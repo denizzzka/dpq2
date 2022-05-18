@@ -1,0 +1,48 @@
+# Author: Harrison Ford (@hatf0)
+# This CI file has been heavily based off of my work in the Mir project.
+
+name: Build Documentation
+
+on:
+  push:
+    branches:
+    - master
+  workflow_dispatch:
+    
+# Only allow for one job from each actor to run at a time, and cancel any jobs currently in progress.
+concurrency:
+  group: docs-${{ github.actor }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_docs:
+    name: Build documentation
+    runs-on: ubuntu-20.04
+    permissions:
+      # Allow this action and this action only to write to the repo itself
+      contents: write
+    steps:
+      - name: Checkout repo 
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+      - name: Setup D compiler 
+        uses: dlang-community/setup-dlang@763d869b4d67e50c3ccd142108c8bca2da9df166
+        with:
+          compiler: dmd-latest
+      - name: Cache dub dependencies
+        uses: actions/cache@937d24475381cd9c75ae6db12cb4e79714b926ed
+        with:
+          path: ~/.dub/packages
+          key: docs-build-${{ hashFiles('**/dub.sdl', '**/dub.json') }}
+          restore-keys: |
+            docs-build-
+      # Not sure if all of these dependencies are needed
+      - name: Install dependencies
+        run: sudo apt-get -y update && sudo apt-get -y install libpq-dev libevent-dev
+      - name: Build documentation
+        run: |
+          dub build --build=ddox
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@8817a56e5bfec6e2b08345c81f4d422db53a2cdc
+        with:
+          branch: gh-pages
+          folder: docs
