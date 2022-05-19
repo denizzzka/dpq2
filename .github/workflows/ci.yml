@@ -66,6 +66,7 @@ jobs:
       BUILD: ${{ matrix.build }}
       STAT_TYPE: ${{ matrix.stat_type }}
       CONN_STRING: "host=localhost port=5432 dbname=postgres password=postgres user=postgres"
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     services:
       postgres:
         image: postgres
@@ -96,7 +97,7 @@ jobs:
         with:
           compiler: ${{ matrix.dc }}
       - name: Install dependencies
-        run: sudo apt-get -y update && sudo apt-get -y install libpq-dev libevent-dev postgresql
+        run: sudo apt-get -y update && sudo apt-get -y install libpq-dev libevent-dev libcurl4-gnutls-dev postgresql
       - name: Cache dub dependencies
         uses: actions/cache@937d24475381cd9c75ae6db12cb4e79714b926ed
         with:
