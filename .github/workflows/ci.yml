@@ -96,7 +96,7 @@ jobs:
         with:
           compiler: ${{ matrix.dc }}
       - name: Install dependencies
-        run: sudo apt-get -y update && sudo apt-get -y install libpq-dev libevent-dev postgresql
+        run: sudo apt-get -y update && sudo apt-get -y install libpq-dev libevent-dev libcurl4 postgresql
       - name: Cache dub dependencies
         uses: actions/cache@937d24475381cd9c75ae6db12cb4e79714b926ed
         with:
