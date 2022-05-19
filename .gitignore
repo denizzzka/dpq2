@@ -3,3 +3,5 @@ bin
 dub.selections.json
 *_integration_*
 *.lst
+docs
+docs.json
