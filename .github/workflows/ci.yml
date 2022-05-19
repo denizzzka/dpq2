@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
       matrix:
         build: [unittest, release]
-        stat_type: [static, dynamic]
+        stat_type: [static, dynamic, dynamic-unmanaged]
         dc: ${{ fromJSON(needs.setup.outputs.compilers) }}
         include:
         - build: unittest-cov
