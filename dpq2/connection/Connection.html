@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Class Connection</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">
+							<a href="../../dpq2.html">dpq2</a>
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">conv
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/arrays.html">arrays</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/from_bson.html">from_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/from_d_types.html">from_d_types</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/geometric.html">geometric</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/jsonb.html">jsonb</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/time.html">time</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/to_bson.html">to_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/to_d_types.html">to_d_types</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/args.html">args</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dpq2/connection.html">connection</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/dynloader.html">dynloader</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/exception.html">exception</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/oids.html">oids</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query.html">query</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query_gen.html">query_gen</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/result.html">result</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/value.html">value</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Class Connection</h1><p>Connection
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">Connection</span>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.cancel.html" class="public">
+									<code>cancel</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Try to cancel query
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.consumeInput.html" class="public">
+									<code>consumeInput</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>If input is available from the server, consume it
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.dbName.html" class="public">
+									<code>dbName</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.errorMessage.html" class="public">
+									<code>errorMessage</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Returns the error message most recently generated by an operation on the connection
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.escapeIdentifier.html" class="public">
+									<code>escapeIdentifier</code>
+								</a>
+								<span class="tableEntryAnnotation">(msg)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.escapeLiteral.html" class="public">
+									<code>escapeLiteral</code>
+								</a>
+								<span class="tableEntryAnnotation">(msg)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.getResult.html" class="public">
+									<code>getResult</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Get next result after sending a non-blocking commands. Can return null.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.host.html" class="public">
+									<code>host</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.isBusy.html" class="public">
+									<code>isBusy</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.isNonBlocking.html" class="public">
+									<code>isNonBlocking</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Returns the blocking status of the database connection
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.parameterStatus.html" class="public">
+									<code>parameterStatus</code>
+								</a>
+								<span class="tableEntryAnnotation">(paramName)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.poll.html" class="public">
+									<code>poll</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Useful only for non-blocking operations.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.posixSocket.html" class="public">
+									<code>posixSocket</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Obtains the file descriptor number of the connection socket to the server
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.posixSocketDuplicate.html" class="public">
+									<code>posixSocketDuplicate</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Obtains duplicate file descriptor number of the connection socket to the server
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.protocolVersion.html" class="public">
+									<code>protocolVersion</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.resetPoll.html" class="public">
+									<code>resetPoll</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Useful only for non-blocking operations.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.resetStart.html" class="public">
+									<code>resetStart</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Begin reset the communication channel to the server, in a nonblocking manner
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.serverVersion.html" class="public">
+									<code>serverVersion</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.setClientEncoding.html" class="public">
+									<code>setClientEncoding</code>
+								</a>
+								<span class="tableEntryAnnotation">(encoding)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.setNoticeProcessor.html" class="public">
+									<code>setNoticeProcessor</code>
+								</a>
+								<span class="tableEntryAnnotation">(proc, arg)</span>
+							</td>
+							<td>Sets or examines the current notice processor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.setSingleRowMode.html" class="public">
+									<code>setSingleRowMode</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Select single-row mode for the currently-executing query
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.socket.html" class="public">
+									<code>socket</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Obtains std.socket.Socket of the connection to the server
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.status.html" class="public">
+									<code>status</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Returns the status of the connection
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.trace.html" class="public">
+									<code>trace</code>
+								</a>
+								<span class="tableEntryAnnotation">(stream)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.transactionStatus.html" class="public">
+									<code>transactionStatus</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Returns the current in-transaction status of the server.
+        The status can be:
+ PQTRANS_IDLE    - currently idle
+ PQTRANS_ACTIVE  - a command is in progress (reported only when a query has been sent to the server and not yet completed)
+ PQTRANS_INTRANS - idle, in a valid transaction block
+ PQTRANS_INERROR - idle, in a failed transaction block
+ PQTRANS_UNKNOWN - reported if the connection is bad
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.untrace.html" class="public">
+									<code>untrace</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

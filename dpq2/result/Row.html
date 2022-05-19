@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Struct Row</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">
+							<a href="../../dpq2.html">dpq2</a>
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">conv
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/arrays.html">arrays</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/from_bson.html">from_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/from_d_types.html">from_d_types</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/geometric.html">geometric</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/jsonb.html">jsonb</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/time.html">time</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/to_bson.html">to_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/to_d_types.html">to_d_types</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/args.html">args</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/connection.html">connection</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/dynloader.html">dynloader</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/exception.html">exception</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/oids.html">oids</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query.html">query</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query_gen.html">query_gen</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dpq2/result.html">result</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/value.html">value</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Struct Row</h1><p>Represents one row from the answer table
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">struct</span> <span class="typ">Row</span>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Constructors</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.this.html" class="public">
+									<code>this</code>
+								</a>
+								<span class="tableEntryAnnotation">(answer, row)</span>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.columnExists.html" class="public">
+									<code>columnExists</code>
+								</a>
+								<span class="tableEntryAnnotation">(column)</span>
+							</td>
+							<td>Checks if column with name exists
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.columnName.html" class="public">
+									<code>columnName</code>
+								</a>
+								<span class="tableEntryAnnotation">(colNum)</span>
+							</td>
+							<td>Returns column name by field number
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.columnNum.html" class="public">
+									<code>columnNum</code>
+								</a>
+								<span class="tableEntryAnnotation">(columnName)</span>
+							</td>
+							<td>Returns column number by field name
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.isNULL.html" class="public">
+									<code>isNULL</code>
+								</a>
+								<span class="tableEntryAnnotation">(col)</span>
+							</td>
+							<td>Checks if value is NULL
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.length.html" class="public">
+									<code>length</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Returns column count
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.opIndex.html" class="public">
+									<code>opIndex</code>
+								</a>
+								<span class="tableEntryAnnotation">(col)</span>
+							</td>
+							<td>Returns cell value by column number
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.opIndex.html" class="public">
+									<code>opIndex</code>
+								</a>
+								<span class="tableEntryAnnotation">(column)</span>
+							</td>
+							<td>Returns cell value by field name
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.size.html" class="public">
+									<code>size</code>
+								</a>
+								<span class="tableEntryAnnotation">(col)</span>
+							</td>
+							<td>Returns the actual length of a cell value in bytes.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/result/Row.toString.html" class="public">
+									<code>toString</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

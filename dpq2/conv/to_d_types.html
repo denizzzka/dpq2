@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Module dpq2.conv.to_d_types</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">
+							<a href="../../dpq2.html">dpq2</a>
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">conv
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/arrays.html">arrays</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/from_bson.html">from_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/from_d_types.html">from_d_types</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/geometric.html">geometric</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/jsonb.html">jsonb</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/time.html">time</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/conv/to_bson.html">to_bson</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dpq2/conv/to_d_types.html">to_d_types</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/args.html">args</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/connection.html">connection</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/dynloader.html">dynloader</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/exception.html">exception</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/oids.html">oids</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query.html">query</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/query_gen.html">query_gen</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/result.html">result</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dpq2/value.html">value</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Module dpq2.conv.to_d_types</h1><p></p>
+				<section></section>
+				<section>
+					<h2>Functions</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="as" class="public" href="../../dpq2/conv/to_d_types/as.html">as</a><span class="tableEntryAnnotation">(v)</span>
+								</code>
+							</td>
+							<td>Returns cell value as a Nullable type using the underlying type conversion after null check.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="as" class="public" href="../../dpq2/conv/to_d_types/as.html">as</a><span class="tableEntryAnnotation">(v)</span>
+								</code>
+							</td>
+							<td>Returns cell value as a native string based type from text or binary formatted field.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="as" class="public" href="../../dpq2/conv/to_d_types/as.html">as</a><span class="tableEntryAnnotation">(v)</span>
+								</code>
+							</td>
+							<td>Returns value as D type value from binary formatted field.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGbigint" class="public" href="../../dpq2/conv/to_d_types/PGbigint.html">
+									<code>PGbigint</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">long</span></code>
+							</td>
+							<td>bigint
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGboolean" class="public" href="../../dpq2/conv/to_d_types/PGboolean.html">
+									<code>PGboolean</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">bool</span></code>
+							</td>
+							<td>boolean
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGbytea" class="public" href="../../dpq2/conv/to_d_types/PGbytea.html">
+									<code>PGbytea</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><span class="typ">ubyte</span><span class="pun">)</span><span class="pun">[]</span></code>
+							</td>
+							<td>bytea
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGdate" class="public" href="../../dpq2/conv/to_d_types/PGdate.html">
+									<code>PGdate</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">datetime<wbr/></span><span class="pun">.</span><span class="pln">date<wbr/></span><span class="pun">.</span><span class="typ">Date</span></code>
+							</td>
+							<td>Date (no time of day)
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGdouble_precision" class="public" href="../../dpq2/conv/to_d_types/PGdouble_precision.html">
+									<code>PGdouble_precision</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">double</span></code>
+							</td>
+							<td>double precision
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGinteger" class="public" href="../../dpq2/conv/to_d_types/PGinteger.html">
+									<code>PGinteger</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">int</span></code>
+							</td>
+							<td>integer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGinterval" class="public" href="../../dpq2/conv/to_d_types/PGinterval.html">
+									<code>PGinterval</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../../dpq2/conv/time/Interval.html"><span class="typ">Interval</span></a></code>
+							</td>
+							<td>Interval
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGjson" class="public" href="../../dpq2/conv/to_d_types/PGjson.html">
+									<code>PGjson</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="pln">vibe<wbr/></span><span class="pun">.</span><span class="pln">data<wbr/></span><span class="pun">.</span><span class="pln">json<wbr/></span><span class="pun">.</span><span class="typ">Json</span></code>
+							</td>
+							<td>json or jsonb
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGline" class="public" href="../../dpq2/conv/to_d_types/PGline.html">
+									<code>PGline</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../../dpq2/conv/geometric/Line.html"><span class="typ">Line</span></a></code>
+							</td>
+							<td>Line (geometric type)
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGnumeric" class="public" href="../../dpq2/conv/to_d_types/PGnumeric.html">
+									<code>PGnumeric</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">string</span></code>
+							</td>
+							<td>numeric represented as string
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGreal" class="public" href="../../dpq2/conv/to_d_types/PGreal.html">
+									<code>PGreal</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">float</span></code>
+							</td>
+							<td>real
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGsmallint" class="public" href="../../dpq2/conv/to_d_types/PGsmallint.html">
+									<code>PGsmallint</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">short</span></code>
+							</td>
+							<td>smallint
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGtext" class="public" href="../../dpq2/conv/to_d_types/PGtext.html">
+									<code>PGtext</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">string</span></code>
+							</td>
+							<td>text
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGtime_with_time_zone" class="public" href="../../dpq2/conv/to_d_types/PGtime_with_time_zone.html">
+									<code>PGtime_with_time_zone</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../../dpq2/conv/time/TimeOfDayWithTZ.html"><span class="typ">TimeOfDayWithTZ</span></a></code>
+							</td>
+							<td>Time of day with TZ(no date)
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGtime_without_time_zone" class="public" href="../../dpq2/conv/to_d_types/PGtime_without_time_zone.html">
+									<code>PGtime_without_time_zone</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">datetime<wbr/></span><span class="pun">.</span><span class="pln">date<wbr/></span><span class="pun">.</span><span class="typ">TimeOfDay</span></code>
+							</td>
+							<td>Time of day (no date)
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGtimestamp" class="public" href="../../dpq2/conv/to_d_types/PGtimestamp.html">
+									<code>PGtimestamp</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../../dpq2/conv/time/TTimeStamp.html"><span class="typ">TTimeStamp</span></a>!(false)</code>
+							</td>
+							<td>Both date and time without time zone
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGtimestamptz" class="public" href="../../dpq2/conv/to_d_types/PGtimestamptz.html">
+									<code>PGtimestamptz</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../../dpq2/conv/time/TTimeStamp.html"><span class="typ">TTimeStamp</span></a>!(true)</code>
+							</td>
+							<td>Both date and time stored in UTC time zone
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGuuid" class="public" href="../../dpq2/conv/to_d_types/PGuuid.html">
+									<code>PGuuid</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">uuid<wbr/></span><span class="pun">.</span><span class="pln">UUID</span></code>
+							</td>
+							<td>UUID
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="PGvarbit" class="public" href="../../dpq2/conv/to_d_types/PGvarbit.html">
+									<code>PGvarbit</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">bitmanip<wbr/></span><span class="pun">.</span><span class="typ">BitArray</span></code>
+							</td>
+							<td>BitArray
+</td>
+						</tr>
+					</table>
+				</section>
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

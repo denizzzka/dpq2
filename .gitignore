@@ -1,5 +1,0 @@
-bin
-.dub
-dub.selections.json
-*_integration_*
-*.lst
