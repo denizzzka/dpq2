@@ -10,7 +10,7 @@ D programming language.
 It adds only tiny overhead to the original low level library libpq but
 make convenient use PostgreSQL from D.
 
-[API documentation](https://denizzzka.github.io/dpq2/docs)
+[API documentation](https://denizzzka.github.io/dpq2)
 
 _Please help us to make documentation better!_
 
