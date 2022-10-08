@@ -13,6 +13,7 @@
 		"money": "~>3.0.2"
 	},
 	"targetType": "sourceLibrary",
+	"libs-windows": ["ws2_32"],
 	"-ddoxTool": "scod",
 	"configurations": [
 		{
