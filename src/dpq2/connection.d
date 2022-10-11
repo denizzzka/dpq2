@@ -221,12 +221,14 @@ class Connection
     version(Windows)
     socket_t posixSocketDuplicate()
     {
-        import std.experimental.allocator.mallocator: Mallocator;
+        import core.stdc.stdlib: malloc, free;
         import core.sys.windows.winbase: GetCurrentProcessId;
 
         static assert(socket_t.sizeof >= SOCKET.sizeof);
 
-        auto protocolInfo = cast(WSAPROTOCOL_INFOW*) Mallocator.instance.allocate(WSAPROTOCOL_INFOW.sizeof);
+        auto protocolInfo = cast(WSAPROTOCOL_INFOW*) malloc(WSAPROTOCOL_INFOW.sizeof);
+        scope(failure) free(protocolInfo);
+
         int dupStatus = WSADuplicateSocketW(posixSocket, GetCurrentProcessId, protocolInfo);
 
         if(dupStatus)
