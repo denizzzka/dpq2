@@ -46,6 +46,8 @@ public void _integration_test( string connParam ) @system
     // to return times in other than UTC time zone but fixed time zone so make the test reproducible in databases with other TZ
     conn.exec("SET TIMEZONE TO +02");
 
+    // It is found what Linux and Windows have different approach for monetary
+    // types formatting at same locales. This line sets equal approach.
     conn.exec("SET lc_monetary = 'C'");
 
     QueryParams params;
