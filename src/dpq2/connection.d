@@ -253,12 +253,7 @@ class Connection
     /// duplicate of internal posix socket will be used.
     Socket socket()
     {
-        /*
-         * Especially for Win32:
-         * Even though sizeof(SOCKET) is 8, it's safe to cast it to int, because
-         * the value constitutes an index in per-process table of limited size
-         * and not a real pointer.
-         */
+        version(Windows) static assert(SOCKET.sizeof == socket_t.sizeof);
 
         return new Socket(cast(socket_t) posixSocketDuplicate, AddressFamily.UNSPEC);
     }
