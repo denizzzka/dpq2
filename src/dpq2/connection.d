@@ -224,8 +224,6 @@ class Connection
         import core.stdc.stdlib: malloc, free;
         import core.sys.windows.winbase: GetCurrentProcessId;
 
-        static assert(socket_t.sizeof >= SOCKET.sizeof);
-
         auto protocolInfo = cast(WSAPROTOCOL_INFOW*) malloc(WSAPROTOCOL_INFOW.sizeof);
         scope(failure) free(protocolInfo);
 
