@@ -69,7 +69,7 @@
 					}
 				}
 			],
-			"sourcePath": "integration_tests",
+			"sourcePaths": [ "integration_tests" ],
 			"versions": ["integration_tests"]
 		},
 		{
@@ -79,7 +79,7 @@
 			{
 				"dpq2": "*"
 			},
-			"sourcePath": "example"
+			"sourcePaths": [ "example" ]
 		}
 	]
 }
