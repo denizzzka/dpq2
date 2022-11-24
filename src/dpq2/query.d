@@ -32,7 +32,7 @@ mixin template Queries()
     }
 
     /// Perform SQL query to DB
-    immutable (Answer) execParams(in ref QueryParams qp)
+    immutable (Answer) execParams(in QueryParams qp)
     {
         auto p = InternalQueryParams(&qp);
         auto pgResult = PQexecParams (
@@ -60,7 +60,7 @@ mixin template Queries()
     }
 
     /// Submits a command and separate parameters to the server without waiting for the result(s)
-    void sendQueryParams(in ref QueryParams qp)
+    void sendQueryParams(in QueryParams qp)
     {
         auto p = InternalQueryParams(&qp);
         size_t r = PQsendQueryParams (
@@ -78,7 +78,7 @@ mixin template Queries()
     }
 
     /// Sends a request to execute a prepared statement with given parameters, without waiting for the result(s)
-    void sendQueryPrepared(in ref QueryParams qp)
+    void sendQueryPrepared(in QueryParams qp)
     {
         auto p = InternalQueryParams(&qp);
         size_t r = PQsendQueryPrepared(
@@ -132,7 +132,7 @@ mixin template Queries()
     }
 
     /// Submits a request to execute a prepared statement with given parameters, and waits for completion.
-    immutable(Answer) execPrepared(in ref QueryParams qp)
+    immutable(Answer) execPrepared(in QueryParams qp)
     {
         auto p = InternalQueryParams(&qp);
         auto pgResult = PQexecPrepared(
