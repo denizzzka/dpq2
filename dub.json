@@ -42,9 +42,11 @@
 		{
 			"name": "integration_tests",
 			"targetType": "executable",
+			"dflags": ["-preview=in"],
 			"dependencies":
 			{
 				"dpq2": { "version": "*", "dflags": ["-preview=in"] },
+				"vibe-d:data": { "version": "*", "dflags": ["-preview=in"] },
 				"gfm:math": "~>7.0.0"
 			},
 			"configurations": [
@@ -75,9 +77,11 @@
 		{
 			"name": "example",
 			"targetType": "executable",
+			"dflags": ["-preview=in"],
 			"dependencies":
 			{
 				"dpq2": { "version": "*", "dflags": ["-preview=in"] },
+				"vibe-d:data": { "version": "*", "dflags": ["-preview=in"] },
 			},
 			"sourcePaths": [ "example" ]
 		}
