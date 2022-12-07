@@ -369,8 +369,7 @@ if( is(T == BitArray) )
             )
         );
 
-    //TODO: avoid redundant copying. It is possible to just wrap v.data type const(immutable(ubyte)[]) into range
-    auto data = v.data.idup;
+    auto data = v.data[];
     size_t len = data.read!int;
     size_t[] newData;
     foreach (ch; data.chunks(size_t.sizeof))
