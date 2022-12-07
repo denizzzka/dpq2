@@ -84,7 +84,8 @@ struct Value
         _oidType = type;
     }
 
-    immutable(ubyte)[] data() pure const scope return
+    //TODO: replace template by return modifier
+    immutable(ubyte)[] data()() pure const scope
     {
         import std.exception;
         import core.exception;
