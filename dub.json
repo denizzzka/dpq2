@@ -42,7 +42,7 @@
 		{
 			"name": "integration_tests",
 			"targetType": "executable",
-			"dflags": ["-preview=in"],
+			"dflags-dmd": ["-preview=in"],
 			"dependencies":
 			{
 				"dpq2": { "version": "*", "dflags": ["-preview=in"] },
