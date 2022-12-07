@@ -47,7 +47,7 @@
 			{
 				"dpq2": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"vibe-d:data": { "version": "*", "dflags-dmd": ["-preview=in"] },
-				"gfm:math": "~>7.0.0"
+				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [
 				{
