@@ -51,7 +51,7 @@ struct Value
         this._oidType = oidType;
     }
 
-    @safe const pure nothrow @nogc
+    @safe const pure nothrow scope @nogc
     {
         /// Indicates if the value is NULL
         bool isNull()
@@ -84,7 +84,7 @@ struct Value
         _oidType = type;
     }
 
-    immutable(ubyte)[] data() pure const
+    ref immutable(ubyte)[] data() pure const scope
     {
         import std.exception;
         import core.exception;
@@ -158,7 +158,7 @@ class ValueConvException : ConvException
     }
 }
 
-package void throwTypeComplaint(OidType receivedType, string expectedType, string file = __FILE__, size_t line = __LINE__) pure
+package void throwTypeComplaint(OidType receivedType, in string expectedType, string file = __FILE__, size_t line = __LINE__) pure
 {
     throw new ValueConvException(
             ConvExceptionType.NOT_IMPLEMENTED,
