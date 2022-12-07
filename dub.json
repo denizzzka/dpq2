@@ -42,11 +42,10 @@
 		{
 			"name": "integration_tests",
 			"targetType": "executable",
-			"dflags-dmd": ["-preview=in"],
 			"dependencies":
 			{
-				"dpq2": { "version": "*", "dflags-dmd": ["-preview=in"] },
-				"vibe-d:data": { "version": "*", "dflags-dmd": ["-preview=in"] },
+				"dpq2": { "version": "*" },
+				"vibe-d:data": { "version": "*" },
 				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [
@@ -77,11 +76,10 @@
 		{
 			"name": "example",
 			"targetType": "executable",
-			"dflags": ["-preview=in"],
 			"dependencies":
 			{
-				"dpq2": { "version": "*", "dflags": ["-preview=in"] },
-				"vibe-d:data": { "version": "*", "dflags": ["-preview=in"] },
+				"dpq2": { "version": "*" },
+				"vibe-d:data": { "version": "*" },
 			},
 			"sourcePaths": [ "example" ]
 		}

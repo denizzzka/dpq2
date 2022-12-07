@@ -114,12 +114,13 @@ jobs:
         if: matrix.build != 'unittest-cov'
         run: |
           dub run dpq2:integration_tests --build=$BUILD --config=$STAT_TYPE -- --conninfo="$CONN_STRING"
+          DFLAGS="-preview=in" dub run dpq2:integration_tests --build=$BUILD --config=$STAT_TYPE -- --conninfo="$CONN_STRING"
         shell: bash
       - name: Build / test with coverage
         if: matrix.build == 'unittest-cov'
         run: |
-          dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="$CONN_STRING"
-          dub run dpq2:example --build=release -- --conninfo="$CONN_STRING"
+          DFLAGS="-preview=in" dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="$CONN_STRING"
+          DFLAGS="-preview=in" dub run dpq2:example --build=release -- --conninfo="$CONN_STRING"
           dub run doveralls
         shell: bash
       - name: Upload coverage data
