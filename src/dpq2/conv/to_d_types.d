@@ -154,7 +154,7 @@ Value[] deserializeRecord(in Value v)
                 "Value length isn't enough to hold object body", __FILE__, __LINE__);
         immutable(ubyte)[] resData = data[0 .. size];
         data = data[size .. $];
-        res = Value(resData, oidType);
+        res = Value(resData.idup, oidType);
     }
 
     return ret;
@@ -369,7 +369,8 @@ if( is(T == BitArray) )
             )
         );
 
-    auto data = v.data;
+    //TODO: avoid redundant copying. It is possible to just wrap v.data type const(immutable(ubyte)[]) into range
+    auto data = v.data.idup;
     size_t len = data.read!int;
     size_t[] newData;
     foreach (ch; data.chunks(size_t.sizeof))

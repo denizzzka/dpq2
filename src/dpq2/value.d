@@ -84,7 +84,7 @@ struct Value
         _oidType = type;
     }
 
-    immutable(ubyte)[] data() pure const scope
+    auto data() pure const scope
     {
         import std.exception;
         import core.exception;
