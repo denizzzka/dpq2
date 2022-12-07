@@ -84,7 +84,7 @@ struct Value
         _oidType = type;
     }
 
-    auto data() pure const scope
+    immutable(ubyte)[] data() pure const
     {
         import std.exception;
         import core.exception;
@@ -158,7 +158,7 @@ class ValueConvException : ConvException
     }
 }
 
-package void throwTypeComplaint(OidType receivedType, string expectedType, string file = __FILE__, size_t line = __LINE__) pure
+package void throwTypeComplaint(OidType receivedType, in string expectedType, string file = __FILE__, size_t line = __LINE__) pure
 {
     throw new ValueConvException(
             ConvExceptionType.NOT_IMPLEMENTED,
