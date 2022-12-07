@@ -45,8 +45,8 @@
 			"dflags-dmd": ["-preview=in"],
 			"dependencies":
 			{
-				"dpq2": { "version": "*", "dflags": ["-preview=in"] },
-				"vibe-d:data": { "version": "*", "dflags": ["-preview=in"] },
+				"dpq2": { "version": "*", "dflags-dmd": ["-preview=in"] },
+				"vibe-d:data": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"gfm:math": "~>7.0.0"
 			},
 			"configurations": [
