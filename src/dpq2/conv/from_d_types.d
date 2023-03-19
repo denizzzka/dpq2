@@ -6,6 +6,7 @@ module dpq2.conv.from_d_types;
 public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : isGeometricType, toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
+import dpq2.conv.ranges;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
@@ -13,7 +14,7 @@ import std.bitmanip: nativeToBigEndian, BitArray, append;
 import std.datetime.date: Date, DateTime, TimeOfDay;
 import std.datetime.systime: SysTime;
 import std.datetime.timezone: LocalTime, TimeZone, UTC;
-import std.traits: isImplicitlyConvertible, isNumeric, isInstanceOf, OriginalType, Unqual, isSomeString;
+import std.traits: isImplicitlyConvertible, isNumeric, isInstanceOf, OriginalType, Unqual, isSomeString, TemplateOf;
 import std.typecons : Nullable;
 import std.uuid: UUID;
 import vibe.data.json: Json;
@@ -371,6 +372,30 @@ Value toRecordValue(Value[] elements)
     }
 
     return Value(buffer.data.idup, OidType.Record);
+}
+
+/// Constructs Value from Ranges
+Value toValue(R)(R r)
+if (__traits(isSame, TemplateOf!R, Range))
+{
+	static if (is(R == Int4Range))	return Value(r.rawData.idup, OidType.Int4Range);
+	static if (is(R == Int8Range))	return Value(r.rawData.idup, OidType.Int8Range);
+	static if (is(R == NumRange))	return Value(r.rawData.idup, OidType.NumRange);
+	static if (is(R == DateRange))	return Value(r.rawData.idup, OidType.DateRange);
+	static if (is(R == TsRange))	return Value(r.rawData.idup, OidType.TimeStampRange);
+	static if (is(R == TsTzRange))	return Value(r.rawData.idup, OidType.TimeStampWithZoneRange);
+}
+
+/// Constructs Value from Multiranges
+Value toValue(M)(M m)
+if (__traits(isSame, TemplateOf!M, MultiRange))
+{
+	static if (is(M == Int4MultiRange))	return Value(m._data.idup, OidType.Int4MultiRange);
+	static if (is(M == Int8MultiRange))	return Value(m._data.idup, OidType.Int8MultiRange);
+	static if (is(M == NumMultiRange))	return Value(m._data.idup, OidType.NumMultiRange);
+	static if (is(M == DateMultiRange))	return Value(m._data.idup, OidType.DateMultiRange);
+	static if (is(M == TsMultiRange))	return Value(m._data.idup, OidType.TimeStampMultiRange);
+	static if (is(M == TsTzMultiRange))	return Value(m._data.idup, OidType.TimeStampWithZoneMultiRange);
 }
 
 version(unittest)
