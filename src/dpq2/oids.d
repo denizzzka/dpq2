@@ -62,6 +62,7 @@ bool isNativeInteger(OidType t) pure
         case Int2:
         case Int4:
         case Oid:
+        case Money:
             return true;
         default:
             break;
@@ -104,22 +105,57 @@ shared static this()
     {
         immutable AppropriateArrOid[] a =
         [
-            A(Text, TextArray),
-            A(Name, NameArray),
             A(Bool, BoolArray),
-            A(Int2, Int2Array),
-            A(Int4, Int4Array),
-            A(Int8, Int8Array),
+            A(Box, BoxArray),
+            A(ByteArray, ByteArrayArray),
+            A(Char, CharArray),
+            A(Circle, CircleArray),
+            A(Date, DateArray),
+            A(DateMultiRange, DateMultiRangeArray),
+            A(DateRange, DateRangeArray),
+            A(FixedBitString, FixedBitStringArray),
+            A(FixedString, FixedStringArray),
             A(Float4, Float4Array),
             A(Float8, Float8Array),
-            A(Date, DateArray),
-            A(Time, TimeArray),
-            A(TimeWithZone, TimeWithZoneArray),
-            A(TimeStampWithZone, TimeStampWithZoneArray),
-            A(TimeStamp, TimeStampArray),
-            A(Line, LineArray),
+            A(HostAddress, HostAddressArray),
+            A(Int2, Int2Array),
+            A(Int4, Int4Array),
+            A(Int4MultiRange, Int4MultiRangeArray),
+            A(Int4Range, Int4RangeArray),
+            A(Int8, Int8Array),
+            A(Int8MultiRange, Int8MultiRangeArray),
+            A(Int8Range, Int8RangeArray),
             A(Json, JsonArray),
-            A(UUID, UUIDArray)
+            A(Jsonb, JsonbArray),
+            A(Line, LineArray),
+            A(LineSegment, LineSegmentArray),
+            A(MacAddress8, MacAddress8Array),
+            A(MacAddress, MacAddressArray),
+            A(Money, MoneyArray),
+            A(Name, NameArray),
+            A(NetworkAddress, NetworkAddressArray),
+            A(Numeric, NumericArray),
+            A(NumMultiRange, NumMultiRangeArray),
+            A(NumRange, NumRangeArray),
+            A(Path, PathArray),
+            A(Point, PointArray),
+            A(Polygon, PolygonArray),
+            A(Text, TextArray),
+            A(Time, TimeArray),
+            A(TimeInterval, TimeIntervalArray),
+            A(TimeStamp, TimeStampArray),
+            A(TimeStampMultiRange, TimeStampMultiRangeArray),
+            A(TimeStampRange, TimeStampRangeArray),
+            A(TimeStampWithZone, TimeStampWithZoneArray),
+            A(TimeStampWithZoneMultiRange, TimeStampWithZoneMultiRangeArray),
+            A(TimeStampWithZoneRange, TimeStampWithZoneRangeArray),
+            A(TimeWithZone, TimeWithZoneArray),
+            A(TSQuery, TSQueryArray),
+            A(TSVector, TSVectorArray),
+            A(UUID, UUIDArray),
+            A(VariableBitString, VariableBitStringArray),
+            A(VariableString, VariableStringArray),
+            A(Xml, XmlArray)
         ];
 
         appropriateArrOid = a;
@@ -134,25 +170,56 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
     switch(t)
     {
         case BoolArray:
+        case BoxArray:
         case ByteArrayArray:
         case CharArray:
-        case Int2Array:
-        case Int4Array:
-        case TextArray:
-        case NameArray:
-        case Int8Array:
+        case CircleArray:
+        case DateArray:
+        case DateMultiRangeArray:
+        case DateRangeArray:
+        case FixedBitStringArray:
+        case FixedStringArray:
         case Float4Array:
         case Float8Array:
-        case TimeStampArray:
-        case TimeStampWithZoneArray:
-        case DateArray:
-        case TimeArray:
-        case TimeWithZoneArray:
-        case NumericArray:
-        case UUIDArray:
-        case LineArray:
+        case HostAddressArray:
+        case Int2Array:
+        case Int4Array:
+        case Int4MultiRangeArray:
+        case Int4RangeArray:
+        case Int8Array:
+        case Int8MultiRangeArray:
+        case Int8RangeArray:
         case JsonArray:
         case JsonbArray:
+        case LineArray:
+        case LineSegmentArray:
+        case MacAddress8Array:
+        case MacAddressArray:
+        case MoneyArray:
+        case NameArray:
+        case NetworkAddressArray:
+        case NumericArray:
+        case NumMultiRangeArray:
+        case NumRangeArray:
+        case PathArray:
+        case PointArray:
+        case PolygonArray:
+        case TextArray:
+        case TimeArray:
+        case TimeIntervalArray:
+        case TimeStampArray:
+        case TimeStampMultiRangeArray:
+        case TimeStampRangeArray:
+        case TimeStampWithZoneArray:
+        case TimeStampWithZoneMultiRangeArray:
+        case TimeStampWithZoneRangeArray:
+        case TimeWithZoneArray:
+        case TSQueryArray:
+        case TSVectorArray:
+        case UUIDArray:
+        case VariableBitStringArray:
+        case VariableStringArray:
+        case XmlArray:
             return true;
         default:
             break;
@@ -266,6 +333,7 @@ public enum OidType : Oid
     Circle = 718, ///
     Money = 790, ///
     MacAddress = 829, ///
+    MacAddress8 = 774,
     HostAddress = 869, ///
     NetworkAddress = 650, ///
 
@@ -305,11 +373,21 @@ public enum OidType : Oid
     DateRange = 3912, ///
     Int8Range = 3926, ///
 
+    Int4MultiRange = 4451,
+    NumMultiRange = 4532,
+    TimeStampMultiRange = 4533,
+    TimeStampWithZoneMultiRange = 4534,
+    DateMultiRange = 4535,
+    Int8MultiRange = 4536,
+
     // Arrays
     XmlArray = 143, ///
+    LineArray = 629,
+    CircleArray = 719,
+    MacAddress8Array = 775,
+    MoneyArray = 791,
     JsonbArray = 3807, ///
     JsonArray = 199, ///
-    LineArray = 629, ///
     BoolArray = 1000, ///
     ByteArrayArray = 1001, ///
     CharArray = 1002, ///
@@ -339,8 +417,8 @@ public enum OidType : Oid
     PolygonArray = 1027, ///
     AccessControlListArray = 1034, ///
     MacAddressArray = 1040, ///
-    HostAdressArray = 1041, ///
-    NetworkAdressArray = 651, ///
+    HostAddressArray = 1041, ///
+    NetworkAddressArray = 651, ///
     CStringArray = 1263, ///
     TimeStampArray = 1115, ///
     DateArray = 1182, ///
@@ -370,6 +448,13 @@ public enum OidType : Oid
     TimeStampWithZoneRangeArray = 3911, ///
     DateRangeArray = 3913, ///
     Int8RangeArray = 3927, ///
+
+    Int4MultiRangeArray = 6150,
+    NumMultiRangeArray = 6151,
+    TimeStampMultiRangeArray = 6152,
+    TimeStampWithZoneMultiRangeArray = 6153,
+    DateMultiRangeArray = 6155,
+    Int8MultiRangeArray = 6157,
 
     // Pseudo types
     Record = 2249, ///
