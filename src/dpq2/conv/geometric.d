@@ -110,8 +110,10 @@ template isValidPolygon(T)
 {
     static if (is(T == Nullable!R, R))
         enum isValidPolygon = false;
+    else static if (is(T == Point[]))
+        enum isValidPolygon = false;
     else
-        enum isValidPolygon = isArray!T && isValidPointType!(ElementType!T);
+        enum isValidPolygon = isArray!T && isValidPointType!(ElementType!T) || __traits(isSame, TemplateOf!T, Polygon);
 }
 
 unittest
@@ -156,6 +158,71 @@ if(isValidBoxType!Box)
     box.serializeBox(data);
 
     return createValue(data, OidType.Box);
+}
+
+
+struct Point
+{
+    double x, y;
+}
+
+struct Box
+{
+    Point min, max;
+}
+
+struct LineSegment(Point)
+{
+    Point[2] data;
+
+    this(Point start, Point end) {
+        this.data[0] = start;
+        this.data[1] = end;
+    }
+
+    auto start() @ property { return data[0]; }
+    auto end() @ property { return data[1]; }
+}
+
+struct Polygon(Point)
+{
+    Point[] data;
+
+    auto opIndex(size_t idx)
+    {
+        assert(idx < data.length, "index out of bounds");
+        return data[idx];
+    }
+
+    auto opIndexAssign(Point value, size_t idx)
+    {
+        if (idx >= data.length) data.length = idx + 1;
+        data[idx] = value;
+
+        return this;
+    }
+
+    int opApply(scope int delegate(size_t, ref Point) dg) @trusted
+    {
+        foreach (i, val; data) {
+            if (auto result = dg(i, val))
+                return result;
+        }
+        return 0;
+    }
+
+    int opApplyReverse(scope int delegate(size_t, ref Point) dg) @trusted
+    {
+        foreach_reverse (i, val; data) {
+            if (auto result = dg(i, val))
+                return result;
+        }
+        return 0;
+    }
+
+    void opAssign(Point[] value) { data = value.dup; }
+
+    Point front() @property { return Point(); }
 }
 
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
