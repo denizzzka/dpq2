@@ -516,7 +516,7 @@ unittest
         p = TestPath(true, [Point(1,1), Point(2,2)]);
         assert(p.toValue.binaryValueAs!TestPath == p);
 
-        TestPolygon poly = [Point(1,1), Point(2,2), Point(3,3)];
+        TestPolygon poly = TestPolygon([Point(1,1), Point(2,2), Point(3,3)]);
         assert(poly.toValue.binaryValueAs!TestPolygon == poly);
 
         auto c = TestCircle(Point(1,2), 3);
