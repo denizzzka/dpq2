@@ -18,8 +18,7 @@ enum PG_TYPE : ushort {
 }
 
 template isNetworkAddress(T) {
-	enum isNetworkAddress = hasMember!(T, "isInet");
-	//pragma(msg, "isNetworkAddress!" ~ T.stringof ~ " = " ~ isNetworkAddress.to!string);
+	enum isNetworkAddress = hasMember!(T, "isInet") && __traits(compiles, typeof(T.isInet));
 }
 
 struct NetworkAddress {

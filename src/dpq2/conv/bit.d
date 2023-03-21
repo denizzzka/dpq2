@@ -11,7 +11,7 @@ import std.traits : hasMember;
 
 
 template isBitString(T) {
-	enum isBitString = hasMember!(T, "bits");
+	enum isBitString = hasMember!(T, "bits") && __traits(compiles, typeof(T.bits));
 }
 
 struct BitString {

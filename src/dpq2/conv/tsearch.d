@@ -13,11 +13,11 @@ import std.traits : hasMember;
 
 
 template isTsQuery(T) {
-	enum isTsQuery = hasMember!(T, "tokens");
+	enum isTsQuery = hasMember!(T, "tokens") && __traits(compiles, typeof(T.tokens));
 }
 
 template isTsVector(T) {
-	enum isTsVector = hasMember!(T, "lexemes");
+	enum isTsVector = hasMember!(T, "lexemes") && __traits(compiles, typeof(T.lexemes));
 }
 
 enum TsTokenType : ubyte {

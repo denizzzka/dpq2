@@ -222,6 +222,8 @@ struct Polygon(Point)
 
     void opAssign(Point[] value) { data = value.dup; }
 
+    auto length() @property { return data.length; }
+
     Point front() @property { return Point(); }
 }
 
@@ -309,7 +311,7 @@ if(isValidPolygon!Polygon)
     ubyte[] data = new ubyte[poly.length * 16 + 4];
     auto rem = (cast(int)poly.length).nativeToBigEndian[0 .. $].copy(data);
 
-    foreach (ref p; poly)
+    foreach (i, ref p; poly)
         rem = p.serializePoint(rem);
 
     return createValue(data, OidType.Polygon);
@@ -466,7 +468,7 @@ package mixin template GeometricInstancesForIntegrationTest()
     @safe:
 
     import gfm.math;
-    import dpq2.conv.geometric: Circle, Path;
+    import dpq2.conv.geometric: Circle, Path, Polygon;
 
     alias Point = vec2d;
     alias Box = box2d;
@@ -485,7 +487,7 @@ package mixin template GeometricInstancesForIntegrationTest()
         }
     }
     alias TestPath = Path!Point;
-    alias Polygon = Point[];
+    alias TestPolygon = Polygon!Point;
     alias TestCircle = Circle!Point;
 }
 
@@ -514,8 +516,8 @@ unittest
         p = TestPath(true, [Point(1,1), Point(2,2)]);
         assert(p.toValue.binaryValueAs!TestPath == p);
 
-        Polygon poly = [Point(1,1), Point(2,2), Point(3,3)];
-        assert(poly.toValue.binaryValueAs!Polygon == poly);
+        TestPolygon poly = [Point(1,1), Point(2,2), Point(3,3)];
+        assert(poly.toValue.binaryValueAs!TestPolygon == poly);
 
         auto c = TestCircle(Point(1,2), 3);
         assert(c.toValue.binaryValueAs!TestCircle == c);
@@ -547,7 +549,7 @@ unittest
 
         v = [Point(1,1), Point(2,2)].toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPolygon);
 
         v = TestCircle(Point(1,1), 3).toValue;
         v.oidType = OidType.Text;
@@ -582,9 +584,9 @@ unittest
 
         v = [Point(1,1), Point(2,2)].toValue;
         v._data.length -= 16;
-        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPolygon);
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPolygon);
 
         v = TestCircle(Point(1,1), 3).toValue;
         v._data.length = 1;
