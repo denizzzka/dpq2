@@ -213,11 +213,13 @@ public void _integration_test( string connParam )
             immutable Value v = answer[0][0];
             Bson bsonRes = v.as!Bson;
 
+            import dpq2.conv.from_bson: typeInternal;
+
             if(v.isNull || !v.isSupportedArray) // standalone
             {
                 if(pgType == "numeric") pgType = "string"; // bypass for numeric values represented as strings
 
-                assert(bsonRes == bsonValue, "Received unexpected value\nreceived bsonType="~to!string(bsonValue.type)~"\nexpected nativeType="~pgType~
+                assert(bsonRes == bsonValue, "Received unexpected value\nreceived bsonType="~bsonValue.typeInternal.to!string~"\nexpected nativeType="~pgType~
                     "\nsent pgValue="~pgValue~"\nexpected bsonValue="~to!string(bsonValue)~"\nresult="~to!string(bsonRes));
             }
             else // arrays

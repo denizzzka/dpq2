@@ -60,12 +60,44 @@ Value bsonValueToValue(Bson v, OidType defaultType)
         default:
             throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format "~v.type.to!(immutable(char)[])~" doesn't supported by Bson to Value converter",
+                    "Format "~v.typeInternal.to!(immutable(char)[])~" doesn't supported by Bson to Value converter",
                     __FILE__, __LINE__
                 );
     }
 
     return ret;
+}
+
+//TODO: remove when vibe/data/bson.d removes deprecated types names
+/// Bson.Type without deprecated items
+package enum BsonTypeWODeprecated : ubyte
+{
+		end        = 0x00,  /// End marker - should never occur explicitly
+		double_    = 0x01,  /// A 64-bit floating point value
+		string     = 0x02,  /// A UTF-8 string
+		object     = 0x03,  /// An object aka. dictionary of string to Bson
+		array      = 0x04,  /// An array of BSON values
+		binData    = 0x05,  /// Raw binary data (ubyte[])
+		undefined  = 0x06,  /// Deprecated
+		objectID   = 0x07,  /// BSON Object ID (96-bit)
+		bool_      = 0x08,  /// Boolean value
+		date       = 0x09,  /// Date value (UTC)
+		null_      = 0x0A,  /// Null value
+		regex      = 0x0B,  /// Regular expression
+		dbRef      = 0x0C,  /// Deprecated
+		code       = 0x0D,  /// JaveScript code
+		symbol     = 0x0E,  /// Symbol/variable name
+		codeWScope = 0x0F,  /// JavaScript code with scope
+		int_       = 0x10,  /// 32-bit integer
+		timestamp  = 0x11,  /// Timestamp value
+		long_      = 0x12,  /// 64-bit integer
+		minKey     = 0xff,  /// Internal value
+		maxKey     = 0x7f,  /// Internal value
+}
+
+package BsonTypeWODeprecated typeInternal(in Bson v)
+{
+    return cast(BsonTypeWODeprecated) v.type;
 }
 
 unittest
