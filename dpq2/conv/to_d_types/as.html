@@ -71,6 +71,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../../dpq2/conv/to_d_types.html">to_d_types</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dpq2/conv/to_variant.html">to_variant</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li>
@@ -147,6 +152,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								Function <code>as</code>
 							</a>
 						</li>
+						<li>
+							<a href="#3">
+								Function <code>as</code>
+							</a>
+						</li>
 					</ul>
 				</nav><h2 id="0">Function as</h2><p>Returns cell value as a Nullable type using the underlying type conversion after null check.
 </p>
@@ -184,7 +194,22 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 <p>AssertError if the db value is NULL.
 </p>
 </section>
-<h2 id="2">Function as</h2><p>Returns value as D type value from binary formatted field.
+<h2 id="2">Function as</h2><p>Returns cell value as a Variant type.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="pln">T</span> <span class="pln">as</span>(T, <span class="typ">bool</span> isNullablePayload<span class="pln"> </span><span class="pun">= </span><span class="kwd">true</span>)
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">in </span><a href="../../../dpq2/value/Value.html"><span class="typ">Value</span></a> <span class="pln">v</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="3">Function as</h2><p>Returns value as D type value from binary formatted field.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
@@ -196,7 +221,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<br/>
 				<span class="pun">)</span>
 				<br/>
-				<span class="kwd">if</span> <span class="pun">(</span><span class="pun">!</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">: </span><span class="kwd">const</span><span class="pun">(</span><span class="typ">char</span><span class="pun">)[]) &amp;&amp; !</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Bson</span><span class="pun">) &amp;&amp; !</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Nullable</span><span class="pun">!</span><span class="pln">R</span><span class="pun">, </span><span class="pln">R</span><span class="pun">)</span><span class="pun">);</span>
+				<span class="kwd">if</span> <span class="pun">(</span><span class="pun">!</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">: </span><span class="kwd">const</span><span class="pun">(</span><span class="typ">char</span><span class="pun">)[]) &amp;&amp; !</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Bson</span><span class="pun">) &amp;&amp; !</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Variant</span><span class="pun">) &amp;&amp; !</span><span class="kwd">is</span><span class="pun">(</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Nullable</span><span class="pun">!</span><span class="pln">R</span><span class="pun">, </span><span class="pln">R</span><span class="pun">)</span><span class="pun">);</span>
 						</div>
 					</code>
 				</div>

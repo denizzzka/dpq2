@@ -91,6 +91,7 @@
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/as.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/as.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/as.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/to_d_types/as.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/PGbigint.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/PGboolean.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/PGbytea.html</loc></url>
@@ -110,6 +111,8 @@
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/PGtimestamptz.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/PGuuid.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/to_d_types/PGvarbit.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/to_variant.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/conv/to_variant/toVariant.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/args.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/args/QueryParams.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/args/QueryParams.args.html</loc></url>

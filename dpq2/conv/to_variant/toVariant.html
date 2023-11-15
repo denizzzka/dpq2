@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Alias PGreal</title>
+		<title>Function toVariant</title>
 		<link rel="stylesheet" href="../../../css/style.min.css"/>
 		<script type="text/javascript" src="../../../js/script.min.js"></script>
 	</head>
@@ -67,12 +67,12 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../../dpq2/conv/to_d_types.html">to_d_types</a>
 						</div>
 					</li>
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../../dpq2/conv/to_variant.html">to_variant</a>
 						</div>
 					</li>
@@ -134,13 +134,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Alias PGreal</h1><p>real
-</p>
+				<h1>Function toVariant</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">alias</span> <span class="pln">PGreal</span>
-				 <span class="pun">=</span> <span class="typ">float</span><span class="pun">;</span>
+				<span class="typ">Variant</span> <span class="pln">toVariant</span>(<span class="typ">bool</span> isNullablePayload<span class="pln"> </span><span class="pun">= </span><span class="kwd">true</span>)
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">in </span><a href="../../../dpq2/value/Value.html"><span class="typ">Value</span></a> <span class="pln">v</span>
+				<br/>
+				<span class="pun">)</span><span class="pln"> </span><span class="kwd">@safe</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
