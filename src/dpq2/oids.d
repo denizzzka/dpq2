@@ -117,6 +117,7 @@ shared static this()
             A(TimeWithZone, TimeWithZoneArray),
             A(TimeStampWithZone, TimeStampWithZoneArray),
             A(TimeStamp, TimeStampArray),
+            A(Line, LineArray),
             A(Json, JsonArray),
             A(UUID, UUIDArray)
         ];
@@ -149,6 +150,7 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
         case TimeWithZoneArray:
         case NumericArray:
         case UUIDArray:
+        case LineArray:
         case JsonArray:
         case JsonbArray:
             return true;
@@ -307,6 +309,7 @@ public enum OidType : Oid
     XmlArray = 143, ///
     JsonbArray = 3807, ///
     JsonArray = 199, ///
+    LineArray = 629, ///
     BoolArray = 1000, ///
     ByteArrayArray = 1001, ///
     CharArray = 1002, ///
