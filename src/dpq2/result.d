@@ -832,7 +832,7 @@ void _integration_test( string connParam )
         "array[11,22,NULL,44]::integer[] as small_array, "~
         "array['1','23',NULL,'789A']::text[] as text_array, "~
         "array[]::text[] as empty_array, "~
-        "'2022-02-23'::date as unsupported_toString_output_type";
+        "'((1, 2), (3, 4))'::lseg as unsupported_toString_output_type";
 
     auto r = conn.execParams(p);
 
