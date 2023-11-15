@@ -98,11 +98,11 @@ struct Value
     ///
     string toString() const @trusted
     {
-        import vibe.data.bson: Bson;
-        import dpq2.conv.to_bson;
+        import dpq2.conv.to_d_types;
         import std.conv: to;
+        import std.variant;
 
-        return this.as!Bson.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
+        return this.as!Variant.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
 }
 
