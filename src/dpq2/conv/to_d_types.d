@@ -20,6 +20,7 @@ import std.traits;
 import std.uuid;
 import std.datetime;
 import std.traits: isScalarType;
+import std.variant: Variant;
 import std.typecons : Nullable;
 import std.bitmanip: bigEndianToNative, BitArray;
 import std.conv: to;
@@ -49,6 +50,16 @@ alias PGvarbit =        BitArray; /// BitArray
 private alias VF = ValueFormat;
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
+
+/**
+    Returns cell value as a Variant type.
+*/
+T as(T : Variant, bool isNullablePayload = true)(in Value v)
+{
+    import dpq2.conv.to_variant;
+
+    return v.toVariant!isNullablePayload;
+}
 
 /**
     Returns cell value as a Nullable type using the underlying type conversion after null check.
@@ -97,6 +108,8 @@ if(is(T : const(char)[]) && !is(T == Nullable!R, R))
     assert(v.isNull);
     assertThrown!AssertError(v.as!string == "");
     assert(v.as!(Nullable!string).isNull == true);
+
+    assert(v.as!Variant.get!(Nullable!string).isNull == true);
 }
 
 /**
@@ -104,7 +117,7 @@ if(is(T : const(char)[]) && !is(T == Nullable!R, R))
     Throws: AssertError if the db value is NULL.
 */
 T as(T)(in Value v)
-if(!is(T : const(char)[]) && !is(T == Bson) && !is(T == Nullable!R,R))
+if(!is(T : const(char)[]) && !is(T == Bson) && !is(T == Variant) && !is(T == Nullable!R,R))
 {
     if(!(v.format == VF.BINARY))
         throw new AE(ET.NOT_BINARY,
@@ -377,7 +390,7 @@ if( is(T == BitArray) )
         ubyte[size_t.sizeof] tmpData;
         tmpData[0 .. ch.length] = ch[];
 
-        // DMD Issue 19693
+        //FIXME: DMD Issue 19693
         version(DigitalMars)
             auto re = softBitswap(bigEndianToNative!size_t(tmpData));
         else

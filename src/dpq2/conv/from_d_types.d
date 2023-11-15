@@ -96,7 +96,7 @@ if(is(Unqual!T == BitArray))
     buffer.append!uint(cast(uint)v.length);
     foreach (d; data[0 .. v.dim])
     {
-        // DMD Issue 19693
+        //FIXME: DMD Issue 19693
         version(DigitalMars)
             auto ntb = nativeToBigEndian(softBitswap(d));
         else

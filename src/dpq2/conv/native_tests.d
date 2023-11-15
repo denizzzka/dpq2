@@ -7,7 +7,7 @@ import std.bitmanip : BitArray;
 import std.datetime;
 import std.typecons: Nullable;
 import std.uuid: UUID;
-import vibe.data.bson: Bson, deserializeBson;
+import std.variant: Variant;
 import vibe.data.json: Json, parseJsonString;
 
 version (integration_tests)
@@ -54,14 +54,18 @@ public void _integration_test( string connParam ) @system
     params.resultFormat = ValueFormat.BINARY;
 
     {
-        void testIt(T)(T nativeValue, string pgType, string pgValue)
+        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
+        mixin GeometricInstancesForIntegrationTest;
+
+        void testIt(T)(T nativeValue, in string pgType, string pgValue)
         {
             import std.algorithm : strip;
             import std.string : representation;
+            import std.meta: AliasSeq, anySatisfy;
 
             static string formatValue(T val)
             {
-                import std.algorithm : joiner, map, strip;
+                import std.algorithm : joiner, map;
                 import std.conv : text, to;
                 import std.range : chain, ElementType;
 
@@ -81,15 +85,56 @@ public void _integration_test( string connParam ) @system
 
             auto result = v.as!T;
 
+            enum disabledForStdVariant = (
+                is(T == Nullable!string[]) || // Variant haven't heuristics to understand what array elements can contain NULLs
+                is(T == Nullable!(int[])) || // Same reason, but here is all values are Nullable and thus incompatible for comparison with original values
+                is(T == SysTime) || is(T == Nullable!SysTime) || // Can't be supported by toVariant because TimeStampWithZone converted to PGtimestamptz
+                is(T == LineSegment) || // Impossible to support: LineSegment struct must be provided by user
+                is(T == PGTestMoney) || // ditto
+                is(T == BitArray) || //TODO: Format of the column (VariableBitString) doesn't supported by Value to Variant converter
+                is(T == Nullable!BitArray) || // ditto
+                is(T == Point) || // Impossible to support: LineSegment struct must be provided by user
+                is(T == Nullable!Point) || // ditto
+                is(T == Box) || // ditto
+                is(T == TestPath) || // ditto
+                is(T == Polygon) || // ditto
+                is(T == TestCircle) // ditto
+            );
+
+            static if(!disabledForStdVariant)
+            {
+                static if (is(T == Nullable!R, R))
+                    auto stdVariantResult = v.as!(Variant, true);
+                else
+                    auto stdVariantResult = v.as!(Variant, false);
+            }
+
+            string formatMsg(string varType)
+            {
+                return format(
+                    "PG to %s conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
+                    varType, v.oidType, typeid(T), pgValue, formatValue(nativeValue), formatValue(result)
+                );
+            }
+
             static if(isArrayType!T)
                 const bool assertResult = compareArraysWithCareAboutNullables(result, nativeValue);
             else
+            {
                 const bool assertResult = result == nativeValue;
 
-            assert(assertResult,
-                format("PG to native conv: received unexpected value\nreceived pgType=%s\nexpected nativeType=%s\nsent pgValue=%s\nexpected nativeValue=%s\nresult=%s",
-                v.oidType, typeid(T), pgValue, formatValue(nativeValue), formatValue(result))
-            );
+                //Variant:
+                static if(!disabledForStdVariant)
+                {
+                    // Ignores "json as string" test case with Json sent natively as string
+                    if(!(is(T == string) && v.oidType == OidType.Json))
+                    {
+                        assert(stdVariantResult == nativeValue, formatMsg("std.variant.Variant (type: %s)".format(stdVariantResult.type)));
+                    }
+                }
+            }
+
+            assert(assertResult, formatMsg("native"));
 
             {
                 // test binary to text conversion
@@ -148,6 +193,7 @@ public void _integration_test( string connParam ) @system
         C!PGvarbit(BitArray([1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]), "varbit", "'101011010110101'");
         C!PGvarbit(BitArray([0, 0, 1, 0, 1]), "varbit", "'00101'");
         C!PGvarbit(BitArray([1, 0, 1, 0, 0]), "varbit", "'10100'");
+        C!(Nullable!PGvarbit)(Nullable!PGvarbit.init, "varbit", "NULL");
 
         // numeric testing
         C!PGnumeric("NaN", "numeric", "'NaN'");
@@ -224,9 +270,6 @@ public void _integration_test( string connParam ) @system
             `'{"float_value": 123.456, "text_str": "text string", "abc": {"key": "value"}}'`);
 
         // Geometric
-        import dpq2.conv.geometric: GeometricInstancesForIntegrationTest;
-        mixin GeometricInstancesForIntegrationTest;
-
         C!Point(Point(1,2), "point", "'(1,2)'");
         C!PGline(Line(1,2,3), "line", "'{1,2,3}'");
         C!LineSegment(LineSegment(Point(1,2), Point(3,4)), "lseg", "'[(1,2),(3,4)]'");
@@ -244,6 +287,7 @@ public void _integration_test( string connParam ) @system
         C!(string[])(["foo","bar", "baz"], "text[]", "'{foo,bar,baz}'");
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
+        C!(PGline[])([Line(1,2,3), Line(4,5,6)], "line[]", `'{"{1,2,3}","{4,5,6}"}'`);
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
         C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
     }
