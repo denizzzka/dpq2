@@ -49,7 +49,7 @@ if (isRangeType!(T,O))
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct range with insufficient data");
+		enforce(binaryData.length >= 1, "cannot construct range with insufficient data");
 
 		this._data = binaryData;
 
