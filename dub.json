@@ -9,7 +9,7 @@
 	"targetPath": "bin",
 	"dependencies": {
 		"derelict-pq": "~>4.0.0",
-		"vibe-d:data": ">=0.8.3-beta.1 <0.11.0",
+		"vibe-serialization": "~>1.0.4",
 		"money": "~>3.0.2"
 	},
 	"targetType": "sourceLibrary",
@@ -47,7 +47,7 @@
 			"dependencies":
 			{
 				"dpq2": { "version": "*", "dflags-dmd": ["-preview=in"] },
-				"vibe-d:data": { "version": "*", "dflags-dmd": ["-preview=in"] },
+				"vibe-serialization": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [
@@ -82,7 +82,7 @@
 			"dependencies":
 			{
 				"dpq2": { "version": "*", "dflags": ["-preview=in"] },
-				"vibe-d:data": { "version": "*", "dflags": ["-preview=in"] },
+				"vibe-serialization": { "version": "*", "dflags": ["-preview=in"] },
 			},
 			"sourcePaths": [ "example" ]
 		}
