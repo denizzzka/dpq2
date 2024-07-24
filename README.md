@@ -1,6 +1,5 @@
 ﻿dpq2
 ====
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/denizzzka/dpq2/CI)
 [![Coverage Status](https://coveralls.io/repos/denizzzka/dpq2/badge.svg?branch=master)](https://coveralls.io/r/denizzzka/dpq2)
 [![codecov.io](https://codecov.io/github/denizzzka/dpq2/coverage.svg?branch=master)](https://codecov.io/github/denizzzka/dpq2)
 
