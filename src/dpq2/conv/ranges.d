@@ -56,17 +56,17 @@ if (isRangeType!(T,O))
 		this.flags = binaryData[0];
 		binaryData = binaryData[1..$];
 
-		if (CheckSize)
-			assert(binaryData.length ==
-				(isLowerInf || isLowerNull ? 0 : 1)*(uint.sizeof + CheckSize) +
-				(isUpperInf || isUpperNull ? 0 : 1)*(uint.sizeof + CheckSize),
-				"size of binary data does not match: " ~ _data.to!string ~ ", check size = " ~ CheckSize.to!string ~
-				", binaryData.length = " ~ binaryData.length.to!string ~ ", condition = " ~
-					isLowerInf.to!string ~ "/" ~ isLowerNull.to!string ~ "/" ~
-					isUpperInf.to!string ~ "/" ~ isUpperNull.to!string
-			);
-
 		if (!isEmpty) {
+			if (CheckSize)
+				assert(binaryData.length ==
+					(isLowerInf || isLowerNull ? 0 : 1)*(uint.sizeof + CheckSize) +
+					(isUpperInf || isUpperNull ? 0 : 1)*(uint.sizeof + CheckSize),
+					"size of binary data does not match: " ~ _data.to!string ~ ", check size = " ~ CheckSize.to!string ~
+					", binaryData.length = " ~ binaryData.length.to!string ~ ", condition = " ~
+						isLowerInf.to!string ~ "/" ~ isLowerNull.to!string ~ "/" ~
+						isUpperInf.to!string ~ "/" ~ isUpperNull.to!string
+				);
+
 			if (!isLowerInf && !isLowerNull) {
 				auto size = binaryData[0..uint.sizeof].bigEndianToNative!uint;
 				if (CheckSize) assert(size == CheckSize, "unexpected lower bound size");
