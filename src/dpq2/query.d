@@ -215,7 +215,7 @@ mixin template Queries()
     /// Before using this function execute a command similar to the 
     /// the following:
     /// ---
-    /// conn.exec("CREATE TEMP TABLE mytable (mycol1 int, mycol2 real)");
+    /// conn.exec("COPY mytable (col1, col2) FROM STDIN WITH (FORMAT binary)");
     /// ---
     ///
     /// where the column names an types depend on the destination table.
