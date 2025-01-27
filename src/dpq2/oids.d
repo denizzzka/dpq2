@@ -153,6 +153,7 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
         case LineArray:
         case JsonArray:
         case JsonbArray:
+        case RecordArray:
             return true;
         default:
             break;
