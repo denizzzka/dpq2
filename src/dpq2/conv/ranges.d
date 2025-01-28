@@ -96,6 +96,7 @@ if (isRangeType!(T,O))
 	T upper() { return data[1]; }
 
 	auto rawData() @property { return _data.dup; }
+	static auto elementOidType() @property { return O; }
 }
 
 struct MultiRange(R)

@@ -246,6 +246,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     import std.traits : Unqual, isSomeString;
     import std.uuid : StdUUID = UUID;
     static import dpq2.conv.geometric;
+    static import dpq2.conv.ranges;
     static import dpq2.conv.time;
     import vibe.data.json : VibeJson = Json;
 
@@ -278,6 +279,18 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(dpq2.conv.geometric.isValidCircleType!UT){ return Circle; } else
         static if(dpq2.conv.geometric.isValidLineSegmentType!UT){ return LineSegment; } else
         static if(dpq2.conv.geometric.isValidBoxType!UT){ return Box; } else
+        static if(is(UT == dpq2.conv.ranges.Int4Range)){ return Int4Range; } else
+        static if(is(UT == dpq2.conv.ranges.Int8Range)){ return Int8Range; } else
+        static if(is(UT == dpq2.conv.ranges.NumRange)){ return NumRange; } else
+        static if(is(UT == dpq2.conv.ranges.DateRange)){ return DateRange; } else
+        static if(is(UT == dpq2.conv.ranges.TsRange)){ return TimeStampRange; } else
+        static if(is(UT == dpq2.conv.ranges.TsTzRange)){ return TimeStampWithZoneRange; } else
+        static if(is(UT == dpq2.conv.ranges.Int4MultiRange)){ return Int4MultiRange; } else
+        static if(is(UT == dpq2.conv.ranges.Int8MultiRange)){ return Int8MultiRange; } else
+        static if(is(UT == dpq2.conv.ranges.NumMultiRange)){ return NumMultiRange; } else
+        static if(is(UT == dpq2.conv.ranges.DateMultiRange)){ return DateMultiRange; } else
+        static if(is(UT == dpq2.conv.ranges.TsMultiRange)){ return TimeStampMultiRange; } else
+        static if(is(UT == dpq2.conv.ranges.TsTzMultiRange)){ return TimeStampWithZoneMultiRange; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }
