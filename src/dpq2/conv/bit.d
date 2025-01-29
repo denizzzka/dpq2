@@ -1,13 +1,13 @@
 module dpq2.conv.bit;
 
 import dpq2.conv.to_d_types;
-import dpq2.oids : OidType;
+import dpq2.oids: OidType;
 import dpq2.value;
 
-import std.bitmanip : bigEndianToNative;
-import std.conv : to;
-import std.exception : enforce;
-import std.traits : hasMember;
+import std.bitmanip: bigEndianToNative;
+import std.conv: to;
+import std.exception: enforce;
+import std.traits: hasMember;
 
 
 template isBitString(T) {

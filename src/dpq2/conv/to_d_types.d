@@ -12,11 +12,11 @@ import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.conv.geometric: binaryValueAs, Line;
-import dpq2.conv.net : binaryValueAs;
-import dpq2.conv.bit : binaryValueAs;
-import dpq2.conv.ranges : binaryValueAs;
-import dpq2.conv.tsearch : binaryValueAs;
-import dpq2.conv.arrays : binaryValueAs;
+import dpq2.conv.net: binaryValueAs;
+import dpq2.conv.bit: binaryValueAs;
+import dpq2.conv.ranges: binaryValueAs;
+import dpq2.conv.tsearch: binaryValueAs;
+import dpq2.conv.arrays: binaryValueAs;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;

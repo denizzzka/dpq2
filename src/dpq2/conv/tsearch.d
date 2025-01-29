@@ -1,15 +1,15 @@
 module dpq2.conv.tsearch;
 
 import dpq2.conv.to_d_types;
-import dpq2.oids : OidType;
+import dpq2.oids: OidType;
 import dpq2.value;
 
-import std.bitmanip : bigEndianToNative;
-import std.conv : to;
-import std.exception : enforce;
-import std.stdio : writefln;
-import std.string : fromStringz;
-import std.traits : hasMember;
+import std.bitmanip: bigEndianToNative;
+import std.conv: to;
+import std.exception: enforce;
+import std.stdio: writefln;
+import std.string: fromStringz;
+import std.traits: hasMember;
 
 
 template isTsQuery(T) {
