@@ -146,19 +146,19 @@ if (__traits(isSame, TemplateOf!R, Range))
 	}
 }
 
-alias Range!(int, OidType.Int4) Int4Range;
-alias Range!(long, OidType.Int8) Int8Range;
-alias Range!(string, OidType.Numeric, 0) NumRange;
-alias Range!(TimeStamp, OidType.TimeStamp, 8) TsRange;
-alias Range!(TimeStampUTC, OidType.TimeStampWithZone, 8) TsTzRange;
-alias Range!(Date, OidType.Date) DateRange;
+alias Int4Range = Range!(int, OidType.Int4);
+alias Int8Range = Range!(long, OidType.Int8);
+alias NumRange = Range!(string, OidType.Numeric, 0);
+alias TsRange = Range!(TimeStamp, OidType.TimeStamp, 8);
+alias TsTzRange = Range!(TimeStampUTC, OidType.TimeStampWithZone, 8);
+alias DateRange = Range!(Date, OidType.Date);
 
-alias MultiRange!Int4Range Int4MultiRange;
-alias MultiRange!Int8Range Int8MultiRange;
-alias MultiRange!NumRange NumMultiRange;
-alias MultiRange!TsRange TsMultiRange;
-alias MultiRange!TsTzRange TsTzMultiRange;
-alias MultiRange!DateRange DateMultiRange;
+alias Int4MultiRange = MultiRange!Int4Range;
+alias Int8MultiRange = MultiRange!Int8Range;
+alias NumMultiRange = MultiRange!NumRange;
+alias TsMultiRange = MultiRange!TsRange;
+alias TsTzMultiRange = MultiRange!TsTzRange;
+alias DateMultiRange = MultiRange!DateRange;
 
 package:
 
