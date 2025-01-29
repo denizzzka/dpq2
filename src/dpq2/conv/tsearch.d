@@ -64,7 +64,7 @@ struct TsQuery {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct text search query with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct text search query with insufficient data");
 
 		this._data = binaryData;
 
@@ -139,7 +139,7 @@ struct TsVector {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct text search vector with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct text search vector with insufficient data");
 
 		this._data = binaryData;
 
