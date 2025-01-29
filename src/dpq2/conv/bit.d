@@ -26,11 +26,10 @@ struct BitString {
 		this._data = binaryData;
 
 		this.stringLen = binaryData[0..uint.sizeof].bigEndianToNative!uint;
+		assert(this.stringLen, "zero bit string length?");
 
 		binaryData = binaryData[uint.sizeof..$];
-
 		assert(binaryData.length >= this.byteLen, "data shorter than bit string length");
-		assert(this.stringLen, "zero bit string length?");
 
 		this.bits = binaryData[0..this.byteLen].dup;
 	}
