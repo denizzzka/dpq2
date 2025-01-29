@@ -39,11 +39,10 @@ struct NetworkAddress {
 		this.netmask = binaryData[1];
 		this.type = binaryData[2].to!PG_TYPE;
 		this.addressLen = binaryData[3];
+		assert(this.addressLen, "zero address length?");
+		assert(this.addressLen <= binaryData.length, "data shorter than address length");
 
 		binaryData = binaryData[4..$];
-
-		assert(this.addressLen <= binaryData.length, "data shorter than address length");
-		assert(this.addressLen, "zero address length?");
 
 		this.address = binaryData[0..this.addressLen].dup;
 	}

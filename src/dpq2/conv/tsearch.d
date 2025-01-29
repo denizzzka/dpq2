@@ -69,10 +69,9 @@ struct TsQuery {
 		this._data = binaryData;
 
 		auto count = binaryData[0..uint.sizeof].bigEndianToNative!uint;
+		assert(count, "zero token count?");
 
 		binaryData = binaryData[uint.sizeof..$];
-
-		assert(count, "zero token count?");
 
 		for (uint i = 0; i < count; i++) {
 			TsToken token;
@@ -145,10 +144,9 @@ struct TsVector {
 		this._data = binaryData;
 
 		auto count = binaryData[0..uint.sizeof].bigEndianToNative!uint;
+		assert(count, "zero lexeme count?");
 
 		binaryData = binaryData[uint.sizeof..$];
-
-		assert(count, "zero lexeme count?");
 
 		for (uint i = 0; i < count; i++) {
 			TsLexeme lexeme;
