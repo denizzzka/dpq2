@@ -15,14 +15,14 @@ import std.traits: TemplateOf;
 
 enum PG_RANGE : ubyte {
 	/* A range's flags byte contains these bits: */
-	EMPTY			= 0x01,			/* range is empty */
-	LB_INC			= 0x02,			/* lower bound is inclusive */
-	UB_INC			= 0x04,			/* upper bound is inclusive */
-	LB_INF			= 0x08,			/* lower bound is -infinity */
-	UB_INF			= 0x10,			/* upper bound is +infinity */
-	LB_NULL			= 0x20,			/* lower bound is null (NOT USED) */
-	UB_NULL			= 0x40,			/* upper bound is null (NOT USED) */
-	CONTAIN_EMPTY	= 0x80			/* marks a GiST internal-page entry whose
+	EMPTY			= 0x01,			/** range is empty */
+	LB_INC			= 0x02,			/** lower bound is inclusive */
+	UB_INC			= 0x04,			/** upper bound is inclusive */
+	LB_INF			= 0x08,			/** lower bound is -infinity */
+	UB_INF			= 0x10,			/** upper bound is +infinity */
+	LB_NULL			= 0x20,			/** lower bound is null (NOT USED) */
+	UB_NULL			= 0x40,			/** upper bound is null (NOT USED) */
+	CONTAIN_EMPTY	= 0x80			/** marks a GiST internal-page entry whose
 									 * subtree contains some empty ranges */
 }
 
