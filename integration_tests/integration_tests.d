@@ -35,14 +35,5 @@ int main(string[] args)
     native._integration_test( conninfo );
     bson._integration_test( conninfo );
 
-    version(Test_Dynamic_Unmanaged)
-    {
-        import core.memory: GC;
-        import derelict.pq.pq;
-
-        GC.collect(); // Ensures that all related to libpq objects are destroyed
-        DerelictPQ.unload();
-    }
-
     return 0;
 }
