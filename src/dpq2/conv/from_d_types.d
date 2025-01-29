@@ -378,24 +378,24 @@ Value toRecordValue(Value[] elements)
 Value toValue(R)(R r)
 if (__traits(isSame, TemplateOf!R, Range))
 {
-	static if (is(R == Int4Range))	return Value(r.rawData.idup, OidType.Int4Range);
-	static if (is(R == Int8Range))	return Value(r.rawData.idup, OidType.Int8Range);
-	static if (is(R == NumRange))	return Value(r.rawData.idup, OidType.NumRange);
-	static if (is(R == DateRange))	return Value(r.rawData.idup, OidType.DateRange);
-	static if (is(R == TsRange))	return Value(r.rawData.idup, OidType.TimeStampRange);
-	static if (is(R == TsTzRange))	return Value(r.rawData.idup, OidType.TimeStampWithZoneRange);
+    static if (is(R == Int4Range))  return Value(r.rawData.idup, OidType.Int4Range);
+    static if (is(R == Int8Range))  return Value(r.rawData.idup, OidType.Int8Range);
+    static if (is(R == NumRange))   return Value(r.rawData.idup, OidType.NumRange);
+    static if (is(R == DateRange))  return Value(r.rawData.idup, OidType.DateRange);
+    static if (is(R == TsRange))    return Value(r.rawData.idup, OidType.TimeStampRange);
+    static if (is(R == TsTzRange))  return Value(r.rawData.idup, OidType.TimeStampWithZoneRange);
 }
 
 /// Constructs Value from Multiranges
 Value toValue(M)(M m)
 if (__traits(isSame, TemplateOf!M, MultiRange))
 {
-	static if (is(M == Int4MultiRange))	return Value(m._data.idup, OidType.Int4MultiRange);
-	static if (is(M == Int8MultiRange))	return Value(m._data.idup, OidType.Int8MultiRange);
-	static if (is(M == NumMultiRange))	return Value(m._data.idup, OidType.NumMultiRange);
-	static if (is(M == DateMultiRange))	return Value(m._data.idup, OidType.DateMultiRange);
-	static if (is(M == TsMultiRange))	return Value(m._data.idup, OidType.TimeStampMultiRange);
-	static if (is(M == TsTzMultiRange))	return Value(m._data.idup, OidType.TimeStampWithZoneMultiRange);
+    static if (is(M == Int4MultiRange)) return Value(m._data.idup, OidType.Int4MultiRange);
+    static if (is(M == Int8MultiRange)) return Value(m._data.idup, OidType.Int8MultiRange);
+    static if (is(M == NumMultiRange))  return Value(m._data.idup, OidType.NumMultiRange);
+    static if (is(M == DateMultiRange)) return Value(m._data.idup, OidType.DateMultiRange);
+    static if (is(M == TsMultiRange))   return Value(m._data.idup, OidType.TimeStampMultiRange);
+    static if (is(M == TsTzMultiRange)) return Value(m._data.idup, OidType.TimeStampWithZoneMultiRange);
 }
 
 version(unittest)

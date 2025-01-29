@@ -347,7 +347,7 @@ public enum OidType : Oid
     Circle = 718, ///
     Money = 790, ///
     MacAddress = 829, ///
-    MacAddress8 = 774,
+    MacAddress8 = 774, ///
     HostAddress = 869, ///
     NetworkAddress = 650, ///
 
@@ -387,19 +387,19 @@ public enum OidType : Oid
     DateRange = 3912, ///
     Int8Range = 3926, ///
 
-    Int4MultiRange = 4451,
-    NumMultiRange = 4532,
-    TimeStampMultiRange = 4533,
-    TimeStampWithZoneMultiRange = 4534,
-    DateMultiRange = 4535,
-    Int8MultiRange = 4536,
+    Int4MultiRange = 4451, ///
+    NumMultiRange = 4532, ///
+    TimeStampMultiRange = 4533, ///
+    TimeStampWithZoneMultiRange = 4534, ///
+    DateMultiRange = 4535, ///
+    Int8MultiRange = 4536, ///
 
     // Arrays
     XmlArray = 143, ///
-    LineArray = 629,
-    CircleArray = 719,
-    MacAddress8Array = 775,
-    MoneyArray = 791,
+    LineArray = 629, ///
+    CircleArray = 719, ///
+    MacAddress8Array = 775, ///
+    MoneyArray = 791, ///
     JsonbArray = 3807, ///
     JsonArray = 199, ///
     BoolArray = 1000, ///
@@ -463,12 +463,12 @@ public enum OidType : Oid
     DateRangeArray = 3913, ///
     Int8RangeArray = 3927, ///
 
-    Int4MultiRangeArray = 6150,
-    NumMultiRangeArray = 6151,
-    TimeStampMultiRangeArray = 6152,
-    TimeStampWithZoneMultiRangeArray = 6153,
-    DateMultiRangeArray = 6155,
-    Int8MultiRangeArray = 6157,
+    Int4MultiRangeArray = 6150, ///
+    NumMultiRangeArray = 6151, ///
+    TimeStampMultiRangeArray = 6152, ///
+    TimeStampWithZoneMultiRangeArray = 6153, ///
+    DateMultiRangeArray = 6155, ///
+    Int8MultiRangeArray = 6157, ///
 
     // Pseudo types
     Record = 2249, ///

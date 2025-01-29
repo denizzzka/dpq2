@@ -91,32 +91,32 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         case VariableStringArray:
             return retArray__!string;
 
-        case Int4Range:		return retVariant!(dpq2.conv.ranges.Int4Range);
-        case Int8Range:		return retVariant!(dpq2.conv.ranges.Int8Range);
-        case NumRange:		return retVariant!(dpq2.conv.ranges.NumRange);
-        case DateRange:		return retVariant!(dpq2.conv.ranges.DateRange);
-        case TimeStampRange:	return retVariant!(dpq2.conv.ranges.TsRange);
+        case Int4Range:         return retVariant!(dpq2.conv.ranges.Int4Range);
+        case Int8Range:         return retVariant!(dpq2.conv.ranges.Int8Range);
+        case NumRange:          return retVariant!(dpq2.conv.ranges.NumRange);
+        case DateRange:         return retVariant!(dpq2.conv.ranges.DateRange);
+        case TimeStampRange:    return retVariant!(dpq2.conv.ranges.TsRange);
         case TimeStampWithZoneRange:  return retVariant!(dpq2.conv.ranges.TsTzRange);
 
-        case Int4RangeArray:		return retArray__!(dpq2.conv.ranges.Int4Range);
-        case Int8RangeArray:		return retArray__!(dpq2.conv.ranges.Int8Range);
-        case NumRangeArray:		return retArray__!(dpq2.conv.ranges.NumRange);
-        case DateRangeArray:		return retArray__!(dpq2.conv.ranges.DateRange);
-        case TimeStampRangeArray:	return retArray__!(dpq2.conv.ranges.TsRange);
+        case Int4RangeArray:            return retArray__!(dpq2.conv.ranges.Int4Range);
+        case Int8RangeArray:            return retArray__!(dpq2.conv.ranges.Int8Range);
+        case NumRangeArray:             return retArray__!(dpq2.conv.ranges.NumRange);
+        case DateRangeArray:            return retArray__!(dpq2.conv.ranges.DateRange);
+        case TimeStampRangeArray:       return retArray__!(dpq2.conv.ranges.TsRange);
         case TimeStampWithZoneRangeArray:  return retArray__!(dpq2.conv.ranges.TsTzRange);
 
-        case Int4MultiRange:		return retVariant!(dpq2.conv.ranges.Int4MultiRange);
-        case Int8MultiRange:		return retVariant!(dpq2.conv.ranges.Int8MultiRange);
-        case NumMultiRange:		return retVariant!(dpq2.conv.ranges.NumMultiRange);
-        case DateMultiRange:		return retVariant!(dpq2.conv.ranges.DateMultiRange);
-        case TimeStampMultiRange:	return retVariant!(dpq2.conv.ranges.TsMultiRange);
+        case Int4MultiRange:            return retVariant!(dpq2.conv.ranges.Int4MultiRange);
+        case Int8MultiRange:            return retVariant!(dpq2.conv.ranges.Int8MultiRange);
+        case NumMultiRange:             return retVariant!(dpq2.conv.ranges.NumMultiRange);
+        case DateMultiRange:            return retVariant!(dpq2.conv.ranges.DateMultiRange);
+        case TimeStampMultiRange:       return retVariant!(dpq2.conv.ranges.TsMultiRange);
         case TimeStampWithZoneMultiRange:  return retVariant!(dpq2.conv.ranges.TsTzMultiRange);
 
-        case Int4MultiRangeArray:		return retArray__!(dpq2.conv.ranges.Int4MultiRange);
-        case Int8MultiRangeArray:		return retArray__!(dpq2.conv.ranges.Int8MultiRange);
-        case NumMultiRangeArray:		return retArray__!(dpq2.conv.ranges.NumMultiRange);
-        case DateMultiRangeArray:		return retArray__!(dpq2.conv.ranges.DateMultiRange);
-        case TimeStampMultiRangeArray:	        return retArray__!(dpq2.conv.ranges.TsMultiRange);
+        case Int4MultiRangeArray:               return retArray__!(dpq2.conv.ranges.Int4MultiRange);
+        case Int8MultiRangeArray:               return retArray__!(dpq2.conv.ranges.Int8MultiRange);
+        case NumMultiRangeArray:                return retArray__!(dpq2.conv.ranges.NumMultiRange);
+        case DateMultiRangeArray:               return retArray__!(dpq2.conv.ranges.DateMultiRange);
+        case TimeStampMultiRangeArray:          return retArray__!(dpq2.conv.ranges.TsMultiRange);
         case TimeStampWithZoneMultiRangeArray:  return retArray__!(dpq2.conv.ranges.TsTzMultiRange);
 
         case ByteArray: return retVariant!PGbytea;
