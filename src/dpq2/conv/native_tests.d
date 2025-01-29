@@ -6,7 +6,7 @@ import dpq2.conv.geometric: Line;
 import dpq2.conv.ranges;
 import std.bitmanip : BitArray;
 import std.datetime;
-import std.string : replace;
+import std.string: replace;
 import std.typecons: Nullable;
 import std.uuid: UUID;
 import std.variant: Variant;

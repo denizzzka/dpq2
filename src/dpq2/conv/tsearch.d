@@ -1,15 +1,14 @@
 module dpq2.conv.tsearch;
 
 import dpq2.conv.to_d_types;
-import dpq2.oids : OidType;
+import dpq2.oids: OidType;
 import dpq2.value;
 
-import std.bitmanip : bigEndianToNative;
-import std.conv : to;
-import std.exception : enforce;
-import std.stdio : writefln;
-import std.string : fromStringz;
-import std.traits : hasMember;
+import std.bitmanip: bigEndianToNative;
+import std.conv: to;
+import std.stdio: writefln;
+import std.string: fromStringz;
+import std.traits: hasMember;
 
 
 template isTsQuery(T) {
@@ -64,15 +63,14 @@ struct TsQuery {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct text search query with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct text search query with insufficient data");
 
 		this._data = binaryData;
 
 		auto count = binaryData[0..uint.sizeof].bigEndianToNative!uint;
+		assert(count, "zero token count?");
 
 		binaryData = binaryData[uint.sizeof..$];
-
-		assert(count, "zero token count?");
 
 		for (uint i = 0; i < count; i++) {
 			TsToken token;
@@ -109,7 +107,12 @@ struct TsQuery {
 	size_t length() @property { return tokens.length; }
 
 	auto opIndex(size_t idx) {
-		enforce(idx < this.tokens.length, "tokens index out of bounds: " ~ this.tokens.length.to!string ~ "/" ~ idx.to!string);
+		if(!(idx < this.tokens.length))
+			throw new ValueConvException(
+				ConvExceptionType.OUT_OF_RANGE,
+				"tokens index out of bounds: " ~ this.tokens.length.to!string ~ "/" ~ idx.to!string,
+			);
+
 		return tokens[idx];
 	}
 
@@ -140,15 +143,14 @@ struct TsVector {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct text search vector with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct text search vector with insufficient data");
 
 		this._data = binaryData;
 
 		auto count = binaryData[0..uint.sizeof].bigEndianToNative!uint;
+		assert(count, "zero lexeme count?");
 
 		binaryData = binaryData[uint.sizeof..$];
-
-		assert(count, "zero lexeme count?");
 
 		for (uint i = 0; i < count; i++) {
 			TsLexeme lexeme;
@@ -170,7 +172,12 @@ struct TsVector {
 	size_t length() @property { return lexemes.length; }
 
 	auto opIndex(size_t idx) {
-		enforce(idx < this.lexemes.length, "lexemes index out of bounds: " ~ this.lexemes.length.to!string ~ "/" ~ idx.to!string);
+		if(!(idx < this.lexemes.length))
+			throw new ValueConvException(
+				ConvExceptionType.OUT_OF_RANGE,
+				"lexemes index out of bounds: " ~ this.lexemes.length.to!string ~ "/" ~ idx.to!string,
+			);
+
 		return lexemes[idx];
 	}
 

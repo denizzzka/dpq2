@@ -1,13 +1,12 @@
 module dpq2.conv.bit;
 
 import dpq2.conv.to_d_types;
-import dpq2.oids : OidType;
+import dpq2.oids: OidType;
 import dpq2.value;
 
-import std.bitmanip : bigEndianToNative;
-import std.conv : to;
-import std.exception : enforce;
-import std.traits : hasMember;
+import std.bitmanip: bigEndianToNative;
+import std.conv: to;
+import std.traits: hasMember;
 
 
 template isBitString(T) {
@@ -21,16 +20,15 @@ struct BitString {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct bit string with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct bit string with insufficient data");
 
 		this._data = binaryData;
 
 		this.stringLen = binaryData[0..uint.sizeof].bigEndianToNative!uint;
+		assert(this.stringLen, "zero bit string length?");
 
 		binaryData = binaryData[uint.sizeof..$];
-
 		assert(binaryData.length >= this.byteLen, "data shorter than bit string length");
-		assert(this.stringLen, "zero bit string length?");
 
 		this.bits = binaryData[0..this.byteLen].dup;
 	}

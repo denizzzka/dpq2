@@ -100,7 +100,7 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 
         case Int4RangeArray:		return retArray__!(dpq2.conv.ranges.Int4Range);
         case Int8RangeArray:		return retArray__!(dpq2.conv.ranges.Int8Range);
-        case NumRangeArray:			return retArray__!(dpq2.conv.ranges.NumRange);
+        case NumRangeArray:		return retArray__!(dpq2.conv.ranges.NumRange);
         case DateRangeArray:		return retArray__!(dpq2.conv.ranges.DateRange);
         case TimeStampRangeArray:	return retArray__!(dpq2.conv.ranges.TsRange);
         case TimeStampWithZoneRangeArray:  return retArray__!(dpq2.conv.ranges.TsTzRange);
@@ -116,7 +116,7 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         case Int8MultiRangeArray:		return retArray__!(dpq2.conv.ranges.Int8MultiRange);
         case NumMultiRangeArray:		return retArray__!(dpq2.conv.ranges.NumMultiRange);
         case DateMultiRangeArray:		return retArray__!(dpq2.conv.ranges.DateMultiRange);
-        case TimeStampMultiRangeArray:	return retArray__!(dpq2.conv.ranges.TsMultiRange);
+        case TimeStampMultiRangeArray:	        return retArray__!(dpq2.conv.ranges.TsMultiRange);
         case TimeStampWithZoneMultiRangeArray:  return retArray__!(dpq2.conv.ranges.TsTzMultiRange);
 
         case ByteArray: return retVariant!PGbytea;

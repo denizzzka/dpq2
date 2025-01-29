@@ -1,15 +1,14 @@
 module dpq2.conv.net;
 
 import dpq2.conv.to_d_types;
-import dpq2.oids : OidType;
+import dpq2.oids: OidType;
 import dpq2.value;
 
-import std.bitmanip : bigEndianToNative;
-import std.conv : to;
-import std.exception : enforce;
-import std.format : format;
-import std.socket : AddressFamily;
-import std.traits : hasMember;
+import std.bitmanip: bigEndianToNative;
+import std.conv: to;
+import std.format: format;
+import std.socket: AddressFamily;
+import std.traits: hasMember;
 
 
 enum PG_TYPE : ushort {
@@ -31,7 +30,7 @@ struct NetworkAddress {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct network address with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct network address with insufficient data");
 
 		this._data = binaryData;
 
@@ -39,11 +38,10 @@ struct NetworkAddress {
 		this.netmask = binaryData[1];
 		this.type = binaryData[2].to!PG_TYPE;
 		this.addressLen = binaryData[3];
+		assert(this.addressLen, "zero address length?");
+		assert(this.addressLen <= binaryData.length, "data shorter than address length");
 
 		binaryData = binaryData[4..$];
-
-		assert(this.addressLen <= binaryData.length, "data shorter than address length");
-		assert(this.addressLen, "zero address length?");
 
 		this.address = binaryData[0..this.addressLen].dup;
 	}
