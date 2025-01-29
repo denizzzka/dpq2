@@ -9,7 +9,6 @@ import dpq2.value;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 import std.datetime.date: Date;
-import std.exception: enforce;
 import std.traits: TemplateOf;
 
 
@@ -49,7 +48,7 @@ if (isRangeType!(T,O))
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= 1, "cannot construct range with insufficient data");
+		enforceSize(binaryData, 1, "cannot construct range with insufficient data");
 
 		this._data = binaryData;
 
@@ -107,7 +106,7 @@ if (__traits(isSame, TemplateOf!R, Range))
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct multirange with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct multirange with insufficient data");
 
 		this._data = binaryData;
 		binaryData = binaryData[uint.sizeof..$];
@@ -123,7 +122,12 @@ if (__traits(isSame, TemplateOf!R, Range))
 	size_t length() @property { return _data.length ? _data[0..uint.sizeof].bigEndianToNative!uint : 0; }
 
 	R opIndex(size_t idx) {
-		enforce(idx < this.length, "multirange index out of bounds: " ~ this.length.to!string ~ "/" ~ idx.to!string);
+        if(!(idx < this.length))
+            throw new ValueConvException(
+                ConvExceptionType.OUT_OF_RANGE,
+                "multirange index out of bounds: " ~ this.length.to!string ~ "/" ~ idx.to!string,
+            );
+
 		return data[idx];
 	}
 
