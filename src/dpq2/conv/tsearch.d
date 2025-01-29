@@ -6,7 +6,6 @@ import dpq2.value;
 
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
-import std.exception: enforce;
 import std.stdio: writefln;
 import std.string: fromStringz;
 import std.traits: hasMember;
@@ -173,7 +172,12 @@ struct TsVector {
 	size_t length() @property { return lexemes.length; }
 
 	auto opIndex(size_t idx) {
-		enforce(idx < this.lexemes.length, "lexemes index out of bounds: " ~ this.lexemes.length.to!string ~ "/" ~ idx.to!string);
+        if(!(idx < this.lexemes.length))
+            throw new ValueConvException(
+                ConvExceptionType.OUT_OF_RANGE,
+                "lexemes index out of bounds: " ~ this.lexemes.length.to!string ~ "/" ~ idx.to!string,
+            );
+
 		return lexemes[idx];
 	}
 
