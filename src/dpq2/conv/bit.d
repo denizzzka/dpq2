@@ -20,9 +20,7 @@ struct BitString {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		if(!(binaryData.length >= uint.sizeof))
-			throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
-				"cannot construct bit string with insufficient data", __FILE__, __LINE__);
+		enforceSize(binaryData, uint.sizeof, "cannot construct bit string with insufficient data");
 
 		this._data = binaryData;
 
