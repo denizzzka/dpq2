@@ -108,7 +108,12 @@ struct TsQuery {
 	size_t length() @property { return tokens.length; }
 
 	auto opIndex(size_t idx) {
-		enforce(idx < this.tokens.length, "tokens index out of bounds: " ~ this.tokens.length.to!string ~ "/" ~ idx.to!string);
+        if(!(idx < this.tokens.length))
+            throw new ValueConvException(
+                ConvExceptionType.OUT_OF_RANGE,
+                "tokens index out of bounds: " ~ this.tokens.length.to!string ~ "/" ~ idx.to!string,
+            );
+
 		return tokens[idx];
 	}
 
