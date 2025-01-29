@@ -6,7 +6,6 @@ import dpq2.value;
 
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
-import std.exception: enforce;
 import std.format: format;
 import std.socket: AddressFamily;
 import std.traits: hasMember;
@@ -31,7 +30,7 @@ struct NetworkAddress {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct network address with insufficient data");
+		enforceSize(binaryData, uint.sizeof, "cannot construct network address with insufficient data");
 
 		this._data = binaryData;
 
