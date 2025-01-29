@@ -122,11 +122,11 @@ if (__traits(isSame, TemplateOf!R, Range))
 	size_t length() @property { return _data.length ? _data[0..uint.sizeof].bigEndianToNative!uint : 0; }
 
 	R opIndex(size_t idx) {
-        if(!(idx < this.length))
-            throw new ValueConvException(
-                ConvExceptionType.OUT_OF_RANGE,
-                "multirange index out of bounds: " ~ this.length.to!string ~ "/" ~ idx.to!string,
-            );
+		if(!(idx < this.length))
+			throw new ValueConvException(
+				ConvExceptionType.OUT_OF_RANGE,
+				"multirange index out of bounds: " ~ this.length.to!string ~ "/" ~ idx.to!string,
+			);
 
 		return data[idx];
 	}
