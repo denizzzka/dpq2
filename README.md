@@ -38,6 +38,16 @@ _Please help us to make documentation better!_
 * On Linux, you may install `libpq-dev` for dynamic linking e.g. `sudo apt-get install libpq-dev`
 
 ## Example
+
+To build the included example, run commands similar to the following.
+```bash
+dub build --single example/example.d
+./example/dpq2_example --conninfo postgresql://postgres@/template1
+```
+Exact details vary based on your PostgreSQL setup and operating system.
+
+A condensed version of `example.d` follows.
+
 ```D
 #!/usr/bin/env rdmd
 
