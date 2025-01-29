@@ -204,6 +204,7 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
         case PathArray:
         case PointArray:
         case PolygonArray:
+        case RecordArray:
         case TextArray:
         case TimeArray:
         case TimeIntervalArray:
