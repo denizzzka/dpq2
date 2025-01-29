@@ -6,7 +6,6 @@ import dpq2.value;
 
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
-import std.exception: enforce;
 import std.traits: hasMember;
 
 
@@ -21,7 +20,9 @@ struct BitString {
 	immutable(ubyte)[] _data;
 
 	this(immutable(ubyte)[] binaryData) {
-		enforce(binaryData.length >= uint.sizeof, "cannot construct bit string with insufficient data");
+		if(!(binaryData.length >= uint.sizeof))
+			throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH,
+				"cannot construct bit string with insufficient data", __FILE__, __LINE__);
 
 		this._data = binaryData;
 
