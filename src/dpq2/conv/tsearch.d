@@ -107,11 +107,11 @@ struct TsQuery {
 	size_t length() @property { return tokens.length; }
 
 	auto opIndex(size_t idx) {
-        if(!(idx < this.tokens.length))
-            throw new ValueConvException(
-                ConvExceptionType.OUT_OF_RANGE,
-                "tokens index out of bounds: " ~ this.tokens.length.to!string ~ "/" ~ idx.to!string,
-            );
+		if(!(idx < this.tokens.length))
+			throw new ValueConvException(
+				ConvExceptionType.OUT_OF_RANGE,
+				"tokens index out of bounds: " ~ this.tokens.length.to!string ~ "/" ~ idx.to!string,
+			);
 
 		return tokens[idx];
 	}
@@ -172,11 +172,11 @@ struct TsVector {
 	size_t length() @property { return lexemes.length; }
 
 	auto opIndex(size_t idx) {
-        if(!(idx < this.lexemes.length))
-            throw new ValueConvException(
-                ConvExceptionType.OUT_OF_RANGE,
-                "lexemes index out of bounds: " ~ this.lexemes.length.to!string ~ "/" ~ idx.to!string,
-            );
+		if(!(idx < this.lexemes.length))
+			throw new ValueConvException(
+				ConvExceptionType.OUT_OF_RANGE,
+				"lexemes index out of bounds: " ~ this.lexemes.length.to!string ~ "/" ~ idx.to!string,
+			);
 
 		return lexemes[idx];
 	}
