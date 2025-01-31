@@ -288,6 +288,7 @@ public void _integration_test( string connParam ) @system
         C!(PGjson[])([Json(["foo": Json(42)])], "json[]", `'{"{\"foo\":42}"}'`);
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
         C!(PGline[])([Line(1,2,3), Line(4,5,6)], "line[]", `'{"{1,2,3}","{4,5,6}"}'`);
+        C!(PGtimestamp[])([PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12))], "timestamp[]", `'{"1997-12-17 07:37:16.000012"}'`);
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
         C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
     }
