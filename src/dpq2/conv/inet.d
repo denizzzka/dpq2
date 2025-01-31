@@ -53,7 +53,7 @@ package struct TInetAddress (bool isCIDR)
                 return new Internet6Address(addr6, port);
 
             default:
-                assert(0, "Unsupported address family "~family.to!string);
+                assert(0, family.unsup);
         }
     }
 
@@ -69,7 +69,7 @@ package struct TInetAddress (bool isCIDR)
                 return format("%s/%d", createStdAddr.toAddrString, this.netmask);
 
             default:
-                return format("Unsupported address family %s", family.to!string); //TODO: deduplicate this code
+                return family.unsup;
         }
     }
 }
@@ -120,10 +120,7 @@ InetAddress vibe2pg(VibeNetworkAddress)(VibeNetworkAddress a)
             break;
 
         default:
-            throw new ValueConvException(
-                ConvExceptionType.NOT_IMPLEMENTED,
-                "Unsupported address family: "~a.family.to!string
-            );
+            throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, a.family.unsup);
     }
 
     return r;
@@ -167,10 +164,7 @@ if(is(T == InetAddress) || is(T == CidrAddress))
             break;
 
         default:
-            throw new ValueConvException(
-                ConvExceptionType.NOT_IMPLEMENTED,
-                "Unsupported address family: "~v.family.to!string
-            );
+            throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, v.family.unsup);
     }
 
     hdr.addr_len = addr_net_byte_order.length.to!ubyte;
@@ -207,10 +201,7 @@ if(is(T == InetAddress) || is(T == CidrAddress))
         case PgFamily.PGSQL_AF_INET: lenMustBe = ipv4_addr_len; break;
         case PgFamily.PGSQL_AF_INET6: lenMustBe = 16; break;
         default:
-            throw new ValueConvException(
-                ConvExceptionType.NOT_IMPLEMENTED,
-                "Unsupported address family: "~hdr.family.to!string
-            );
+            throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, hdr.family.unsup);
     }
 
     if(hdr.addr_len != lenMustBe && hdr.always_zero == 0)
@@ -251,6 +242,11 @@ if(is(T == InetAddress) || is(T == CidrAddress))
 }
 
 private:
+
+string unsup(T)(in T family)
+{
+    return "Unsupported address family: "~family.to!string;
+}
 
 private union AddrValue
 {
