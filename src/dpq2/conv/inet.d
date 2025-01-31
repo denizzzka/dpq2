@@ -120,7 +120,7 @@ InetAddress vibe2pg(VibeNetworkAddress)(VibeNetworkAddress a)
             break;
 
         default:
-            throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, a.family.unsup);
+            throwUnsup(a.family);
     }
 
     return r;
@@ -164,7 +164,7 @@ if(is(T == InetAddress) || is(T == CidrAddress))
             break;
 
         default:
-            throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, v.family.unsup);
+            throwUnsup(v.family);
     }
 
     hdr.addr_len = addr_net_byte_order.length.to!ubyte;
@@ -200,8 +200,7 @@ if(is(T == InetAddress) || is(T == CidrAddress))
     {
         case PgFamily.PGSQL_AF_INET: lenMustBe = ipv4_addr_len; break;
         case PgFamily.PGSQL_AF_INET6: lenMustBe = 16; break;
-        default:
-            throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, hdr.family.unsup);
+        default: throwUnsup(hdr.family);
     }
 
     if(hdr.addr_len != lenMustBe && hdr.always_zero == 0)
@@ -242,6 +241,12 @@ if(is(T == InetAddress) || is(T == CidrAddress))
 }
 
 private:
+
+//TODO: noreturn?
+void throwUnsup(T)(T family)
+{
+    throw new ValueConvException(ConvExceptionType.NOT_IMPLEMENTED, family.unsup);
+}
 
 string unsup(T)(in T family)
 {
