@@ -7,6 +7,7 @@ public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : isGeometricType, toValue;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.conv.ranges;
+import dpq2.conv.tsearch;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
 
@@ -396,6 +397,19 @@ if (__traits(isSame, TemplateOf!M, MultiRange))
     static if (is(M == DateMultiRange)) return Value(m._data.idup, OidType.DateMultiRange);
     static if (is(M == TsMultiRange))   return Value(m._data.idup, OidType.TimeStampMultiRange);
     static if (is(M == TsTzMultiRange)) return Value(m._data.idup, OidType.TimeStampWithZoneMultiRange);
+}
+
+/// Constructs Value from text search query and vector
+Value toValue(T)(T t)
+if (isTsQuery!T)
+{
+	return Value(t.rawData.idup, OidType.TSQuery);
+}
+
+Value toValue(T)(T t)
+if (isTsVector!T)
+{
+	return Value(t.rawData.idup, OidType.TSVector);
 }
 
 version(unittest)
