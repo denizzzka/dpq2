@@ -4,6 +4,7 @@ import dpq2;
 import dpq2.conv.arrays : isArrayType;
 import dpq2.conv.geometric: Line;
 import dpq2.conv.ranges;
+import dpq2.conv.tsearch;
 import std.bitmanip : BitArray;
 import std.datetime;
 import std.string: replace;
@@ -100,7 +101,9 @@ public void _integration_test( string connParam ) @system
                 is(T == Box) || // ditto
                 is(T == TestPath) || // ditto
                 is(T == TestPolygon) || // ditto
-                is(T == TestCircle) // ditto
+                is(T == TestCircle) || // ditto
+                is(T == TsQuery) || // ditto
+                is(T == TsVector) // ditto
             );
 
             static if(!disabledForStdVariant)
@@ -168,6 +171,14 @@ public void _integration_test( string connParam ) @system
 
                 static if(is(T == TsRange[]) || is(T == TsTzRange[]) || is(T == TsMultiRange[]) || is(T == TsTzMultiRange[]))
                 	textResult = textResult.replace(`\"`, "");
+
+                static if(is(T == TsQuery) || is(T == TsQuery[]) || is(T == TsVector) || is(T == TsVector[]))
+                	textResult = textResult.replace("'", "");
+
+                static if(is(T == TsQuery[])) {
+                	pgValue = pgValue.replace(`"`, "");
+                	textResult = textResult.replace(`"`, "");
+                }
 
                 assert(textResult == pgValue,
                     format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",
@@ -330,6 +341,12 @@ public void _integration_test( string connParam ) @system
 		C!(TsMultiRange[])([TsMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0])], "tsmultirange[]", `'{"{[2025-01-10 09:10:00,2025-01-27 11:45:00)}"}'`);
 		C!(TsTzMultiRange[])([TsTzMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0])], "tstzmultirange[]", `'{"{[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)}"}'`);
 		C!(DateMultiRange[])([DateMultiRange([0,0,0,1, 0,0,0,17, 2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190])], "datemultirange[]", `'{"{[1980-01-01,1982-12-31)}"}'`);
+
+		// text search (query, vector)
+		C!(TsQuery)(TsQuery([0,0,0,5, 2,2, 2,3, 1,0,0,99,97,116,0, 1,0,0,114,97,116,0, 1,0,0,102,97,116,0]), "tsquery", `'fat & ( rat | cat )'`);
+		C!(TsQuery[])([TsQuery([0,0,0,5, 2,2, 2,3, 1,0,0,99,97,116,0, 1,0,0,114,97,116,0, 1,0,0,102,97,116,0]), TsQuery([0,0,0,1, 1,0,0,104,97,116,0])], "tsquery[]", `'{"fat & ( rat | cat )","hat"}'`);
+		C!(TsVector)(TsVector([0,0,0,9, 97,0,0,3,0,1,0,6,0,10, 97,110,100,0,0,1,0,8, 97,116,101,0,0,1,0,9, 99,97,116,0,0,1,0,3, 102,97,116,0,0,2,0,2,0,11, 109,97,116,0,0,1,0,7, 111,110,0,0,1,0,5, 114,97,116,0,0,1,0,12, 115,97,116,0,0,1,0,4]), "tsvector", `'a:1,6,10 and:8 ate:9 cat:3 fat:2,11 mat:7 on:5 rat:12 sat:4'`);
+		C!(TsVector[])([TsVector([0,0,0,4, 97,0,0,3,0,1,0,6,0,10, 97,110,100,0,0,1,0,8, 97,116,101,0,0,1,0,9, 99,97,116,0,0,1,0,3]), TsVector([0,0,0,5, 102,97,116,0,0,2,0,2,0,11, 109,97,116,0,0,1,0,7, 111,110,0,0,1,0,5, 114,97,116,0,0,1,0,12, 115,97,116,0,0,1,0,4])], "tsvector[]", `'{"a:1,6,10 and:8 ate:9 cat:3","fat:2,11 mat:7 on:5 rat:12 sat:4"}'`);
     }
 
     // test round-trip compound types

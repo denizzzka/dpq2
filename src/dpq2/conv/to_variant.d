@@ -7,6 +7,7 @@ import dpq2.result: ArrayProperties;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 static import dpq2.conv.ranges;
+static import dpq2.conv.tsearch;
 import dpq2.conv.time: TimeStampUTC;
 static import geom = dpq2.conv.geometric;
 import std.bitmanip: bigEndianToNative, BitArray;
@@ -140,6 +141,12 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         case TimeStampWithZoneArray:    return retArray__!PGtimestamptz;
 
         case TimeInterval:         return retVariant!PGinterval;
+
+        case TSQuery:         return retVariant!(dpq2.conv.tsearch.TsQuery);
+        case TSQueryArray:    return retArray__!(dpq2.conv.tsearch.TsQuery);
+
+        case TSVector:         return retVariant!(dpq2.conv.tsearch.TsVector);
+        case TSVectorArray:    return retArray__!(dpq2.conv.tsearch.TsVector);
 
         case Json:
         case Jsonb:

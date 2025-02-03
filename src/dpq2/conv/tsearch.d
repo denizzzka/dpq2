@@ -7,7 +7,7 @@ import dpq2.value;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 import std.stdio: writefln;
-import std.string: fromStringz;
+import std.string: format, fromStringz;
 import std.traits: hasMember;
 
 
@@ -45,6 +45,14 @@ struct TsToken {
 			string value;
 		}
 		Value val;
+	}
+	
+	auto toString()
+	{
+		return format("%s(%s)", this.type, this.type == TsTokenType.TS_TYPE_VAL
+			? format("[%d,%s]%s", this.val.weight, this.val.prefix, this.val.value)
+			: format("%s->%d", this.oper.operator, this.oper.distance)
+		);
 	}
 }
 
@@ -106,7 +114,8 @@ struct TsQuery {
 
 	size_t length() @property { return tokens.length; }
 
-	auto opIndex(size_t idx) {
+	auto opIndex(size_t idx)
+	{
 		if(!(idx < this.tokens.length))
 			throw new ValueConvException(
 				ConvExceptionType.OUT_OF_RANGE,
@@ -114,6 +123,11 @@ struct TsQuery {
 			);
 
 		return tokens[idx];
+	}
+
+	auto opEquals(TsQuery other)
+	{
+		return this._data == other.rawData;
 	}
 
 	int opApply(scope int delegate(size_t, ref TsToken) dg)
