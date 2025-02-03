@@ -86,7 +86,7 @@ jobs:
         stat_type: [static, dynamic, dynamic-unmanaged]
         dc: ${{ fromJSON(needs.setup.outputs.compilers) }}
         include:
-        - build: unittest-cov
+        - build: tests_and_cov
           dc: dmd-latest
           stat_type: none
     steps:
@@ -111,19 +111,18 @@ jobs:
           dub fetch doveralls
         shell: bash
       - name: Build / test 
-        if: matrix.build != 'unittest-cov'
+        if: matrix.build != 'tests_and_cov'
         run: |
           dub run dpq2:integration_tests --build=$BUILD --config=$STAT_TYPE -- --conninfo="$CONN_STRING"
         shell: bash
       - name: Build / test with coverage
-        if: matrix.build == 'unittest-cov'
+        if: matrix.build == 'tests_and_cov'
         run: |
           dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="$CONN_STRING"
+          dub run dpq2:integration_tests --build=cov -- --conninfo="$CONN_STRING"
           dub run dpq2:example --build=release -- --conninfo="$CONN_STRING"
           dub run doveralls
         shell: bash
       - name: Upload coverage data
-        if: matrix.build == 'unittest-cov'
+        if: matrix.build == 'tests_and_cov'
         uses: codecov/codecov-action@f32b3a3741e1053eb607407145bc9619351dc93b
-    
-        
