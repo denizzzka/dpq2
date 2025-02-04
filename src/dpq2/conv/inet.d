@@ -15,9 +15,10 @@ enum PgFamily : ubyte {
     PGSQL_AF_INET6,
 }
 
-alias InetAddress = TInetAddress!false;
-alias CidrAddress = TInetAddress!true;
+alias InetAddress = TInetAddress!false; /// Represents inet PG value
+alias CidrAddress = TInetAddress!true; /// Represents cidr PG value
 
+///
 package struct TInetAddress (bool isCIDR)
 {
     PgFamily family;
