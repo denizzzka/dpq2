@@ -249,6 +249,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     static import dpq2.conv.geometric;
     static import dpq2.conv.ranges;
     static import dpq2.conv.time;
+    static import dpq2.conv.tsearch;
     import vibe.data.json : VibeJson = Json;
 
     alias UT = Unqual!T;
@@ -292,6 +293,8 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == dpq2.conv.ranges.DateMultiRange)){ return DateMultiRange; } else
         static if(is(UT == dpq2.conv.ranges.TsMultiRange)){ return TimeStampMultiRange; } else
         static if(is(UT == dpq2.conv.ranges.TsTzMultiRange)){ return TimeStampWithZoneMultiRange; } else
+        static if(is(UT == dpq2.conv.tsearch.TsQuery)){ return TSQuery; } else
+        static if(is(UT == dpq2.conv.tsearch.TsVector)){ return TSVector; } else
 
         static assert(false, "Unsupported D type: "~T.stringof);
     }

@@ -4,6 +4,7 @@ import dpq2;
 import dpq2.conv.arrays : isArrayType;
 import dpq2.conv.geometric: Line;
 import dpq2.conv.ranges;
+import dpq2.conv.tsearch;
 import std.bitmanip : BitArray;
 import std.datetime;
 import std.string: replace;
@@ -100,7 +101,9 @@ public void _integration_test( string connParam ) @system
                 is(T == Box) || // ditto
                 is(T == TestPath) || // ditto
                 is(T == TestPolygon) || // ditto
-                is(T == TestCircle) // ditto
+                is(T == TestCircle) || // ditto
+                is(T == TsQuery) || // ditto
+                is(T == TsVector) // ditto
             );
 
             static if(!disabledForStdVariant)
@@ -168,6 +171,14 @@ public void _integration_test( string connParam ) @system
 
                 static if(is(T == TsRange[]) || is(T == TsTzRange[]) || is(T == TsMultiRange[]) || is(T == TsTzMultiRange[]))
                     textResult = textResult.replace(`\"`, "");
+
+                static if(is(T == TsQuery) || is(T == TsQuery[]) || is(T == TsVector) || is(T == TsVector[]))
+                    textResult = textResult.replace("'", "");
+
+                static if(is(T == TsQuery[])) {
+                    pgValue = pgValue.replace(`"`, "");
+                    textResult = textResult.replace(`"`, "");
+                }
 
                 assert(textResult == pgValue,
                     format("Native to PG conv: received unexpected value\nreceived pgType=%s\nsent nativeType=%s\nsent nativeValue=%s\nexpected pgValue=%s\nresult=%s\nexpectedRepresentation=%s\nreceivedRepresentation=%s",

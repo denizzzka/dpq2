@@ -7,7 +7,7 @@ import dpq2.value;
 import std.bitmanip: bigEndianToNative;
 import std.conv: to;
 import std.stdio: writefln;
-import std.string: fromStringz;
+import std.string: format, fromStringz;
 import std.traits: hasMember;
 
 
@@ -45,6 +45,14 @@ struct TsToken {
             string value;
         }
         Value val;
+    }
+
+    auto toString() const
+    {
+        return format("%s(%s)", type, type == TsTokenType.TS_TYPE_VAL
+            ? format("[%d,%s]%s", val.weight, val.prefix, val.value)
+            : format("%s->%d", oper.operator, oper.distance)
+        );
     }
 }
 
@@ -114,6 +122,11 @@ struct TsQuery {
             );
 
         return tokens[idx];
+    }
+
+    auto opEquals(TsQuery other)
+    {
+        return this._data == other.rawData;
     }
 
     int opApply(scope int delegate(size_t, ref TsToken) dg)
@@ -200,6 +213,20 @@ struct TsVector {
     }
 
     auto rawData() @property { return _data.dup; }
+}
+
+/// Constructs Value from text search query
+Value toValue(T)(T t)
+if (isTsQuery!T)
+{
+    return Value(t.rawData.idup, OidType.TSQuery);
+}
+
+/// Constructs Value from text search vector
+Value toValue(T)(T t)
+if (isTsVector!T)
+{
+    return Value(t.rawData.idup, OidType.TSVector);
 }
 
 package:
