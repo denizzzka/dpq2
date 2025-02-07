@@ -12,7 +12,11 @@ import dpq2.conv.from_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: binaryValueAs, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.conv.geometric: binaryValueAs, Line;
-import dpq2.conv.arrays : binaryValueAs;
+import dpq2.conv.net: binaryValueAs;
+import dpq2.conv.bit: binaryValueAs;
+import dpq2.conv.ranges: binaryValueAs;
+import dpq2.conv.tsearch: binaryValueAs;
+import dpq2.conv.arrays: binaryValueAs;
 
 import vibe.data.json: Json, parseJsonString;
 import vibe.data.bson: Bson;
@@ -88,9 +92,10 @@ if(is(T : const(char)[]) && !is(T == Nullable!R, R))
             v.oidType == OidType.Numeric ||
             v.oidType == OidType.Json ||
             v.oidType == OidType.Jsonb ||
+            v.oidType == OidType.Xml ||
             v.oidType == OidType.Name
         ))
-            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Json or Jsonb", __FILE__, __LINE__);
+            throwTypeComplaint(v.oidType, "Text, FixedString, VariableString, Name, Numeric, Xml, Json or Jsonb", __FILE__, __LINE__);
     }
 
     if(v.format == VF.BINARY && v.oidType == OidType.Numeric)
@@ -193,7 +198,7 @@ char[] valueAsString(in Value v) pure
 T binaryValueAs(T)(in Value v)
 if(is(T : const ubyte[]))
 {
-    if(!(v.oidType == OidType.ByteArray))
+    if(v.oidType != OidType.ByteArray && v.oidType != OidType.MacAddress && v.oidType != OidType.MacAddress8)
         throwTypeComplaint(v.oidType, "immutable ubyte[]", __FILE__, __LINE__);
 
     return v.data;
