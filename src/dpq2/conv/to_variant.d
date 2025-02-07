@@ -4,6 +4,7 @@ module dpq2.conv.to_variant;
 import dpq2.value;
 import dpq2.oids: OidType;
 import dpq2.result: ArrayProperties;
+import dpq2.conv.inet: InetAddress, CidrAddress;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 import dpq2.conv.time: TimeStampUTC;
@@ -97,6 +98,12 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 
         case Date:      return retVariant!PGdate;
         case DateArray: return retArray__!PGdate;
+
+        case HostAddress:       return retVariant!InetAddress;
+        case HostAddressArray:  return retArray__!InetAddress;
+
+        case NetworkAddress:        return retVariant!CidrAddress;
+        case NetworkAddressArray:   return retArray__!CidrAddress;
 
         case Time:      return retVariant!PGtime_without_time_zone;
         case TimeArray: return retArray__!PGtime_without_time_zone;

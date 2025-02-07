@@ -119,6 +119,8 @@ shared static this()
             A(TimeStamp, TimeStampArray),
             A(Line, LineArray),
             A(Json, JsonArray),
+            A(NetworkAddress, NetworkAddressArray),
+            A(HostAddress, HostAddressArray),
             A(UUID, UUIDArray)
         ];
 
@@ -149,6 +151,8 @@ bool isSupportedArray(OidType t) pure nothrow @nogc
         case TimeArray:
         case TimeWithZoneArray:
         case NumericArray:
+        case NetworkAddressArray:
+        case HostAddressArray:
         case UUIDArray:
         case LineArray:
         case JsonArray:
@@ -181,6 +185,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     import std.uuid : StdUUID = UUID;
     static import dpq2.conv.geometric;
     static import dpq2.conv.time;
+    import dpq2.conv.inet: InetAddress, CidrAddress;
     import vibe.data.json : VibeJson = Json;
 
     alias UT = Unqual!T;
@@ -203,6 +208,8 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
         static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
         static if(is(UT == VibeJson)){ return Json; } else
+        static if(is(UT == InetAddress)){ return HostAddress; } else
+        static if(is(UT == CidrAddress)){ return NetworkAddress; } else
         static if(is(UT == StdUUID)){ return UUID; } else
         static if(is(UT == BitArray)){ return VariableBitString; } else
         static if(dpq2.conv.geometric.isValidPointType!UT){ return Point; } else
@@ -340,8 +347,8 @@ public enum OidType : Oid
     PolygonArray = 1027, ///
     AccessControlListArray = 1034, ///
     MacAddressArray = 1040, ///
-    HostAdressArray = 1041, ///
-    NetworkAdressArray = 651, ///
+    HostAddressArray = 1041, ///
+    NetworkAddressArray = 651, ///
     CStringArray = 1263, ///
     TimeStampArray = 1115, ///
     DateArray = 1182, ///

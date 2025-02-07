@@ -3,8 +3,10 @@ module dpq2.conv.native_tests;
 import dpq2;
 import dpq2.conv.arrays : isArrayType;
 import dpq2.conv.geometric: Line;
+import dpq2.conv.inet: InetAddress, CidrAddress;
 import std.bitmanip : BitArray;
 import std.datetime;
+import std.socket: InternetAddress, Internet6Address;
 import std.typecons: Nullable;
 import std.uuid: UUID;
 import std.variant: Variant;
@@ -40,6 +42,7 @@ public void _integration_test( string connParam ) @system
 {
     import std.format: format;
     import dpq2.connection: createTestConn;
+    import vibe.core.net: VibeNetworkAddress = NetworkAddress;
 
     auto conn = createTestConn(connParam);
 
@@ -258,6 +261,28 @@ public void _integration_test( string connParam ) @system
         C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
         C!(Nullable!SysTime)(Nullable!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ)), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
 
+        // inet
+        const testInetAddr1 = InetAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY), 9);
+        C!InetAddress(testInetAddr1, "inet", `'127.0.0.1/9'`);
+        const testInetAddr2 = InetAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY));
+        C!InetAddress(testInetAddr2, "inet", `'127.0.0.1/32'`);
+        const testInetAddr3 = VibeNetworkAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY)).vibe2pg;
+        C!InetAddress(testInetAddr3, "inet", `'127.0.0.1/32'`);
+
+        // inet6
+        const testInet6Addr1 = InetAddress(new Internet6Address("2::1", InternetAddress.PORT_ANY));
+        C!InetAddress(testInet6Addr1, "inet", `'2::1/128'`);
+        const testInet6Addr2 = InetAddress(new Internet6Address("2001:0:130F::9C0:876A:130B", InternetAddress.PORT_ANY),24);
+        C!InetAddress(testInet6Addr2, "inet", `'2001:0:130f::9c0:876a:130b/24'`);
+        const testInet6Addr3 = VibeNetworkAddress(new Internet6Address("2001:0:130F::9C0:876A:130B", InternetAddress.PORT_ANY)).vibe2pg;
+        C!InetAddress(testInet6Addr3, "inet", `'2001:0:130f::9c0:876a:130b/128'`);
+
+        // cidr
+        const testCidrAddr1 = CidrAddress(new InternetAddress("192.168.0.0", InternetAddress.PORT_ANY), 25);
+        C!CidrAddress(testCidrAddr1, "cidr", `'192.168.0.0/25'`);
+        const testCidrAddr2 = CidrAddress(new Internet6Address("::", InternetAddress.PORT_ANY), 64);
+        C!CidrAddress(testCidrAddr2, "cidr", `'::/64'`);
+
         // json
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
         C!(Nullable!PGjson)(Nullable!Json(Json(["foo": Json("bar")])), "json", `'{"foo":"bar"}'`);
@@ -289,6 +314,7 @@ public void _integration_test( string connParam ) @system
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
         C!(PGline[])([Line(1,2,3), Line(4,5,6)], "line[]", `'{"{1,2,3}","{4,5,6}"}'`);
         C!(PGtimestamp[])([PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12))], "timestamp[]", `'{"1997-12-17 07:37:16.000012"}'`);
+        C!(InetAddress[])([testInetAddr1, testInet6Addr2], "inet[]", `'{127.0.0.1/9,2001:0:130f::9c0:876a:130b/24}'`);
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
         C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
     }
