@@ -167,3 +167,10 @@ package void throwTypeComplaint(OidType receivedType, in string expectedType, st
             file, line
         );
 }
+
+//TODO: use for all ConvExceptionType.SIZE_MISMATCH checks
+package void enforceSize(T)(const ref T binaryData, size_t sz, string msg, string file = __FILE__, size_t line = __LINE__)
+{
+    if(!(binaryData.length >= sz))
+        throw new ValueConvException(ConvExceptionType.SIZE_MISMATCH, msg, file, line);
+}
