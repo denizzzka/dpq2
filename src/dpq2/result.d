@@ -503,6 +503,7 @@ struct ArrayProperties
 {
     OidType OID = OidType.Undefined; /// Oid
     int[] dimsSize; /// Dimensions sizes info
+    int[] leftBounds; /// Left bounds of each dimension. Can differ from 1 for slices. Useful to restore coordinates inside of a slice.
     size_t nElems; /// Total elements
     package size_t dataOffset;
 
@@ -540,6 +541,7 @@ struct ArrayProperties
         dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
 
         dimsSize = new int[nDims];
+        leftBounds = new int[nDims];
 
         // Recognize dimensions of array
         for( auto i = 0; i < nDims; ++i )
@@ -547,17 +549,11 @@ struct ArrayProperties
             Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
 
             const dim_size = bigEndianToNative!int(d.dim_size);
-            const lbound = bigEndianToNative!int(d.lbound);
+            leftBounds[i] = bigEndianToNative!int(d.lbound);
 
             if(dim_size < 0)
                 throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                     "Dimension size is negative ("~to!string(dim_size)~")",
-                );
-
-            // FIXME: What is lbound in postgresql array reply?
-            if(!(lbound == 1))
-                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
-                    "Please report if you came across this error! lbound=="~to!string(lbound),
                 );
 
             dimsSize[i] = dim_size;
