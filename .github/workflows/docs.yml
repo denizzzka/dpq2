@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build_docs:
     name: Build documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       # Allow this action and this action only to write to the repo itself
       contents: write
