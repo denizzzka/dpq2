@@ -110,8 +110,10 @@ template isValidPolygon(T)
 {
     static if (is(T == Nullable!R, R))
         enum isValidPolygon = false;
+    else static if (is(T == Point[]))
+        enum isValidPolygon = false;
     else
-        enum isValidPolygon = isArray!T && isValidPointType!(ElementType!T);
+        enum isValidPolygon = isArray!T && isValidPointType!(ElementType!T) || __traits(isSame, TemplateOf!T, Polygon);
 }
 
 unittest
@@ -156,6 +158,73 @@ if(isValidBoxType!Box)
     box.serializeBox(data);
 
     return createValue(data, OidType.Box);
+}
+
+
+struct Point
+{
+    double x, y;
+}
+
+struct Box
+{
+    Point min, max;
+}
+
+struct LineSegment(Point)
+{
+    Point[2] data;
+
+    this(Point start, Point end) {
+        this.data[0] = start;
+        this.data[1] = end;
+    }
+
+    auto start() @ property { return data[0]; }
+    auto end() @ property { return data[1]; }
+}
+
+struct Polygon(Point)
+{
+    Point[] data;
+
+    auto opIndex(size_t idx)
+    {
+        assert(idx < data.length, "index out of bounds");
+        return data[idx];
+    }
+
+    auto opIndexAssign(Point value, size_t idx)
+    {
+        if (idx >= data.length) data.length = idx + 1;
+        data[idx] = value;
+
+        return this;
+    }
+
+    int opApply(scope int delegate(size_t, ref Point) dg) @trusted
+    {
+        foreach (i, val; data) {
+            if (auto result = dg(i, val))
+                return result;
+        }
+        return 0;
+    }
+
+    int opApplyReverse(scope int delegate(size_t, ref Point) dg) @trusted
+    {
+        foreach_reverse (i, val; data) {
+            if (auto result = dg(i, val))
+                return result;
+        }
+        return 0;
+    }
+
+    void opAssign(Point[] value) { data = value.dup; }
+
+    auto length() @property { return data.length; }
+
+    Point front() @property { return Point(); }
 }
 
 /// Infinite line - {A,B,C} (Ax + By + C = 0)
@@ -242,7 +311,7 @@ if(isValidPolygon!Polygon)
     ubyte[] data = new ubyte[poly.length * 16 + 4];
     auto rem = (cast(int)poly.length).nativeToBigEndian[0 .. $].copy(data);
 
-    foreach (ref p; poly)
+    foreach (i, ref p; poly)
         rem = p.serializePoint(rem);
 
     return createValue(data, OidType.Polygon);
@@ -399,7 +468,7 @@ package mixin template GeometricInstancesForIntegrationTest()
     @safe:
 
     import gfm.math;
-    import dpq2.conv.geometric: Circle, Path;
+    import dpq2.conv.geometric: Circle, Path, Polygon;
 
     alias Point = vec2d;
     alias Box = box2d;
@@ -418,7 +487,7 @@ package mixin template GeometricInstancesForIntegrationTest()
         }
     }
     alias TestPath = Path!Point;
-    alias Polygon = Point[];
+    alias TestPolygon = Polygon!Point;
     alias TestCircle = Circle!Point;
 }
 
@@ -447,8 +516,8 @@ unittest
         p = TestPath(true, [Point(1,1), Point(2,2)]);
         assert(p.toValue.binaryValueAs!TestPath == p);
 
-        Polygon poly = [Point(1,1), Point(2,2), Point(3,3)];
-        assert(poly.toValue.binaryValueAs!Polygon == poly);
+        TestPolygon poly = TestPolygon([Point(1,1), Point(2,2), Point(3,3)]);
+        assert(poly.toValue.binaryValueAs!TestPolygon == poly);
 
         auto c = TestCircle(Point(1,2), 3);
         assert(c.toValue.binaryValueAs!TestCircle == c);
@@ -480,7 +549,7 @@ unittest
 
         v = [Point(1,1), Point(2,2)].toValue;
         v.oidType = OidType.Text;
-        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPolygon);
 
         v = TestCircle(Point(1,1), 3).toValue;
         v.oidType = OidType.Text;
@@ -515,9 +584,9 @@ unittest
 
         v = [Point(1,1), Point(2,2)].toValue;
         v._data.length -= 16;
-        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPolygon);
         v._data.length = 1;
-        assertThrown!ValueConvException(v.binaryValueAs!Polygon);
+        assertThrown!ValueConvException(v.binaryValueAs!TestPolygon);
 
         v = TestCircle(Point(1,1), 3).toValue;
         v._data.length = 1;
