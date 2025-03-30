@@ -21,11 +21,11 @@ concurrency:
 jobs:
   setup:
     name: 'Load job configuration'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       compilers: ${{ steps.load-config.outputs.compilers }}
     steps:
-    - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+    - uses: actions/checkout@v4
     # This step checks if we want to skip CI entirely, then outputs the compilers to be used for
     # each job. A little overkill, as we don't intend to support multiple platforms, but I digress.
     - id: load-config
@@ -56,7 +56,7 @@ jobs:
 
   ci:
     name: '[ci] ${{ matrix.dc }}/${{ matrix.build }}-${{ matrix.stat_type }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: setup
     # Only run if the setup phase explicitly defined compilers to be used
     if: ${{ fromJSON(needs.setup.outputs.compilers) != '' && fromJSON(needs.setup.outputs.compilers) != '[]' }}
@@ -91,15 +91,15 @@ jobs:
           stat_type: none
     steps:
       - name: Checkout repo 
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+        uses: actions/checkout@v4
       - name: Setup D compiler 
-        uses: dlang-community/setup-dlang@763d869b4d67e50c3ccd142108c8bca2da9df166
+        uses: dlang-community/setup-dlang@v1.3.0
         with:
           compiler: ${{ matrix.dc }}
       - name: Install dependencies
         run: sudo apt-get -y update && sudo apt-get -y install libpq-dev libevent-dev libcurl4-gnutls-dev postgresql
       - name: Cache dub dependencies
-        uses: actions/cache@937d24475381cd9c75ae6db12cb4e79714b926ed
+        uses: actions/cache@v4
         with:
           path: ~/.dub/packages
           key: ubuntu-latest-build-${{ hashFiles('**/dub.sdl', '**/dub.json') }}
@@ -125,4 +125,4 @@ jobs:
         shell: bash
       - name: Upload coverage data
         if: matrix.build == 'tests_and_cov'
-        uses: codecov/codecov-action@f32b3a3741e1053eb607407145bc9619351dc93b
+        uses: codecov/codecov-action@v2

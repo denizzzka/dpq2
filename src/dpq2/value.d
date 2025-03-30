@@ -90,7 +90,7 @@ struct Value
         import std.exception;
         import core.exception;
 
-        enforce!AssertError(!isNull, "Attempt to read NULL value", __FILE__, __LINE__);
+        enforce!AssertError(!isNull, "Attempt to read SQL NULL value", __FILE__, __LINE__);
 
         return _data;
     }
