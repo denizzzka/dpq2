@@ -48,6 +48,7 @@
 			{
 				"dpq2": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"vibe-serialization": { "version": "*", "dflags-dmd": ["-preview=in"] },
+				"vibe-core": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [
