@@ -5,3 +5,4 @@ dub.selections.json
 *.lst
 docs
 docs.json
+example/dpq2_example*
