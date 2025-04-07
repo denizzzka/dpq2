@@ -23,13 +23,13 @@ jobs:
       contents: write
     steps:
       - name: Checkout repo 
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+        uses: actions/checkout@v4
       - name: Setup D compiler 
-        uses: dlang-community/setup-dlang@763d869b4d67e50c3ccd142108c8bca2da9df166
+        uses: dlang-community/setup-dlang@v1.3.0
         with:
           compiler: dmd-latest
       - name: Cache dub dependencies
-        uses: actions/cache@937d24475381cd9c75ae6db12cb4e79714b926ed
+        uses: actions/cache@v4
         with:
           path: ~/.dub/packages
           key: docs-build-${{ hashFiles('**/dub.sdl', '**/dub.json') }}
