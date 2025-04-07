@@ -251,6 +251,14 @@ immutable class Answer : Result
         return opIndex(0);
     }
 
+    /// Checks Answer to make sure that it contains exactly one Row and one column
+    /// and returns this one found cell Value
+    ///
+    /// Returns: cell Value
+    immutable(Value) oneCell(string file = __FILE__, size_t line = __LINE__)
+    {
+        return this.oneRow(file, line).oneCell(file, line);
+    }
 
     /**
      Returns the number of parameters of a prepared statement.
@@ -900,6 +908,7 @@ void _integration_test( string connParam )
 
         assert(r.oneRow[0].as!short == -32761);
         assertThrown!AnswerException(r.oneRow.oneCell);
+        assertThrown!AnswerException(r.oneCell);
 
         // Access to NULL cell
         {
@@ -929,6 +938,7 @@ void _integration_test( string connParam )
         const o = conn.exec("select 'test_value'");
 
         assert(o.oneRow.oneCell.as!string == "test_value");
+        assert(o.oneCell.as!string == "test_value");
     }
 
     // Notifies test
