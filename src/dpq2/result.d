@@ -235,6 +235,23 @@ immutable class Answer : Result
         return immutable Row(this, row);
     }
 
+    /// Checks Answer to make sure that it contains exactly one Row
+    /// and returns this one row
+    ///
+    /// Returns: Row of cells
+    immutable(Row) oneRow(string file = __FILE__, size_t line = __LINE__)
+    {
+        if(length != 1)
+            throw new AnswerException(
+                    ExceptionType.UNEXPECTED_LENGTH,
+                    "Answer contains "~length.to!string~" rows, but expected 1",
+                    file, line
+                );
+
+        return opIndex(0);
+    }
+
+
     /**
      Returns the number of parameters of a prepared statement.
      This function is only useful when inspecting the result of describePrepared.
@@ -761,6 +778,7 @@ enum ExceptionType
     FATAL_ERROR, ///
     COLUMN_NOT_FOUND, /// Column is not found
     OUT_OF_RANGE, ///
+    UNEXPECTED_LENGTH, ///
     COPY_OUT_NOT_IMPLEMENTED = 10000, /// TODO
 }
 
@@ -807,6 +825,8 @@ void _integration_test( string connParam )
         assert( e[1]["field_name"].as!PGtext == "def" );
         assert(e.columnExists("field_name"));
         assert(!e.columnExists("foo"));
+
+        assertThrown!AnswerException(e.oneRow);
     }
 
     // Binary type arguments testing:
@@ -861,6 +881,8 @@ void _integration_test( string connParam )
 
         r[0].toString; // Must not throw
         assertThrown!ValueConvException(r[0]["unsupported_toString_output_type"].toString);
+
+        assert(r.oneRow[0].as!short == -32761);
 
         // Access to NULL cell
         {
