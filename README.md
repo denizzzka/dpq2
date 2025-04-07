@@ -91,7 +91,7 @@ void main(string[] args)
     scope(exit) destroy(r);
 
     writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
-    writeln( "1: ", r[0][1].as!PGtext );
+    writeln( "1: ", r.oneRow[1].as!PGtext ); // .oneRow additionally checks that here is only one row was returned
     writeln( "2.1 isNull: ", r[0][2].isNull );
     writeln( "2.2 isNULL: ", r[0].isNULL(2) );
     writeln( "3.1: ", r[0][3].asArray[0].as!PGtext );
