@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Enum ExceptionType</title>
+		<title>Function Row.oneCell</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -133,56 +133,28 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Enum ExceptionType</h1><p>Answer exception types
+				<h1>Function Row.oneCell</h1><p>Checks Row to make sure that it contains exactly one column
+and returns this one found cell Value
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">enum</span> <span class="typ">ExceptionType</span> <span class="pun">:</span> <span class="typ">int</span> <span class="pun">{ ... }</span>
+				<span class="kwd">immutable</span><span class="pun">(</span><a href="../../dpq2/value/Value.html"><span class="typ">Value</span></a><span class="pun">)</span> <span class="pln">oneCell</span><span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">file</span> <span class="pun">=</span> <span class="kwd">__FILE__</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">line</span> <span class="pun">=</span> <span class="kwd">cast</span><span class="pun">(</span><span class="typ">ulong</span><span class="pun">)</span><span class="kwd">__LINE__</span>
+				<br/>
+				<span class="pun">)</span><span class="pln"> </span><span class="kwd">immutable</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				
-				<section><h2>Enum members</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td id="COLUMN_NOT_FOUND">
-								<code>COLUMN_NOT_FOUND</code>
-							</td>
-							<td>Column is not found
-</td>
-						</tr>
-						<tr>
-							<td id="COPY_OUT_NOT_IMPLEMENTED">
-								<code>COPY_OUT_NOT_IMPLEMENTED</code>
-							</td>
-							<td>TODO
-</td>
-						</tr>
-						<tr>
-							<td id="FATAL_ERROR">
-								<code>FATAL_ERROR</code>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td id="OUT_OF_RANGE">
-								<code>OUT_OF_RANGE</code>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td id="UNEXPECTED_LENGTH">
-								<code>UNEXPECTED_LENGTH</code>
-							</td>
-							<td></td>
-						</tr>
-					</table>
-				</section>
+				<section></section>
+<section><h2>Returns</h2>
+<p>cell Value
+</p>
+</section>
+
 			</div>
 			<footer>
 				<div id="license-info">

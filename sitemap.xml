@@ -203,6 +203,8 @@
 <url><loc>http://127.0.0.1/dpq2/result/Answer.length.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Answer.nParams.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Answer.OID.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/Answer.oneCell.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/Answer.oneRow.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Answer.opIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Answer.paramType.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Answer.toString.html</loc></url>
@@ -222,6 +224,7 @@
 <url><loc>http://127.0.0.1/dpq2/result/Array.opIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.dimsSize.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.leftBounds.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.nElems.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/ArrayProperties.OID.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/asArray.html</loc></url>
@@ -245,6 +248,7 @@
 <url><loc>http://127.0.0.1/dpq2/result/Row.columnNum.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.isNULL.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.length.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/result/Row.oneCell.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.opIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.opIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.size.html</loc></url>
