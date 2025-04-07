@@ -412,6 +412,22 @@ immutable struct Row
         return answer.columnName( colNum );
     }
 
+    /// Checks Row to make sure that it contains exactly one column
+    /// and returns this one found cell Value
+    ///
+    /// Returns: cell Value
+    immutable(Value) oneCell(string file = __FILE__, size_t line = __LINE__)
+    {
+        if(length != 1)
+            throw new AnswerException(
+                    ExceptionType.UNEXPECTED_LENGTH,
+                    "Row contains "~length.to!string~" columns, but expected 1",
+                    file, line
+                );
+
+        return opIndex(0);
+    }
+
     /// Returns column count
     size_t length() { return answer.columnCount(); }
 
@@ -883,6 +899,7 @@ void _integration_test( string connParam )
         assertThrown!ValueConvException(r[0]["unsupported_toString_output_type"].toString);
 
         assert(r.oneRow[0].as!short == -32761);
+        assertThrown!AnswerException(r.oneRow.oneCell);
 
         // Access to NULL cell
         {
@@ -905,6 +922,13 @@ void _integration_test( string connParam )
             finally
                 assert(isNullFlag);
         }
+    }
+
+    // oneRow/oneCell tests
+    {
+        const o = conn.exec("select 'test_value'");
+
+        assert(o.oneRow.oneCell.as!string == "test_value");
     }
 
     // Notifies test
