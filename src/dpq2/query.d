@@ -207,6 +207,30 @@ mixin template Queries()
         return r != 0;
     }
 
+    /// Sends a buffer of binary data to the COPY command
+    ///
+    /// A details example setup and iteration for binary data copy-in 
+    /// can be found in example/example.d
+    ///
+    /// Before using this function execute a command similar to the 
+    /// the following:
+    /// ---
+    /// conn.exec("COPY mytable (col1, col2) FROM STDIN WITH (FORMAT binary)");
+    /// ---
+    ///
+    /// where the column names an types depend on the destination table.
+    /// Returns:
+    ///   true if the data was queued, false if it was not queued because of
+    ///   full buffers (this will only happen in nonblocking mode)
+    bool putCopyData(const(ubyte)[] data )
+    {
+        const int r = PQputCopyData(conn, cast(const char*)data.ptr, data.length.to!int);
+
+        if(r == -1) throw new ConnectionException(this);
+
+        return r != 0;
+    }
+
     /// Signals that COPY data send is finished. Finalize and flush the COPY command.
     immutable(Answer) putCopyEnd()
     {
@@ -501,19 +525,11 @@ void _integration_test( string connParam ) @trusted
     conn.socket.shutdown(SocketShutdown.BOTH); // breaks connection
 
     {
-        import dpq2.result: ResponseException;
-
         bool exceptionFlag = false;
         string errorMsg;
 
         try conn.exec("SELECT 'abc'::text").getAnswer;
         catch(ConnectionException e)
-        {
-            exceptionFlag = true;
-            errorMsg = e.msg;
-            assert(e.msg.length > 15); // error message check
-        }
-        catch(ResponseException e)
         {
             exceptionFlag = true;
             errorMsg = e.msg;
