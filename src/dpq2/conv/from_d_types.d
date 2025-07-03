@@ -5,7 +5,8 @@ module dpq2.conv.from_d_types;
 
 public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : isGeometricType, toValue;
-public import dpq2.conv.inet: toValue, vibe2pg;
+
+import dpq2.conv.inet: InetAddress, CidrAddress;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.oids : detectOidTypeFromNative, oidConvTo, OidType;
 import dpq2.value : Value, ValueFormat;
@@ -353,6 +354,15 @@ if (is(Unqual!T == Json))
     r.oidType = OidType.Json;
 
     return r;
+}
+
+/// Constructs Value from InetAddress or from CidrAddress
+Value toValue(T)(T v)
+if (is(Unqual!T == InetAddress) || is(Unqual!T == CidrAddress))
+{
+    import dpq2.conv.inet: addrToValue = toValue;
+
+    return v.addrToValue;
 }
 
 Value toRecordValue(Value[] elements)

@@ -261,6 +261,8 @@ public void _integration_test( string connParam ) @system
         C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
         C!(Nullable!SysTime)(Nullable!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ)), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
 
+        import dpq2.conv.inet: vibe2pg;
+
         // inet
         const testInetAddr1 = InetAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY), 9);
         C!InetAddress(testInetAddr1, "inet", `'127.0.0.1/9'`);
@@ -276,6 +278,10 @@ public void _integration_test( string connParam ) @system
         C!InetAddress(testInet6Addr2, "inet", `'2001:0:130f::9c0:876a:130b/24'`);
         const testInet6Addr3 = VibeNetworkAddress(new Internet6Address("2001:0:130F::9C0:876A:130B", InternetAddress.PORT_ANY)).vibe2pg;
         C!InetAddress(testInet6Addr3, "inet", `'2001:0:130f::9c0:876a:130b/128'`);
+
+        // nullable inet
+        C!(Nullable!InetAddress)(Nullable!InetAddress.init, "inet", "NULL");
+        C!(Nullable!CidrAddress)(Nullable!CidrAddress.init, "cidr", "NULL");
 
         // cidr
         const testCidrAddr1 = CidrAddress(new InternetAddress("192.168.0.0", InternetAddress.PORT_ANY), 25);
