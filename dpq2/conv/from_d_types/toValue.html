@@ -211,6 +211,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								Function <code>toValue</code>
 							</a>
 						</li>
+						<li>
+							<a href="#15">
+								Function <code>toValue</code>
+							</a>
+						</li>
 					</ul>
 				</nav><h2 id="0">Function toValue</h2><p>Converts Nullable!T to Value
 </p>
@@ -456,6 +461,20 @@ See also: PostgreSQL's "lc_monetary" description and "money" package description
 				<span class="pun">)</span>
 				<br/>
 				<span class="kwd">if</span> <span class="pun">(</span><span class="kwd">is</span><span class="pun">(</span><span class="typ">Unqual</span><span class="pun">!</span><span class="pln">T </span><span class="pun">== </span><span class="typ">Json</span><span class="pun">)</span><span class="pun">);</span>
+						</div>
+					</code>
+				</div>
+				<h2 id="15">Function toValue</h2><p>Constructs Value from InetAddress or from CidrAddress
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<a href="../../../dpq2/value/Value.html"><span class="typ">Value</span></a> <span class="pln">toValue</span>(T)<span class="pun">(</span>
+				<br/>&nbsp;&nbsp;<span class="pln">T</span> <span class="pln">v</span>
+				<br/>
+				<span class="pun">)</span>
+				<br/>
+				<span class="kwd">if</span> <span class="pun">(</span><span class="kwd">is</span><span class="pun">(</span><span class="typ">Unqual</span><span class="pun">!</span><span class="pln">T </span><span class="pun">== </span><span class="typ">InetAddress</span><span class="pun">) || </span><span class="kwd">is</span><span class="pun">(</span><span class="typ">Unqual</span><span class="pun">!</span><span class="pln">T </span><span class="pun">== </span><span class="typ">CidrAddress</span><span class="pun">)</span><span class="pun">);</span>
 						</div>
 					</code>
 				</div>
