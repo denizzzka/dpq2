@@ -102,7 +102,7 @@ struct Value
         import std.conv: to;
         import std.variant;
 
-        return this.as!Variant.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
+        return this.as!(string)~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
 }
 
