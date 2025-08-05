@@ -1,5 +1,9 @@
 ///
+
 module dpq2.conv.to_variant;
+
+version(NO_VARIANT) {
+} else {
 
 import dpq2.value;
 import dpq2.oids: OidType;
@@ -137,4 +141,5 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
                     __FILE__, __LINE__
                 );
     }
+}
 }
