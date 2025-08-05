@@ -22,7 +22,7 @@ import std.uuid;
 import std.datetime;
 import std.traits: isScalarType;
 version(NO_VARIANT) {
-	struct Variant {}
+	private struct Variant {}
 } else {
 import std.variant: Variant;
 }

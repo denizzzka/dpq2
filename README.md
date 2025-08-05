@@ -37,6 +37,13 @@ _Please help us to make documentation better!_
 
 * On Linux, you may install `libpq-dev` for dynamic linking e.g. `sudo apt-get install libpq-dev`
 
+If version **NO_VARIANT** is supplied the function
+```
+T as(T : Variant, bool isNullablePayload = true)(in Value v);
+```
+is no longer available and std.variant.Variant is no longer used.
+This can speed up compilation significant.
+
 ## Example
 ```D
 #!/usr/bin/env rdmd

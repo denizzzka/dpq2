@@ -95,20 +95,18 @@ struct Value
         return _data;
     }
 
+	version(NO_VARIANT) {
+	} else {
     ///
     string toString() const @trusted
     {
         import dpq2.conv.to_d_types;
         import std.conv: to;
+        import std.variant;
 
-		string value;
-		version(NO_VARIANT) {
-			return "::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
-		} else {
-			import std.variant;
-			return this.as!Variant.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
-		}
+        return this.as!Variant.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
+	}
 }
 
 @system unittest
