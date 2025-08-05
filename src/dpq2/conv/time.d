@@ -342,8 +342,8 @@ if( is( T == Interval ) )
     );
 }
 
-package const POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
-package const POSTGRES_EPOCH_JDATE = Date(2000, 1, 1).julianDay;
+package immutable POSTGRES_EPOCH_DATE = Date(2000, 1, 1);
+package immutable POSTGRES_EPOCH_JDATE = Date(2000, 1, 1).julianDay;
 static assert(POSTGRES_EPOCH_JDATE == 2_451_545); // value from Postgres code
 
 private:
