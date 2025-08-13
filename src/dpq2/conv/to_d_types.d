@@ -21,7 +21,11 @@ import std.traits;
 import std.uuid;
 import std.datetime;
 import std.traits: isScalarType;
+version(NO_VARIANT) {
+	private struct Variant {}
+} else {
 import std.variant: Variant;
+}
 import std.typecons : Nullable;
 import std.bitmanip: bigEndianToNative, BitArray;
 import std.conv: to;
@@ -52,6 +56,8 @@ private alias VF = ValueFormat;
 private alias AE = ValueConvException;
 private alias ET = ConvExceptionType;
 
+version(NO_VARIANT) {
+} else {
 /**
     Returns cell value as a Variant type.
 */
@@ -60,6 +66,20 @@ T as(T : Variant, bool isNullablePayload = true)(in Value v)
     import dpq2.conv.to_variant;
 
     return v.toVariant!isNullablePayload;
+}
+
+@system unittest
+{
+    import core.exception: AssertError;
+
+    auto v = Value(ValueFormat.BINARY, OidType.Text);
+
+    assert(v.isNull);
+    assertThrown!AssertError(v.as!string == "");
+    assert(v.as!(Nullable!string).isNull == true);
+
+    assert(v.as!Variant.get!(Nullable!string).isNull == true);
+}
 }
 
 /**
@@ -98,19 +118,6 @@ if(is(T : const(char)[]) && !is(T == Nullable!R, R))
         return rawValueToNumeric(v.data); // special case for 'numeric' which represented in dpq2 as string
     else
         return v.valueAsString;
-}
-
-@system unittest
-{
-    import core.exception: AssertError;
-
-    auto v = Value(ValueFormat.BINARY, OidType.Text);
-
-    assert(v.isNull);
-    assertThrown!AssertError(v.as!string == "");
-    assert(v.as!(Nullable!string).isNull == true);
-
-    assert(v.as!Variant.get!(Nullable!string).isNull == true);
 }
 
 /**

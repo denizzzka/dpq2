@@ -95,6 +95,8 @@ struct Value
         return _data;
     }
 
+	version(NO_VARIANT) {
+	} else {
     ///
     string toString() const @trusted
     {
@@ -104,6 +106,7 @@ struct Value
 
         return this.as!Variant.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
+	}
 }
 
 @system unittest

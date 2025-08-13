@@ -1,5 +1,13 @@
 ///
+
 module dpq2.conv.to_variant;
+
+version(NO_VARIANT) {
+/* Without std.variant dpq2 compiles significantly faster, and often the
+* ability explore unknown database schemas is not needed, removing the need
+* for a Variant type.
+*/
+} else {
 
 import dpq2.value;
 import dpq2.oids: OidType;
@@ -137,4 +145,5 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
                     __FILE__, __LINE__
                 );
     }
+}
 }
