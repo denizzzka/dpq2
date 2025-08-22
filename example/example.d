@@ -4,6 +4,7 @@ import dpq2;
 import std.getopt;
 import std.stdio: writeln;
 import std.typecons: Nullable;
+import std.variant: Variant;
 import vibe.data.bson;
 
 void main(string[] args)
@@ -62,10 +63,15 @@ void main(string[] args)
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
     writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 
-    // It is possible to read values of unknown type using BSON:
+    // It is possible to read values of unknown type
+    // using std.variant.Variant or vibe.data.bson.Bson:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].as!Bson);
+        writeln(
+            "column: '", r.columnName(column), "', ",
+            "Variant: ", r[0][column].as!Variant, ", ",
+            "Bson: ", r[0][column].as!Bson
+        );
     }
 
     // It is possible to upload CSV data ultra-fast:

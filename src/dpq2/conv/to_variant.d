@@ -59,11 +59,29 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
     template retArray__(NativeT)
     {
         static if(isNullablePayload)
-            alias arrType = Nullable!NativeT[];
+            alias ArrType = Nullable!NativeT;
         else
-            alias arrType = NativeT[];
+            alias ArrType = NativeT;
 
-        alias retArray__ = retVariant!arrType;
+        auto retArray__() @trusted
+        {
+            import dpq2.conv.arrays: ab = binaryValueAs;
+
+            const ap = ArrayProperties(v);
+
+            switch(ap.dimsSize.length)
+            {
+                case 0: return Variant(v.ab!(ArrType[])); // PG can return zero-dimensional arrays
+                case 1: return Variant(v.ab!(ArrType[]));
+                case 2: return Variant(v.ab!(ArrType[][]));
+                case 3: return Variant(v.ab!(ArrType[][][]));
+                case 4: return Variant(v.ab!(ArrType[][][][]));
+                default: throw new ValueConvException(
+                    ConvExceptionType.DIMENSION_MISMATCH,
+                    "Attempt to convert an array of dimension "~ap.dimsSize.length.to!string~" to type Variant: dimensions greater than 4 are not supported"
+                );
+            }
+        }
     }
 
     with(OidType)
