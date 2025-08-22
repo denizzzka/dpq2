@@ -1,17 +1,40 @@
-﻿#!/usr/bin/env rdmd
+#!/usr/bin/env dub
+/+ dub.sdl:
+   name "dpq2_example"
+   dependency "dpq2" version="*" path="../"
++/
 
 import dpq2;
+import std.system;
+import std.bitmanip;
 import std.getopt;
+import std.range;
 import std.stdio: writeln;
 import std.typecons: Nullable;
 import vibe.data.bson;
 
-void main(string[] args)
+alias BE = Endian.bigEndian;
+
+int main(string[] args)
 {
     string connInfo;
     getopt(args, "conninfo", &connInfo);
 
-    Connection conn = new Connection(connInfo);
+    Connection conn;
+    try{
+        conn = new Connection(connInfo);
+    }
+    catch(ConnectionException ex){
+        writeln(ex.msg);
+        writeln("Try adding the arguments:
+
+   '--conninfo postgresql://postgres@/template1' or
+   '--conninfo postgresql://postgres@localhost/template1'
+
+to set the DB connection info.  The first version has no host part
+and so it tries a local unix-domain socket.");
+        return 3;
+    }
 
     // Only text query result can be obtained by this call:
     auto answer = conn.exec(
@@ -88,4 +111,64 @@ void main(string[] args)
     // Signal that the COPY is finished. Let Postgresql finalize the command
     // and return any errors with the data.
     conn.putCopyEnd();
+    writeln("CSV copy-in worked.");
+
+
+    // It is also possible to send raw binary data.  It's even faster, and can
+    // handle any PostgreSQL type, including BYTEA, but it's more complex than
+    // sending parsable text streams
+    conn.exec("CREATE TEMP TABLE test_dpq2_blob (item BIGINT, data BYTEA)");
+
+    // Init the COPY command, this time for direct binary input
+    conn.exec("COPY test_dpq2_blob (item, data) FROM STDIN WITH (FORMAT binary)");
+
+    // For FORMAT binary, send over the 19 byte PostgreSQL header manually
+    //                   P    G    C    O    P    Y   \n  255   \r   \n
+    conn.putCopyData(cast(ubyte[])[
+        0x50,0x47,0x43,0x4F,0x50,0x59,0x0A,0xFF,0x0D,0x0A,0,0,0,0,0,0,0,0,0
+    ]);
+
+    // Write 10 rows of variable length binary data. PostgreSQL internal 
+    // storage is big endian and the number of values and the length of each
+    // must be provided.  Since binary copy-in is likely to be used in 
+    // "tight-loop" code, we'll use a stack memory. Stack buffer size is:
+    // 
+    //   2 bytes for the number of values
+    //   plus 4 length bytes for each value
+    //   plus total size of all values in the largest row
+    //
+    enum LOOPS = 10;
+    ubyte[2 + 2*4 + 8 + (2*LOOPS + 7)] buf;
+    foreach(i;0..LOOPS){
+        size_t offset = 0;
+        buf[].write!(short, BE)(2, &offset);            // Sending two fields
+
+        buf[].write!(int,   BE)(long.sizeof, &offset);  // BIGINT == long
+        buf[].write!(long,  BE)(i, &offset);            // add the item value
+
+        // Generate some data.  Here's we're making the blob larger for each
+        // iteration just to emphasize that BYTEA is not fixed length value type.
+        ubyte[] blob = iota(cast(ubyte)1, cast(ubyte)(2*i + 7), 1).array;
+
+        buf[].write!(int, BE)(cast(int)blob.length, &offset);
+        
+        buf[offset..offset+blob.length] = blob;
+        offset += blob.length;
+
+        // Send the variable length buffer
+        conn.putCopyData(buf[0..offset]);
+    }
+    
+    // Signal that the copy is finished. PostgreSQL will check constraints at
+    // this point.
+    conn.putCopyEnd();
+    writeln("Direct binary copy-in worked.");
+
+    // Read binary blobs back as hex-string data. 
+    // For more precise type handling use QueryParams objects with execParams and
+    // convert the output using the as!(PGbytea) template from to_d_types.d
+    foreach(row; conn.exec("SELECT item, data from test_dpq2_blob").rangify())
+        writeln(row[0], ", ", row[1]);
+
+    return 0;
 }
