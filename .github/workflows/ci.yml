@@ -118,11 +118,11 @@ jobs:
       - name: Build / test with coverage
         if: matrix.build == 'tests_and_cov'
         run: |
+          dub test --d-version=NO_VARIANT
           dub run dpq2:integration_tests --build=unittest-cov -- --conninfo="$CONN_STRING"
           dub run dpq2:integration_tests --build=cov -- --conninfo="$CONN_STRING"
           dub run dpq2:example --build=release -- --conninfo="$CONN_STRING"
           dub run doveralls
-          dub test --f-version=NO_VARIANT
         shell: bash
       - name: Upload coverage data
         if: matrix.build == 'tests_and_cov'
