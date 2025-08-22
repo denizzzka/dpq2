@@ -52,6 +52,7 @@ import dpq2;
 import std.getopt;
 import std.stdio: writeln;
 import std.typecons: Nullable;
+import std.variant: Variant;
 import vibe.data.bson;
 
 void main(string[] args)
@@ -110,10 +111,15 @@ void main(string[] args)
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
     writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 
-    // It is possible to read values of unknown type using BSON:
+    // It is possible to read values of unknown type
+    // using std.variant.Variant or vibe.data.bson.Bson:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].as!Bson);
+        writeln(
+            "column: '", r.columnName(column), "', ",
+            "Variant: ", r[0][column].as!Variant, ", ",
+            "Bson: ", r[0][column].as!Bson
+        );
     }
 
     // It is possible to upload CSV data ultra-fast:
@@ -142,11 +148,9 @@ void main(string[] args)
 Compile and run:
 ```
 Running ./dpq2_example --conninfo=user=postgres
-2018-12-09T10:08:07.862:package.d:__lambda1:19 DerelictPQ loading...
-2018-12-09T10:08:07.863:package.d:__lambda1:26 ...DerelictPQ loading finished
-Text query result by name: 2018-12-09 10:08:07.868141
+Text query result by name: 2025-08-22 15:33:57.417629
 Text query result by index: 456.78
-bson: "2018-12-09 10:08:07.868141"
+bson: "2025-08-22 15:33:57.417629"
 bson: "abc"
 bson: "123"
 bson: "456.78"
@@ -164,12 +168,13 @@ second line
 4.2: [[1, 2, 3], [4, 5, 6]]
 5.1 Json: {"text_str":"text string","float_value":123.456}
 5.2 Bson: {"text_str":"text string","float_value":123.456}
-column name: 'double_field', bson: -1234.56789012345
-column name: 'text', bson: "first line\nsecond line"
-column name: 'null_field', bson: null
-column name: 'array_field', bson: ["first","second",null]
-column name: 'multi_array', bson: [[1,2,3],[4,5,6]]
-column name: 'json_value', bson: {"text_str":"text string","float_value":123.456}
+column: 'double_field', Variant: -1234.57, Bson: -1234.56789012345
+column: 'text', Variant: first line
+second line, Bson: "first line\nsecond line"
+column: 'null_field', Variant: Nullable.null, Bson: null
+column: 'array_field', Variant: [first, second, Nullable.null], Bson: ["first","second",null]
+column: 'multi_array', Variant: [[1, 2, 3], [4, 5, 6]], Bson: [[1,2,3],[4,5,6]]
+column: 'json_value', Variant: {"text_str":"text string","float_value":123.456}, Bson: {"text_str":"text string","float_value":123.456}
 ```
 
 ## Using dynamic version of libpq
