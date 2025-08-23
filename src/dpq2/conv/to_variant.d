@@ -58,6 +58,13 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 
     template retArray__(NativeT)
     {
+        /*
+            Variant storage haven't heuristics to understand
+            what array elements can contain NULLs. So, to
+            simplify things, if declared that cell itself is
+            not nullable then we decease that array elements
+            also can't contain NULL values
+        */
         static if(isNullablePayload)
             alias ArrType = Nullable!NativeT;
         else
@@ -65,6 +72,19 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 
         auto retArray__() @trusted
         {
+            if(isNullablePayload && v.isNull)
+            {
+                /*
+                    One-dimensional array return is used here only to
+                    highlight that the value contains an array. For
+                    NULL cell we can determine only its type, but not
+                    the number of dimensions
+                */
+                return Variant(
+                    Nullable!(ArrType[]).init
+                );
+            }
+
             import dpq2.conv.arrays: ab = binaryValueAs;
 
             const ap = ArrayProperties(v);

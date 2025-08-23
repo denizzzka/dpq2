@@ -89,8 +89,8 @@ public void _integration_test( string connParam ) @system
             auto result = v.as!T;
 
             enum disabledForStdVariant = (
-                is(T == Nullable!string[]) || // Variant haven't heuristics to understand what array elements can contain NULLs
-                is(T == Nullable!(int[])) || // Same reason, but here is all values are Nullable and thus incompatible for comparison with original values
+                is(T == Nullable!string[]) || // Not-nullable Value cell but can contain nullable elements which prohibited if Variant used
+                is(T == Nullable!(int[])) || // Nullable Value implies array elements should be Nullable too if Variant used
                 is(T == SysTime) || is(T == Nullable!SysTime) || // Can't be supported by toVariant because TimeStampWithZone converted to PGtimestamptz
                 is(T == LineSegment) || // Impossible to support: LineSegment struct must be provided by user
                 is(T == PGTestMoney) || // ditto
@@ -323,6 +323,7 @@ public void _integration_test( string connParam ) @system
         C!(InetAddress[])([testInetAddr1, testInet6Addr2], "inet[]", `'{127.0.0.1/9,2001:0:130f::9c0:876a:130b/24}'`);
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
         C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
+        C!(Nullable!(Nullable!int[]))(Nullable!(Nullable!int[]).init, "int[]", "NULL");
     }
 
     // test round-trip compound types
