@@ -76,13 +76,35 @@ private mixin template ConnectionCtors()
     }
 }
 
+//TODO: move to DerelictPQ
+public {
+
+private extern(C) int PQenterPipelineMode(PGconn *conn);
+private extern(C) int PQexitPipelineMode(PGconn *conn);
+extern(C) int PQpipelineSync(PGconn *conn);
+extern(C) int PQsendPipelineSync(PGconn *conn);
+extern(C) int PQsendFlushRequest(PGconn *conn);
+extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
+
+enum PGRES_PIPELINE_SYNC = 10;
+enum PGRES_PIPELINE_ABORTED = 11;
+
+enum PGpipelineStatus
+{
+    PQ_PIPELINE_OFF,
+    PQ_PIPELINE_ON,
+    PQ_PIPELINE_ABORTED
+}
+
+}
+
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
 /// Connection
 class Connection
 {
-    package PGconn* conn;
+    /*package*/ PGconn* conn;
 
     invariant
     {
@@ -186,7 +208,7 @@ class Connection
         if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-    package bool flush()
+    /*package*/ bool flush()
     {
         assert(conn);
 
@@ -306,6 +328,19 @@ class Connection
     bool setSingleRowMode()
     {
         return PQsetSingleRowMode(conn) == 1;
+    }
+
+    /// Causes a connection to enter pipeline mode if it is currently idle or already in pipeline mode
+    void enterPipelineMode()
+    {
+        if(PQenterPipelineMode(conn) == 0)
+            throw new ConnectionException("Enabling pipeline mode failed");
+    }
+
+    void exitPipelineMode()
+    {
+        if(PQexitPipelineMode(conn) == 0)
+            throw new ConnectionException(this);
     }
 
     /**
