@@ -76,6 +76,27 @@ private mixin template ConnectionCtors()
     }
 }
 
+//TODO: move to DerelictPQ
+public {
+
+private extern(C) int PQenterPipelineMode(PGconn *conn);
+private extern(C) int PQexitPipelineMode(PGconn *conn);
+private extern(C) int PQpipelineSync(PGconn *conn);
+private extern(C) int PQsendFlushRequest(PGconn *conn);
+private extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
+
+enum PGRES_PIPELINE_SYNC = 10;
+enum PGRES_PIPELINE_ABORTED = 11;
+
+enum PGpipelineStatus
+{
+    PQ_PIPELINE_OFF,
+    PQ_PIPELINE_ON,
+    PQ_PIPELINE_ABORTED
+}
+
+}
+
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
@@ -186,7 +207,12 @@ class Connection
         if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-    package bool flush()
+    /// Attempts to flush any queued output data to the server.
+    ///
+    /// Returns: true if successful (or if the send queue is empty), or 1
+    /// if it was unable to send all the data in the send queue yet (this
+    /// case can only occur if the connection is nonblocking).
+    bool flush()
     {
         assert(conn);
 
@@ -306,6 +332,40 @@ class Connection
     bool setSingleRowMode()
     {
         return PQsetSingleRowMode(conn) == 1;
+    }
+
+    /// Causes a connection to enter pipeline mode if it is currently idle or already in pipeline mode.
+    void enterPipelineMode()
+    {
+        if(PQenterPipelineMode(conn) == 0)
+            throw new ConnectionException(this);
+    }
+
+    /// Causes a connection to exit pipeline mode if it is currently in pipeline mode with an empty queue and no pending results.
+    void exitPipelineMode()
+    {
+        if(PQexitPipelineMode(conn) == 0)
+            throw new ConnectionException(this);
+    }
+
+    /// Sends a request for the server to flush its output buffer.
+    void sendFlushRequest()
+    {
+        if(PQsendFlushRequest(conn) == 0)
+            throw new ConnectionException(this);
+    }
+
+    /// Marks a synchronization point in a pipeline by sending a sync message and flushing the send buffer.
+    void pipelineSync()
+    {
+        if(PQpipelineSync(conn) != 1)
+            throw new ConnectionException(this);
+    }
+
+    ///
+    PGpipelineStatus pipelineStatus()
+    {
+        return PQpipelineStatus(conn);
     }
 
     /**
