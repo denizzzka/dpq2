@@ -81,7 +81,7 @@ public {
 
 private extern(C) int PQenterPipelineMode(PGconn *conn);
 private extern(C) int PQexitPipelineMode(PGconn *conn);
-extern(C) int PQpipelineSync(PGconn *conn);
+private extern(C) int PQpipelineSync(PGconn *conn);
 extern(C) int PQsendPipelineSync(PGconn *conn);
 private extern(C) int PQsendFlushRequest(PGconn *conn);
 private extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
@@ -330,25 +330,35 @@ class Connection
         return PQsetSingleRowMode(conn) == 1;
     }
 
-    /// Causes a connection to enter pipeline mode if it is currently idle or already in pipeline mode
+    /// Causes a connection to enter pipeline mode if it is currently idle or already in pipeline mode.
     void enterPipelineMode()
     {
         if(PQenterPipelineMode(conn) == 0)
             throw new ConnectionException("Enabling pipeline mode failed");
     }
 
+    /// Causes a connection to exit pipeline mode if it is currently in pipeline mode with an empty queue and no pending results.
     void exitPipelineMode()
     {
         if(PQexitPipelineMode(conn) == 0)
             throw new ConnectionException(this);
     }
 
+    /// Sends a request for the server to flush its output buffer.
     void sendFlushRequest()
     {
         if(PQsendFlushRequest(conn) == 0)
             throw new ConnectionException(this);
     }
 
+    /// Marks a synchronization point in a pipeline by sending a sync message and flushing the send buffer.
+    void pipelineSync()
+    {
+        if(PQpipelineSync(conn) != 1)
+            throw new ConnectionException(this);
+    }
+
+    ///
     PGpipelineStatus pipelineStatus()
     {
         return PQpipelineStatus(conn);
