@@ -103,7 +103,7 @@ struct ConnectionStart {};
 /// Connection
 class Connection
 {
-    /*package*/ PGconn* conn;
+    package PGconn* conn;
 
     invariant
     {
@@ -207,7 +207,12 @@ class Connection
         if( r != 1 ) throw new ConnectionException(this, __FILE__, __LINE__);
     }
 
-    /*package*/ bool flush()
+    /// Attempts to flush any queued output data to the server.
+    ///
+    /// Returns: true if successful (or if the send queue is empty), or 1
+    /// if it was unable to send all the data in the send queue yet (this
+    /// case can only occur if the connection is nonblocking).
+    bool flush()
     {
         assert(conn);
 
