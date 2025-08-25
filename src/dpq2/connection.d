@@ -82,7 +82,6 @@ public {
 private extern(C) int PQenterPipelineMode(PGconn *conn);
 private extern(C) int PQexitPipelineMode(PGconn *conn);
 private extern(C) int PQpipelineSync(PGconn *conn);
-extern(C) int PQsendPipelineSync(PGconn *conn);
 private extern(C) int PQsendFlushRequest(PGconn *conn);
 private extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
 
