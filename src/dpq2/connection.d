@@ -83,8 +83,8 @@ private extern(C) int PQenterPipelineMode(PGconn *conn);
 private extern(C) int PQexitPipelineMode(PGconn *conn);
 extern(C) int PQpipelineSync(PGconn *conn);
 extern(C) int PQsendPipelineSync(PGconn *conn);
-extern(C) int PQsendFlushRequest(PGconn *conn);
-extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
+private extern(C) int PQsendFlushRequest(PGconn *conn);
+private extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
 
 enum PGRES_PIPELINE_SYNC = 10;
 enum PGRES_PIPELINE_ABORTED = 11;
@@ -341,6 +341,17 @@ class Connection
     {
         if(PQexitPipelineMode(conn) == 0)
             throw new ConnectionException(this);
+    }
+
+    void sendFlushRequest()
+    {
+        if(PQsendFlushRequest(conn) == 0)
+            throw new ConnectionException(this);
+    }
+
+    PGpipelineStatus pipelineStatus()
+    {
+        return PQpipelineStatus(conn);
     }
 
     /**
