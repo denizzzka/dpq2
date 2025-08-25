@@ -338,7 +338,7 @@ class Connection
     void enterPipelineMode()
     {
         if(PQenterPipelineMode(conn) == 0)
-            throw new ConnectionException("Enabling pipeline mode failed");
+            throw new ConnectionException(this);
     }
 
     /// Causes a connection to exit pipeline mode if it is currently in pipeline mode with an empty queue and no pending results.
