@@ -256,6 +256,8 @@
 <url><loc>http://127.0.0.1/dpq2/result/Row.this.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/Row.toString.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/result/toString.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/socket_stuff.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/socket_stuff/duplicateSocket.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/value.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/value/ConvExceptionType.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/value/Value.html</loc></url>
