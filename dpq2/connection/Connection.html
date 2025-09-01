@@ -185,6 +185,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
+								<a href="../../dpq2/connection/Connection.enterPipelineMode.html" class="public">
+									<code>enterPipelineMode</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Causes a connection to enter pipeline mode if it is currently idle or already in pipeline mode.
+</td>
+						</tr>
+						<tr>
+							<td>
 								<a href="../../dpq2/connection/Connection.errorMessage.html" class="public">
 									<code>errorMessage</code>
 								</a>
@@ -210,6 +220,26 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<span class="tableEntryAnnotation">(msg)</span>
 							</td>
 							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.exitPipelineMode.html" class="public">
+									<code>exitPipelineMode</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Causes a connection to exit pipeline mode if it is currently in pipeline mode with an empty queue and no pending results.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.flush.html" class="public">
+									<code>flush</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Attempts to flush any queued output data to the server.
+</td>
 						</tr>
 						<tr>
 							<td>
@@ -257,6 +287,25 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<span class="tableEntryAnnotation">(paramName)</span>
 							</td>
 							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.pipelineStatus.html" class="public">
+									<code>pipelineStatus</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.pipelineSync.html" class="public">
+									<code>pipelineSync</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Marks a synchronization point in a pipeline by sending a sync message and flushing the send buffer.
+</td>
 						</tr>
 						<tr>
 							<td>
@@ -315,6 +364,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Begin reset the communication channel to the server, in a nonblocking manner
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/Connection.sendFlushRequest.html" class="public">
+									<code>sendFlushRequest</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Sends a request for the server to flush its output buffer.
 </td>
 						</tr>
 						<tr>
