@@ -8,6 +8,7 @@ module dpq2.connection;
 
 import dpq2.query;
 import dpq2.args: QueryParams;
+import dpq2.cancellation;
 import dpq2.result;
 import dpq2.exception;
 
@@ -334,7 +335,7 @@ class Connection
     }
 
     /**
-     Try to cancel query
+     Try to cancel query in a blocking manner
 
      If the cancellation is effective, the current command will
      terminate early and return an error result or exception. If the
@@ -510,67 +511,6 @@ package void _connStringCheck(string connString)
         PQfreemem(cast(void*) errmsg);
 
         throw new ConnectionException(s, __FILE__, __LINE__);
-    }
-}
-
-/// Represents query cancellation process
-class Cancellation
-{
-    version(Dpq2_Dynamic)
-    {
-        import dpq2.dynloader: ReferenceCounter;
-        private immutable ReferenceCounter dynLoaderRefCnt;
-    }
-
-    private PGcancel* cancel;
-
-    ///
-    this(Connection c)
-    {
-        version(Dpq2_Dynamic) dynLoaderRefCnt = ReferenceCounter(true);
-
-        cancel = PQgetCancel(c.conn);
-
-        if(cancel is null)
-            throw new ConnectionException(c, __FILE__, __LINE__);
-    }
-
-    ///
-    ~this()
-    {
-        PQfreeCancel(cancel);
-
-        version(Dpq2_Dynamic) dynLoaderRefCnt.__custom_dtor();
-    }
-
-    /**
-     Requests that the server abandon processing of the current command
-
-     Throws exception if cancel request was not successfully dispatched.
-
-     Successful dispatch is no guarantee that the request will have any
-     effect, however. If the cancellation is effective, the current
-     command will terminate early and return an error result
-     (exception). If the cancellation fails (say, because the server
-     was already done processing the command), then there will be no
-     visible result at all.
-    */
-    void doCancel()
-    {
-        char[256] errbuf;
-        auto res = PQcancel(cancel, errbuf.ptr, errbuf.length);
-
-        if(res != 1)
-            throw new CancellationException(to!string(errbuf.ptr.fromStringz), __FILE__, __LINE__);
-    }
-}
-
-///
-class CancellationException : Dpq2Exception
-{
-    this(string msg, string file = __FILE__, size_t line = __LINE__)
-    {
-        super(msg, file, line);
     }
 }
 
