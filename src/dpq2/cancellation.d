@@ -25,6 +25,7 @@ private pure nothrow @nogc extern(C)
     int PQcancelBlocking(PGcancelConn *cancelConn);
     int PQcancelStart(PGcancelConn *cancelConn);
     PostgresPollingStatusType PQcancelPoll(PGcancelConn *cancelConn);
+    int PQcancelSocket(const PGcancelConn *cancelConn);
 }
 
 /// Represents query cancellation process (cancellation connection)
@@ -101,6 +102,19 @@ class Cancellation
     PostgresPollingStatusType poll() nothrow
     {
         return PQcancelPoll(cancelConn);
+    }
+
+    ///
+    auto socketDuplicate()
+    {
+        import dpq2.socket_stuff: duplicateSocket;
+
+        auto s = PQcancelSocket(cancelConn);
+
+        if(s == -1)
+            throw new CancellationException(errorMessage);
+
+        return s.duplicateSocket;
     }
 }
 
