@@ -100,6 +100,7 @@ var symbols = [
 {name: 'dpq2.cancellation.Cancellation.doCancel', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.doCancel.html', attributes: []},
 {name: 'dpq2.cancellation.Cancellation.errorMessage', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.errorMessage.html', attributes: ["const"]},
 {name: 'dpq2.cancellation.Cancellation.poll', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.poll.html', attributes: []},
+{name: 'dpq2.cancellation.Cancellation.socketDuplicate', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.socketDuplicate.html', attributes: ["auto"]},
 {name: 'dpq2.cancellation.Cancellation.start', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.start.html', attributes: []},
 {name: 'dpq2.cancellation.Cancellation.status', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.status.html', attributes: ["nothrow", "const"]},
 {name: 'dpq2.cancellation.Cancellation.this', kind: "functiondeclaration", path: './dpq2/cancellation/Cancellation.this.html', attributes: []},
