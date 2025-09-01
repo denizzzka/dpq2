@@ -208,44 +208,11 @@ class Connection
     }
 
     /// Obtains duplicate file descriptor number of the connection socket to the server
-    version(Posix)
-    socket_t posixSocketDuplicate()
+    auto posixSocketDuplicate()
     {
-        import core.sys.posix.unistd: dup;
+        import dpq2.socket_stuff;
 
-        static assert(socket_t.sizeof == int.sizeof);
-
-        return cast(socket_t) dup(cast(socket_t) posixSocket);
-    }
-
-    /// Obtains duplicate file descriptor number of the connection socket to the server
-    version(Windows)
-    SOCKET posixSocketDuplicate()
-    {
-        import core.stdc.stdlib: malloc, free;
-        import core.sys.windows.winbase: GetCurrentProcessId;
-
-        auto protocolInfo = cast(WSAPROTOCOL_INFOW*) malloc(WSAPROTOCOL_INFOW.sizeof);
-        scope(failure) free(protocolInfo);
-
-        int dupStatus = WSADuplicateSocketW(posixSocket, GetCurrentProcessId, protocolInfo);
-
-        if(dupStatus)
-            throw new ConnectionException("WSADuplicateSocketW error, code "~WSAGetLastError().to!string);
-
-        SOCKET s = WSASocketW(
-                FROM_PROTOCOL_INFO,
-                FROM_PROTOCOL_INFO,
-                FROM_PROTOCOL_INFO,
-                protocolInfo,
-                0,
-                0
-            );
-
-        if(s == INVALID_SOCKET)
-            throw new ConnectionException("WSASocket error, code "~WSAGetLastError().to!string);
-
-        return s;
+        return posixSocket.duplicateSocket;
     }
 
     /// Obtains std.socket.Socket of the connection to the server
@@ -254,8 +221,6 @@ class Connection
     /// duplicate of internal posix socket will be used.
     Socket socket()
     {
-        version(Windows) static assert(SOCKET.sizeof == socket_t.sizeof);
-
         return new Socket(cast(socket_t) posixSocketDuplicate, AddressFamily.UNSPEC);
     }
 
@@ -427,58 +392,6 @@ class Connection
     {
         if(PQsetClientEncoding(conn, encoding.toStringz) != 0)
             throw new ConnectionException(this, __FILE__, __LINE__);
-    }
-}
-
-// Socket duplication stuff for Win32
-version(Windows)
-private
-{
-    import core.sys.windows.windef;
-    import core.sys.windows.basetyps: GUID;
-
-    alias GROUP = uint;
-
-    enum INVALID_SOCKET = 0;
-    enum FROM_PROTOCOL_INFO =-1;
-    enum MAX_PROTOCOL_CHAIN = 7;
-    enum WSAPROTOCOL_LEN = 255;
-
-    struct WSAPROTOCOLCHAIN
-    {
-        int ChainLen;
-        DWORD[MAX_PROTOCOL_CHAIN] ChainEntries;
-    }
-
-    struct WSAPROTOCOL_INFOW
-    {
-        DWORD dwServiceFlags1;
-        DWORD dwServiceFlags2;
-        DWORD dwServiceFlags3;
-        DWORD dwServiceFlags4;
-        DWORD dwProviderFlags;
-        GUID ProviderId;
-        DWORD dwCatalogEntryId;
-        WSAPROTOCOLCHAIN ProtocolChain;
-        int iVersion;
-        int iAddressFamily;
-        int iMaxSockAddr;
-        int iMinSockAddr;
-        int iSocketType;
-        int iProtocol;
-        int iProtocolMaxOffset;
-        int iNetworkByteOrder;
-        int iSecurityScheme;
-        DWORD dwMessageSize;
-        DWORD dwProviderReserved;
-        WCHAR[WSAPROTOCOL_LEN+1] szProtocol;
-    }
-
-    extern(Windows) nothrow @nogc
-    {
-        import core.sys.windows.winsock2: WSAGetLastError;
-        int WSADuplicateSocketW(SOCKET s, DWORD dwProcessId, WSAPROTOCOL_INFOW* lpProtocolInfo);
-        SOCKET WSASocketW(int af, int type, int protocol, WSAPROTOCOL_INFOW*, GROUP, DWORD dwFlags);
     }
 }
 
