@@ -12,22 +12,6 @@ import dpq2.exception;
 import derelict.pq.pq;
 import std.conv: to;
 
-//TODO: move to DerelictPQ
-private pure nothrow @nogc extern(C)
-{
-    enum CONNECTION_ALLOCATED = 14;
-    struct PGcancelConn;
-
-    PGcancelConn *PQcancelCreate(PGconn *conn);
-    void PQcancelFinish(PGcancelConn *cancelConn);
-    ConnStatusType PQcancelStatus(const PGcancelConn *cancelConn);
-    char *PQcancelErrorMessage(const PGcancelConn *cancelconn);
-    int PQcancelBlocking(PGcancelConn *cancelConn);
-    int PQcancelStart(PGcancelConn *cancelConn);
-    PostgresPollingStatusType PQcancelPoll(PGcancelConn *cancelConn);
-    int PQcancelSocket(const PGcancelConn *cancelConn);
-}
-
 /// Represents query cancellation process (cancellation connection)
 class Cancellation
 {
