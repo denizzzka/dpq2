@@ -551,6 +551,8 @@ private pure nothrow @nogc extern(C)
     ConnStatusType PQcancelStatus(const PGcancelConn *cancelConn);
     char *PQcancelErrorMessage(const PGcancelConn *cancelconn);
     int PQcancelBlocking(PGcancelConn *cancelConn);
+    int PQcancelStart(PGcancelConn *cancelConn);
+    PostgresPollingStatusType PQcancelPoll(PGcancelConn *cancelConn);
 }
 
 /// Represents query cancellation process (connection)
@@ -585,7 +587,7 @@ class Cancellation
     }
 
     /// Returns the status of the cancel connection
-    ConnStatusType status() const
+    ConnStatusType status() const nothrow
     {
         return PQcancelStatus(cancelConn);
     }
@@ -614,6 +616,19 @@ class Cancellation
 
         if(res != 1)
             throw new CancellationException(errorMessage);
+    }
+
+    /// Requests that the server abandons processing of the current command in a non-blocking manner
+    void start()
+    {
+        if(PQcancelStart(cancelConn) != 1)
+            throw new CancellationException(errorMessage);
+    }
+
+    ///
+    PostgresPollingStatusType poll() nothrow
+    {
+        return PQcancelPoll(cancelConn);
     }
 }
 
