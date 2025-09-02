@@ -105,7 +105,7 @@ class Cancellation
     }
 
     ///
-    auto socketDuplicate()
+    auto socket()
     {
         import dpq2.socket_stuff: duplicateSocket;
 
@@ -114,7 +114,7 @@ class Cancellation
         if(s == -1)
             throw new CancellationException(errorMessage);
 
-        return s.duplicateSocket;
+        return s;
     }
 }
 
