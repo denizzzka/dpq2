@@ -83,7 +83,7 @@ class Cancellation
      was already done processing the command), then there will be no
      visible result at all.
     */
-    void doCancel()
+    void doCancelBlocking()
     {
         auto res = PQcancelBlocking(cancelConn);
 
