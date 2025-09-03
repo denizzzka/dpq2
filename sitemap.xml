@@ -126,10 +126,10 @@
 <url><loc>http://127.0.0.1/dpq2/args/QueryParams.sqlCommand.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.html</loc></url>
-<url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.doCancel.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.doCancelBlocking.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.errorMessage.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.poll.html</loc></url>
-<url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.socketDuplicate.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.socket.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.start.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.status.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.this.html</loc></url>
