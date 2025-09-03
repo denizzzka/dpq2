@@ -77,27 +77,6 @@ private mixin template ConnectionCtors()
     }
 }
 
-//TODO: move to DerelictPQ
-public {
-
-private extern(C) int PQenterPipelineMode(PGconn *conn);
-private extern(C) int PQexitPipelineMode(PGconn *conn);
-private extern(C) int PQpipelineSync(PGconn *conn);
-private extern(C) int PQsendFlushRequest(PGconn *conn);
-private extern(C) PGpipelineStatus PQpipelineStatus(const PGconn *conn);
-
-enum PGRES_PIPELINE_SYNC = 10;
-enum PGRES_PIPELINE_ABORTED = 11;
-
-enum PGpipelineStatus
-{
-    PQ_PIPELINE_OFF,
-    PQ_PIPELINE_ON,
-    PQ_PIPELINE_ABORTED
-}
-
-}
-
 /// dumb flag for Connection ctor parametrization
 struct ConnectionStart {};
 
