@@ -9,7 +9,7 @@
 	"targetPath": "bin",
 	"dependencies": {
 		"derelict-pq": {
-			"version": "==4.0.0-pg17-unofficial",
+			"version": "b5bb17f582dbfb78dda8ebb99e0205f219b65fd1",
 			"repository": "git+https://github.com/denizzzka/DerelictPQ.git"
 		},
 		"vibe-serialization": "~>1.0.4",
