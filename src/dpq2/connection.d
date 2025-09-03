@@ -324,7 +324,7 @@ class Connection
     void cancel()
     {
         auto c = new Cancellation(this);
-        c.doCancel;
+        c.doCancelBlocking;
     }
 
     ///
