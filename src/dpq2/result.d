@@ -326,7 +326,7 @@ immutable class Answer : Result
     }
 }
 
-/// Creates forward range from immutable Answer
+/// Creates forward range from Answer, Row or from any immutable indexed type
 auto rangify(T)(T obj)
 {
     struct Rangify(T)

@@ -71,13 +71,6 @@ void main(string[] args)
     writeln( "Text query result by name: ", answer[0]["current_time"].as!string );
     writeln( "Text query result by index: ", answer[0][3].as!string );
 
-    // It is possible to read values of unknown type using BSON:
-    auto firstRow = answer[0];
-    foreach(cell; rangify(firstRow))
-    {
-        writeln("bson: ", cell.as!Bson);
-    }
-
     // Binary arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
@@ -142,6 +135,20 @@ void main(string[] args)
     // Signal that the COPY is finished. Let Postgresql finalize the command
     // and return any errors with the data.
     conn.putCopyEnd();
+
+    import std.range: enumerate;
+
+    // rangify() template helps to iterate over Answer and Row:
+    auto few_rows = conn.exec("SELECT v1, v2 FROM test_dpq2_copy");
+    foreach(row_num, row; few_rows.rangify.enumerate)
+    {
+        foreach(col_num, cell; row.rangify.enumerate)
+            writeln(
+                "row_num: ", row_num,
+                " col_num: ", col_num,
+                " value: ", cell.as!Bson
+            );
+    }
 }
 ```
 
@@ -175,6 +182,14 @@ column: 'null_field', Variant: Nullable.null, Bson: null
 column: 'array_field', Variant: [first, second, Nullable.null], Bson: ["first","second",null]
 column: 'multi_array', Variant: [[1, 2, 3], [4, 5, 6]], Bson: [[1,2,3],[4,5,6]]
 column: 'json_value', Variant: {"text_str":"text string","float_value":123.456}, Bson: {"text_str":"text string","float_value":123.456}
+row_num: 0 col_num: 0 value: "This, right here, is a test"
+row_num: 0 col_num: 1 value: "8"
+row_num: 1 col_num: 0 value: "Wow! it works"
+row_num: 1 col_num: 1 value: "13"
+row_num: 2 col_num: 0 value: "Horray!"
+row_num: 2 col_num: 1 value: "3456"
+row_num: 3 col_num: 0 value: "Super fast!"
+row_num: 3 col_num: 1 value: "325"
 ```
 
 ## Using dynamic version of libpq

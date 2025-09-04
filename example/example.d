@@ -23,13 +23,6 @@ void main(string[] args)
     writeln( "Text query result by name: ", answer[0]["current_time"].as!string );
     writeln( "Text query result by index: ", answer[0][3].as!string );
 
-    // It is possible to read values of unknown type using BSON:
-    auto firstRow = answer[0];
-    foreach(cell; rangify(firstRow))
-    {
-        writeln("bson: ", cell.as!Bson);
-    }
-
     // Binary arguments query with binary result:
     QueryParams p;
     p.sqlCommand = "SELECT "~
@@ -94,4 +87,18 @@ void main(string[] args)
     // Signal that the COPY is finished. Let Postgresql finalize the command
     // and return any errors with the data.
     conn.putCopyEnd();
+
+    import std.range: enumerate;
+
+    // rangify() template helps to iterate over Answer and Row:
+    auto few_rows = conn.exec("SELECT v1, v2 FROM test_dpq2_copy");
+    foreach(row_num, row; few_rows.rangify.enumerate)
+    {
+        foreach(col_num, cell; row.rangify.enumerate)
+            writeln(
+                "row_num: ", row_num,
+                " col_num: ", col_num,
+                " value: ", cell.as!Bson
+            );
+    }
 }
