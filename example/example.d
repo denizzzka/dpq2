@@ -2,7 +2,7 @@
 
 import dpq2;
 import std.getopt;
-import std.stdio: writeln;
+import std.stdio: writefln, writeln;
 import std.typecons: Nullable;
 import std.variant: Variant;
 import vibe.data.bson;
@@ -94,11 +94,7 @@ void main(string[] args)
     auto few_rows = conn.exec("SELECT v1, v2 FROM test_dpq2_copy");
     foreach(row_num, row; few_rows.rangify.enumerate)
     {
-        foreach(col_num, cell; row.rangify.enumerate)
-            writeln(
-                "row_num: ", row_num,
-                " col_num: ", col_num,
-                " value: ", cell.as!Bson
-            );
+        foreach(cell; row.rangify)
+            writefln("row_num: %d value: %s", row_num, cell.as!Bson);
     }
 }

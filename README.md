@@ -50,7 +50,7 @@ This can speed up compilation significant.
 
 import dpq2;
 import std.getopt;
-import std.stdio: writeln;
+import std.stdio: writefln, writeln;
 import std.typecons: Nullable;
 import std.variant: Variant;
 import vibe.data.bson;
@@ -142,12 +142,8 @@ void main(string[] args)
     auto few_rows = conn.exec("SELECT v1, v2 FROM test_dpq2_copy");
     foreach(row_num, row; few_rows.rangify.enumerate)
     {
-        foreach(col_num, cell; row.rangify.enumerate)
-            writeln(
-                "row_num: ", row_num,
-                " col_num: ", col_num,
-                " value: ", cell.as!Bson
-            );
+        foreach(cell; row.rangify)
+            writefln("row_num: %d value: %s", row_num, cell.as!Bson);
     }
 }
 ```
@@ -182,14 +178,14 @@ column: 'null_field', Variant: Nullable.null, Bson: null
 column: 'array_field', Variant: [first, second, Nullable.null], Bson: ["first","second",null]
 column: 'multi_array', Variant: [[1, 2, 3], [4, 5, 6]], Bson: [[1,2,3],[4,5,6]]
 column: 'json_value', Variant: {"text_str":"text string","float_value":123.456}, Bson: {"text_str":"text string","float_value":123.456}
-row_num: 0 col_num: 0 value: "This, right here, is a test"
-row_num: 0 col_num: 1 value: "8"
-row_num: 1 col_num: 0 value: "Wow! it works"
-row_num: 1 col_num: 1 value: "13"
-row_num: 2 col_num: 0 value: "Horray!"
-row_num: 2 col_num: 1 value: "3456"
-row_num: 3 col_num: 0 value: "Super fast!"
-row_num: 3 col_num: 1 value: "325"
+row_num: 0 value: "This, right here, is a test"
+row_num: 0 value: "8"
+row_num: 1 value: "Wow! it works"
+row_num: 1 value: "13"
+row_num: 2 value: "Horray!"
+row_num: 2 value: "3456"
+row_num: 3 value: "Super fast!"
+row_num: 3 value: "325"
 ```
 
 ## Using dynamic version of libpq
