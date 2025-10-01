@@ -45,7 +45,7 @@ is no longer available and std.variant.Variant is no longer used.
 This can speed up compilation significant.
 
 ## Example
-```D
+```d
 #!/usr/bin/env rdmd
 
 import dpq2;
