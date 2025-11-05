@@ -397,10 +397,15 @@ unittest
 
 unittest
 {
-    Value v = toValue(cast(short) 123);
+    Value v = toValue(short(123));
 
     assert(v.oidType == OidType.Int2);
     assert(v.as!short == 123);
+
+    v = toValue(ushort(123));
+    assert(v.oidType == OidType.Int2);
+    assert(v.as!short == 123);
+    assert(v.as!ushort == 123);
 }
 
 unittest
