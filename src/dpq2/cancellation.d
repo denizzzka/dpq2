@@ -91,8 +91,6 @@ class Cancellation
     ///
     auto socket()
     {
-        import dpq2.socket_stuff: duplicateSocket;
-
         auto s = PQcancelSocket(cancelConn);
 
         if(s == -1)
