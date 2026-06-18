@@ -385,7 +385,10 @@ Value toRecordValue(Value[] elements)
 }
 
 version(unittest)
-import dpq2.conv.to_d_types : as, deserializeRecord;
+{
+    import std.math: isClose;
+    import dpq2.conv.to_d_types : as, deserializeRecord;
+}
 
 unittest
 {
@@ -405,10 +408,18 @@ unittest
 
 unittest
 {
-    Value v = toValue(-123.456);
+    Value v = float(-123.456).toValue;
+
+    assert(v.oidType == OidType.Float4);
+    assert(isClose(v.as!float, -123.456));
+}
+
+unittest
+{
+    Value v = double(-123.456).toValue;
 
     assert(v.oidType == OidType.Float8);
-    assert(v.as!double == -123.456);
+    assert(isClose(v.as!double, -123.456));
 }
 
 unittest
