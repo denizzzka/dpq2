@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Connection.socket</title>
+		<title>Class SocketNotBorrowed</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -143,15 +143,37 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Connection.socket</h1><p>Obtains std.socket.Socket of the connection to the server
+				<h1>Class SocketNotBorrowed</h1><p>Same as std.socket.Socket, but socket acquired from the outside doesn't
+close in the destructor. This allows to use a system socket borrowed
+from somewhere and simply leave, so that others can continue working
+with it.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
-						<div class="single-prototype"><a href="../../dpq2/connection/SocketNotBorrowed.html"><span class="typ">SocketNotBorrowed</span></a> <span class="pln">socket</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">SocketNotBorrowed</span><br>&nbsp;&nbsp;: <span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">socket<wbr/></span><span class="pun">.</span><span class="typ">Socket</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
+				<section><h2>Constructors</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dpq2/connection/SocketNotBorrowed.this.html" class="public">
+									<code>this</code>
+								</a>
+								<span class="tableEntryAnnotation">(sock, af)</span>
+							</td>
+							<td>Use an existing socket handle.
+</td>
+						</tr>
+					</table>
+				</section>
 			</div>
 			<footer>
 				<div id="license-info">

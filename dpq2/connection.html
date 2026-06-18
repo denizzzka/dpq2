@@ -192,6 +192,18 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>Connection exception
 </td>
 						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SocketNotBorrowed" class="public" href="../dpq2/connection/SocketNotBorrowed.html">SocketNotBorrowed</a>
+								</code>
+							</td>
+							<td>Same as std.socket.Socket, but socket acquired from the outside doesn't
+close in the destructor. This allows to use a system socket borrowed
+from somewhere and simply leave, so that others can continue working
+with it.
+</td>
+						</tr>
 					</table>
 				</section>
 				<section>

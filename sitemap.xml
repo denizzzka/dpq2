@@ -154,7 +154,6 @@
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.pipelineSync.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.poll.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.posixSocket.html</loc></url>
-<url><loc>http://127.0.0.1/dpq2/connection/Connection.posixSocketDuplicate.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.protocolVersion.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.resetPoll.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/Connection.resetStart.html</loc></url>
@@ -171,6 +170,8 @@
 <url><loc>http://127.0.0.1/dpq2/connection/ConnectionException.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/ConnectionStart.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/connection/connStringCheck.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/connection/SocketNotBorrowed.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/connection/SocketNotBorrowed.this.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/dynloader.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/exception.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/exception/Dpq2Exception.html</loc></url>

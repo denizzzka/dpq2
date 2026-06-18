@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Connection.posixSocketDuplicate</title>
+		<title>Function SocketNotBorrowed.this</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -143,11 +143,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Connection.posixSocketDuplicate</h1><p>Obtains duplicate file descriptor number of the connection socket to the server
+				<h1>Function SocketNotBorrowed.this</h1><p>Use an existing socket handle.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
-						<div class="single-prototype"><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">socket<wbr/></span><span class="pun">.</span><span class="pln">socket_t</span> <span class="pln">posixSocketDuplicate</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+						<div class="single-prototype">
+				<span class="pln">this</span><span class="pun">(</span>
+				<br/>&nbsp;&nbsp;<span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">socket<wbr/></span><span class="pun">.</span><span class="pln">socket_t</span> <span class="pln">sock</span><span class="pun">,</span>
+				<br/>&nbsp;&nbsp;<span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">socket<wbr/></span><span class="pun">.</span><span class="typ">AddressFamily</span> <span class="pln">af</span>
+				<br/>
+				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
