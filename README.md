@@ -27,7 +27,7 @@ _Please help us to make documentation better!_
  * JSONB type (ditto)
  * Geometric types
 * Conversion of values to BSON (into vibe.data.bson.Bson)
-* Access to PostgreSQL's multidimensional arrays
+* Access to Postgres multidimensional arrays
 * LISTEN/NOTIFY support
 * Bulk data upload to table from string data ([SQL COPY](https://www.postgresql.org/docs/current/sql-copy.html))
 * Simple SQL query builder
