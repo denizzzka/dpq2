@@ -235,6 +235,31 @@ immutable class Answer : Result
         return immutable Row(this, row);
     }
 
+    /// Checks Answer to make sure that it contains exactly one Row
+    /// and returns this one row
+    ///
+    /// Returns: Row of cells
+    immutable(Row) oneRow(string file = __FILE__, size_t line = __LINE__)
+    {
+        if(length != 1)
+            throw new AnswerException(
+                    ExceptionType.UNEXPECTED_LENGTH,
+                    "Answer contains "~length.to!string~" rows, but expected 1",
+                    file, line
+                );
+
+        return opIndex(0);
+    }
+
+    /// Checks Answer to make sure that it contains exactly one Row and one column
+    /// and returns this one found cell Value
+    ///
+    /// Returns: cell Value
+    immutable(Value) oneCell(string file = __FILE__, size_t line = __LINE__)
+    {
+        return this.oneRow(file, line).oneCell(file, line);
+    }
+
     /**
      Returns the number of parameters of a prepared statement.
      This function is only useful when inspecting the result of describePrepared.
@@ -301,7 +326,7 @@ immutable class Answer : Result
     }
 }
 
-/// Creates forward range from immutable Answer
+/// Creates forward range from Answer, Row or from any immutable indexed type
 auto rangify(T)(T obj)
 {
     struct Rangify(T)
@@ -393,6 +418,22 @@ immutable struct Row
     string columnName( in size_t colNum )
     {
         return answer.columnName( colNum );
+    }
+
+    /// Checks Row to make sure that it contains exactly one column
+    /// and returns this one found cell Value
+    ///
+    /// Returns: cell Value
+    immutable(Value) oneCell(string file = __FILE__, size_t line = __LINE__)
+    {
+        if(length != 1)
+            throw new AnswerException(
+                    ExceptionType.UNEXPECTED_LENGTH,
+                    "Row contains "~length.to!string~" columns, but expected 1",
+                    file, line
+                );
+
+        return opIndex(0);
     }
 
     /// Returns column count
@@ -503,6 +544,7 @@ struct ArrayProperties
 {
     OidType OID = OidType.Undefined; /// Oid
     int[] dimsSize; /// Dimensions sizes info
+    int[] leftBounds; /// Left bounds of each dimension. Can differ from 1 for slices. Useful to restore coordinates inside of a slice.
     size_t nElems; /// Total elements
     package size_t dataOffset;
 
@@ -540,6 +582,7 @@ struct ArrayProperties
         dataOffset = ArrayHeader_net.sizeof + Dim_net.sizeof * nDims;
 
         dimsSize = new int[nDims];
+        leftBounds = new int[nDims];
 
         // Recognize dimensions of array
         for( auto i = 0; i < nDims; ++i )
@@ -547,17 +590,11 @@ struct ArrayProperties
             Dim_net* d = (cast(Dim_net*) (h + 1)) + i;
 
             const dim_size = bigEndianToNative!int(d.dim_size);
-            const lbound = bigEndianToNative!int(d.lbound);
+            leftBounds[i] = bigEndianToNative!int(d.lbound);
 
             if(dim_size < 0)
                 throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
                     "Dimension size is negative ("~to!string(dim_size)~")",
-                );
-
-            // FIXME: What is lbound in postgresql array reply?
-            if(!(lbound == 1))
-                throw new ValueConvException(ConvExceptionType.CORRUPTED_ARRAY,
-                    "Please report if you came across this error! lbound=="~to!string(lbound),
                 );
 
             dimsSize[i] = dim_size;
@@ -765,6 +802,7 @@ enum ExceptionType
     FATAL_ERROR, ///
     COLUMN_NOT_FOUND, /// Column is not found
     OUT_OF_RANGE, ///
+    UNEXPECTED_LENGTH, ///
     COPY_OUT_NOT_IMPLEMENTED = 10000, /// TODO
 }
 
@@ -811,6 +849,8 @@ void _integration_test( string connParam )
         assert( e[1]["field_name"].as!PGtext == "def" );
         assert(e.columnExists("field_name"));
         assert(!e.columnExists("foo"));
+
+        assertThrown!AnswerException(e.oneRow);
     }
 
     // Binary type arguments testing:
@@ -866,6 +906,10 @@ void _integration_test( string connParam )
         r[0].toString; // Must not throw
         assertThrown!ValueConvException(r[0]["unsupported_toString_output_type"].toString);
 
+        assert(r.oneRow[0].as!short == -32761);
+        assertThrown!AnswerException(r.oneRow.oneCell);
+        assertThrown!AnswerException(r.oneCell);
+
         // Access to NULL cell
         {
             bool isNullFlag = false;
@@ -887,6 +931,14 @@ void _integration_test( string connParam )
             finally
                 assert(isNullFlag);
         }
+    }
+
+    // oneRow/oneCell tests
+    {
+        const o = conn.exec("select 'test_value'");
+
+        assert(o.oneRow.oneCell.as!string == "test_value");
+        assert(o.oneCell.as!string == "test_value");
     }
 
     // Notifies test

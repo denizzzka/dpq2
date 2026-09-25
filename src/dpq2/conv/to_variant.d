@@ -1,9 +1,18 @@
 ///
+
 module dpq2.conv.to_variant;
+
+version(NO_VARIANT) {
+/* Without std.variant dpq2 compiles significantly faster, and often the
+* ability explore unknown database schemas is not needed, removing the need
+* for a Variant type.
+*/
+} else {
 
 import dpq2.value;
 import dpq2.oids: OidType;
 import dpq2.result: ArrayProperties;
+import dpq2.conv.inet: InetAddress, CidrAddress;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
 static import dpq2.conv.ranges;
@@ -51,12 +60,50 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
 
     template retArray__(NativeT)
     {
+        /*
+            Variant storage haven't heuristics to understand
+            what array elements can contain NULLs. So, to
+            simplify things, if declared that cell itself is
+            not nullable then we decease that array elements
+            also can't contain NULL values
+        */
         static if(isNullablePayload)
-            alias arrType = Nullable!NativeT[];
+            alias ArrType = Nullable!NativeT;
         else
-            alias arrType = NativeT[];
+            alias ArrType = NativeT;
 
-        alias retArray__ = retVariant!arrType;
+        auto retArray__() @trusted
+        {
+            if(isNullablePayload && v.isNull)
+            {
+                /*
+                    One-dimensional array return is used here only to
+                    highlight that the value contains an array. For
+                    NULL cell we can determine only its type, but not
+                    the number of dimensions
+                */
+                return Variant(
+                    Nullable!(ArrType[]).init
+                );
+            }
+
+            import dpq2.conv.arrays: ab = binaryValueAs;
+
+            const ap = ArrayProperties(v);
+
+            switch(ap.dimsSize.length)
+            {
+                case 0: return Variant(v.ab!(ArrType[])); // PG can return zero-dimensional arrays
+                case 1: return Variant(v.ab!(ArrType[]));
+                case 2: return Variant(v.ab!(ArrType[][]));
+                case 3: return Variant(v.ab!(ArrType[][][]));
+                case 4: return Variant(v.ab!(ArrType[][][][]));
+                default: throw new ValueConvException(
+                    ConvExceptionType.DIMENSION_MISMATCH,
+                    "Attempt to convert an array of dimension "~ap.dimsSize.length.to!string~" to type Variant: dimensions greater than 4 are not supported"
+                );
+            }
+        }
     }
 
     with(OidType)
@@ -128,6 +175,12 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
         case Date:      return retVariant!PGdate;
         case DateArray: return retArray__!PGdate;
 
+        case HostAddress:       return retVariant!InetAddress;
+        case HostAddressArray:  return retArray__!InetAddress;
+
+        case NetworkAddress:        return retVariant!CidrAddress;
+        case NetworkAddressArray:   return retArray__!CidrAddress;
+
         case Time:      return retVariant!PGtime_without_time_zone;
         case TimeArray: return retArray__!PGtime_without_time_zone;
 
@@ -166,4 +219,5 @@ Variant toVariant(bool isNullablePayload = true)(in Value v) @safe
                     __FILE__, __LINE__
                 );
     }
+}
 }

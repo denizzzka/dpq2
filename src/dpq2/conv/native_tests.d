@@ -1,12 +1,14 @@
 module dpq2.conv.native_tests;
 
 import dpq2;
-import dpq2.conv.arrays : isArrayType;
+import dpq2.conv.arrays: isArrayType;
 import dpq2.conv.geometric: Line;
+import dpq2.conv.inet: InetAddress, CidrAddress;
 import dpq2.conv.ranges;
 import dpq2.conv.tsearch;
-import std.bitmanip : BitArray;
+import std.bitmanip: BitArray;
 import std.datetime;
+import std.socket: InternetAddress, Internet6Address;
 import std.string: replace;
 import std.typecons: Nullable;
 import std.uuid: UUID;
@@ -43,6 +45,7 @@ public void _integration_test( string connParam ) @system
 {
     import std.format: format;
     import dpq2.connection: createTestConn;
+    import vibe.core.net: VibeNetworkAddress = NetworkAddress;
 
     auto conn = createTestConn(connParam);
 
@@ -89,8 +92,8 @@ public void _integration_test( string connParam ) @system
             auto result = v.as!T;
 
             enum disabledForStdVariant = (
-                is(T == Nullable!string[]) || // Variant haven't heuristics to understand what array elements can contain NULLs
-                is(T == Nullable!(int[])) || // Same reason, but here is all values are Nullable and thus incompatible for comparison with original values
+                is(T == Nullable!string[]) || // Not-nullable Value cell but can contain nullable elements which prohibited if Variant used
+                is(T == Nullable!(int[])) || // Nullable Value implies array elements should be Nullable too if Variant used
                 is(T == SysTime) || is(T == Nullable!SysTime) || // Can't be supported by toVariant because TimeStampWithZone converted to PGtimestamptz
                 is(T == LineSegment) || // Impossible to support: LineSegment struct must be provided by user
                 is(T == PGTestMoney) || // ditto
@@ -276,6 +279,34 @@ public void _integration_test( string connParam ) @system
         C!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
         C!(Nullable!SysTime)(Nullable!SysTime(SysTime(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12), testTZ)), "timestamptz", "'1997-12-17 07:37:16.000012+02'");
 
+        import dpq2.conv.inet: vibe2pg;
+
+        // inet
+        const testInetAddr1 = InetAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY), 9);
+        C!InetAddress(testInetAddr1, "inet", `'127.0.0.1/9'`);
+        const testInetAddr2 = InetAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY));
+        C!InetAddress(testInetAddr2, "inet", `'127.0.0.1/32'`);
+        const testInetAddr3 = VibeNetworkAddress(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY)).vibe2pg;
+        C!InetAddress(testInetAddr3, "inet", `'127.0.0.1/32'`);
+
+        // inet6
+        const testInet6Addr1 = InetAddress(new Internet6Address("2::1", InternetAddress.PORT_ANY));
+        C!InetAddress(testInet6Addr1, "inet", `'2::1/128'`);
+        const testInet6Addr2 = InetAddress(new Internet6Address("2001:0:130F::9C0:876A:130B", InternetAddress.PORT_ANY),24);
+        C!InetAddress(testInet6Addr2, "inet", `'2001:0:130f::9c0:876a:130b/24'`);
+        const testInet6Addr3 = VibeNetworkAddress(new Internet6Address("2001:0:130F::9C0:876A:130B", InternetAddress.PORT_ANY)).vibe2pg;
+        C!InetAddress(testInet6Addr3, "inet", `'2001:0:130f::9c0:876a:130b/128'`);
+
+        // nullable inet
+        C!(Nullable!InetAddress)(Nullable!InetAddress.init, "inet", "NULL");
+        C!(Nullable!CidrAddress)(Nullable!CidrAddress.init, "cidr", "NULL");
+
+        // cidr
+        const testCidrAddr1 = CidrAddress(new InternetAddress("192.168.0.0", InternetAddress.PORT_ANY), 25);
+        C!CidrAddress(testCidrAddr1, "cidr", `'192.168.0.0/25'`);
+        const testCidrAddr2 = CidrAddress(new Internet6Address("::", InternetAddress.PORT_ANY), 64);
+        C!CidrAddress(testCidrAddr2, "cidr", `'::/64'`);
+
         // json
         C!PGjson(Json(["float_value": Json(123.456), "text_str": Json("text string")]), "json", `'{"float_value": 123.456,"text_str": "text string"}'`);
         C!(Nullable!PGjson)(Nullable!Json(Json(["foo": Json("bar")])), "json", `'{"foo":"bar"}'`);
@@ -307,46 +338,48 @@ public void _integration_test( string connParam ) @system
         C!(PGuuid[])([UUID("8b9ab33a-96e9-499b-9c36-aad1fe86d640")], "uuid[]", "'{8b9ab33a-96e9-499b-9c36-aad1fe86d640}'");
         C!(PGline[])([Line(1,2,3), Line(4,5,6)], "line[]", `'{"{1,2,3}","{4,5,6}"}'`);
         C!(PGtimestamp[])([PGtimestamp(DateTime(1997, 12, 17, 7, 37, 16), dur!"usecs"(12))], "timestamp[]", `'{"1997-12-17 07:37:16.000012"}'`);
+        C!(InetAddress[])([testInetAddr1, testInet6Addr2], "inet[]", `'{127.0.0.1/9,2001:0:130f::9c0:876a:130b/24}'`);
         C!(Nullable!(int[]))(Nullable!(int[]).init, "int[]", "NULL");
         C!(Nullable!(int[]))(Nullable!(int[])([1,2,3]), "int[]", "'{1,2,3}'");
+        C!(Nullable!(Nullable!int[]))(Nullable!(Nullable!int[]).init, "int[]", "NULL");
 
         // Ranges
-		C!Int4Range(Int4Range([2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71]), "int4range", "'[35,71)'");
-		C!Int8Range(Int8Range([2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11]), "int8range", "'[348,36306955)'");
-		C!NumRange(NumRange([2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128]), "numrange", "'[123456.987654,321654.989796)'");
-		C!TsRange(TsRange([2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0]), "tsrange", "'[2025-01-10 09:10:00,2025-01-27 11:45:00)'");
-		C!TsTzRange(TsTzRange([2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0]), "tstzrange", "'[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)'");
-		C!DateRange(DateRange([2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190]), "daterange", "'[1980-01-01,1982-12-31)'");
+        C!Int4Range(Int4Range([2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71]), "int4range", "'[35,71)'");
+        C!Int8Range(Int8Range([2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11]), "int8range", "'[348,36306955)'");
+        C!NumRange(NumRange([2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128]), "numrange", "'[123456.987654,321654.989796)'");
+        C!TsRange(TsRange([2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0]), "tsrange", "'[2025-01-10 09:10:00,2025-01-27 11:45:00)'");
+        C!TsTzRange(TsTzRange([2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0]), "tstzrange", "'[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)'");
+        C!DateRange(DateRange([2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190]), "daterange", "'[1980-01-01,1982-12-31)'");
 
         // Range arrays
-		C!(Int4Range[])([Int4Range([2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71])], "int4range[]", `'{"[35,71)"}'`);
-		C!(Int8Range[])([Int8Range([2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11])], "int8range[]", `'{"[348,36306955)"}'`);
-		C!(NumRange[])([NumRange([2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128])], "numrange[]", `'{"[123456.987654,321654.989796)"}'`);
-		C!(TsRange[])([TsRange([2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0])], "tsrange[]", `'{"[2025-01-10 09:10:00,2025-01-27 11:45:00)"}'`);
-		C!(TsTzRange[])([TsTzRange([2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0])], "tstzrange[]", `'{"[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)"}'`);
-		C!(DateRange[])([DateRange([2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190])], "daterange[]", `'{"[1980-01-01,1982-12-31)"}'`);
+        C!(Int4Range[])([Int4Range([2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71])], "int4range[]", `'{"[35,71)"}'`);
+        C!(Int8Range[])([Int8Range([2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11])], "int8range[]", `'{"[348,36306955)"}'`);
+        C!(NumRange[])([NumRange([2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128])], "numrange[]", `'{"[123456.987654,321654.989796)"}'`);
+        C!(TsRange[])([TsRange([2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0])], "tsrange[]", `'{"[2025-01-10 09:10:00,2025-01-27 11:45:00)"}'`);
+        C!(TsTzRange[])([TsTzRange([2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0])], "tstzrange[]", `'{"[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)"}'`);
+        C!(DateRange[])([DateRange([2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190])], "daterange[]", `'{"[1980-01-01,1982-12-31)"}'`);
 
-		// Multiranges
-		C!Int4MultiRange(Int4MultiRange([0,0,0,2, 0,0,0,17, 2, 0,0,0,4, 0,0,0,23, 0,0,0,4, 0,0,0,32, 0,0,0,17, 2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71]), "int4multirange", "'{[23,32),[35,71)}'");
-		C!Int8MultiRange(Int8MultiRange([0,0,0,2, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,0,3, 0,0,0,8, 0,0,0,0,0,0,0,14, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11]), "int8multirange", "'{[3,14),[348,36306955)}'");
-		C!NumMultiRange(NumMultiRange([0,0,0,2, 0,0,0,33, 2, 0,0,0,12, 0,2,0,0,0,0,0,2,0,17,34,196, 0,0,0,12, 0,2,0,0,0,0,0,3,0,24,30,210, 0,0,0,41, 2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128]), "nummultirange", "'{[17.89,24.789),[123456.987654,321654.989796)}'");
-		C!TsMultiRange(TsMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0]), "tsmultirange", "'{[2025-01-10 09:10:00,2025-01-27 11:45:00)}'");
-		C!TsTzMultiRange(TsTzMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0]), "tstzmultirange", "'{[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)}'");
-		C!DateMultiRange(DateMultiRange([0,0,0,1, 0,0,0,17, 2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190]), "datemultirange", "'{[1980-01-01,1982-12-31)}'");
+        // Multiranges
+        C!Int4MultiRange(Int4MultiRange([0,0,0,2, 0,0,0,17, 2, 0,0,0,4, 0,0,0,23, 0,0,0,4, 0,0,0,32, 0,0,0,17, 2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71]), "int4multirange", "'{[23,32),[35,71)}'");
+        C!Int8MultiRange(Int8MultiRange([0,0,0,2, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,0,3, 0,0,0,8, 0,0,0,0,0,0,0,14, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11]), "int8multirange", "'{[3,14),[348,36306955)}'");
+        C!NumMultiRange(NumMultiRange([0,0,0,2, 0,0,0,33, 2, 0,0,0,12, 0,2,0,0,0,0,0,2,0,17,34,196, 0,0,0,12, 0,2,0,0,0,0,0,3,0,24,30,210, 0,0,0,41, 2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128]), "nummultirange", "'{[17.89,24.789),[123456.987654,321654.989796)}'");
+        C!TsMultiRange(TsMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0]), "tsmultirange", "'{[2025-01-10 09:10:00,2025-01-27 11:45:00)}'");
+        C!TsTzMultiRange(TsTzMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0]), "tstzmultirange", "'{[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)}'");
+        C!DateMultiRange(DateMultiRange([0,0,0,1, 0,0,0,17, 2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190]), "datemultirange", "'{[1980-01-01,1982-12-31)}'");
 
-		// Multirange arrays
-		C!(Int4MultiRange[])([Int4MultiRange([0,0,0,2, 0,0,0,17, 2, 0,0,0,4, 0,0,0,23, 0,0,0,4, 0,0,0,32, 0,0,0,17, 2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71])], "int4multirange[]", `'{"{[23,32),[35,71)}"}'`);
-		C!(Int8MultiRange[])([Int8MultiRange([0,0,0,2, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,0,3, 0,0,0,8, 0,0,0,0,0,0,0,14, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11])], "int8multirange[]", `'{"{[3,14),[348,36306955)}"}'`);
-		C!(NumMultiRange[])([NumMultiRange([0,0,0,2, 0,0,0,33, 2, 0,0,0,12, 0,2,0,0,0,0,0,2,0,17,34,196, 0,0,0,12, 0,2,0,0,0,0,0,3,0,24,30,210, 0,0,0,41, 2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128])], "nummultirange[]", `'{"{[17.89,24.789),[123456.987654,321654.989796)}"}'`);
-		C!(TsMultiRange[])([TsMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0])], "tsmultirange[]", `'{"{[2025-01-10 09:10:00,2025-01-27 11:45:00)}"}'`);
-		C!(TsTzMultiRange[])([TsTzMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0])], "tstzmultirange[]", `'{"{[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)}"}'`);
-		C!(DateMultiRange[])([DateMultiRange([0,0,0,1, 0,0,0,17, 2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190])], "datemultirange[]", `'{"{[1980-01-01,1982-12-31)}"}'`);
+        // Multirange arrays
+        C!(Int4MultiRange[])([Int4MultiRange([0,0,0,2, 0,0,0,17, 2, 0,0,0,4, 0,0,0,23, 0,0,0,4, 0,0,0,32, 0,0,0,17, 2, 0,0,0,4, 0,0,0,35, 0,0,0,4, 0,0,0,71])], "int4multirange[]", `'{"{[23,32),[35,71)}"}'`);
+        C!(Int8MultiRange[])([Int8MultiRange([0,0,0,2, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,0,3, 0,0,0,8, 0,0,0,0,0,0,0,14, 0,0,0,25, 2, 0,0,0,8, 0,0,0,0,0,0,1,92, 0,0,0,8, 0,0,0,0,2,42,0,11])], "int8multirange[]", `'{"{[3,14),[348,36306955)}"}'`);
+        C!(NumMultiRange[])([NumMultiRange([0,0,0,2, 0,0,0,33, 2, 0,0,0,12, 0,2,0,0,0,0,0,2,0,17,34,196, 0,0,0,12, 0,2,0,0,0,0,0,3,0,24,30,210, 0,0,0,41, 2, 0,0,0,16, 0,4,0,1,0,0,0,6,0,12,13,128,38,148,21,24, 0,0,0,16, 0,4,0,1,0,0,0,6,0,32,6,118,38,169,37,128])], "nummultirange[]", `'{"{[17.89,24.789),[123456.987654,321654.989796)}"}'`);
+        C!(TsMultiRange[])([TsMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,85,58,90,234,0, 0,0,0,8, 0,2,207,173,95,251,7,0])], "tsmultirange[]", `'{"{[2025-01-10 09:10:00,2025-01-27 11:45:00)}"}'`);
+        C!(TsTzMultiRange[])([TsTzMultiRange([0,0,0,1, 0,0,0,25, 2, 0,0,0,8, 0,2,206,83,141,51,162,0, 0,0,0,8, 0,2,207,171,178,211,191,0])], "tstzmultirange[]", `'{"{[2025-01-10 09:10:00+02,2025-01-27 11:45:00+02)}"}'`);
+        C!(DateMultiRange[])([DateMultiRange([0,0,0,1, 0,0,0,17, 2, 0,0,0,4, 255,255,227,119, 0,0,0,4, 255,255,231,190])], "datemultirange[]", `'{"{[1980-01-01,1982-12-31)}"}'`);
 
-		// text search (query, vector)
-		C!(TsQuery)(TsQuery([0,0,0,5, 2,2, 2,3, 1,0,0,99,97,116,0, 1,0,0,114,97,116,0, 1,0,0,102,97,116,0]), "tsquery", `'fat & ( rat | cat )'`);
-		C!(TsQuery[])([TsQuery([0,0,0,5, 2,2, 2,3, 1,0,0,99,97,116,0, 1,0,0,114,97,116,0, 1,0,0,102,97,116,0]), TsQuery([0,0,0,1, 1,0,0,104,97,116,0])], "tsquery[]", `'{"fat & ( rat | cat )","hat"}'`);
-		C!(TsVector)(TsVector([0,0,0,9, 97,0,0,3,0,1,0,6,0,10, 97,110,100,0,0,1,0,8, 97,116,101,0,0,1,0,9, 99,97,116,0,0,1,0,3, 102,97,116,0,0,2,0,2,0,11, 109,97,116,0,0,1,0,7, 111,110,0,0,1,0,5, 114,97,116,0,0,1,0,12, 115,97,116,0,0,1,0,4]), "tsvector", `'a:1,6,10 and:8 ate:9 cat:3 fat:2,11 mat:7 on:5 rat:12 sat:4'`);
-		C!(TsVector[])([TsVector([0,0,0,4, 97,0,0,3,0,1,0,6,0,10, 97,110,100,0,0,1,0,8, 97,116,101,0,0,1,0,9, 99,97,116,0,0,1,0,3]), TsVector([0,0,0,5, 102,97,116,0,0,2,0,2,0,11, 109,97,116,0,0,1,0,7, 111,110,0,0,1,0,5, 114,97,116,0,0,1,0,12, 115,97,116,0,0,1,0,4])], "tsvector[]", `'{"a:1,6,10 and:8 ate:9 cat:3","fat:2,11 mat:7 on:5 rat:12 sat:4"}'`);
+        // text search (query, vector)
+        C!(TsQuery)(TsQuery([0,0,0,5, 2,2, 2,3, 1,0,0,99,97,116,0, 1,0,0,114,97,116,0, 1,0,0,102,97,116,0]), "tsquery", `'fat & ( rat | cat )'`);
+        C!(TsQuery[])([TsQuery([0,0,0,5, 2,2, 2,3, 1,0,0,99,97,116,0, 1,0,0,114,97,116,0, 1,0,0,102,97,116,0]), TsQuery([0,0,0,1, 1,0,0,104,97,116,0])], "tsquery[]", `'{"fat & ( rat | cat )","hat"}'`);
+        C!(TsVector)(TsVector([0,0,0,9, 97,0,0,3,0,1,0,6,0,10, 97,110,100,0,0,1,0,8, 97,116,101,0,0,1,0,9, 99,97,116,0,0,1,0,3, 102,97,116,0,0,2,0,2,0,11, 109,97,116,0,0,1,0,7, 111,110,0,0,1,0,5, 114,97,116,0,0,1,0,12, 115,97,116,0,0,1,0,4]), "tsvector", `'a:1,6,10 and:8 ate:9 cat:3 fat:2,11 mat:7 on:5 rat:12 sat:4'`);
+        C!(TsVector[])([TsVector([0,0,0,4, 97,0,0,3,0,1,0,6,0,10, 97,110,100,0,0,1,0,8, 97,116,101,0,0,1,0,9, 99,97,116,0,0,1,0,3]), TsVector([0,0,0,5, 102,97,116,0,0,2,0,2,0,11, 109,97,116,0,0,1,0,7, 111,110,0,0,1,0,5, 114,97,116,0,0,1,0,12, 115,97,116,0,0,1,0,4])], "tsvector[]", `'{"a:1,6,10 and:8 ate:9 cat:3","fat:2,11 mat:7 on:5 rat:12 sat:4"}'`);
     }
 
     // test round-trip compound types

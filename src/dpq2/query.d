@@ -20,7 +20,7 @@ mixin template Queries()
     /// It uses the old wire protocol and all values are returned in textual
     /// form. This means that the dpq2.conv.to_d_types.as template will likely
     /// not work for anything but strings.
-    /// Try to used execParams instead, even if now parameters are present.
+    /// Try to use execParams instead, even if now parameters are present.
     immutable (Answer) exec( string SQLcmd )
     {
         auto pgResult = PQexec(conn, toStringz( SQLcmd ));

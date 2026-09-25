@@ -8,7 +8,10 @@
 	],
 	"targetPath": "bin",
 	"dependencies": {
-		"derelict-pq": "~>4.0.0",
+		"derelict-pq": {
+			"version": "b5bb17f582dbfb78dda8ebb99e0205f219b65fd1",
+			"repository": "git+https://github.com/denizzzka/DerelictPQ.git"
+		},
 		"vibe-serialization": "~>1.0.4",
 		"money": "~>3.0.2"
 	},
@@ -48,6 +51,7 @@
 			{
 				"dpq2": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"vibe-serialization": { "version": "*", "dflags-dmd": ["-preview=in"] },
+				"vibe-core": { "version": "*", "dflags-dmd": ["-preview=in"] },
 				"gfm:math": "~>8.0.6"
 			},
 			"configurations": [

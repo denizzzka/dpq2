@@ -6,6 +6,7 @@
 module dpq2;
 
 public import dpq2.dynloader;
+public import dpq2.cancellation;
 public import dpq2.connection;
 public import dpq2.query;
 public import dpq2.result;

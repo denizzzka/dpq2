@@ -95,6 +95,8 @@ struct Value
         return _data;
     }
 
+	version(NO_VARIANT) {
+	} else {
     ///
     string toString() const @trusted
     {
@@ -104,6 +106,7 @@ struct Value
 
         return this.as!Variant.toString~"::"~oidType.to!string~"("~(format == ValueFormat.TEXT? "t" : "b")~")";
     }
+	}
 }
 
 @system unittest
@@ -161,9 +164,14 @@ class ValueConvException : ConvException
 
 package void throwTypeComplaint(OidType receivedType, in string expectedType, string file = __FILE__, size_t line = __LINE__) pure
 {
+    throwTypeComplaint(receivedType.to!string, expectedType, file, line);
+}
+
+package void throwTypeComplaint(string receivedTypeName, in string expectedType, string file = __FILE__, size_t line = __LINE__) pure
+{
     throw new ValueConvException(
             ConvExceptionType.NOT_IMPLEMENTED,
-            "Format of the column ("~to!string(receivedType)~") doesn't match to D native "~expectedType,
+            "Format of the column ("~receivedTypeName~") doesn't match to D native "~expectedType,
             file, line
         );
 }

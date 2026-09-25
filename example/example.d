@@ -2,8 +2,9 @@
 
 import dpq2;
 import std.getopt;
-import std.stdio: writeln;
+import std.stdio: writefln, writeln;
 import std.typecons: Nullable;
+import std.variant: Variant;
 import vibe.data.bson;
 
 void main(string[] args)
@@ -19,15 +20,8 @@ void main(string[] args)
         "123 as field_3, 456.78 as field_4, '{\"JSON field name\": 123.456}'::json"
         );
 
-    writeln( "Text query result by name: ", answer[0]["current_time"].as!PGtext );
-    writeln( "Text query result by index: ", answer[0][3].as!PGtext );
-
-    // It is possible to read values of unknown type using BSON:
-    auto firstRow = answer[0];
-    foreach(cell; rangify(firstRow))
-    {
-        writeln("bson: ", cell.as!Bson);
-    }
+    writeln( "Text query result by name: ", answer[0]["current_time"].as!string );
+    writeln( "Text query result by index: ", answer[0][3].as!string );
 
     // Binary arguments query with binary result:
     QueryParams p;
@@ -49,23 +43,28 @@ void main(string[] args)
     auto r = conn.execParams(p);
     scope(exit) destroy(r);
 
-    writeln( "0: ", r[0]["double_field"].as!PGdouble_precision );
-    writeln( "1: ", r[0][1].as!PGtext );
+    writeln( "0: ", r[0]["double_field"].as!double );
+    writeln( "1: ", r.oneRow[1].as!string ); // .oneRow additionally checks that here is only one row was returned
     writeln( "2.1 isNull: ", r[0][2].isNull );
     writeln( "2.2 isNULL: ", r[0].isNULL(2) );
-    writeln( "3.1: ", r[0][3].asArray[0].as!PGtext );
-    writeln( "3.2: ", r[0][3].asArray[1].as!PGtext );
+    writeln( "3.1: ", r[0][3].asArray[0].as!string );
+    writeln( "3.2: ", r[0][3].asArray[1].as!string );
     writeln( "3.3: ", r[0]["array_field"].asArray[2].isNull );
     writeln( "3.4: ", r[0]["array_field"].asArray.isNULL(2) );
-    writeln( "4.1: ", r[0]["multi_array"].asArray.getValue(1, 2).as!PGinteger );
+    writeln( "4.1: ", r[0]["multi_array"].asArray.getValue(1, 2).as!int );
     writeln( "4.2: ", r[0]["multi_array"].as!(int[][]) );
     writeln( "5.1 Json: ", r[0]["json_value"].as!Json);
     writeln( "5.2 Bson: ", r[0]["json_value"].as!Bson);
 
-    // It is possible to read values of unknown type using BSON:
+    // It is possible to read values of unknown type
+    // using std.variant.Variant or vibe.data.bson.Bson:
     for(auto column = 0; column < r.columnCount; column++)
     {
-        writeln("column name: '"~r.columnName(column)~"', bson: ", r[0][column].as!Bson);
+        writeln(
+            "column: '", r.columnName(column), "', ",
+            "Variant: ", r[0][column].as!Variant, ", ",
+            "Bson: ", r[0][column].as!Bson
+        );
     }
 
     // It is possible to upload CSV data ultra-fast:
@@ -88,4 +87,14 @@ void main(string[] args)
     // Signal that the COPY is finished. Let Postgresql finalize the command
     // and return any errors with the data.
     conn.putCopyEnd();
+
+    import std.range: enumerate;
+
+    // rangify() template helps to iterate over Answer and Row:
+    auto few_rows = conn.exec("SELECT v1, v2 FROM test_dpq2_copy");
+    foreach(row_num, row; few_rows.rangify.enumerate)
+    {
+        foreach(cell; row.rangify)
+            writefln("row_num: %d value: %s", row_num, cell.as!Bson);
+    }
 }

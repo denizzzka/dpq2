@@ -250,6 +250,7 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
     static import dpq2.conv.ranges;
     static import dpq2.conv.time;
     static import dpq2.conv.tsearch;
+    import dpq2.conv.inet: InetAddress, CidrAddress;
     import vibe.data.json : VibeJson = Json;
 
     alias UT = Unqual!T;
@@ -272,6 +273,8 @@ private OidType detectOidTypeNotCareAboutNullable(T)()
         static if(is(UT == dpq2.conv.time.TimeStamp)){ return TimeStamp; } else
         static if(is(UT == dpq2.conv.time.TimeStampUTC)){ return TimeStampWithZone; } else
         static if(is(UT == VibeJson)){ return Json; } else
+        static if(is(UT == InetAddress)){ return HostAddress; } else
+        static if(is(UT == CidrAddress)){ return NetworkAddress; } else
         static if(is(UT == StdUUID)){ return UUID; } else
         static if(is(UT == BitArray)){ return VariableBitString; } else
         static if(dpq2.conv.geometric.isValidPointType!UT){ return Point; } else

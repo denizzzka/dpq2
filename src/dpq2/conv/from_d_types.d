@@ -5,6 +5,8 @@ module dpq2.conv.from_d_types;
 
 public import dpq2.conv.arrays : isArrayType, toValue, isStaticArrayString;
 public import dpq2.conv.geometric : isGeometricType, toValue;
+
+import dpq2.conv.inet: InetAddress, CidrAddress;
 import dpq2.conv.time : POSTGRES_EPOCH_DATE, TimeStamp, TimeStampUTC, TimeOfDayWithTZ, Interval;
 import dpq2.conv.ranges;
 import dpq2.conv.tsearch;
@@ -356,6 +358,15 @@ if (is(Unqual!T == Json))
     return r;
 }
 
+/// Constructs Value from InetAddress or from CidrAddress
+Value toValue(T)(T v)
+if (is(Unqual!T == InetAddress) || is(Unqual!T == CidrAddress))
+{
+    import dpq2.conv.inet: addrToValue = toValue;
+
+    return v.addrToValue;
+}
+
 Value toRecordValue(Value[] elements)
 {
     import std.array : appender;
@@ -413,7 +424,10 @@ if (isTsVector!T)
 }
 
 version(unittest)
-import dpq2.conv.to_d_types : as, deserializeRecord;
+{
+    import std.math: isClose;
+    import dpq2.conv.to_d_types : as, deserializeRecord;
+}
 
 unittest
 {
@@ -433,10 +447,18 @@ unittest
 
 unittest
 {
-    Value v = toValue(-123.456);
+    Value v = float(-123.456).toValue;
+
+    assert(v.oidType == OidType.Float4);
+    assert(isClose(v.as!float, -123.456));
+}
+
+unittest
+{
+    Value v = double(-123.456).toValue;
 
     assert(v.oidType == OidType.Float8);
-    assert(v.as!double == -123.456);
+    assert(isClose(v.as!double, -123.456));
 }
 
 unittest
