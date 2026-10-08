@@ -3,6 +3,7 @@ module dpq2.async.connection;
 import dpq2.async.waiter;
 import dpq2.async.poll;
 import dpq2.async.cancellation : CancellationSupport;
+import dpq2.async.queries : Queries;
 
 import core.time : Duration, dur;
 import dpq2.connection : Connection, ConnectionException;
@@ -71,6 +72,7 @@ class AsyncConnection : Connection
     }
 
     mixin CancellationSupport;
+    mixin Queries;
 
     ///
     void reset()
