@@ -36,8 +36,7 @@ struct ConnectPoller
                 else
                     mode = SocketWaitMode.read;
 
-                if (!waiter.wait(mode, pollingTimeout))
-                    throw new ConnectionException(conn);
+                waiter.wait(mode, pollingTimeout);
 
                 continue;
             }
@@ -69,7 +68,7 @@ struct ConnectPoller
                     mode = SocketWaitMode.read;
 
                 if (!waiter.wait(mode, pollingTimeout))
-                    throw new ConnectionException(conn, __FILE__, __LINE__);
+                    throw new PostgresClientTimeoutException(__FILE__, __LINE__);
 
                 continue;
             }

@@ -1,7 +1,8 @@
 module dpq2.async.waiter;
 
 import core.time : Duration;
-import dpq2.connection : Connection, ConnectionException;
+import dpq2.connection : Connection;
+import dpq2.exception : Dpq2Exception;
 
 public enum SocketWaitMode
 {
@@ -31,25 +32,26 @@ struct ResultWaiter
     ///
     void waitEndOfReadAndConsume(Connection conn, Duration timeout)
     {
-        while (conn.isBusy)
+        do
         {
             if (!waiter.wait(SocketWaitMode.read, timeout))
-                throw new AsyncTimeoutException("Connection timeout while waiting for result");
+                throw new PostgresClientTimeoutException(__FILE__, __LINE__);
             conn.consumeInput();
         }
+        while (conn.isBusy);
     }
 }
 
 ///
-public class AsyncTimeoutException : ConnectionException
+class PostgresClientTimeoutException : Dpq2Exception
 {
+    this(string file = __FILE__, size_t line = __LINE__)
+    {
+        this("Exceeded query time limit", file, line);
+    }
+
     this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line);
-    }
-
-    this(string msg)
-    {
-        super(msg);
     }
 }
