@@ -17,21 +17,21 @@ struct ConnectPoller
     {
         conn.resetStart();
 
-        while (true)
+        while(true)
         {
-            if (conn.status() == CONNECTION_BAD)
+            if(conn.status() == CONNECTION_BAD)
                 throw new ConnectionException(conn);
 
             auto st = conn.resetPoll();
-            if (st != PGRES_POLLING_OK)
+            if(st != PGRES_POLLING_OK)
             {
                 SocketWaitMode mode;
 
-                if (st == PGRES_POLLING_READING)
+                if(st == PGRES_POLLING_READING)
                     mode = SocketWaitMode.read;
-                else if (st == PGRES_POLLING_WRITING)
+                else if(st == PGRES_POLLING_WRITING)
                     mode = SocketWaitMode.write;
-                else if (st == PGRES_POLLING_FAILED)
+                else if(st == PGRES_POLLING_FAILED)
                     throw new ConnectionException(conn);
                 else
                     mode = SocketWaitMode.read;
@@ -48,26 +48,26 @@ struct ConnectPoller
     ///
     void poll(Connection conn)
     {
-        while (true)
+        while(true)
         {
-            if (conn.status() == CONNECTION_BAD)
+            if(conn.status() == CONNECTION_BAD)
                 throw new ConnectionException(conn, __FILE__, __LINE__);
 
             auto st = conn.poll();
-            if (st != PGRES_POLLING_OK)
+            if(st != PGRES_POLLING_OK)
             {
                 SocketWaitMode mode;
 
-                if (st == PGRES_POLLING_READING)
+                if(st == PGRES_POLLING_READING)
                     mode = SocketWaitMode.read;
-                else if (st == PGRES_POLLING_WRITING)
+                else if(st == PGRES_POLLING_WRITING)
                     mode = SocketWaitMode.write;
-                else if (st == PGRES_POLLING_FAILED)
+                else if(st == PGRES_POLLING_FAILED)
                     throw new ConnectionException(conn, __FILE__, __LINE__);
                 else
                     mode = SocketWaitMode.read;
 
-                if (!waiter.wait(mode, pollingTimeout))
+                if(!waiter.wait(mode, pollingTimeout))
                     throw new PostgresClientTimeoutException(__FILE__, __LINE__);
 
                 continue;

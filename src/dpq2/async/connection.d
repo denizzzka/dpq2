@@ -2,6 +2,7 @@ module dpq2.async.connection;
 
 import dpq2.async.waiter;
 import dpq2.async.poll;
+import dpq2.async.cancellation : CancellationSupport;
 
 import core.time : Duration, dur;
 import dpq2.connection : Connection, ConnectionException;
@@ -57,15 +58,19 @@ class AsyncConnection : Connection
     Duration requestTimeout; /// Timeout for queries etc
 
     private AsyncHelper helper;
+    private SocketWaiterFactory waiterFactory;
 
     ///
-    this(string connString, SocketWaiter waiter, Duration pollingTimeout, Duration requestTimeout)
+    this(string connString, SocketWaiterFactory waiterFactory, Duration pollingTimeout, Duration requestTimeout)
     {
         super(connString);
         this.pollingTimeout = pollingTimeout;
         this.requestTimeout = requestTimeout;
-        this.helper = new AsyncHelper(waiter, pollingTimeout, requestTimeout);
+        this.waiterFactory = waiterFactory;
+        this.helper = new AsyncHelper(waiterFactory(posixSocket), pollingTimeout, requestTimeout);
     }
+
+    mixin CancellationSupport;
 
     ///
     void reset()
@@ -76,14 +81,14 @@ class AsyncConnection : Connection
     ///
     void setSingleRowModeEx()
     {
-        if (setSingleRowMode() != 1)
+        if(setSingleRowMode() != 1)
             throw new ConnectionException("PQsetSingleRowMode failed");
     }
 
     ///
     immutable(Result) getResult(in Duration timeout)
     {
-        if (isBusy)
+        if(isBusy)
             waitEndOfReadAndConsume(timeout);
 
         return super.getResult();
@@ -108,14 +113,14 @@ class AsyncConnection : Connection
             {
                 sendsStatementDg();
 
-                if (isRowByRowMode)
+                if(isRowByRowMode)
                     setSingleRowModeEx();
 
                 scope (failure)
                 {
-                    if (isRowByRowMode)
+                    if(isRowByRowMode)
                     {
-                        while (super.getResult() !is null) {} // autoclean of results queue
+                        while(super.getResult() !is null) {} // autoclean of results queue
                     }
                 }
 
@@ -123,7 +128,7 @@ class AsyncConnection : Connection
                 {
                     consumeInput(); // TODO: redundant call (also called in waitEndOfReadAndConsume) - can be moved into catch block?
 
-                    while (true)
+                    while(true)
                     {
                         auto r = super.getResult();
 
@@ -139,10 +144,10 @@ class AsyncConnection : Connection
                          if they fail be prepared to retry everything since you opened
                          the transaction. – Craig Ringer Jan 14 '13 at 2:59
                          */
-                        if (status == CONNECTION_BAD)
+                        if(status == CONNECTION_BAD)
                             throw new ConnectionException(this, __FILE__, __LINE__);
 
-                        if (r is null) break;
+                        if(r is null) break;
 
                         processResult(r);
                     }
@@ -196,7 +201,7 @@ class AsyncConnection : Connection
     {
         // try read available
         auto ntf = getNextNotify();
-        if (ntf !is null) return ntf;
+        if(ntf !is null) return ntf;
 
         // wait for next one
         try waitEndOfReadAndConsume(timeout);

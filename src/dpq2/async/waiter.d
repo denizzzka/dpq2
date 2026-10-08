@@ -17,6 +17,9 @@ public interface SocketWaiter
     bool wait(SocketWaitMode mode, Duration timeout);
 }
 
+/// Creates a SocketWaiter bound to the given socket descriptor
+public alias SocketWaiterFactory = SocketWaiter delegate(int socket);
+
 ///
 struct ResultWaiter
 {
@@ -34,11 +37,11 @@ struct ResultWaiter
     {
         do
         {
-            if (!waiter.wait(SocketWaitMode.read, timeout))
+            if(!waiter.wait(SocketWaitMode.read, timeout))
                 throw new PostgresClientTimeoutException(__FILE__, __LINE__);
             conn.consumeInput();
         }
-        while (conn.isBusy);
+        while(conn.isBusy);
     }
 }
 

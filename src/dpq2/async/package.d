@@ -7,3 +7,4 @@ module dpq2.async;
 public import dpq2.async.waiter;
 public import dpq2.async.poll;
 public import dpq2.async.connection;
+public import dpq2.async.cancellation;
