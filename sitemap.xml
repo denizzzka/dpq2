@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://127.0.0.1/index.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/async/queries.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/arrays.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/arrays/toValue.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/conv/from_bson.html</loc></url>
@@ -124,6 +125,7 @@
 <url><loc>http://127.0.0.1/dpq2/args/QueryParams.preparedStatementName.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/args/QueryParams.resultFormat.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/args/QueryParams.sqlCommand.html</loc></url>
+<url><loc>http://127.0.0.1/dpq2/async.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.html</loc></url>
 <url><loc>http://127.0.0.1/dpq2/cancellation/Cancellation.doCancelBlocking.html</loc></url>
