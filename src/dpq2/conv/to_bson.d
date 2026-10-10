@@ -6,10 +6,10 @@ import dpq2.oids: OidType;
 import dpq2.result: ArrayProperties;
 import dpq2.conv.to_d_types;
 import dpq2.conv.numeric: rawValueToNumeric;
-import dpq2.conv.time: TimeStampUTC;
+import dpq2.conv.time: TimeStampUTC, binaryValueAs;
 import vibe.data.bson;
 import std.uuid;
-import std.datetime: SysTime, dur, TimeZone, UTC;
+import std.datetime: SysTime, dur, TimeZone, UTC, SDate = Date;
 import std.bitmanip: bigEndianToNative, BitArray;
 import std.conv: to;
 
@@ -149,6 +149,10 @@ Bson rawValueToBson(in Value v)
             res = serializeToBson(v.tunnelForBinaryValueAsCalls!PGuuid);
             break;
 
+        case OidType.Date:
+            res = Bson(BsonDate(v.binaryValueAs!SDate));
+            break;
+
         case TimeStampWithZone:
             auto ts = v.tunnelForBinaryValueAsCalls!TimeStampUTC;
             auto time = BsonDate(SysTime(ts.dateTime, UTC()));
@@ -165,7 +169,7 @@ Bson rawValueToBson(in Value v)
         default:
             throw new ValueConvException(
                     ConvExceptionType.NOT_IMPLEMENTED,
-                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") doesn't supported by Value to Bson converter",
+                    "Format of the column ("~to!(immutable(char)[])(v.oidType)~") isn't supported by Value to Bson converter",
                     __FILE__, __LINE__
                 );
     }
