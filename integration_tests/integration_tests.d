@@ -35,5 +35,14 @@ int main(string[] args)
     native._integration_test( conninfo );
     bson._integration_test( conninfo );
 
+    // Async tests are not run here: dpq2 has no SocketWaiter implementation.
+    // dpq2.async.tests exports a template that needs a SocketWaiter factory,
+    // which belongs to the event loop library using dpq2. The external consumer
+    // compiles that module with its own version token and supplies the factory:
+    //
+    //   // in the consumer, e.g. vibe.db.postgresql, build with -version=AsyncIntegrationTests
+    //   import dpq2.async.tests : _integration_test;
+    //   _integration_test!((int fd) => new VibeSocketWaiter(createReadSocketEvent(fd)))( conninfo );
+
     return 0;
 }
