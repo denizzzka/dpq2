@@ -78,6 +78,7 @@ class AsyncConnection : Connection
     void reset()
     {
         helper.reset(this);
+        helper = new AsyncHelper(waiterFactory(posixSocket), pollingTimeout, requestTimeout);
     }
 
     ///
