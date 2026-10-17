@@ -222,8 +222,12 @@ void _integration_test(alias waiterFactory, alias runDetachedTask, alias sleep)(
         bool canceled;
         try
         {
-            while(conn.getResult(Duration.max) !is null) {}
-            assert(conn.getResult(Duration.max) is null);
+            for (;;)
+            {
+                auto r = conn.getResult(20.seconds);
+                if (r is null) break;
+                r.getAnswer();
+            }
         }
         catch(ResponseException) // ERROR: canceling statement due to user request
             canceled = true;
