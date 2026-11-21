@@ -31,10 +31,17 @@ static assert(!isStaticArrayString!(ubyte[2]));
 template isArrayType(T)
 {
     import dpq2.conv.geometric : isValidPolygon;
+    import dpq2.conv.ranges : isMultiRange;
     import std.traits : Unqual;
 
-    enum isArrayType = isArray!T && !isAssociativeArray!T && !isValidPolygon!T && !is(Unqual!(ElementType!T) == ubyte) && !isSomeString!T
-        && !isStaticArrayString!T;
+    enum isArrayType = isArray!T && !(
+        isAssociativeArray!T ||
+        isMultiRange!T ||
+        isValidPolygon!T ||
+        is(Unqual!(ElementType!T) == ubyte) ||
+        isSomeString!T ||
+        isStaticArrayString!T
+    );
 }
 
 static assert(isArrayType!(int[]));
